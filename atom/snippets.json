@@ -1,0 +1,12 @@
+{
+  ".source.js": {
+    "Arrow function": {
+      "prefix": "arr",
+      "body": "(${1:argument}) => {\n\t${2:// body...}\n}"
+    },
+    "One-liner": {
+      "prefix": "one",
+      "body": "(${1:argument}) => ${2:// body...}"
+    }
+  }
+}
