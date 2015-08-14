@@ -51,10 +51,10 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(vi-mode git colored-man colorize web-search node npm)
 
-# Enable Vim mode
-# bindkey -v
-
 # User configuration
+
+bindkey -v
+bindkey "^R" history-incremental-search-backward
 
 export PATH="/home/jonasws/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.8.4/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 export MANPATH="/usr/local/man:$MANPATH"
