@@ -1,5 +1,5 @@
 # Path to your oh-my-zsh installation.
-export ZSH=/home/jonasws/.oh-my-zsh
+export ZSH=$HOME/.oh-my-zsh
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -49,14 +49,14 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(vi-mode git colored-man colorize web-search node npm python django)
+plugins=(last-working-dir vi-mode git colored-man colorize web-search node npm python django)
 
 # User configuration
 
 bindkey -v
 bindkey "^R" history-incremental-search-backward
 
-export PATH="/home/jonasws/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.8.4/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+export PATH="${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.8.4/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
@@ -89,3 +89,6 @@ alias ping_google="ping 8.8.8.8"
 alias router_config="xdg-open http://routerlogin.net"
 alias ping_router="ping $(/sbin/ip route | awk '/default/ { print $3 }')"
 alias ping6_router="ping6 $(/sbin/ip -6 route | awk '/default/ { print $3 }')"
+alias serve_dir="python -m SimpleHTTPServer 9000"
+alias tv2_sport="vlc udp://@233.155.107.105:5700"
+
