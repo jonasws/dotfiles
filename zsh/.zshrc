@@ -90,5 +90,5 @@ alias router_config="xdg-open http://routerlogin.net"
 alias ping_router="ping $(/sbin/ip route | awk '/default/ { print $3 }')"
 alias ping6_router="ping6 $(/sbin/ip -6 route | awk '/default/ { print $3 }')"
 alias serve_dir="python -m SimpleHTTPServer 9000"
-alias tv2_sport="vlc udp://@233.155.107.105:5700"
+alias tv2_sport="cvlc udp://@233.155.107.105:5700"
 
