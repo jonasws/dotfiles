@@ -17,8 +17,7 @@
   "atom-text-editor.vim-mode:not(.insert-mode)": {
     ">": "ex-mode:open",
     "\\": "vim-mode:search-current-word",
-    "&": "vim-mode:search",
-    "=": "vim-mode:move-to-first-character-of-line-down"
+    "&": "vim-mode:search"
   },
 
   "body": {
