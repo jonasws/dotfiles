@@ -15,9 +15,10 @@
   },
 
   "atom-text-editor.vim-mode:not(.insert-mode)": {
-    ">": "ex-mode:open",
+    "shift-:": "ex-mode:open",
     "\\": "vim-mode:search-current-word",
-    "&": "vim-mode:search"
+    "&": "vim-mode:search",
+    "+": "unset!"
   },
 
   "body": {

@@ -99,3 +99,7 @@ startvm () {
 stopvm () {
   VBoxManage controlvm "$1" poweroff
 }
+
+alias stk="startvm \"Kali Linux\""
+alias spk="stopvm \"Kali Linux\""
+
