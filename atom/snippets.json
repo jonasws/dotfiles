@@ -8,5 +8,12 @@
       "prefix": "one",
       "body": "(${1:argument}) => ${2:// body...}"
     }
+  },
+
+  ".text.tex.latex": {
+    "Emph": {
+      "prefix": "em",
+      "body": "\\\\emph{${1:value}}$2"
+    }
   }
 }

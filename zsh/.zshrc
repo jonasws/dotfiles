@@ -102,4 +102,5 @@ stopvm () {
 
 alias stk="startvm \"Kali Linux\""
 alias spk="stopvm \"Kali Linux\""
+alias download_wav="youtube-dl -x --audio-format \"wav\" "
 
