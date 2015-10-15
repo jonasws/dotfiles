@@ -1,19 +1,25 @@
 {
-  ".source.js": {
-    "Arrow function": {
-      "prefix": "arr",
-      "body": "(${1:argument}) => {\n\t${2:// body...}\n}"
+    ".source.js": {
+        "Arrow function": {
+            "prefix": "arr",
+            "body": "(${1:argument}) => {\n\t${2:// body...}\n}"
+        },
+        "One-liner": {
+            "prefix": "one",
+            "body": "(${1:argument}) => ${2:// body...}"
+        }
     },
-    "One-liner": {
-      "prefix": "one",
-      "body": "(${1:argument}) => ${2:// body...}"
-    }
-  },
+    ".text.tex.latex": {
+        "Emph": {
+            "prefix": "em",
+            "body": "\\\\emph{${1:value}}$2"
+        }
+    },
 
-  ".text.tex.latex": {
-    "Emph": {
-      "prefix": "em",
-      "body": "\\\\emph{${1:value}}$2"
+    ".text.bibtex": {
+      "Entry": {
+        "prefix": "en",
+        "body": "@${1:type}{ ${2:label},\n\t${3:body}\n}\n$4"
+      }
     }
-  }
 }

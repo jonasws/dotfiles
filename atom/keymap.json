@@ -16,10 +16,9 @@
   },
 
   "atom-text-editor.vim-mode:not(.insert-mode)": {
-    "shift-:": "ex-mode:open",
     "\\": "vim-mode:search-current-word",
-    "&": "vim-mode:search",
-    "+": "unset!"
+    "n": "custom:move-to-beginning-of-screen-line",
+    "m": "custom:move-to-end-of-screen-line"
   },
 
   "body": {
