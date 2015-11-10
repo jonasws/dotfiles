@@ -19,16 +19,11 @@ set mouse=a
 set cmdheight=2
 set number
 set notimeout ttimeout ttimeoutlen=200
-set pastetoggle=<F11>
 set grepprg=grep\ -nH\ $*
 
 
-let g:tex_flavor='latex'
-let g:Tex_DefaultTargetformat='pdf'
-let g:Tex_CompileRule_pdf='latexmk -pdf $'
 set shiftwidth=2
 set softtabstop=2
 set expandtab
 
-map Y y$
-noremap <C-L> :nohl<CR><C-L>
+map yy y$

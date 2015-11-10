@@ -104,3 +104,9 @@ alias stk="startvm \"Kali Linux\""
 alias spk="stopvm \"Kali Linux\""
 alias download_wav="youtube-dl -x --audio-format \"wav\" "
 
+eval $(thefuck --alias)
+
+rip_spotify_url () {
+  spotify-ripper --user jstroemsodd --flat --wav $(spotify_url_to_uri $1)
+}
+

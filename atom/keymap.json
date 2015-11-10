@@ -17,8 +17,8 @@
 
   "atom-text-editor.vim-mode:not(.insert-mode)": {
     "\\": "vim-mode:search-current-word",
-    "n": "custom:move-to-beginning-of-screen-line",
-    "m": "custom:move-to-end-of-screen-line"
+    "ø": "custom:move-to-beginning-of-screen-line",
+    "æ": "custom:move-to-end-of-screen-line"
   },
 
   "body": {
