@@ -51,6 +51,10 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(last-working-dir vi-mode git colored-man colorize web-search node npm python django docker)
 
+# GitHub API access configuration
+export GITHUB_USERNAME="jonasws"
+export GITHUB_ACCESS_TOKEN="$(cat $HOME/.github_token)"
+
 # User configuration
 
 bindkey -v
