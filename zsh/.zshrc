@@ -30,7 +30,7 @@ ZSH_THEME="robbyrussell"
 ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
-# COMPLETION_WAITING_DOTS="true"
+COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
@@ -49,7 +49,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(last-working-dir vi-mode git colored-man colorize web-search node npm python django docker)
+plugins=(copydir copyfile dirpersist last-working-dir vi-mode git colored-man colorize web-search node npm python django docker alias-tips)
 
 # GitHub API access configuration
 export GITHUB_USERNAME="jonasws"
@@ -60,6 +60,8 @@ export GITHUB_ACCESS_TOKEN="$(cat $HOME/.github_token)"
 bindkey -v
 bindkey "^R" history-incremental-search-backward
 
+
+export ANDROID_HOME="${HOME}/android-sdk-linux"
 export PATH="${HOME}/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 export MANPATH="/usr/local/man:$MANPATH"
 
@@ -89,12 +91,19 @@ fi
 # Example aliases
 alias zshconfig="vim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
+
+# Redefine some aliases, adding nocorrect
+alias ssh="nocorrect ssh"
+alias which="nocorrect which"
+
+# Custom aliases
 alias ping_google="ping 8.8.8.8"
 alias router_config="xdg-open http://routerlogin.net"
 alias ping_router="ping $(/sbin/ip route | awk '/default/ { print $3 }')"
 alias ping6_router="ping6 $(/sbin/ip -6 route | awk '/default/ { print $3 }')"
 alias serve_dir="python -m SimpleHTTPServer 9000"
-alias tv2_sport="cvlc udp://@233.155.107.105:5700"
+alias tv2_sport="vlc udp://@233.155.107.105:5700"
+alias gcd="git checkout develop"
 
 startvm () {
   VBoxManage startvm "$1" --type headless
@@ -114,3 +123,6 @@ rip_spotify_url () {
   spotify-ripper --user jstroemsodd --flat --wav $(spotify_url_to_uri $1)
 }
 
+alias aptup="_ apt-get update && _ apt-get upgrade"
+alias ghu="$HOME/utils/fetch_github_utils_download_count.py"
+alias reload_pipelight="_ pipelight-plugin --disable silverlight && _ pipelight-plugin --enable silverlight"
