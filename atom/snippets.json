@@ -13,6 +13,10 @@
         "Emph": {
             "prefix": "em",
             "body": "\\\\emph{${1:value}}$2"
+        },
+        "Gls": {
+            "prefix": "gls",
+            "body": "\\\\gls{${1:value}}$2"
         }
     },
 

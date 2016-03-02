@@ -8,7 +8,8 @@
     "ctrl-h": "editor:toggle-line-comments",
     "ctrl-i": "editor:auto-indent",
     "ctrl-e": "emmet:expand-abbreviation",
-    "alt-c": "spell-check:correct-misspelling"
+    "alt-c": "spell-check:correct-misspelling",
+    "alt-r": "symbols-view:toggle-file-symbols"
   },
 
   "atom-text-editor[data-grammar=\"source js jsx\"]:not([mini])": {
