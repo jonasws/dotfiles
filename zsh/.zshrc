@@ -113,6 +113,10 @@ stopvm () {
   VBoxManage controlvm "$1" poweroff
 }
 
+xdg-qopen () {
+  xdg-open "$1" 2> /dev/null
+}
+
 alias stk="startvm \"Kali Linux\""
 alias spk="stopvm \"Kali Linux\""
 alias download_wav="youtube-dl -x --audio-format \"wav\" "
@@ -125,4 +129,5 @@ rip_spotify_url () {
 
 alias aptup="_ apt-get update && _ apt-get upgrade"
 alias ghu="$HOME/utils/fetch_github_utils_download_count.py"
+
 alias reload_pipelight="_ pipelight-plugin --disable silverlight && _ pipelight-plugin --enable silverlight"
