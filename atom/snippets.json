@@ -17,6 +17,10 @@
         "Gls": {
             "prefix": "gls",
             "body": "\\\\gls{${1:value}}$2"
+        },
+        "Acr": {
+            "prefix": "acr",
+            "body": "\\\\newacronym{${1:label}}{${2:short}}{${3:desc}}"
         }
     },
 
