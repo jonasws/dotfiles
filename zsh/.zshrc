@@ -49,7 +49,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(copydir copyfile dirpersist last-working-dir vi-mode git colored-man colorize web-search node npm python django docker alias-tips)
+plugins=(copydir copyfile dirpersist last-working-dir vi-mode git colored-man colorize web-search node npm python django docker docker-compose alias-tips)
 
 # GitHub API access configuration
 export GITHUB_USERNAME="jonasws"
@@ -130,4 +130,5 @@ rip_spotify_url () {
 alias aptup="_ apt-get update && _ apt-get upgrade"
 alias ghu="$HOME/utils/fetch_github_utils_download_count.py"
 
-alias reload_pipelight="_ pipelight-plugin --disable silverlight && _ pipelight-plugin --enable silverlight"
+alias gitlab_start="docker-compose --file=/media/jonasws/gitlab-thumb/gitlab/docker-compose.yml start"
+alias gitlab_stop="docker-compose --file=/media/jonasws/gitlab-thumb/gitlab/docker-compose.yml stop"
