@@ -1,6 +1,7 @@
 set nocompatible
 filetype indent plugin on
 syntax on
+
 set hidden
 set wildmenu
 set showcmd
@@ -21,9 +22,11 @@ set number
 set notimeout ttimeout ttimeoutlen=200
 set grepprg=grep\ -nH\ $*
 
-
+let g:tex_flavor='latex'
 set shiftwidth=2
 set softtabstop=2
 set expandtab
+
+set clipboard=unnamedplus
 
 map yy y$

@@ -60,9 +60,12 @@ export GITHUB_ACCESS_TOKEN="$(cat $HOME/.github_token)"
 bindkey -v
 bindkey "^R" history-incremental-search-backward
 
-
 export ANDROID_HOME="${HOME}/android-sdk-linux"
-export PATH="${HOME}/.local/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+
+export GOPATH="${HOME}/go"
+export GOROOT="/usr/local/go"
+
+export PATH="${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
@@ -129,6 +132,8 @@ rip_spotify_url () {
 
 alias aptup="_ apt-get update && _ apt-get upgrade"
 alias ghu="$HOME/utils/fetch_github_utils_download_count.py"
+
+alias kbfsstart="KEYBASE_RUN_MODE=prod kbfsfuse /keybase"
 
 alias gitlab_start="docker-compose --file=/media/jonasws/gitlab-thumb/gitlab/docker-compose.yml start"
 alias gitlab_stop="docker-compose --file=/media/jonasws/gitlab-thumb/gitlab/docker-compose.yml stop"
