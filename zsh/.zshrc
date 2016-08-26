@@ -65,7 +65,7 @@ export ANDROID_HOME="${HOME}/android-sdk-linux"
 export GOPATH="${HOME}/go"
 export GOROOT="/usr/local/go"
 
-export PATH="${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+export PATH="${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
@@ -107,33 +107,17 @@ alias ping6_router="ping6 $(/sbin/ip -6 route | awk '/default/ { print $3 }')"
 alias serve_dir="python -m SimpleHTTPServer 9000"
 alias tv2_sport="vlc udp://@233.155.107.105:5700"
 alias gcd="git checkout develop"
+alias pretty="json_pp | colorize"
 
-startvm () {
-  VBoxManage startvm "$1" --type headless
-}
-
-stopvm () {
-  VBoxManage controlvm "$1" poweroff
-}
+alias tinemount="_  mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10082.tine.no/resources /mnt/tine-resources"
+alias tineunmount="_ umount /mnt/tine-resources"
 
 xdg-qopen () {
   xdg-open "$1" 2> /dev/null
 }
 
-alias stk="startvm \"Kali Linux\""
-alias spk="stopvm \"Kali Linux\""
 alias download_wav="youtube-dl -x --audio-format \"wav\" "
-
-eval $(thefuck --alias)
 
 rip_spotify_url () {
   spotify-ripper --user jstroemsodd --flat --wav $(spotify_url_to_uri $1)
 }
-
-alias aptup="_ apt-get update && _ apt-get upgrade"
-alias ghu="$HOME/utils/fetch_github_utils_download_count.py"
-
-alias kbfsstart="KEYBASE_RUN_MODE=prod kbfsfuse /keybase"
-
-alias gitlab_start="docker-compose --file=/media/jonasws/gitlab-thumb/gitlab/docker-compose.yml start"
-alias gitlab_stop="docker-compose --file=/media/jonasws/gitlab-thumb/gitlab/docker-compose.yml stop"
