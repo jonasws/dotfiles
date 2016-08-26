@@ -2,15 +2,15 @@
 
 import Shell from 'shell';
 
-function togglePackage(packageName) {
+const togglePackage = function (packageName) {
 
   if (atom.packages.isPackageDisabled(packageName)) {
-    let enabled = atom.packages.enablePackage(packageName);
+    const enabled = atom.packages.enablePackage(packageName);
     if (enabled !== null) {
       atom.notifications.addInfo(`${packageName} enabled`);
     }
   } else {
-    let disabled = atom.packages.disablePackage(packageName);
+    const disabled = atom.packages.disablePackage(packageName);
     if (disabled !== null) {
       atom.notifications.addInfo(`${packageName} disabled`);
     }
@@ -18,8 +18,8 @@ function togglePackage(packageName) {
 
 }
 
-function getCursors() {
-  let editor = atom.workspace.getActiveTextEditor();
+const getCursors = () => {
+  const editor = atom.workspace.getActiveTextEditor();
   return editor ? editor.getCursors() : [];
 }
 
@@ -30,7 +30,7 @@ atom.commands.add('atom-workspace', 'custom:toggle-emmet', togglePackage.bind(un
 atom.commands.add('atom-workspace', 'custom:toggle-autocomplete-snippets', togglePackage.bind(undefined, 'autocomplete-snippets'));
 
 atom.commands.add('atom-text-editor', 'custom:move-to-beginning-of-screen-line', () => {
-  let cursors = getCursors();
+  const cursors = getCursors();
 
   if (cursors.length === 1) {
     cursors[0].moveToBeginningOfScreenLine();
@@ -38,9 +38,11 @@ atom.commands.add('atom-text-editor', 'custom:move-to-beginning-of-screen-line',
 });
 
 atom.commands.add('atom-text-editor', 'custom:move-to-end-of-screen-line', () => {
-  let cursors = getCursors();
+  const cursors = getCursors();
 
   if (cursors.length === 1) {
     cursors[0].moveToEndOfScreenLine();
   }
 });
+
+atom.commands.add('atom-text-editor', 'custom:toggle-wrap-guide', togglePackage.bind(undefined, 'wrap-guide'));
