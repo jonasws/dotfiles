@@ -1,29 +1,23 @@
 {
-  "atom-workspace": {
-    "alt-k": "custom:open-karma"
-  },
-
   "atom-text-editor:not([mini])": {
     "ctrl-'": "toggle-quotes:toggle",
     "ctrl-h": "editor:toggle-line-comments",
     "ctrl-i": "editor:auto-indent",
     "ctrl-e": "emmet:expand-abbreviation",
     "alt-c": "spell-check:correct-misspelling",
-    "alt-r": "symbols-view:toggle-file-symbols"
+    "alt-r": "symbols-view:toggle-file-symbols",
+    "alt-'": "emmet:update-tag",
+    "alt-o": "fuzzy-finder:toggle-buffer-finder",
+    "ctrl-alt-p": "command-palette:toggle"
   },
 
   "atom-text-editor[data-grammar=\"source js jsx\"]:not([mini])": {
     "ctrl-e": "emmet:expand-abbreviation"
   },
 
-  "atom-text-editor.vim-mode:not(.insert-mode)": {
-    "\\": "vim-mode:search-current-word",
-    "q": "vim-mode:move-to-first-character-of-line",
+  "atom-text-editor.vim-mode-plus:not(.insert-mode)": {
     "ctrl-i": "cursor-history:prev",
-    "ctrl-o": "cursor-history:next"
-  },
-
-  "body": {
-    "alt-0": "window:reset-font-size"
+    "ctrl-o": "cursor-history:next",
+    "space": "command-palette:toggle"
   }
 }
