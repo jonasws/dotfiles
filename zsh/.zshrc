@@ -5,7 +5,7 @@ export ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="ys"
+ZSH_THEME="agnoster"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -49,7 +49,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(copydir copyfile dirpersist last-working-dir vi-mode git colored-man colorize web-search node npm python django docker docker-compose alias-tips)
+plugins=(zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir vi-mode git colored-man colorize web-search node npm python docker docker-compose alias-tips)
 
 # GitHub API access configuration
 export GITHUB_USERNAME="jonasws"
@@ -60,12 +60,13 @@ export GITHUB_ACCESS_TOKEN="$(cat $HOME/.github_token)"
 bindkey -v
 bindkey "^R" history-incremental-search-backward
 
-export ANDROID_HOME="${HOME}/android-sdk-linux"
 
 export GOPATH="${HOME}/go"
 export GOROOT="/usr/local/go"
 
-export PATH="${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+export ANDROID_HOME="${HOME}/Android/Sdk"
+
+export PATH="${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
@@ -108,7 +109,7 @@ alias serve_dir="python -m SimpleHTTPServer 9000"
 alias tv2_sport="vlc udp://@233.155.107.105:5700"
 alias gcd="git checkout develop"
 alias pretty="json_pp | colorize"
-
+alias ab="atom-beta"
 alias tinemount="_  mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10082.tine.no/resources /mnt/tine-resources"
 alias tineunmount="_ umount /mnt/tine-resources"
 
@@ -121,3 +122,4 @@ alias download_wav="youtube-dl -x --audio-format \"wav\" "
 rip_spotify_url () {
   spotify-ripper --user jstroemsodd --flat --wav $(spotify_url_to_uri $1)
 }
+
