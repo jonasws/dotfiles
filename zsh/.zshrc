@@ -114,6 +114,9 @@ alias ab="atom-beta"
 alias tinemount="_  mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10082.tine.no/resources /mnt/tine-resources"
 alias tineunmount="_ umount /mnt/tine-resources"
 
+alias tineprodmount="_ mount -t cifs -o credentials=/home/jonasws/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10080.tine.no/shared/resources /mnt/tine-prod-resources"
+alias tineprodunmount="_ umount /mnt/tine-prod-resources"
+
 xdg-qopen () {
   xdg-open "$1" 2> /dev/null
 }
