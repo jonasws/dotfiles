@@ -128,13 +128,7 @@ unmount_tine_logs() {
   sudo umount /mnt/tine-prod-logs/*
 }
 
-filter_xslt_errors() {
-  grep -A10 '\"XsltProcessorException\"'
-
-}
-
-
-alias tailenonicerror="tail -F /mnt/tine-prod-logs/*/was100*-8080.log | grep filter_xslt_errors"
+alias tailenonicerror="tail -F /mnt/tine-prod-logs/*/was100*-8080.log | grep -A10 XsltProcessorException"
 
 xdg-qopen () {
   xdg-open "$1" 2> /dev/null
