@@ -110,12 +110,31 @@ alias tv2_sport="vlc udp://@233.155.107.105:5700"
 alias gcd="git checkout develop"
 alias pretty="json_pp | colorize"
 alias gh="gh-home"
+alias ghu="gh-upstream"
 alias ab="atom-beta"
-alias tinemount="_  mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10082.tine.no/resources /mnt/tine-resources"
+alias tinemount="sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10082.tine.no/resources /mnt/tine-resources"
 alias tineunmount="_ umount /mnt/tine-resources"
 
-alias tineprodmount="_ mount -t cifs -o credentials=/home/jonasws/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10080.tine.no/shared/resources /mnt/tine-prod-resources"
-alias tineprodunmount="_ umount /mnt/tine-prod-resources"
+alias tineprodmount="sudo mount -t cifs -o credentials=/home/jonasws/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10080.tine.no/shared/resources /mnt/tine-prod-resources"
+alias tineprodunmount="sudo umount /mnt/tine-prod-resources"
+
+mount_tine_logs() {
+  sudo mount -t cifs -o credentials=/home/jonasws/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10079.tine.no/logs /mnt/tine-prod-logs/was10079
+  sudo mount -t cifs -o credentials=/home/jonasws/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10080.tine.no/logs /mnt/tine-prod-logs/was10080
+  sudo mount -t cifs -o credentials=/home/jonasws/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10081.tine.no/logs /mnt/tine-prod-logs/was10081
+}
+
+unmount_tine_logs() {
+  sudo umount /mnt/tine-prod-logs/*
+}
+
+filter_xslt_errors() {
+  grep -A10 '\"XsltProcessorException\"'
+
+}
+
+
+alias tailenonicerror="tail -F /mnt/tine-prod-logs/*/was100*-8080.log | grep filter_xslt_errors"
 
 xdg-qopen () {
   xdg-open "$1" 2> /dev/null
@@ -126,4 +145,3 @@ alias download_wav="youtube-dl -x --audio-format \"wav\" "
 rip_spotify_url () {
   spotify-ripper --user jstroemsodd --flat --wav $(spotify_url_to_uri $1)
 }
-
