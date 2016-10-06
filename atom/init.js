@@ -2,8 +2,7 @@
 
 import Shell from 'shell';
 
-const togglePackage = packageName => () =>
-  {
+const togglePackage = packageName => () => {
     if (atom.packages.isPackageDisabled(packageName)) {
       const enabled = atom.packages.enablePackage(packageName);
       if (enabled !== null) {
@@ -15,13 +14,19 @@ const togglePackage = packageName => () =>
         atom.notifications.addInfo(`${packageName} disabled`);
       }
     }
-
   };
 
 const getCursors = () => {
   const editor = atom.workspace.getActiveTextEditor();
   return editor ? editor.getCursors() : [];
-}
+};
+
+const setXslGrammar = () => {
+  const xslGrammar = atom.grammars.grammarForScopeName('text.xml.xsl');
+  atom.workspace.getActiveTextEditor().setGrammar(xslGrammar);
+};
+
+atom.commands.add('atom-workspace atom-text-editor', 'custom:set-xsl-grammar', setXslGrammar);
 
 atom.commands.add('atom-workspace atom-text-editor', 'custom:open-karma', Shell.openExternal.bind(Shell, 'http://localhost:8080/debug.html'));
 
