@@ -115,13 +115,13 @@ alias ab="atom-beta"
 alias tinemount="sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10082.tine.no/resources /mnt/tine-resources"
 alias tineunmount="_ umount /mnt/tine-resources"
 
-alias tineprodmount="sudo mount -t cifs -o credentials=/home/jonasws/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10080.tine.no/shared/resources /mnt/tine-prod-resources"
+alias tineprodmount="sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10080.tine.no/shared/resources /mnt/tine-prod-resources"
 alias tineprodunmount="sudo umount /mnt/tine-prod-resources"
 
 mount_tine_logs() {
-  sudo mount -t cifs -o credentials=/home/jonasws/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10079.tine.no/logs /mnt/tine-prod-logs/was10079
-  sudo mount -t cifs -o credentials=/home/jonasws/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10080.tine.no/logs /mnt/tine-prod-logs/was10080
-  sudo mount -t cifs -o credentials=/home/jonasws/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10081.tine.no/logs /mnt/tine-prod-logs/was10081
+  sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10079.tine.no/logs /mnt/tine-prod-logs/was10079
+  sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10080.tine.no/logs /mnt/tine-prod-logs/was10080
+  sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10081.tine.no/logs /mnt/tine-prod-logs/was10081
 }
 
 unmount_tine_logs() {
