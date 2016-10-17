@@ -117,6 +117,13 @@ alias tineunmount="_ umount /mnt/tine-resources"
 
 alias tineprodmount="sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10080.tine.no/shared/resources /mnt/tine-prod-resources"
 alias tineprodunmount="sudo umount /mnt/tine-prod-resources"
+alias y="yarn"
+alias yb="yarn build"
+alias ys="yarn start"
+alias yt="yarn test"
+
+alias top="vtop"
+alias oldtop="/usr/bin/top"
 
 mount_tine_logs() {
   sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10079.tine.no/logs /mnt/tine-prod-logs/was10079
