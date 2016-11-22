@@ -5,7 +5,7 @@ export ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="agnoster"
+ZSH_THEME="pure"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -49,7 +49,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir vi-mode git colored-man colorize web-search node npm python docker docker-compose alias-tips)
+plugins=(fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir vi-mode git colored-man colorize web-search node npm python docker docker-compose alias-tips)
 
 # GitHub API access configuration
 export GITHUB_USERNAME="jonasws"
@@ -66,7 +66,7 @@ export GOROOT="/usr/local/go"
 
 export ANDROID_HOME="${HOME}/Android/Sdk"
 
-export PATH="${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+# export PATH="${HOME}/.npm-global/bin:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
@@ -122,8 +122,14 @@ alias yb="yarn build"
 alias ys="yarn start"
 alias yt="yarn test"
 
+alias cl="colorize"
+
 alias top="vtop"
 alias oldtop="/usr/bin/top"
+
+alias sse="docker-compose -f ${HOME}/nylas-sync-engine/docker-compose.yml start"
+
+alias tinypng="${HOME}/.npm-global/bin/tinypng -k $(cat $HOME/.tinypngkey) "
 
 mount_tine_logs() {
   sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10079.tine.no/logs /mnt/tine-prod-logs/was10079

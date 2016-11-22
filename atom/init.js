@@ -52,4 +52,6 @@ atom.commands.add('atom-text-editor', 'custom:move-to-end-of-screen-line', () =>
 
 atom.commands.add('atom-text-editor', 'custom:toggle-wrap-guide', togglePackage('wrap-guide'));
 
-atom.commands.add('atom-text-editor', 'custom:toggle-autosave', togglePackage('autosave'))
+atom.commands.add('atom-text-editor', 'custom:toggle-autosave', togglePackage('autosave'));
+
+atom.commands.add('atom-text-editor', 'custom:toggle-linter-eslint', togglePackage('linter-eslint'));
