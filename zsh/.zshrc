@@ -80,7 +80,7 @@ if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
 else
   export EDITOR='emacsclient -t'
-  export ALTERNATIVE_EDITOR='vim'
+  export ALTERNATE_EDITOR='vim'
 fi
 
 # Compilation flags
