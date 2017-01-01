@@ -5,7 +5,7 @@ export ZSH=$HOME/.oh-my-zsh
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="pure"
+ZSH_THEME="robbyrussell"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -56,7 +56,7 @@ export GITHUB_USERNAME="jonasws"
 export GITHUB_ACCESS_TOKEN="$(cat $HOME/.github_token)"
 
 # User configuration
-export PATH="${HOME}/.npm-global/bin:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
+# export PATH="${HOME}/.npm-global/bin:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 
 bindkey -v
 bindkey "^R" history-incremental-search-backward
@@ -114,11 +114,7 @@ alias pretty="json_pp | colorize"
 alias gh="gh-home"
 alias ghu="gh-upstream"
 alias ab="atom-beta"
-alias tinemount="sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10082.tine.no/resources /mnt/tine-resources"
-alias tineunmount="_ umount /mnt/tine-resources"
 
-alias tineprodmount="sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10080.tine.no/shared/resources /mnt/tine-prod-resources"
-alias tineprodunmount="sudo umount /mnt/tine-prod-resources"
 alias y="yarn"
 alias yb="yarn build"
 alias ys="yarn start"
@@ -132,18 +128,6 @@ alias oldtop="/usr/bin/top"
 alias sse="docker-compose -f ${HOME}/nylas-sync-engine/docker-compose.yml start"
 
 alias tinypng="${HOME}/.npm-global/bin/tinypng -k $(cat $HOME/.tinypngkey) "
-
-mount_tine_logs() {
-  sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10079.tine.no/logs /mnt/tine-prod-logs/was10079
-  sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10080.tine.no/logs /mnt/tine-prod-logs/was10080
-  sudo mount -t cifs -o credentials=$HOME/.tinecredentials,iocharset=utf8,gid=1000,uid=1000,file_mode=07777,dir_mode=0777 //was10081.tine.no/logs /mnt/tine-prod-logs/was10081
-}
-
-unmount_tine_logs() {
-  sudo umount /mnt/tine-prod-logs/*
-}
-
-alias tailenonicerror="tail -F /mnt/tine-prod-logs/*/was100*-8080.log | grep -A10 XsltProcessorException"
 
 xdg-qopen () {
   xdg-open "$1" 2> /dev/null
