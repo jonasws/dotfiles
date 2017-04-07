@@ -158,13 +158,14 @@ values."
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
                          flatland
-                         spacegray
+                         gandalf
                          )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font '("Source Code Pro"
+                               ;; :size 14
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
