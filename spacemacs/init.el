@@ -350,17 +350,35 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
-  (beacon-mode 1)
-  (editorconfig-mode 1)
+
+  ;; Set the spacemacs.d directory, for convenience
+  (defconst spacemacs-d-dir
+    (expand-file-name ".spacemacs.d/" (getenv "HOME"))
+    )
+
+  (beacon-mode t)
+  (editorconfig-mode t)
   (setq
    neo-theme 'icons
    )
   (setq-default
    elm-format-on-save t)
 
+  ;; Configure prettier
+  (require 'prettier-js
+           (expand-file-name "prettier-js.el" spacemacs-d-dir)
+   )
+
+  (setq prettier-args '(
+                        "--no-semi"
+                        ))
+  ;; (add-hook 'react-mode-hook 'prettier-mode)
+
+
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "w ." 'spacemacs/web-mode-transient-state/body)
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "w c" 'web-mode-element-clone)
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "w w" 'web-mode-element-wrap)
+  (spacemacs/set-leader-keys-for-major-mode 'react-mode "f" 'prettier)
 )
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
