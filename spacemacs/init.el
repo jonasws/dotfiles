@@ -374,11 +374,11 @@ you should place your code here."
                         ))
   ;; (add-hook 'react-mode-hook 'prettier-mode)
 
-
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "w ." 'spacemacs/web-mode-transient-state/body)
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "w c" 'web-mode-element-clone)
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "w w" 'web-mode-element-wrap)
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "f" 'prettier)
+  (spacemacs/set-leader-keys-for-major-mode 'elm-mode "f" 'elm-mode-format-buffer)
 )
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
