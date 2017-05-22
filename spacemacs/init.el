@@ -2,6 +2,10 @@
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
+(defconst is-on-windows
+  (string-equal (getenv "OS") "Windows_NT")
+  )
+
 (defun dotspacemacs/layers ()
   "Configuration Layers declaration.
 You should not put any user code in this function besides modifying the variable
@@ -117,7 +121,7 @@ values."
    ;; This variable has no effect if Emacs is launched with the parameter
    ;; `--insecure' which forces the value of this variable to nil.
    ;; (default t)
-   dotspacemacs-elpa-https t
+   dotspacemacs-elpa-https (if (not is-on-windows) t)
    ;; Maximum allowed time in seconds to contact an ELPA repository.
    dotspacemacs-elpa-timeout 5
    ;; If non nil then spacemacs will check for updates at startup
@@ -168,8 +172,8 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Source Code Pro"
-                               ;; :size 14
+   dotspacemacs-default-font `("Source Code Pro"
+                               :size ,(if is-on-windows 14)
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -369,15 +373,16 @@ you should place your code here."
            (expand-file-name "prettier-js.el" spacemacs-d-dir)
    )
 
-  (setq prettier-args '(
-                        "--no-semi"
-                        ))
+  ;; (setq prettier-args '(
+  ;;                       "--no-semi"
+  ;;                       ))
   ;; (add-hook 'react-mode-hook 'prettier-mode)
 
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "w ." 'spacemacs/web-mode-transient-state/body)
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "w c" 'web-mode-element-clone)
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "w w" 'web-mode-element-wrap)
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "f" 'prettier)
+  (spacemacs/set-leader-keys-for-major-mode 'js2-mode "f" 'prettier)
   (spacemacs/set-leader-keys-for-major-mode 'elm-mode "f" 'elm-mode-format-buffer)
 )
 (defun dotspacemacs/emacs-custom-settings ()
