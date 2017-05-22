@@ -66,7 +66,6 @@ export GOPATH="${HOME}/go"
 export GOROOT="/usr/local/go"
 
 export ANDROID_HOME="${HOME}/Android/Sdk"
-export XP_HOME="${HOME}/enonic-xp-distros/enonic-xp-6.9.3/home"
 # export PATH="${HOME}/.npm-global/bin:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 export MANPATH="/usr/local/man:$MANPATH"
 
