@@ -49,7 +49,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(svn fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir vi-mode git colored-man colorize web-search node npm python docker docker-compose alias-tips)
+plugins=(svn fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python docker docker-compose alias-tips)
 
 # GitHub API access configuration
 export GITHUB_USERNAME="jonasws"
@@ -57,9 +57,6 @@ export GITHUB_ACCESS_TOKEN="$(cat $HOME/.github_token)"
 
 # User configuration
 # export PATH="${HOME}/.npm-global/bin:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
-
-bindkey -v
-bindkey "^R" history-incremental-search-backward
 
 
 export GOPATH="${HOME}/go"
@@ -137,3 +134,6 @@ alias download_wav="youtube-dl -x --audio-format \"wav\" "
 rip_spotify_url () {
   spotify-ripper --user jstroemsodd --flat --wav $(spotify_url_to_uri $1)
 }
+
+# AWS CLI completion
+source $HOME/.local/bin/aws_zsh_completer.sh
