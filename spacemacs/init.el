@@ -93,6 +93,7 @@ values."
      editorconfig
      react-snippets
      all-the-icons
+     groovy-mode
      ;; FIXME: When prettier-js is added to MELPA, remove the custom location arugmnet
      (prettier-js :location (recipe :repo "prettier/prettier-emacs"
                                     :fetcher github
