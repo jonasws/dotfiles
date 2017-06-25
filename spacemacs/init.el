@@ -6,6 +6,11 @@
   (string-equal (getenv "OS") "Windows_NT")
   )
 
+(defconst is-on-mac
+  (string-equal system-type "darwin")
+  )
+
+
 (defun dotspacemacs/layers ()
   "Configuration Layers declaration.
 You should not put any user code in this function besides modifying the variable
@@ -181,7 +186,7 @@ values."
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font `("Source Code Pro"
-                               :size ,(if is-on-windows 14)
+                               :size ,(if (or is-on-windows is-on-mac) 14)
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
