@@ -3,7 +3,7 @@
 ;; It must be stored in your home directory.
 
 (defconst is-on-windows
-  (string-equal system-type "windows_nt")
+  (string-equal system-type "windows-nt")
   )
 
 (defconst is-on-mac
