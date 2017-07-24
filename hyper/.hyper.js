@@ -5,7 +5,7 @@ module.exports = {
     showHamburgerMenu: true,
 
     // font family with optional fallbacks
-    fontFamily: 'Menlo, "DejaVu Sans Mono", "Lucida Console", monospace',
+    fontFamily: '"Source Code Pro", Menlo, "DejaVu Sans Mono", "Lucida Console", monospace',
     // terminal cursor background color and opacity (hex, rgb, hsl, hsv, hwb or cmyk)
     cursorColor: "rgba(248,28,229,0.8)",
 
@@ -51,7 +51,7 @@ module.exports = {
       lightCyan: "#00ffff",
       lightWhite: "#ffffff"
     },
-    pokemon: "random",
+    pokemon: "pikachu",
     pokemonSyntax: "dark",
     unibody: "false",
 
