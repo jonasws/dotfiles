@@ -121,18 +121,12 @@ alias cl="colorize"
 alias top="vtop"
 alias oldtop="/usr/bin/top"
 
-alias sse="docker-compose -f ${HOME}/nylas-sync-engine/docker-compose.yml start"
+TIGER_CONFIG_DIR="${HOME}/tigervpn-config"
 
-alias tinypng="${HOME}/.npm-global/bin/tinypng -k $(cat $HOME/.tinypngkey) "
-
-xdg-qopen () {
-  xdg-open "$1" 2> /dev/null
-}
-
-alias download_wav="youtube-dl -x --audio-format \"wav\" "
-
-rip_spotify_url () {
-  spotify-ripper --user jstroemsodd --flat --wav $(spotify_url_to_uri $1)
+tigervpn() {
+    exp=$1*
+    config=$(find $TIGER_CONFIG_DIR -name $exp)
+    _ openvpn --cd $TIGER_CONFIG_DIR --config $config
 }
 
 # AWS CLI completion
