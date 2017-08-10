@@ -95,7 +95,6 @@ values."
    dotspacemacs-additional-packages
    '(
      beacon
-     flycheck-flow
      editorconfig
      react-snippets
      all-the-icons
@@ -388,29 +387,47 @@ you should place your code here."
 
   (add-to-list 'auto-mode-alist '("\\.es6\\'" . js2-mode));
 
-  ;; Configure prettier
-  ;; (require 'prettier-js
-  ;;          (expand-file-name "prettier-js.el" spacemacs-d-dir)
-  ;;  )
-
-  ;; (setq prettier-args '(
-  ;;                       "--no-semi"
-  ;;                       ))
-
-
   ;; Web mode
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "w ." 'spacemacs/web-mode-transient-state/body)
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "w c" 'web-mode-element-clone)
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "w w" 'web-mode-element-wrap)
 
   ;; Flow configuration
-  (require 'flycheck-flow)
-  (add-hook 'react-mode-hook 'flycheck-mode)
+  (require 'f)
+  (require 'json)
+  (require 'flycheck)
+  (defun flycheck-parse-flow (output checker buffer)
+    (let ((json-array-type 'list))
+      (let ((o (json-read-from-string output)))
+        (mapcar #'(lambda (errp)
+                    (let ((err (cadr (assoc 'message errp)))
+                          (err2 (cadr (cdr (assoc 'message errp)))))
+                      (flycheck-error-new
+                       :line (cdr (assoc 'line err))
+                       :column (cdr (assoc 'start err))
+                       :level 'error
+                       :message (concat (cdr (assoc 'descr err)) ". " (cdr (assoc 'descr err2)))
+                       :filename (f-relative
+                                  (cdr (assoc 'path err))
+                                  (f-dirname (file-truename
+                                              (buffer-file-name))))
+                       :buffer buffer
+                       :checker checker)))
+                (cdr (assoc 'errors o))))))
 
+  (flycheck-define-checker javascript-flow
+    "Static type checking using Flow."
+    :command ("flow" "--json" source-original)
+    :error-parser flycheck-parse-flow
+    :modes react-mode js2-mode)
+
+  (add-to-list 'flycheck-checkers 'javascript-flow)
 
   ;; Prettier keybindings
   (require 'prettier-js)
-  (add-hook 'react-mode-hook 'prettier-js-mode)
+
+  ;; Uncomment this line to enable prettier on save for react-mode buffers
+  ;; (add-hook 'react-mode-hook 'prettier-js-mode)
   (spacemacs/set-leader-keys-for-major-mode 'react-mode "f" 'prettier-js)
   (spacemacs/set-leader-keys-for-major-mode 'js2-mode "f" 'prettier-js)
 
@@ -476,6 +493,7 @@ This function is called at the very end of Spacemacs initialization."
  '(hl-fg-colors
    (quote
     ("#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36" "#002b36")))
+ '(js-indent-level 2)
  '(json-reformat:indent-width 2)
  '(linum-format " %5i ")
  '(magit-diff-use-overlays nil)
