@@ -49,7 +49,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(svn fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python docker docker-compose alias-tips z)
+plugins=(svn fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python docker alias-tips z dnf)
 
 # GitHub API access configuration
 export GITHUB_USERNAME="jonasws"
@@ -121,7 +121,7 @@ alias cl="colorize"
 alias top="vtop"
 alias oldtop="/usr/bin/top"
 
-alias android_emulator="$HOME/Android/Sdk/emulator/emulator @Nexus_5X_API_26"
+alias android_emulator="$HOME/Android/Sdk/emulator/emulator @Nexus_10_API_23"
 
 TIGER_CONFIG_DIR="${HOME}/tigervpn-config"
 
@@ -133,3 +133,5 @@ tigervpn() {
 
 # AWS CLI completion
 source $HOME/.local/bin/aws_zsh_completer.sh
+
+[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
