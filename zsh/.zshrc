@@ -135,3 +135,10 @@ tigervpn() {
 source $HOME/.local/bin/aws_zsh_completer.sh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+# tabtab source for serverless package
+# uninstall by removing these lines or running `tabtab uninstall serverless`
+[[ -f /home/jonasws/.config/yarn/global/node_modules/tabtab/.completions/serverless.zsh ]] && . /home/jonasws/.config/yarn/global/node_modules/tabtab/.completions/serverless.zsh
+# tabtab source for sls package
+# uninstall by removing these lines or running `tabtab uninstall sls`
+[[ -f /home/jonasws/.config/yarn/global/node_modules/tabtab/.completions/sls.zsh ]] && . /home/jonasws/.config/yarn/global/node_modules/tabtab/.completions/sls.zsh
