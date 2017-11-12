@@ -121,7 +121,7 @@ alias cl="colorize"
 alias top="vtop"
 alias oldtop="/usr/bin/top"
 
-alias android_emulator="$HOME/Android/Sdk/emulator/emulator @Nexus_10_API_23"
+alias android_emulator="$HOME/Android/Sdk/emulator/emulator @Pixel_XL_API_26"
 
 TIGER_CONFIG_DIR="${HOME}/tigervpn-config"
 
