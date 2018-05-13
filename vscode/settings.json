@@ -1,5 +1,6 @@
 {
     "vim.easymotion": true,
+    "vim.surround": true,
     "vim.incsearch": true,
     "vim.useSystemClipboard": true,
     "vim.useCtrlKeys": true,
@@ -8,7 +9,7 @@
         {
             "before": [
                 "j",
-                "j"
+                "k"
             ],
             "after": [
                 "<Esc>"
@@ -42,5 +43,6 @@
     "vim.handleKeys": {
         "<C-a>": false,
         "<C-f>": false
-    }
+    },
+    "editor.formatOnSave": true
 }

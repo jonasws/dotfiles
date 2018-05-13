@@ -1,0 +1,6 @@
+# name: redux action handler
+# key: rah
+# --
+[$1](state: $2, action: AnyAction) {
+  return {$0};
+},

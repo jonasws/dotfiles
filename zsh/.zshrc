@@ -49,11 +49,11 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(svn fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker alias-tips z dnf kubectl httpie)
+plugins=(fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose alias-tips z dnf kubectl httpie yarn)
 
 # GitHub API access configuration
-export GITHUB_USERNAME="jonasws"
-export GITHUB_ACCESS_TOKEN="$(cat $HOME/.github_token)"
+#export GITHUB_USERNAME="jonasws"
+#export GITHUB_ACCESS_TOKEN="$(cat $HOME/.github_token)"
 
 # User configuration
 # export PATH="${HOME}/.npm-global/bin:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
@@ -75,7 +75,7 @@ source $ZSH/oh-my-zsh.sh
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
 else
-  export EDITOR='vim'
+  export EDITOR='emacsclient -c'
   export ALTERNATE_EDITOR='vim'
 fi
 
@@ -121,7 +121,13 @@ alias cl="colorize"
 alias top="vtop"
 alias oldtop="/usr/bin/top"
 
+
+# ENTUR CLI aliases :)
+alias subway_munkelia="entur_oracle departures NSR:Quay:10667"
+alias train_nyland="entur_oracle departures NSR:Quay:505"
+
 alias android_emulator="$HOME/Android/Sdk/emulator/emulator @Pixel_XL_API_26"
+alias cal="cal -m"
 
 TIGER_CONFIG_DIR="${HOME}/tigervpn-config"
 
@@ -131,8 +137,10 @@ tigervpn() {
     _ openvpn --cd $TIGER_CONFIG_DIR --config $config
 }
 
+eval $(opam config env --switch 4.02.3)
+
 # AWS CLI completion
-source $HOME/.local/bin/aws_zsh_completer.sh
+[ -f $HOME/.local/bin/aws_zsh_completer.sh ] && source $HOME/.local/bin/aws_zsh_completer.sh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
