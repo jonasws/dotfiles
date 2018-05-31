@@ -75,8 +75,7 @@ source $ZSH/oh-my-zsh.sh
 if [[ -n $SSH_CONNECTION ]]; then
   export EDITOR='vim'
 else
-  export EDITOR='emacsclient -c'
-  export ALTERNATE_EDITOR='vim'
+  export EDITOR='vim'
 fi
 
 # Compilation flags
