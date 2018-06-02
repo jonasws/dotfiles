@@ -171,11 +171,6 @@ bindsym $mod+m move workspace to output right
 exec --no-startup-id setxkbmap -layout us -variant altgr-intl
 
 
-bindsym $mod+Shift+t exec --no-startup-id /home/jonasws/.screenlayout/layout-external-only.sh
-exec --no-startup-id /home/jonasws/.screenlayout/layout.sh
 exec --no-startup-id compton -f
 
 
-# Whenever I'm on a normal keyboard, I still want Caps Lock to act as Escape
-exec --no-startup-id xmodmap -e "clear lock" #disable caps lock switch
-exec --no-startup-id xmodmap -e "keysym Caps_Lock = Escape" #set caps_lock as escape
