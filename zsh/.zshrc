@@ -1,5 +1,4 @@
 # Path to your oh-my-zsh installation.
-export ZSH=$HOME/.oh-my-zsh
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -51,20 +50,11 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Add wisely, as too many plugins slow down shell startup.
 plugins=(fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose alias-tips z dnf kubectl httpie yarn)
 
-# GitHub API access configuration
-#export GITHUB_USERNAME="jonasws"
-#export GITHUB_ACCESS_TOKEN="$(cat $HOME/.github_token)"
 
 # User configuration
 # export PATH="${HOME}/.npm-global/bin:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 
 
-export GOPATH="${HOME}/go"
-export GOROOT="/usr/local/go"
-
-export ANDROID_HOME="${HOME}/Android/Sdk"
-# export PATH="${HOME}/.npm-global/bin:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
-export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
 
@@ -117,10 +107,6 @@ alias yt="yarn test"
 
 alias cl="colorize"
 
-alias top="vtop"
-alias oldtop="/usr/bin/top"
-
-
 # ENTUR CLI aliases :)
 alias subway_munkelia="entur_oracle departures NSR:Quay:10667"
 alias train_nyland="entur_oracle departures NSR:Quay:505"
@@ -136,7 +122,6 @@ tigervpn() {
     _ openvpn --cd $TIGER_CONFIG_DIR --config $config
 }
 
-eval $(opam config env --switch 4.02.3)
 
 # AWS CLI completion
 [ -f $HOME/.local/bin/aws_zsh_completer.sh ] && source $HOME/.local/bin/aws_zsh_completer.sh
@@ -148,4 +133,44 @@ eval $(opam config env --switch 4.02.3)
 [[ -f /home/jonasws/.config/yarn/global/node_modules/tabtab/.completions/serverless.zsh ]] && . /home/jonasws/.config/yarn/global/node_modules/tabtab/.completions/serverless.zsh
 # tabtab source for sls package
 # uninstall by removing these lines or running `tabtab uninstall sls`
-[[ -f /home/jonasws/.config/yarn/global/node_modules/tabtab/.completions/sls.zsh ]] && . /home/jonasws/.config/yarn/global/node_modules/tabtab/.completions/sls.zsh
+[[ -f /homej/onasws/.config/yarn/global/node_modules/tabtab/.completions/sls.zsh ]] && . /home/jonasws/.config/yarn/global/node_modules/tabtab/.completions/sls.zsh
+###-begin-pm2-completion-###
+### credits to npm for the completion file model
+#
+# Installation: pm2 completion >> ~/.bashrc  (or ~/.zshrc)
+#
+
+COMP_WORDBREAKS=${COMP_WORDBREAKS/=/}
+COMP_WORDBREAKS=${COMP_WORDBREAKS/@/}
+export COMP_WORDBREAKS
+
+if type complete &>/dev/null; then
+  _pm2_completion () {
+    local si="$IFS"
+    IFS=$'\n' COMPREPLY=($(COMP_CWORD="$COMP_CWORD" \
+                           COMP_LINE="$COMP_LINE" \
+                           COMP_POINT="$COMP_POINT" \
+                           pm2 completion -- "${COMP_WORDS[@]}" \
+                           2>/dev/null)) || return $?
+    IFS="$si"
+  }
+  complete -o default -F _pm2_completion pm2
+elif type compctl &>/dev/null; then
+  _pm2_completion () {
+    local cword line point words si
+    read -Ac words
+    read -cn cword
+    let cword-=1
+    read -l line
+    read -ln point
+    si="$IFS"
+    IFS=$'\n' reply=($(COMP_CWORD="$cword" \
+                       COMP_LINE="$line" \
+                       COMP_POINT="$point" \
+                       pm2 completion -- "${words[@]}" \
+                       2>/dev/null)) || return $?
+    IFS="$si"
+  }
+  compctl -K _pm2_completion + -f + pm2
+fi
+###-end-pm2-completion-###
