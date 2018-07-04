@@ -48,7 +48,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose alias-tips z dnf kubectl httpie yarn)
+plugins=(fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose alias-tips z dnf kubectl httpie yarn vscode)
 
 
 # User configuration
@@ -109,9 +109,27 @@ alias cl="colorize"
 
 # ENTUR CLI aliases :)
 alias subway_munkelia="entur_oracle departures NSR:Quay:10667"
+alias subway_stortinget="entur_oracle departures NSR:Quay:7257"
 
 alias android_emulator="$HOME/Android/Sdk/emulator/emulator @Pixel_XL_API_26"
 alias cal="cal -m"
+
+# Aliasing vcode nigthly to "code"
+alias code="code-insiders"
+
+
+function parse-log-lines() {
+    jq -R -r '. as $line | try fromjson catch $line | "[\(.level)] \(."@timestamp") \(.logger) - \(.message)"'
+}
+
+function klogs {
+    kubectl logs -l app=$1 | parse-log-lines
+}
+
+
+function restart-pod {
+    kubectl patch deployment $1 -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"date\":\"`date +'%s'`\"}}}}}"
+}
 
 TIGER_CONFIG_DIR="${HOME}/tigervpn-config"
 
