@@ -118,7 +118,11 @@ alias cal="cal -m"
 alias code="code-insiders"
 
 
-function parse-log-lines() {
+alias top=vtop
+alias oldtop=/usr/bin/top
+
+# k8s snacks
+function parse-log-lines {
     jq -R -r '. as $line | try fromjson catch $line | "[\(.level)] \(."@timestamp") \(.logger) - \(.message)"'
 }
 
@@ -126,8 +130,11 @@ function klogs {
     kubectl logs -l app=$1 | parse-log-lines
 }
 
+function kgpa {
+    kubectl get pods -l app=$1
+}
 
-function restart-pod {
+function restart-deployment {
     kubectl patch deployment $1 -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"date\":\"`date +'%s'`\"}}}}}"
 }
 
