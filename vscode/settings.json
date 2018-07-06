@@ -2,6 +2,7 @@
 		"editor.fontSize": 18,
 		"editor.fontFamily": "'Dank Mono', 'monospace', monospace, 'Droid Sans Fallback'",
 		"editor.fontLigatures": true,
+		"editor.formatOnSave": true,
 	    "vim.leader": "<space>",
 	    "vim.normalModeKeyBindings": [
 	        {
