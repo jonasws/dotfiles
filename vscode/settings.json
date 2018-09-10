@@ -933,5 +933,7 @@
 	            ]
 	        }
 	    ],
-	    "vim.easymotion": true
+		"vim.easymotion": true,
+		"workbench.colorTheme": "Dracula",
+		"window.zoomLevel": 1
 	}

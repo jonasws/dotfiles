@@ -48,7 +48,9 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose alias-tips z dnf kubectl httpie yarn vscode)
+plugins=(fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose alias-tips z dnf kubectl kube-ps1 httpie yarn nvm)
+
+
 
 
 # User configuration
@@ -57,6 +59,9 @@ plugins=(fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyf
 
 
 source $ZSH/oh-my-zsh.sh
+
+# Add nvm bin to path
+export PATH="${HOME}/.nvm/versions/node/$(nvm current)/bin:$PATH"
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
