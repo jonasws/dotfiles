@@ -126,22 +126,51 @@ alias code="code-insiders"
 alias top=vtop
 alias oldtop=/usr/bin/top
 
+# LastPass ncieties
+getpassword() {
+    lpass show $1 --password --clip
+    echo "Password for $1 copied to clipboard :)"
+}
+
+
+alias get-pipeline-passd=getpassword 3524432367032092355
+
 # k8s snacks
-function parse-log-lines {
+parse-log-lines() {
     jq -R -r '. as $line | try fromjson catch $line | "[\(.level)] \(."@timestamp") \(.logger) - \(.message)"'
 }
 
-function klogs {
+klogs() {
     kubectl logs -l app=$1 | parse-log-lines
 }
 
-function kgpa {
+klogsf() {
+    kubectl logs --follow -l app=$1 | parse-log-lines
+}
+
+kgpa() {
     kubectl get pods -l app=$1
 }
 
-function restart-deployment {
+kgpaf() {
+    kubectl get pods --follow -l app=$1
+}
+
+kgu() {
+    kubectl get ingress -l=app=$1 --output=json | jq -r ".items[0] | .spec.rules[].host"
+}
+
+ restart-deployment() {
     kubectl patch deployment $1 -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"date\":\"`date +'%s'`\"}}}}}"
 }
+
+ K8S_LABELS=$(kubectl get service -o=jsonpath="{range .items[*]}{ .metadata.name}{' '}")
+
+ _k8s_labels() {
+     _alternative "($K8S_LABELS)"
+ }
+
+ compdef _k8s_labels kga kgaf klogs klogsf kgu
 
 TIGER_CONFIG_DIR="${HOME}/tigervpn-config"
 

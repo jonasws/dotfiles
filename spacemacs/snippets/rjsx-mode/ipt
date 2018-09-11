@@ -1,0 +1,4 @@
+# name: import PropTypes
+# key: ipt
+# --
+import PropTypes from 'prop-types';
