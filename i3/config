@@ -156,7 +156,8 @@ bar {
   status_command i3status
 }
 
-bindsym $mod+Shift+x exec i3lock --color 475263
+exec --no-startup-id "feh --bg-scale /home/jonasws/Pictures/docker-dead-whale.png"
+bindsym $mod+Shift+x exec --no-startup-id "/home/jonasws/.i3/i3lock-multimonitor/lock -i /home/jonasws/Pictures/docker-dead-whale.png"
 
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 1 +5%
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 1 -5%
@@ -165,5 +166,6 @@ bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 1 toggle # mute s
 bindsym $mod+m move workspace to output right
 
 exec --no-startup-id setxkbmap -layout us -variant altgr-intl
-exec --no-startup-id /home/jonasws/remap_escape_and_prtscr.sh
-exec --no--startup-id /home/jonasws/.screenlayouts/layout.sh
+exec --no-startup-id xset r rate 300 30
+# exec --no-startup-id /home/jonasws/remap_escape_and_prtscr.sh
+# exec --no-startup-id /home/jonasws/.screenlayouts/layout.sh
