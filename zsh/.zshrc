@@ -48,7 +48,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose alias-tips z dnf kubectl kube-ps1 httpie yarn nvm)
+plugins=(fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose alias-tips z dnf kubectl kube-ps1 httpie yarn)
 
 
 
@@ -59,9 +59,6 @@ plugins=(fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyf
 
 
 source $ZSH/oh-my-zsh.sh
-
-# Add nvm bin to path
-export PATH="${HOME}/.nvm/versions/node/$(nvm current)/bin:$PATH"
 
 # You may need to manually set your language environment
 # export LANG=en_US.UTF-8
@@ -95,8 +92,8 @@ alias which="nocorrect which"
 # Custom aliases
 alias ping_google="ping 8.8.8.8"
 alias router_config="xdg-open http://routerlogin.net"
-alias ping_router="ping $(/sbin/ip route | awk '/default/ { print $3 }')"
-alias ping6_router="ping6 $(/sbin/ip -6 route | awk '/default/ { print $3 }')"
+alias ping_router="ping \$(/sbin/ip route | awk '/default/ { print $3 }')"
+alias ping6_router="ping6 \$(/sbin/ip -6 route | awk '/default/ { print $3 }')"
 alias serve_dir="python -m SimpleHTTPServer 9000"
 alias tv2_sport="vlc udp://@233.155.107.105:5700"
 alias gcd="git checkout develop"
@@ -133,44 +130,6 @@ getpassword() {
 }
 
 
-alias get-pipeline-passd=getpassword 3524432367032092355
-
-# k8s snacks
-parse-log-lines() {
-    jq -R -r '. as $line | try fromjson catch $line | "[\(.level)] \(."@timestamp") \(.logger) - \(.message)"'
-}
-
-klogs() {
-    kubectl logs -l app=$1 | parse-log-lines
-}
-
-klogsf() {
-    kubectl logs --follow -l app=$1 | parse-log-lines
-}
-
-kgpa() {
-    kubectl get pods -l app=$1
-}
-
-kgpaf() {
-    kubectl get pods --follow -l app=$1
-}
-
-kgu() {
-    kubectl get ingress -l=app=$1 --output=json | jq -r ".items[0] | .spec.rules[].host"
-}
-
- restart-deployment() {
-    kubectl patch deployment $1 -p "{\"spec\":{\"template\":{\"metadata\":{\"annotations\":{\"date\":\"`date +'%s'`\"}}}}}"
-}
-
- K8S_LABELS=$(kubectl get service -o=jsonpath="{range .items[*]}{ .metadata.name}{' '}")
-
- _k8s_labels() {
-     _alternative "($K8S_LABELS)"
- }
-
- compdef _k8s_labels kga kgaf klogs klogsf kgu
 
 TIGER_CONFIG_DIR="${HOME}/tigervpn-config"
 
