@@ -59,14 +59,18 @@ values."
      sql
      ruby
      scala
-     elm
+     (elm :variables
+          elm-sort-imports-on-save t
+          elm-format-on-save t
+          )
      yaml
      html
 
-     lsp
-     (lsp-intellij :variables lsp-intellij-server-port 9137)
+     ;; (lsp-intellij :variables lsp-intellij-server-port 9137)
      tern
-     (javascript :variables javascript-backend 'lsp)
+     lsp
+     ;; (javascript :variables javascript-backend 'lsp)
+     javascript
      typescript
      react
      treemacs
@@ -84,6 +88,8 @@ values."
 
      ibuffer
      xkcd
+
+     spotify
      ;; ----------------------------------------------------------------
      ;; Example of useful layers you may want to use right away.
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
@@ -110,7 +116,7 @@ values."
      spell-checking
      syntax-checking
      (version-control :variables
-                       version-control-diff-tool 'diff-hl
+                       version-control-diff-tool 'git-gutter
                        version-control-global-margin t)
      )
    ;; List of additional packages that will be installed without being
@@ -210,7 +216,7 @@ values."
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font `("Dank Mono"
-                               :size ,(if (or is-on-windows is-on-mac) 14 20)
+                               :size ,(if (or is-on-windows is-on-mac) 14 14)
                                :weight normal
                                :width normal
                                :powerline-scale 1.1)
@@ -369,9 +375,11 @@ before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   (setq-default
    vc-follow-symlinks t
+   git-enable-magit-svn-plugin t
 
    ;; js2-mode
    js2-basic-offset 2
+   js2-indent-level 2
 
    ;; web-mode
    css-indent-offset 4
@@ -383,7 +391,9 @@ before packages are loaded. If you are unsure, you should try in setting them in
    avy-all-windows 'all-frames
    )
 
+
   )
+
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
@@ -392,6 +402,13 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+
+
+  (spacemacs/set-leader-keys "ou" '(lambda ()
+                                     (interactive)
+                                     (save-buffer)
+                                     (shell-command "/home/jonasws/TINE/Produsentsystemer/Raavaretorget/reload-stuff.sh")
+                                    ))
 
   ;; Set the spacemacs.d directory, for convenience
   (defconst spacemacs-d-dir
@@ -412,7 +429,7 @@ you should place your code here."
   (setq-default
 
    neo-theme 'icons
-   elm-format-on-save t)
+   )
 
   ;; (add-to-list 'auto-mode-alist '("\\.es6\\'" . react-mode));
   (add-to-list 'auto-mode-alist '("\\.js\\'" . rjsx-mode));
@@ -422,60 +439,20 @@ you should place your code here."
   ;; (spacemacs/set-leader-keys-for-major-mode 'react-mode "w c" 'web-mode-element-clone)
   ;; (spacemacs/set-leader-keys-for-major-mode 'react-mode "w w" 'web-mode-element-wrap)
 
-  ;;----------------------------------------------------------------------------
-  ;; Reason setup
-  ;;----------------------------------------------------------------------------
-
-  (defun shell-cmd (cmd)
-    "Returns the stdout output of a shell command or nil if the command returned
-   an error"
-    (car (ignore-errors (apply 'process-lines (split-string cmd)))))
-
-  (defun reason-cmd-where (cmd)
-    (let ((where (shell-cmd cmd)))
-      (if (not (string-equal "unknown flag ----where" where))
-          where)))
-
-  (let* ((refmt-bin (or (reason-cmd-where "refmt ----where")
-                        (shell-cmd "which refmt")))
-         (merlin-bin (or (reason-cmd-where "ocamlmerlin ----where")
-                         (shell-cmd "which ocamlmerlin")))
-         (merlin-base-dir (when merlin-bin
-                            (replace-regexp-in-string "bin/ocamlmerlin$" "" merlin-bin))))
-    ;; Add merlin.el to the emacs load path and tell emacs where to find ocamlmerlin
-    (when merlin-bin
-      (add-to-list 'load-path (concat merlin-base-dir "share/emacs/site-lisp/"))
-      (setq merlin-command merlin-bin))
-
-    (when refmt-bin
-      (setq refmt-command refmt-bin)))
-
-  (require 'reason-mode)
-  (require 'merlin)
-  (add-hook 'reason-mode-hook (lambda ()
-                                (add-hook 'before-save-hook 'refmt-before-save)
-                                (merlin-mode)))
-
-  (setq merlin-ac-setup t)
-
   ;; Open nunjucks files as web mode
   (add-to-list 'auto-mode-alist '("\\.njk\\'" . web-mode));
 
   ;; Prettier keybindings
   (require 'prettier-js)
   ;; Uncomment this line to enable prettier on save for react-mode buffers
-  (add-hook 'rjsx-mode-hook 'prettier-js-mode)
-  (add-hook 'rjsx-mode-hook #'lsp-javascript-typescript-enable)
   (add-hook 'rjsx-mode-hook 'smartparens-mode)
   (spacemacs/enable-flycheck 'rjsx-mode)
 
   (add-hook 'js2-mode-hook 'prettier-js-mode)
-  (add-hook 'js2-mode-hook #'lsp-javascript-typescript-enable)
+  (add-hook 'js2-mode-hook 'lsp)
 
   (add-hook 'typescript-mode-hook 'prettier-js-mode)
   (add-hook 'typescript-tsx-mode-hook 'prettier-js-mode)
-  (add-hook 'typescript-mode-hook #'lsp-javascript-typescript-enable)
-  (add-hook 'typescript-tsx-mode-hook #'lsp-javascript-typescript-enable)
   ;; (add-hook 'json-mode-hook 'prettier-js-mode)
 
   ;; SCSS mode mods
@@ -490,12 +467,19 @@ you should place your code here."
   (spacemacs/set-leader-keys-for-major-mode 'js2-mode "f" 'prettier-js)
 
   ;; Elm format
-  (spacemacs/set-leader-keys-for-major-mode 'elm-mode "f" 'elm-mode-format-buffer)
+  ;; (spacemacs/set-leader-keys-for-major-mode 'elm-mode "f" 'elm-mode-format-buffer)
 
   ;; Add semicolon at the end of line and move line down
   (define-key evil-normal-state-map (kbd "g s") (kbd "m ` A ; <escape> ` `"))
   (define-key evil-normal-state-map (kbd "g o") (kbd "g s o"))
 
+  (spaceline-define-segment spotify
+    "spotify current song"
+    (string-join (butlast (split-string (spotify-current) "/")) ":")
+    :enabled t
+    )
+
+  (spaceline-spacemacs-theme 'spotify)
 )
 (defun dotspacemacs/emacs-custom-settings ()
   "Emacs custom settings.
@@ -509,7 +493,7 @@ This function is called at the very end of Spacemacs initialization."
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (org-plus-contrib zenburn-theme zen-and-art-theme yasnippet-snippets yapfify yaml-mode xterm-color xkcd ws-butler winum white-sand-theme which-key web-mode web-beautify volatile-highlights vmd-mode vimrc-mode vi-tilde-fringe uuidgen use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme treemacs-projectile treemacs-evil toxi-theme toml-mode toc-org tide tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection sql-indent spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smeargle slim-mode shell-pop seti-theme seeing-is-believing scss-mode sass-mode rvm ruby-tools ruby-test-mode ruby-refactor ruby-hash-syntax rubocop rspec-mode robe rjsx-mode reverse-theme restart-emacs rebecca-theme reason-mode react-snippets rbenv ranger rake rainbow-mode rainbow-identifiers rainbow-delimiters railscasts-theme racer pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme prettier-js popwin planet-theme pippel pipenv pip-requirements phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode password-generator paradox ox-gfm overseer orgit organic-green-theme org-projectile org-present org-pomodoro org-mime org-download org-bullets org-brain open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noflet noctilux-theme nginx-mode naquadah-theme nameless mvn mustang-theme multi-term move-text monokai-theme monochrome-theme molokai-theme moe-theme mmm-mode minitest minimal-theme meghanada maven-test-mode material-theme markdown-toc majapahit-theme magit-svn magit-gitflow madhat2r-theme macrostep lush-theme lsp-ui lsp-python lsp-javascript-typescript lsp-java lsp-intellij lorem-ipsum livid-mode live-py-mode link-hint light-soap-theme kotlin-mode kaolin-themes json-navigator js2-refactor js-doc jbeans-theme jazz-theme ir-black-theme inkpot-theme indent-guide importmagic impatient-mode ibuffer-projectile hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-xref helm-themes helm-swoop helm-pydoc helm-purpose helm-projectile helm-mode-manager helm-make helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag hc-zenburn-theme gruvbox-theme gruber-darker-theme groovy-mode groovy-imports graphql-mode grandshell-theme gradle-mode gotham-theme google-translate golden-ratio gnuplot gitignore-templates gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md gandalf-theme fuzzy font-lock+ flyspell-correct-helm flycheck-rust flycheck-pos-tip flycheck-kotlin flycheck-elm flx-ido flatui-theme flatland-theme fill-column-indicator farmhouse-theme fancy-battery eziam-theme eyebrowse expand-region exotica-theme evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-org evil-numbers evil-nerd-commenter evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help ensime engine-mode emojify emoji-cheat-sheet-plus emmet-mode elm-test-runner elm-mode elisp-slime-nav editorconfig dumb-jump dracula-theme dotenv-mode doom-themes doom-modeline dockerfile-mode docker django-theme diminish diff-hl define-word darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme dactyl-mode cython-mode cyberpunk-theme csv-mode counsel-projectile company-web company-tern company-statistics company-lsp company-emoji company-emacs-eclim company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode clues-theme clean-aindent-mode chruby cherry-blossom-theme centered-cursor-mode cargo busybee-theme bundler bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme beacon badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme ace-link ace-jump-helm-line ac-ispell))))
+    (lsp-ui lsp-java lsp-mode zenburn-theme zen-and-art-theme yasnippet-snippets yapfify yaml-mode xterm-color xkcd ws-butler writeroom-mode winum white-sand-theme which-key web-mode web-beautify volatile-highlights vmd-mode vimrc-mode vi-tilde-fringe uuidgen use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme treemacs-projectile treemacs-evil toxi-theme toml-mode toc-org tide tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit systemd symon sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection sql-indent spotify spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smeargle slim-mode shell-pop seti-theme seeing-is-believing scss-mode sass-mode rvm ruby-tools ruby-test-mode ruby-refactor ruby-hash-syntax rubocop rspec-mode robe rjsx-mode reverse-theme restart-emacs rebecca-theme reason-mode react-snippets rbenv ranger rake rainbow-mode rainbow-identifiers rainbow-delimiters railscasts-theme racer pyvenv pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme prettier-js popwin planet-theme pippel pipenv pip-requirements phoenix-dark-pink-theme phoenix-dark-mono-theme persp-mode password-generator paradox ox-gfm overseer orgit organic-green-theme org-projectile org-present org-pomodoro org-mime org-download org-bullets org-brain open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme noflet noctilux-theme nginx-mode naquadah-theme nameless mvn mustang-theme multi-term move-text monokai-theme monochrome-theme molokai-theme moe-theme mmm-mode minitest minimal-theme meghanada maven-test-mode material-theme markdown-toc majapahit-theme magit-svn magit-gitflow madhat2r-theme macrostep lush-theme lorem-ipsum livid-mode live-py-mode link-hint light-soap-theme kotlin-mode kaolin-themes json-navigator js2-refactor js-doc jbeans-theme jazz-theme ir-black-theme inkpot-theme indent-guide importmagic impatient-mode ibuffer-projectile hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-xref helm-themes helm-swoop helm-spotify-plus helm-pydoc helm-purpose helm-projectile helm-org-rifle helm-mode-manager helm-make helm-gitignore helm-git-grep helm-flx helm-descbinds helm-css-scss helm-company helm-c-yasnippet helm-ag hc-zenburn-theme gruvbox-theme gruber-darker-theme groovy-mode groovy-imports graphql-mode grandshell-theme gradle-mode gotham-theme google-translate golden-ratio gnuplot gitignore-templates gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe git-gutter-fringe+ gh-md gandalf-theme fuzzy font-lock+ flyspell-correct-helm flycheck-rust flycheck-pos-tip flycheck-kotlin flycheck-elm flx-ido flatui-theme flatland-theme fill-column-indicator farmhouse-theme fancy-battery eziam-theme eyebrowse expand-region exotica-theme evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-surround evil-org evil-numbers evil-nerd-commenter evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help ensime engine-mode emojify emoji-cheat-sheet-plus emmet-mode elm-test-runner elm-mode elisp-slime-nav editorconfig dumb-jump dracula-theme dotenv-mode doom-themes doom-modeline dockerfile-mode docker django-theme diminish diff-hl define-word darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme dactyl-mode cython-mode cyberpunk-theme csv-mode counsel-projectile company-web company-tern company-statistics company-lsp company-emoji company-emacs-eclim company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode clues-theme clean-aindent-mode chruby cherry-blossom-theme centered-cursor-mode cargo busybee-theme bundler bubbleberry-theme browse-at-remote birds-of-paradise-plus-theme beacon badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme ace-link ace-jump-helm-line ac-ispell))))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
  ;; If you edit it by hand, you could mess it up, so be careful.

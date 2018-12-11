@@ -18,7 +18,7 @@ set $mod Mod4
 
 # This font is widely installed, provides lots of unicode glyphs, right-to-left
 # text rendering and scalability on retina/hidpi displays (thanks to pango).
-font pango:DejaVu Sans Mono 14
+font pango:DejaVu Sans Mono 12
 
 # Before i3 v4.8, we used to recommend this one as the default:
 # font -misc-fixed-medium-r-normal--13-120-75-75-C-70-iso10646-1
@@ -26,6 +26,10 @@ font pango:DejaVu Sans Mono 14
 # clear in small sizes. However, its unicode glyph coverage is limited, the old
 # X core fonts rendering does not support right-to-left and this being a bitmap
 # font, it doesn’t scale on retina/hidpi displays.
+
+focus_follows_mouse no
+
+
 
 # Use Mouse+$mod to drag floating windows to their wanted position
 floating_modifier $mod
@@ -158,6 +162,7 @@ bar {
 
 exec --no-startup-id "feh --bg-scale /home/jonasws/Pictures/docker-dead-whale.png"
 bindsym $mod+Shift+x exec --no-startup-id "/home/jonasws/.i3/i3lock-multimonitor/lock -i /home/jonasws/Pictures/docker-dead-whale.png"
+# bindsym $mod+Shift+x exec --no-startup-id i3lock
 
 bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 1 +5%
 bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 1 -5%
