@@ -1,16 +1,11 @@
 set ignorecase
 set smartcase
 set surround
-set scrolloff=3         " 3 lines above/below cursor when scrolling
 
 " Integrate with system clipboard
 set clipboard=unnamedplus,unnamed
 
 let mapleader = ' '
-
-" These create newlines like o and O but stay in normal mode
-nmap zj o<Esc>k
-nmap zk O<Esc>j
 
 " key bindings for quickly moving between windows
 " h left, l right, k up, j down
