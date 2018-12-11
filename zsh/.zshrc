@@ -109,16 +109,16 @@ alias yt="yarn test"
 
 alias cl="colorize"
 
+
 # ENTUR CLI aliases :)
 alias subway_munkelia="entur_oracle departures NSR:Quay:10667"
-alias subway_stortinget="entur_oracle departures NSR:Quay:7257"
+alias train_nyland="entur_oracle departures NSR:Quay:505"
 
 alias android_emulator="$HOME/Android/Sdk/emulator/emulator @Pixel_XL_API_26"
 alias cal="cal -m"
 
 # Aliasing vcode nigthly to "code"
 alias code="code-insiders"
-
 
 alias top=vtop
 alias oldtop=/usr/bin/top
