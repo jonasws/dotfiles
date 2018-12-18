@@ -117,6 +117,9 @@ alias train_nyland="entur_oracle departures NSR:Quay:505"
 alias android_emulator="$HOME/Android/Sdk/emulator/emulator @Pixel_XL_API_26"
 alias cal="cal -m"
 
+
+alias paste_without_whitespace="clippaste | sed 's/\s//g'"
+
 # Aliasing vcode nigthly to "code"
 alias code="code-insiders"
 
