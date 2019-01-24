@@ -173,6 +173,11 @@ values."
    ;; This variable has no effect if Emacs is launched with the parameter
    ;; `--insecure' which forces the value of this variable to nil.
    ;; (default t)
+
+
+   ;; dotspacemacs-mode-line-theme 'all-the-icons
+   dotspacemacs-mode-line-theme 'spacemacs
+
    dotspacemacs-elpa-https (if (not is-on-windows) t)
    ;; Maximum allowed time in seconds to contact an ELPA repository.
    dotspacemacs-elpa-timeout 5
@@ -469,7 +474,7 @@ you should place your code here."
   (add-hook 'scss-mode-hook 'rainbow-mode-hook)
 
   (spacemacs/set-leader-keys-for-major-mode 'rjsx-mode "f" 'prettier-js)
-  (spacemacs/set-leader-keys-for-major-mode 'rjsx-mode "=" 'prettier-js)
+  ;; (spacemacs/set-leader-keys-for-major-mode 'rjsx-mode "=" 'prettier-js)
   (spacemacs/set-leader-keys-for-major-mode 'typescript-mode "=" 'prettier-js)
   (spacemacs/set-leader-keys-for-major-mode 'typescript-tsx-mode "=" 'prettier-js)
   (spacemacs/set-leader-keys-for-major-mode 'js2-mode "f" 'prettier-js)
