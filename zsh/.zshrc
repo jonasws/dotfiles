@@ -48,7 +48,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(fedora gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose alias-tips z dnf kubectl kube-ps1 httpie yarn)
+plugins=(gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose sudo systemd command-not-found alias-tips z httpie yarn wd brew)
 
 
 
@@ -112,10 +112,11 @@ alias cl="colorize"
 
 # ENTUR CLI aliases :)
 alias subway_munkelia="entur_oracle departures NSR:Quay:10667"
+alias subway_stortinget="entur_oracle departures NSR:Quay:7256 -n 5 --filter Bergkrystallen"
 alias train_nyland="entur_oracle departures NSR:Quay:505"
 
 alias android_emulator="$HOME/Android/Sdk/emulator/emulator @Pixel_XL_API_26"
-alias cal="cal -m"
+alias cal="cal -m"op
 
 
 alias paste_without_whitespace="clippaste | sed 's/\s//g'"
@@ -126,12 +127,29 @@ alias code="code-insiders"
 alias top=vtop
 alias oldtop=/usr/bin/top
 
+alias activate_draw_mode="pkill -f xbindkeys && xbindkeys -f $HOME/.xbindkeysrc-draw"
+alias activate_normal_mode="pkill -f xbindkeys && xbindkeys -f $HOME/.xbindkeysrc"
+
+
+alias build_in_jenkins="$HOME/TINE/Brukerskifte/trigger-jenkins.sh \$(basename \$(git rev-parse --show-toplevel))"
+
+get_jenkins_jobs() {
+    JENKINS_BASE_URL="http://lrm-dev.tine.no:8080"
+    AUTH="lrm:melkpaavei"
+    http --auth $AUTH GET $JENKINS_BASE_URL/api/json | jq -r ".jobs[].name" | fzf
+}
+
 # LastPass ncieties
 getpassword() {
     lpass show $1 --password --clip
     echo "Password for $1 copied to clipboard :)"
 }
 
+searchpassword() {
+	  ACCOUNT=$(lpass export --fields=name,username | tail -n +2 | fzf)
+    echo $ACCOUNT | cut -d "," -f 1 | xargs lpass show --password --clip
+    echo "Copied password to clipboard :)"
+}
 
 
 TIGER_CONFIG_DIR="${HOME}/tigervpn-config"
@@ -147,6 +165,7 @@ tigervpn() {
 [ -f $HOME/.local/bin/aws_zsh_completer.sh ] && source $HOME/.local/bin/aws_zsh_completer.sh
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f ~/.docker-fzf.zsh ] && source ~/.docker-fzf.zsh
 
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
@@ -154,43 +173,7 @@ tigervpn() {
 # tabtab source for sls package
 # uninstall by removing these lines or running `tabtab uninstall sls`
 [[ -f /homej/onasws/.config/yarn/global/node_modules/tabtab/.completions/sls.zsh ]] && . /home/jonasws/.config/yarn/global/node_modules/tabtab/.completions/sls.zsh
-###-begin-pm2-completion-###
-### credits to npm for the completion file model
-#
-# Installation: pm2 completion >> ~/.bashrc  (or ~/.zshrc)
-#
 
-COMP_WORDBREAKS=${COMP_WORDBREAKS/=/}
-COMP_WORDBREAKS=${COMP_WORDBREAKS/@/}
-export COMP_WORDBREAKS
-
-if type complete &>/dev/null; then
-  _pm2_completion () {
-    local si="$IFS"
-    IFS=$'\n' COMPREPLY=($(COMP_CWORD="$COMP_CWORD" \
-                           COMP_LINE="$COMP_LINE" \
-                           COMP_POINT="$COMP_POINT" \
-                           pm2 completion -- "${COMP_WORDS[@]}" \
-                           2>/dev/null)) || return $?
-    IFS="$si"
-  }
-  complete -o default -F _pm2_completion pm2
-elif type compctl &>/dev/null; then
-  _pm2_completion () {
-    local cword line point words si
-    read -Ac words
-    read -cn cword
-    let cword-=1
-    read -l line
-    read -ln point
-    si="$IFS"
-    IFS=$'\n' reply=($(COMP_CWORD="$cword" \
-                       COMP_LINE="$line" \
-                       COMP_POINT="$point" \
-                       pm2 completion -- "${words[@]}" \
-                       2>/dev/null)) || return $?
-    IFS="$si"
-  }
-  compctl -K _pm2_completion + -f + pm2
+if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
+        source /etc/profile.d/vte-2.91.sh
 fi
-###-end-pm2-completion-###
