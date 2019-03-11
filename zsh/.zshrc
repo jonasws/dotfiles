@@ -4,7 +4,8 @@
 # Look in ~/.oh-my-zsh/themes/
 # Optionally, if you set this to "random", it'll load a random theme each
 # time that oh-my-zsh is loaded.
-ZSH_THEME="refined"
+#ZSH_THEME="refined"
+ZSH_THEME="dracula"
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -48,7 +49,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose sudo systemd command-not-found alias-tips z httpie yarn wd brew)
+plugins=(gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose sudo systemd alias-tips z httpie yarn wd brew)
 
 
 
@@ -132,11 +133,21 @@ alias activate_normal_mode="pkill -f xbindkeys && xbindkeys -f $HOME/.xbindkeysr
 
 
 alias build_in_jenkins="$HOME/TINE/Brukerskifte/trigger-jenkins.sh \$(basename \$(git rev-parse --show-toplevel))"
+alias boc="$HOME/TINE/Brukerskifte/open-jenkins-pipeline.sh \$(basename \$(git rev-parse --show-toplevel))"
+alias bos="get_jenkins_job | xargs $HOME/TINE/Brukerskifte/open-jenkins-pipeline.sh"
 
-get_jenkins_jobs() {
+alias download="http --download"
+
+get_jenkins_job() {
     JENKINS_BASE_URL="http://lrm-dev.tine.no:8080"
     AUTH="lrm:melkpaavei"
     http --auth $AUTH GET $JENKINS_BASE_URL/api/json | jq -r ".jobs[].name" | fzf
+}
+
+get_jenkins_jobs_as_json() {
+    JENKINS_BASE_URL="http://lrm-dev.tine.no:8080"
+    AUTH="lrm:melkpaavei"
+    http --auth $AUTH GET $JENKINS_BASE_URL/api/json
 }
 
 # LastPass ncieties
@@ -146,9 +157,8 @@ getpassword() {
 }
 
 searchpassword() {
-	  ACCOUNT=$(lpass export --fields=name,username | tail -n +2 | fzf)
-    echo $ACCOUNT | cut -d "," -f 1 | xargs lpass show --password --clip
-    echo "Copied password to clipboard :)"
+    ACCOUNT=$(lpass export --fields=name,username,id | tail -n +2 | fzf | cut -d "," -f 3)
+     lpass show --password --clip $ACCOUNT && echo "Copied password to clipboard :)"
 }
 
 
