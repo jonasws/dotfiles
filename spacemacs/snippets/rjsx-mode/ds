@@ -1,0 +1,4 @@
+# name: Dev safe
+# key: ds
+# --
+process.env.NODE_ENV !== 'production' && $1

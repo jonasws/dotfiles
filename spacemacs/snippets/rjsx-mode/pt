@@ -1,0 +1,6 @@
+# name: Assign PropTypes
+# key: pt
+# --
+$1.propTypes = {
+  $2
+}
