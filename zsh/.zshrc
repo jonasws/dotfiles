@@ -49,7 +49,7 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose sudo systemd alias-tips z httpie yarn wd brew)
+plugins=(gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose thefuck systemd alias-tips z httpie yarn wd brew fd github)
 
 
 
@@ -57,7 +57,9 @@ plugins=(gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dir
 # User configuration
 # export PATH="${HOME}/.npm-global/bin:${ANDROID_HOME}/tools:${ANDROID_HOME}/platform-tools:${HOME}/.cabal/bin:/opt/cabal/1.22/bin:/opt/ghc/7.10.3/bin:${HOME}/.local/bin:${GOPATH}/bin:/usr/local/go/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games"
 
-
+if (( ! ${fpath[(I)/home/linuxbrew/.linuxbrew/share/zsh/site-functions]} )); then
+	FPATH=/home/linuxbrew/.linuxbrew/share/zsh/site-functions:$FPATH
+fi
 
 source $ZSH/oh-my-zsh.sh
 
@@ -85,6 +87,7 @@ fi
 # Example aliases
 alias zshconfig="vim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
+alias ci="code-insiders"
 
 # Redefine some aliases, adding nocorrect
 alias ssh="nocorrect ssh"
@@ -104,12 +107,15 @@ alias ghu="gh-upstream"
 alias ab="atom-beta"
 
 alias y="yarn"
+alias yi="yarn --ignore-engines"
 alias yb="yarn build"
 alias ys="yarn start"
 alias yt="yarn test"
 
 alias cl="colorize"
 
+# Git stuff
+alias gupa="git pull --rebase --autostash"
 
 # ENTUR CLI aliases :)
 alias subway_munkelia="entur_oracle departures NSR:Quay:10667"
@@ -117,7 +123,6 @@ alias subway_stortinget="entur_oracle departures NSR:Quay:7256 -n 5 --filter Ber
 alias train_nyland="entur_oracle departures NSR:Quay:505"
 
 alias android_emulator="$HOME/Android/Sdk/emulator/emulator @Pixel_XL_API_26"
-alias cal="cal -m"op
 
 
 alias paste_without_whitespace="clippaste | sed 's/\s//g'"
@@ -129,14 +134,22 @@ alias top=vtop
 alias oldtop=/usr/bin/top
 
 alias activate_draw_mode="pkill -f xbindkeys && xbindkeys -f $HOME/.xbindkeysrc-draw"
+alias activate_presenter_mode="pkill -f xbindkeys && xbindkeys -f $HOME/.xbindkeysrc-presenter"
 alias activate_normal_mode="pkill -f xbindkeys && xbindkeys -f $HOME/.xbindkeysrc"
 
+
+alias quickopen="bat \$(fzf)"
 
 alias build_in_jenkins="$HOME/TINE/Brukerskifte/trigger-jenkins.sh \$(basename \$(git rev-parse --show-toplevel))"
 alias boc="$HOME/TINE/Brukerskifte/open-jenkins-pipeline.sh \$(basename \$(git rev-parse --show-toplevel))"
 alias bos="get_jenkins_job | xargs $HOME/TINE/Brukerskifte/open-jenkins-pipeline.sh"
 
-alias download="http --download"
+alias locjs="fd \.js$ src | xargs cat | wc -l"
+alias locjs_notest='fd \.js$ src  -E "*.test.js" -E __mocks__ -E stories| xargs cat | wc -l'
+
+download() {
+    http $1 --download --out $2
+}
 
 get_jenkins_job() {
     JENKINS_BASE_URL="http://lrm-dev.tine.no:8080"
@@ -158,7 +171,7 @@ getpassword() {
 
 searchpassword() {
     ACCOUNT=$(lpass export --fields=name,username,id | tail -n +2 | fzf | cut -d "," -f 3)
-     lpass show --password --clip $ACCOUNT && echo "Copied password to clipboard :)"
+    lpass show $ACCOUNT --password --clip && echo "Copied password to clipboard :)"
 }
 
 
@@ -176,14 +189,3 @@ tigervpn() {
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 [ -f ~/.docker-fzf.zsh ] && source ~/.docker-fzf.zsh
-
-# tabtab source for serverless package
-# uninstall by removing these lines or running `tabtab uninstall serverless`
-[[ -f /home/jonasws/.config/yarn/global/node_modules/tabtab/.completions/serverless.zsh ]] && . /home/jonasws/.config/yarn/global/node_modules/tabtab/.completions/serverless.zsh
-# tabtab source for sls package
-# uninstall by removing these lines or running `tabtab uninstall sls`
-[[ -f /homej/onasws/.config/yarn/global/node_modules/tabtab/.completions/sls.zsh ]] && . /home/jonasws/.config/yarn/global/node_modules/tabtab/.completions/sls.zsh
-
-if [ $TILIX_ID ] || [ $VTE_VERSION ]; then
-        source /etc/profile.d/vte-2.91.sh
-fi
