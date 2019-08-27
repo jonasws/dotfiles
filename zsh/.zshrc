@@ -49,7 +49,9 @@ DISABLE_UNTRACKED_FILES_DIRTY="true"
 # Custom plugins may be added to ~/.oh-my-zsh/custom/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose thefuck systemd alias-tips z httpie yarn wd brew fd github)
+plugins=(gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dirpersist last-working-dir git colored-man colorize web-search node npm python mvn docker docker-compose thefuck systemd alias-tips z httpie yarn wd brew fd github vscode fedora)
+
+VSCODE="code-insiders"
 
 
 
@@ -60,6 +62,9 @@ plugins=(gradle zsh-syntax-highlighting zsh-autosuggestions copydir copyfile dir
 if (( ! ${fpath[(I)/home/linuxbrew/.linuxbrew/share/zsh/site-functions]} )); then
 	FPATH=/home/linuxbrew/.linuxbrew/share/zsh/site-functions:$FPATH
 fi
+
+ZSH_THEME="dracula"
+
 
 source $ZSH/oh-my-zsh.sh
 
@@ -87,7 +92,6 @@ fi
 # Example aliases
 alias zshconfig="vim ~/.zshrc"
 alias ohmyzsh="vim ~/.oh-my-zsh"
-alias ci="code-insiders"
 
 # Redefine some aliases, adding nocorrect
 alias ssh="nocorrect ssh"
@@ -128,8 +132,6 @@ alias android_emulator="$HOME/Android/Sdk/emulator/emulator @Pixel_XL_API_26"
 alias paste_without_whitespace="clippaste | sed 's/\s//g'"
 
 # Aliasing vcode nigthly to "code"
-alias code="code-insiders"
-
 alias top=vtop
 alias oldtop=/usr/bin/top
 
@@ -139,13 +141,21 @@ alias activate_normal_mode="pkill -f xbindkeys && xbindkeys -f $HOME/.xbindkeysr
 
 
 alias quickopen="bat \$(fzf)"
+alias qo="quickopen"
 
-alias build_in_jenkins="$HOME/TINE/Brukerskifte/trigger-jenkins.sh \$(basename \$(git rev-parse --show-toplevel))"
-alias boc="$HOME/TINE/Brukerskifte/open-jenkins-pipeline.sh \$(basename \$(git rev-parse --show-toplevel))"
-alias bos="get_jenkins_job | xargs $HOME/TINE/Brukerskifte/open-jenkins-pipeline.sh"
+alias build_in_jenkins="$HOME/TINE/trigger-jenkins.sh \$(basename \$(git rev-parse --show-toplevel))"
+alias boc="$HOME/TINE/open-jenkins-pipeline.sh \$(basename \$(git rev-parse --show-toplevel)) > /dev/null"
+alias bos="$HOME/TINE/open-jenkins-pipeline.sh \$(get_jenkins_job) > /dev/null"
 
 alias locjs="fd \.js$ src | xargs cat | wc -l"
 alias locjs_notest='fd \.js$ src  -E "*.test.js" -E __mocks__ -E stories| xargs cat | wc -l'
+
+alias cb="clipboard"
+
+
+bindkey -e
+bindkey '^[^[[C' emacs-forward-word
+bindkey '^[^[[D' emacs-backward-word
 
 download() {
     http $1 --download --out $2
@@ -165,13 +175,13 @@ get_jenkins_jobs_as_json() {
 
 # LastPass ncieties
 getpassword() {
-    lpass show $1 --password --clip
-    echo "Password for $1 copied to clipboard :)"
+    lpass show $1 --password --clip &&  echo "Password for $1 copied to clipboard :)"
 }
 
 searchpassword() {
     ACCOUNT=$(lpass export --fields=name,username,id | tail -n +2 | fzf | cut -d "," -f 3)
-    lpass show $ACCOUNT --password --clip && echo "Copied password to clipboard :)"
+    # lpass show $ACCOUNT --password --clip && echo "Copied password to clipboard :)"
+    getpassword $ACCOUNT
 }
 
 
@@ -187,5 +197,5 @@ tigervpn() {
 # AWS CLI completion
 [ -f $HOME/.local/bin/aws_zsh_completer.sh ] && source $HOME/.local/bin/aws_zsh_completer.sh
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+[ -f /usr/share/fzf/shell/key-bindings.zsh ] && source /usr/share/fzf/shell/key-bindings.zsh
 [ -f ~/.docker-fzf.zsh ] && source ~/.docker-fzf.zsh
