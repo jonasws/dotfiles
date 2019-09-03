@@ -41,12 +41,60 @@ abbr cb clipboard
 
 abbr -a gupa "git pull --rebase --autostash"
 
+
+function update-starship
+    set githubToken (cat ~/.github_token)
+    set query "
+        query lastStarshipRlease {
+          repository(owner: "starship", name: "starship") {
+            releases(last: 1) {
+              nodes {
+                tagName
+                releaseAssets(last: 5) {
+                  nodes {
+                    name
+                    downloadUrl
+                  }
+                }
+              }
+            }
+          }
+        }
+
+    "
+    set latestReleaseJson (http post https://api.github.com/graphql "Authorization: Bearer $githubToken" query=$query | jq .data.repository.releases.nodes[0])
+
+    set latestAvailableVersion (echo $latestReleaseJson | jq -r ".tagName")
+    set installedVersion "v"(starship --version | cut -d " " -f 2)
+
+    if test $latestAvailableVersion != $installedVersion
+        echo "Newer version of starship is available: $latestAvailableVersion"
+        set assetUrl ( echo $latestReleaseJson | jq -r ".releaseAssets.nodes | map(select(.name|test(\"linux\"))) | .[0].downloadUrl")
+
+        http --download $assetUrl > ~/Downloads/starship.tar.gz 2> /dev/null
+
+        mkdir ~/Downloads/starship-download
+        tar xzvf ~/Downloads/starship.tar.gz 2>&1 -C ~/Downloads/starship-download > /dev/null 2>&1
+        mv ~/Downloads/starship-download/x86_64-unknown-linux-gnu/starship ~/.local/bin/starship
+        chmod +x ~/.local/bin/starship
+
+        rm -r ~/Downloads/{starship.tar.gz,starship-download}
+
+        echo "Done updating starship. New version is $latestAvailableVersion"
+
+    else
+        echo "Starship is already the latest version: $installedVersion"
+    end
+
+
+end
+
 function trigger-lrm-jenkins
     set JOB_NAME $argv[1]
     set JENKINS_BASE http://lrm-dev.tine.no:8080
     set AUTH lrm:melkpaavei
     set CRUMB (http --auth $AUTH GET $JENKINS_BASE/crumbIssuer/api/json | jq -r .crumb)
-    http --auth $AUTH POST $JENKINS_BASE/job/$JOB_NAME/job/master/build Jenkins-Crumb:$CRUMB > /dev/null 2> /dev/null &&\
+    http --auth $AUTH POST $JENKINS_BASE/job/$JOB_NAME/job/master/build Jenkins-Crumb:$CRUMB >/dev/null 2>/dev/null && \
         echo "Triggered build of $JOB_NAME"
 end
 
@@ -56,7 +104,7 @@ function open-in-jenkins
 end
 
 function repo-name
-   basename (git rev-parse --show-toplevel)
+    basename (git rev-parse --show-toplevel)
 end
 
 alias oni2 /home/jonasws/Onivim2-x86_64.AppImage
@@ -66,5 +114,5 @@ thefuck --alias | source
 
 # tabtab source for serverless package
 # uninstall by removing these lines or running `tabtab uninstall serverless`
-[ -f /home/jonasws/.npm-global/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish ]; and . /home/jonasws/.npm-global/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish
-
+[ -f /home/jonasws/.npm-global/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish ]
+and . /home/jonasws/.npm-global/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish
