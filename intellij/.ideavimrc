@@ -1,6 +1,7 @@
 set ignorecase
 set smartcase
 set surround
+set visualbell
 
 " Integrate with system clipboard
 set clipboard=unnamedplus,unnamed
