@@ -93,14 +93,21 @@ function trigger-lrm-jenkins
     set JOB_NAME $argv[1]
     set JENKINS_BASE http://lrm-dev.tine.no:8080
     set AUTH lrm:melkpaavei
-    set CRUMB (http --auth $AUTH GET $JENKINS_BASE/crumbIssuer/api/json | jq -r .crumb)
-    http --auth $AUTH POST $JENKINS_BASE/job/$JOB_NAME/job/master/build Jenkins-Crumb:$CRUMB >/dev/null 2>/dev/null && \
-        echo "Triggered build of $JOB_NAME"
+
+    set CRUMB (http --session=/tmp/lrm-jenkins-session.json --auth $AUTH GET $JENKINS_BASE/crumbIssuer/api/json | jq -r .crumb)
+
+    http --session=/tmp/lrm-jenkins-session.json --auth $AUTH POST $JENKINS_BASE/job/$JOB_NAME/job/master/build Jenkins-Crumb:$CRUMB > /dev/null 2> /dev/null &&\
+      echo "Trigger build of $JOB_NAME"
 end
 
 function open-in-jenkins
     set JOB_NAME (repo-name)
-    open http://lrm-dev.tine.no:8080/blue/organizations/jenkins/$JOB_NAME/activity
+    set JENKINS_BASE http://lrm-dev.tine.no:8080
+    set AUTH lrm:melkpaavei
+
+    set LATEST_BUILD_NUMBER (http --auth $AUTH GET $JENKINS_BASE/job/$JOB_NAME/job/master/api/json | jq -r .builds[0].number)
+
+    open http://lrm-dev.tine.no:8080/blue/organizations/jenkins/$JOB_NAME/detail/master/$LATEST_BUILD_NUMBER/pipeline
 end
 
 function repo-name
