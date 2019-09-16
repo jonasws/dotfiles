@@ -97,7 +97,7 @@ function trigger-lrm-jenkins
     set CRUMB (http --session=/tmp/lrm-jenkins-session.json --auth $AUTH GET $JENKINS_BASE/crumbIssuer/api/json | jq -r .crumb)
 
     http --session=/tmp/lrm-jenkins-session.json --auth $AUTH POST $JENKINS_BASE/job/$JOB_NAME/job/master/build Jenkins-Crumb:$CRUMB > /dev/null 2> /dev/null &&\
-      echo "Trigger build of $JOB_NAME"
+      echo "Triggered build of $JOB_NAME"
 end
 
 function open-in-jenkins
@@ -117,9 +117,3 @@ end
 alias oni2 /home/jonasws/Onivim2-x86_64.AppImage
 
 thefuck --alias | source
-
-
-# tabtab source for serverless package
-# uninstall by removing these lines or running `tabtab uninstall serverless`
-[ -f /home/jonasws/.npm-global/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish ]
-and . /home/jonasws/.npm-global/lib/node_modules/serverless/node_modules/tabtab/.completions/serverless.fish
