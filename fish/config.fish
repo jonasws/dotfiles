@@ -117,3 +117,5 @@ end
 alias oni2 /home/jonasws/Onivim2-x86_64.AppImage
 
 thefuck --alias | source
+
+status --is-interactive; and source (pyenv init -|psub)
