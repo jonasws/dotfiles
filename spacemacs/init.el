@@ -118,6 +118,8 @@ values."
      github
      (markdown :variables
                markdown-live-preview-engine 'vmd)
+     latex
+
      (org :variables
           org-enable-github-support t)
      (ranger :variables
@@ -133,6 +135,13 @@ values."
      (version-control :variables
                        version-control-diff-tool 'git-gutter
                        version-control-global-margin t)
+
+     (elfeed :variables
+             elfeed-feeds '(
+                            "http://news.ycombinator.com/rss"
+                            ))
+
+     deft
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -494,4 +503,5 @@ you should place your code here."
 
   ;; Emojis!
   (add-hook 'magit-mode-hook #'global-emojify-mode)
+  (add-hook 'doc-view-mode-hook 'auto-revert-mode)
 )
