@@ -84,7 +84,7 @@ values."
      (java :variables
            java-backend 'lsp
            java--ensime-modes nil
-           lsp-java-vmargs '("-noverify" "-Xmx1G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-javaagent:/home/jonasws/.m2/repository/org/projectlombok/lombok/1.18.4/lombok-1.18.4.jar" "-Xbootclasspath/a:/home/jonasws/.m2/repository/org/projectlombok/lombok/1.18.4/lombok-1.18.4.jar")
+           ;; lsp-java-vmargs '("-noverify" "-Xmx1G" "-XX:+UseG1GC" "-XX:+UseStringDeduplication" "-javaagent:/home/jonasws/.m2/repository/org/projectlombok/lombok/1.18.4/lombok-1.18.4.jar" "-Xbootclasspath/a:/home/jonasws/.m2/repository/org/projectlombok/lombok/1.18.4/lombok-1.18.4.jar")
            lsp-java-format-settings-url "https://raw.githubusercontent.com/google/styleguide/gh-pages/intellij-java-google-style.xml"
            )
      kotlin
