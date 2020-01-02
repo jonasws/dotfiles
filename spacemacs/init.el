@@ -2,7 +2,6 @@
 ;; This file is loaded by Spacemacs at startup.
 ;; It must be stored in your home directory.
 
-
 (defun dotspacemacs/layers ()
   "Configuration Layers declaration.
 You should not put any user code in this function besides modifying the variable
@@ -42,29 +41,27 @@ values."
    '(shell-scripts
      vimscript
      (python :variables
-             python-enable-yapf-format-on-save t
-     )
-     rust
+             python-backend 'anaconda
+             )
      nginx
-     systemd
      csv
      sql
-     ruby
-     scala
      (elm :variables
           elm-sort-imports-on-save t
           elm-format-on-save t
           )
+
+
+     multiple-cursors
+
      yaml
      prettier
      (html :variables
            web-fmt-tool 'prettier
            )
 
-     dap
-     (lsp :variables
-          lsp-ui-sideline-enable nil
-      )
+     terraform
+     lsp
      (javascript :variables
                  javascript-backend 'lsp
                  javascript-fmt-tool 'prettier
@@ -89,9 +86,13 @@ values."
            )
      kotlin
 
-     docker
 
-     colors
+     docker
+     restclient
+
+     (colors :variables
+             colors-enable-nyan-cat-progress-bar t
+             )
      emoji
      themes-megapack
 
@@ -106,58 +107,53 @@ values."
      ;; Uncomment some layer names and press <SPC f e R> (Vim style) or
      ;; <M-m f e R> (Emacs style) to install them.
      ;; ----------------------------------------------------------------
-     helm
+     ;; helm
+     ivy
      (auto-completion :variables
                       auto-completion-return-key-behavior nil
       )
      emacs-lisp
      (git :variables
           magit-repository-directories `(
-                                         (,(getenv "HOME") . 2)
+                                         (,(expand-file-name "OpenBanking" (getenv "HOME")) . 1)
                                          ))
-     github
      (markdown :variables
                markdown-live-preview-engine 'vmd)
-     latex
 
      (org :variables
           org-enable-github-support t)
      (ranger :variables
              ranger-show-preview t
-             ranger-override-dired t)
-     (shell :variables
-            shell-default-shell 'ansi-term
-            shell-default-height 30
-            shell-default-position 'bottom
-            )
+             ranger-override-dired t
+             ranger-show-hidden t)
+
+     ;; (shell :variables
+     ;;        shell-default-shell 'ansi-term
+     ;;        shell-default-height 30
+     ;;        shell-default-position 'bottom
+     ;;        )
+     shell
      spell-checking
      syntax-checking
      (version-control :variables
                        version-control-diff-tool 'git-gutter
                        version-control-global-margin t)
 
+     speed-reading
      (elfeed :variables
              elfeed-feeds '(
                             "http://news.ycombinator.com/rss"
                             ))
-
-     deft
+     (osx :variables
+          osx-option-as 'meta
+          osx-right-option-as 'none
+          )
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages
-   '(
-     forge
-
-     beacon
-     editorconfig
-     all-the-icons
-     groovy-mode
-     graphql-mode
-     emojify
-     )
+   dotspacemacs-additional-packages '()
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -386,11 +382,12 @@ values."
    dotspacemacs-highlight-delimiters 'all
    ;; If non nil, advise quit functions to keep server open when quitting.
    ;; (default nil)
+   dotspacemacs-enable-server nil
    dotspacemacs-persistent-server nil
    ;; List of search tool executable names. Spacemacs uses the first installed
    ;; tool of the list. Supported tools are `ag', `pt', `ack' and `grep'.
    ;; (default '("ag" "pt" "ack" "grep"))
-   dotspacemacs-search-tools '("ag" "pt" "ack" "grep")
+   dotspacemacs-search-tools '("rg" "ag" "pt" "ack" "grep")
    ;; The default package repository used if no explicit repository has been
    ;; specified with an installed package.
    ;; Not used for now. (default nil)
@@ -419,11 +416,11 @@ before packages are loaded. If you are unsure, you should try in setting them in
    js2-indent-level 2
 
    ;; web-mode
-   css-indent-offset 4
-   web-mode-markup-indent-offset 4
-   web-mode-css-indent-offset 4
-   web-mode-code-indent-offset 4
-   web-mode-attr-indent-offset 4
+   css-indent-offset 2
+   web-mode-markup-indent-offset 2
+   web-mode-css-indent-offset 2
+   web-mode-code-indent-offset 2
+   web-mode-attr-indent-offset 2
    )
   )
 
@@ -437,42 +434,15 @@ explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
 
 
-  (defun reload-raavaretorget ()
-    (interactive)
-    (save-buffer)
-    (shell-command "/home/jonasws/TINE/Produsentsystemer/Raavaretorget/reload-stuff.sh")
-    )
-
-  (defun trigger-jenkins-build ()
-    (interactive)
-    (shell-command "trigger-lrm-jenkins (repo-name)")
-    )
-
-  (defun open-in-jenkins ()
-    (interactive)
-    (shell-command "open-in-jenkins")
-    )
-
-  (spacemacs/set-leader-keys
-    "ou" 'reload-raavaretorget
-    "ob" 'trigger-jenkins-build
-    "op" 'open-in-jenkins
-    )
-
   (spacemacs/toggle-display-time-on)
 
-  (setq
-   web-mode-enable-auto-quoting nil
-   ;; typescript--tmp-location (expand-file-name ".tmp" (getenv "HOME"))
-   )
 
   (zone-when-idle 600)
 
   (setq-default
-
    neo-theme 'icons
+   groovy-indent-offset 2
    )
-
 
   ;; Open nunjucks files as web mode
   (add-to-list 'auto-mode-alist '("\\.njk\\'" . web-mode));
@@ -504,4 +474,23 @@ you should place your code here."
   ;; Emojis!
   (add-hook 'magit-mode-hook #'global-emojify-mode)
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+
+
+  (defun browse-in-bitbucket ()
+    (interactive)
+    (shell-command "browse-in-bitbucket"))
+
+  (defun compare-in-bitbucket ()
+    (interactive)
+    (shell-command "compare-in-bitbucket"))
+
+  (defun view-pr-in-bitbucket ()
+    (interactive)
+    (shell-command "view-pull-request"))
+
+  (spacemacs/set-leader-keys
+    "ob" 'browse-in-bitbucket
+    "oc" 'compare-in-bitbucket
+    "op" 'view-pr-in-bitbucket
+    )
 )
