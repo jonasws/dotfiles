@@ -4,6 +4,12 @@ function __fish_describe_command; end
 
 source $HOME/dotfiles/fish/local.fish
 
+
+# To now slow down Emacs searching/projectile magic while on macOS
+if not builtin status is-interactive
+    exit
+end
+
 starship init fish | source
 
 functions --erase fish_starship_prompt
@@ -41,11 +47,14 @@ set fish_color_autosuggestion white
 # Vim duh
 set -x EDITOR vim
 
-# some git abbrs that were missing atmw
+# some git abbrs that were missing atm
 abbr gsw "git switch"
 
-abbr yi "yarn --ignore-engines"
-abbr yt "yarn test"
+
+abbr gpsup "git push -u origin (git rev-parse --abbrev-ref HEAD)"
+
+abbr -a gupa "git pull --rebase --autostash"
+abbr -a gsm "git switch master"
 
 alias bussen_hjem "entur_oracle departures NSR:Quay:7169"
 
@@ -53,15 +62,15 @@ alias git hub
 
 abbr - "cd -"
 
-abbr cb clipboard
-
-abbr -a gupa "git pull --rebase --autostash"
-abbr -a gcm "git checkout master"
-
 
 function repo-name
     basename (git rev-parse --show-toplevel)
 end
+
+function current-branch
+    git rev-parse --abbrev-ref HEAD
+end
+
 
 alias gproxy "sudo ssh -f -nNT gitproxy 2> /dev/null && echo \"Successfully connected with gproxy 😎\""
 alias gproxy-status "sudo ssh -O check gitproxy"
@@ -80,6 +89,10 @@ function assume-aws-role
       ;  set -gx AWS_DEFAULT_REGION eu-west-1
 end
 
+function get-lb-dns
+    aws elbv2  describe-load-balancers --names $argv[1] --query "LoadBalancers[0].DNSName" | xargs dig +short
+end
+
 complete -f -c assume-aws-role -a "(__aada_profile_completion)"
 
 alias assume assume-aws-role
@@ -90,12 +103,19 @@ set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 set -x PATH (dirname (nvm which node)) (dirname (pyenv which python)) /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bin $PATH
 set -x BD_OPT 'insensitive'
 
-set -x FZF_DEFAULT_COMMAND 'fd --type f'
-set -x FZF_CTRL_T_COMMAND "$FZF_DEFAULT_COMMAND"
+set -U FZF_DEFAULT_COMMAND "fd --type f"
+set -U FZF_FIND_FILE_COMMAND "fd --type f . \$dir"
+set -U FZF_OPEN_COMMAND "fd --type f . \$dir"
+
+set -U FZF_PREVIEW_FILE_CMD "bat --plain --color=always --line-range :10"
+set -U FZF_ENABLE_OPEN_PREVIEW 1
+set -U FZF_LEGACY_KEYBINDINGS 0
+
+alias fp 'fzf --preview="bat {} --color=always" --print0 | xargs -0 bat'
+alias fpd 'fzf --preview="bat {} --color=always" --preview-window down --print0 | xargs -0 | xargs bat'
+
 
 set -g fish_user_paths "/usr/local/sbin" $fish_user_paths
-
-
 
 
 set -x RIPGREP_CONFIG_PATH $HOME/.config/ripgrep/rc
@@ -110,27 +130,15 @@ alias tree "exa --tree"
 alias t tig
 alias tst "tig status"
 
-alias fp 'fzf --preview="bat {} --color=always"'
-alias fpd 'fzf --preview="bat {} --color=always" --preview-window down'
-
 alias code code-insiders
 alias vsc "code ."
 
 pyenv init - | source
 
-function rg
-    if isatty stdout
-        command rg -p $argv | less -RMFXK
-    else
-        command rg $argv
-    end
-end
-
-
 function jq
     if isatty stdout
         # Because bat, duh
-        command jq $argv | bat --language json
+        command jq $argv | bat --plain --language json
     else
         command jq $argv
     end
@@ -138,15 +146,31 @@ end
 
 function http
     if isatty stdout
-        command http --pretty all $argv | bat
+        command http  --check-status --pretty all $argv | bat --plain
     else
         command http $argv
     end
 end
 
-set -x FZF_DEFAULT_COMMAND 'fd --type f'
-set -x FZF_CTRL_T_COMMAND $FZF_DEFAULT_COMMAND
-set -x FZF_ALT_C_COMMAND $FZF_DEFAULT_COMMAND
+function fish_title_once
+    echo -ne "\033]0;$argv[1]\a"
+end
+
+function bootLocal
+    set port $argv[1]
+    if test -z $port
+        set port 8080
+
+    end
+
+    set jvmArgs "-Dspring.profiles.active=local -Dserver.port=$port"
+
+    set appName (repo-name)
+    fish_title_once "🥾 $appName $port"
+
+    mvn spring-boot:run -Dspring-boot.run.jvmArguments="$jvmArgs"
+end
+
 
 
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
