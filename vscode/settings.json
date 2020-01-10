@@ -970,5 +970,6 @@
     },
     "files.associations": {
         "*.js": "javascriptreact"
-    }
+    },
+    "workbench.startupEditor": "newUntitledFile"
 }
