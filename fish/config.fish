@@ -2,6 +2,10 @@ set -x LC_ALL en_US.UTF-8
 
 function __fish_describe_command; end
 
+function repo-name
+    basename (git rev-parse --show-toplevel)
+end
+
 source $HOME/dotfiles/fish/local.fish
 
 
@@ -63,9 +67,6 @@ alias git hub
 abbr - "cd -"
 
 
-function repo-name
-    basename (git rev-parse --show-toplevel)
-end
 
 function current-branch
     git rev-parse --abbrev-ref HEAD
@@ -124,7 +125,6 @@ set -x RIPGREP_CONFIG_PATH $HOME/.config/ripgrep/rc
 alias ll "exa --long --git"
 alias l "exa --long --git"
 alias la "exa --long --all"
-alias tree "exa --tree"
 
 # Tig aliases
 alias t tig
@@ -152,6 +152,22 @@ function http
     end
 end
 
+function jql
+    if isatty stdout
+        command jql $argv | bat --plain --language json
+    else
+        command jql $argv
+    end
+end
+
+function tree
+    if isatty stdout
+        command exa --tree --color=always $argv | bat --plain
+    else
+        command exa --tree $argv
+    end
+end
+
 function fish_title_once
     echo -ne "\033]0;$argv[1]\a"
 end
@@ -160,7 +176,6 @@ function bootLocal
     set port $argv[1]
     if test -z $port
         set port 8080
-
     end
 
     set jvmArgs "-Dspring.profiles.active=local -Dserver.port=$port"
