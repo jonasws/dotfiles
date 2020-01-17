@@ -52,10 +52,10 @@ set fish_color_autosuggestion white
 set -x EDITOR vim
 
 # some git abbrs that were missing atm
-abbr gsw "git switch"
+abbr -a gsw "git switch"
 
 
-abbr gpsup "git push -u origin (git rev-parse --abbrev-ref HEAD)"
+abbr -a gpsup "git push -u origin (git rev-parse --abbrev-ref HEAD)"
 
 abbr -a gupa "git pull --rebase --autostash"
 abbr -a gsm "git switch master"
@@ -64,8 +64,7 @@ alias bussen_hjem "entur_oracle departures NSR:Quay:7169"
 
 alias git hub
 
-abbr - "cd -"
-
+abbr -a - "cd -"
 
 
 function current-branch
@@ -77,26 +76,33 @@ alias gproxy "sudo ssh -f -nNT gitproxy 2> /dev/null && echo \"Successfully conn
 alias gproxy-status "sudo ssh -O check gitproxy"
 alias gproxy-off "sudo ssh -O exit gitproxy"
 
-alias reload-fish-config "source ~/.config/fish/config.fish && echo \"Fish config reloaded 🐟🚀\""
-
-function __aada_profile_completion
-    rg "\[profile (.*?)\]" $HOME/.aws/config -Nor "\$1"
-end
-
-function assume-aws-role
-    set profile $argv[1]
-    aada login --profile $profile \
-      && set -gx AWS_PROFILE $profile \
-      ;  set -gx AWS_DEFAULT_REGION eu-west-1
-end
+alias reload-fish-config "source ~/.config/fish/config.fish && echo \"Fish config reloaded 🐟 🚀\""
 
 function get-lb-dns
     aws elbv2  describe-load-balancers --names $argv[1] --query "LoadBalancers[0].DNSName" | xargs dig +short
 end
 
+function __aada_profile_completion
+    rg "\[profile (.*?)\]" $HOME/.aws/config -Nor "\$1"
+end
+
+function use-aws-role
+    set profile $argv[1]
+    set -gx AWS_PROFILE $profile \
+    ;  set -gx AWS_DEFAULT_REGION eu-west-1
+end
+
+function assume-aws-role
+    set profile $argv[1]
+    aada login --profile $profile \
+      && use-aws-role $profile
+end
+
 complete -f -c assume-aws-role -a "(__aada_profile_completion)"
+complete -f -c use-aws-role -a "(__aada_profile_completion)"
 
 alias assume assume-aws-role
+alias use use-aws-role
 
 
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
@@ -185,6 +191,10 @@ function bootLocal
 
     mvn spring-boot:run -Dspring-boot.run.jvmArguments="$jvmArgs"
 end
+
+abbr -a mcv "mvn clean verify"
+
+abbr -a pitests "mvn org.pitest:pitest-maven:mutationCoverage -DwithHistory"
 
 
 

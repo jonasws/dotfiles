@@ -1,15 +1,10 @@
-
+let leader=" "
 " Selected IntelliSpace modules
-source ~/intelli-space/spacemacs.vim
-source ~/intelli-space/extra.vim
-source ~/intelli-space/major.vim
-source ~/intelli-space/hybrid.vim
+source ~/.intellimacs/spacemacs.vim
+source ~/.intellimacs/extra.vim
+source ~/.intellimacs/major.vim
+source ~/.intellimacs/hybrid.vim
 
-set ignorecase
-set smartcase
-set surround
 set visualbell
 
-" Integrate with system clipboard
-set clipboard=unnamedplus,unnamed
-
+nnoremap Y y$
