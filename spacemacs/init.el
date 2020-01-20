@@ -44,7 +44,9 @@ values."
              python-backend 'anaconda
              )
      nginx
-     csv
+     (csv :variables
+          csv-separators '(";")
+          )
      sql
      (elm :variables
           elm-sort-imports-on-save t
