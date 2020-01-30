@@ -6,6 +6,8 @@ function repo-name
     basename (git rev-parse --show-toplevel)
 end
 
+alias grt "cd (git rev-parse --show-toplevel)"
+
 source $HOME/dotfiles/fish/local.fish
 
 
@@ -51,11 +53,15 @@ set fish_color_autosuggestion white
 # Vim duh
 set -x EDITOR vim
 
-# some git abbrs that were missing atm
+# some git stuff that were missing atm
+function current-branch
+    git rev-parse --abbrev-ref HEAD
+end
+
 abbr -a gsw "git switch"
 
 
-abbr -a gpsup "git push -u origin (git rev-parse --abbrev-ref HEAD)"
+abbr -a gpsup "git push -u origin (current-branch)"
 
 abbr -a gupa "git pull --rebase --autostash"
 abbr -a gsm "git switch master"
@@ -67,11 +73,6 @@ alias git hub
 abbr -a - "cd -"
 
 
-function current-branch
-    git rev-parse --abbrev-ref HEAD
-end
-
-
 alias gproxy "sudo ssh -f -nNT gitproxy 2> /dev/null && echo \"Successfully connected with gproxy 😎\""
 alias gproxy-status "sudo ssh -O check gitproxy"
 alias gproxy-off "sudo ssh -O exit gitproxy"
@@ -81,6 +82,11 @@ alias reload-fish-config "source ~/.config/fish/config.fish && echo \"Fish confi
 function get-lb-dns
     aws elbv2  describe-load-balancers --names $argv[1] --query "LoadBalancers[0].DNSName" | xargs dig +short
 end
+
+function browse-ssm-params
+    aws ssm describe-parameters --output=json | jq -r ".Parameters[].Name" | fzf --preview="aws ssm get-parameters --names={} | bat --color=always --language=json"
+end
+
 
 function __aada_profile_completion
     rg "\[profile (.*?)\]" $HOME/.aws/config -Nor "\$1"
@@ -140,6 +146,7 @@ alias code code-insiders
 alias vsc "code ."
 
 pyenv init - | source
+jenv init - | source
 
 function jq
     if isatty stdout
@@ -163,6 +170,27 @@ function jql
         command jql $argv | bat --plain --language json
     else
         command jql $argv
+    end
+end
+
+function rg
+    if isatty stdout
+        command rg -p $argv | less -RXF
+    else
+        command rg $argv
+    end
+end
+
+
+function awslogs
+    if isatty stdout
+        if contains -- -w $argv or contains -- --watch $argv
+            command awslogs $argv --color=always  | bat --plain --language log --paging=never
+        else
+            command awslogs $argv --color=always | bat --plain --language log
+        end
+    else
+        command awslogs $argv
     end
 end
 
@@ -191,6 +219,17 @@ function bootLocal
 
     mvn spring-boot:run -Dspring-boot.run.jvmArguments="$jvmArgs"
 end
+
+function test-one
+    set testName (fd --type f -e java "" src/test | fzf | xargs -J {} basename {} .java)
+
+    if test -n "$testName"
+        commandline "mvn test -Dtest=$testName"
+    end
+
+
+end
+
 
 abbr -a mcv "mvn clean verify"
 
