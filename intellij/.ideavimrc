@@ -6,5 +6,11 @@ source ~/.intellimacs/major.vim
 source ~/.intellimacs/hybrid.vim
 
 set visualbell
+set commentary
+set surround
+set argtextobj
 
 nnoremap Y y$
+
+nnoremap <leader>gb :action Annotate<CR>
+vnoremap <leader>gb :action Annotate<CR>

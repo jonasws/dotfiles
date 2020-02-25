@@ -58,10 +58,12 @@ function current-branch
     git rev-parse --abbrev-ref HEAD
 end
 
+abbr -a delete-merged "git branch --merged | rg -v master | xargs git branch -d"
+
 abbr -a gsw "git switch"
 
 
-abbr -a gpsup "git push -u origin (current-branch)"
+abbr -a gpsup "git push -u origin (git current-branch)"
 
 abbr -a gupa "git pull --rebase --autostash"
 abbr -a gsm "git switch master"
@@ -69,6 +71,9 @@ abbr -a gsm "git switch master"
 alias bussen_hjem "entur_oracle departures NSR:Quay:7169"
 
 alias git hub
+
+git config --global alias.newest-tag "describe --abbrev=0"
+git config --global alias.current-branch "rev-parse --abbrev-ref HEAD"
 
 abbr -a - "cd -"
 
@@ -146,7 +151,6 @@ alias code code-insiders
 alias vsc "code ."
 
 pyenv init - | source
-jenv init - | source
 
 function jq
     if isatty stdout
@@ -158,7 +162,7 @@ function jq
 end
 
 function http
-    if isatty stdout
+    if isatty stdout; and not contains -- --download $argv and not contains -- -d $argv
         command http  --check-status --pretty all $argv | bat --plain
     else
         command http $argv
