@@ -136,7 +136,7 @@ alias fpd 'fzf --preview="bat {} --color=always" --preview-window down --print0 
 set -g fish_user_paths "/usr/local/sbin" $fish_user_paths
 
 
-set -x RIPGREP_CONFIG_PATH $HOME/.config/ripgrep/rc
+set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 
 # Exa is cooler than ls, duh
 alias ll "exa --long --git"
