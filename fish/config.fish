@@ -154,8 +154,7 @@ pyenv init - | source
 
 function jq
     if isatty stdout
-        # Because bat, duh
-        command jq $argv | bat --plain --language json
+        command jq -C $argv | less -RXF
     else
         command jq $argv
     end
@@ -171,7 +170,7 @@ end
 
 function jql
     if isatty stdout
-        command jql $argv | bat --plain --language json
+        command jql $argv | less -RXF
     else
         command jql $argv
     end
@@ -200,7 +199,7 @@ end
 
 function tree
     if isatty stdout
-        command exa --tree --color=always $argv | bat --plain
+        command exa --tree --color=always $argv |  less -RXF
     else
         command exa --tree $argv
     end
