@@ -229,9 +229,42 @@ function test-one
     if test -n "$testName"
         commandline "mvn test -Dtest=$testName"
     end
-
-
 end
+
+function op
+    if contains signin $argv
+        set token (command op $argv --raw)
+        set name $argv[2]
+
+        set -gx OP_SESSION_$name $token
+    else
+        command op $argv 2> /dev/null
+
+        if test $status -ne 0
+            echo "Re-auth required"
+            op signin my
+            command op $argv
+        end
+
+    end
+end
+
+function findpass
+  set entry (op list items \
+        | jq -r ".[] | [.uuid, .overview.url, .overview.title] | @tsv" \
+        | fzf)
+
+  set name (printf $entry | cut -f 3)
+  set uuid (printf $entry | cut -f 1)
+
+  op get item $uuid \
+      | jq -r '.details.fields[] | select(.designation=="password").value' \
+      | pbcopy
+
+  echo "Copied password for entry" $name "to clipbaord"
+end
+
+
 
 
 abbr -a mcv "mvn clean verify"
