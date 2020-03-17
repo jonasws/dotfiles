@@ -188,7 +188,7 @@ end
 function awslogs
     if isatty stdout
         if contains -- -w $argv or contains -- --watch $argv
-            command awslogs $argv --color=always  | bat --plain --language log --paging=never
+            command awslogs $argv --color=always | bat --plain --language log --paging=never
         else
             command awslogs $argv --color=always | bat --plain --language log
         end
@@ -270,7 +270,3 @@ end
 abbr -a mcv "mvn clean verify"
 
 abbr -a pitests "mvn org.pitest:pitest-maven:mutationCoverage -DwithHistory"
-
-
-
-complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
