@@ -137,6 +137,7 @@ values."
      (ranger :variables
              ranger-show-preview t
              ranger-override-dired t
+             ranger-enter-with-minus t
              ranger-show-hidden t)
 
      ;; (shell :variables
@@ -260,7 +261,7 @@ values."
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font `("Dank Mono"
-                               :size 14
+                               :size 16
                                ;; :size 32
                                :weight normal
                                :width normal
@@ -502,6 +503,7 @@ you should place your code here."
     "ob" 'browse-in-bitbucket
     "oc" 'compare-in-bitbucket
     "op" 'view-pr-in-bitbucket
+    "ad" 'deer
     )
 )
 (defun dotspacemacs/emacs-custom-settings ()
