@@ -473,7 +473,10 @@ you should place your code here."
 
   ;; SCSS mode mods
   ;; (add-hook 'scss-mode-hook 'prettier-js-mode)
-  (add-hook 'scss-mode-hook 'rainbow-mode-hook)
+  (add-hook 'scss-mode-hook 'rainbow-mode)
+
+  ;; YAML
+  (add-hook 'yaml-mode-hook 'rainbow-delimiters-mode)
 
   ;; Elm format
   ;; (spacemacs/set-leader-keys-for-major-mode 'elm-mode "f" 'elm-mode-format-buffer)
@@ -502,7 +505,5 @@ you should place your code here."
   (spacemacs/set-leader-keys
     "ob" 'browse-in-bitbucket
     "oc" 'compare-in-bitbucket
-    "op" 'view-pr-in-bitbucket
-    "ad" 'deer
     )
 )
