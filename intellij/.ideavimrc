@@ -10,7 +10,13 @@ set commentary
 set surround
 set argtextobj
 
+
 nnoremap Y y$
 
 nnoremap <leader>gb :action Annotate<CR>
 vnoremap <leader>gb :action Annotate<CR>
+
+
+" Comma for major mode
+nmap , <leader>m
+vmap , <leader>m
