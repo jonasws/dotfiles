@@ -68,8 +68,6 @@ abbr -a gpsup "git push -u origin (git current-branch)"
 abbr -a gupa "git pull --rebase --autostash"
 abbr -a gsm "git switch master"
 
-alias bussen_hjem "entur_oracle departures NSR:Quay:7169"
-
 alias git hub
 
 git config --global alias.newest-tag "describe --abbrev=0"
