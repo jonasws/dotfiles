@@ -40,6 +40,9 @@
 ;; To ensure right-alt (option) things still work on macOS
 (setq mac-right-option-modifier 'none)
 
+;; Override some keybinds in company
+(define-key! company-active-map
+  "C-l" #'company-complete)
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
 ;; - `load!' for loading external *.el files relative to this one
