@@ -6,8 +6,8 @@
 
 ;; Some functionality uses this to identify you, e.g. GPG configuration, email
 ;; clients, file templates and snippets.
-(setq user-full-name "John Doe"
-      user-mail-address "john@doe.test")
+(setq user-full-name "Jonas Strømsodd"
+      user-mail-address "jonas.stromsodd@gmail.com")
 
 ;; Doom exposes five (optional) variables for controlling fonts in Doom. Here
 ;; are the three important ones:
@@ -37,6 +37,8 @@
                                          (,(expand-file-name "OpenBanking" (getenv "HOME")) . 1)
                                          ))
 
+;; To ensure right-alt (option) things still work on macOS
+(setq mac-right-option-modifier 'none)
 
 ;; Here are some additional functions/macros that could help you configure Doom:
 ;;
