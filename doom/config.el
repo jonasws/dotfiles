@@ -36,6 +36,7 @@
 (setq magit-repository-directories `(
                                          (,(expand-file-name "OpenBanking" (getenv "HOME")) . 1)
                                          ))
+(setq magit-display-buffer-function #'magit-display-buffer-traditional)
 
 ;; To ensure right-alt (option) things still work on macOS
 (setq mac-right-option-modifier 'none)
