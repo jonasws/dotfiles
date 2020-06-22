@@ -33,13 +33,10 @@
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
-(setq magit-repository-directories `(
-                                         (,(expand-file-name "OpenBanking" (getenv "HOME")) . 1)
-                                         ))
-(setq magit-display-buffer-function #'magit-display-buffer-traditional)
 
-;; To ensure right-alt (option) things still work on macOS
-(setq mac-right-option-modifier 'none)
+
+(define-key! evil-normal-state-map
+  "-" #'deer)
 
 ;; Override some keybinds in company
 (define-key! company-active-map
@@ -60,3 +57,6 @@
 ;;
 ;; You can also try 'gd' (or 'C-c g d') to jump to their definition and see how
 ;; they are implemented.
+
+;; Source "private", computer-specific config
+(load! "private.el")
