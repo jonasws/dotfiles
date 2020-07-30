@@ -87,7 +87,12 @@ function get-lb-dns
 end
 
 function browse-ssm-params
-    aws ssm describe-parameters --output=json | jq -r ".Parameters[].Name" | fzf --preview="aws ssm get-parameters --names={} | bat --color=always --language=json"
+    aws ssm describe-parameters --output=json \
+        | jq -r ".Parameters[].Name" \
+        | fzf --preview="aws ssm get-parameters --names={} | bat --color=always --language=json" \
+        | xargs -I {} aws ssm get-parameters --names={} \
+        | jq
+
 end
 
 
