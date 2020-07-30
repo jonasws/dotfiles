@@ -62,7 +62,10 @@ values."
            web-fmt-tool 'prettier
            )
 
-     terraform
+     (terraform :variables
+                terraform-auto-format-on-save t
+                terraform-backend 'lsp
+                )
      lsp
      (javascript :variables
                  javascript-backend 'lsp
@@ -199,8 +202,8 @@ values."
    ;; (default t)
 
 
-   ;; dotspacemacs-mode-line-theme 'all-the-icons
-   dotspacemacs-mode-line-theme 'spacemacs
+   dotspacemacs-mode-line-theme 'all-the-icons
+   ;; dotspacemacs-mode-line-theme 'spacemacs
 
    dotspacemacs-elpa-https t
    ;; Maximum allowed time in seconds to contact an ELPA repository.
@@ -252,9 +255,8 @@ values."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
+                         gandalf
                          dracula
-                         oldlace
-                         white-sand
                          )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
    dotspacemacs-colorize-cursor-according-to-state t
@@ -451,7 +453,6 @@ you should place your code here."
   (zone-when-idle 600)
 
   (setq-default
-   neo-theme 'icons
    groovy-indent-offset 2
    )
 
