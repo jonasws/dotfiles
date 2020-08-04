@@ -971,5 +971,6 @@
     "files.associations": {
         "*.js": "javascriptreact"
     },
-    "workbench.startupEditor": "newUntitledFile"
+    "workbench.startupEditor": "newUntitledFile",
+    "python.languageServer": "Microsoft"
 }
