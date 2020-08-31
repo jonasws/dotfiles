@@ -131,6 +131,7 @@ set -U FZF_OPEN_COMMAND "fd --type f . \$dir"
 set -U FZF_PREVIEW_FILE_CMD "bat --plain --color=always --line-range :10"
 set -U FZF_ENABLE_OPEN_PREVIEW 1
 set -U FZF_LEGACY_KEYBINDINGS 0
+set -U FZF_COMPLETE 2
 
 alias fp 'fzf --preview="bat {} --color=always" --print0 | xargs -0 bat'
 alias fpd 'fzf --preview="bat {} --color=always" --preview-window down --print0 | xargs -0 | xargs bat'
@@ -267,6 +268,7 @@ function findpass
   echo "Copied password for entry" $name "to clipbaord"
 end
 
+complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
 
 
 
