@@ -22,7 +22,7 @@ functions --erase fish_starship_prompt
 functions --copy fish_prompt fish_starship_prompt
 
 function fish_prompt
-    set gproxyProcess (ps -u root | rg "ssh -f -nNT gitproxy")
+    set gproxyProcess (ps -u root | grep "ssh -f -nNT gitproxy" | grep -v "grep")
     if test -n "$gproxyProcess"
         set gproxyStatusIcon  "📡"
     else
@@ -58,7 +58,7 @@ function current-branch
     git rev-parse --abbrev-ref HEAD
 end
 
-abbr -a delete-merged "git branch --merged | rg -v master | xargs git branch -d"
+abbr -a delete-merged "git branch --merged | grep -v master | xargs git branch -d"
 
 abbr -a gsw "git switch"
 
@@ -76,11 +76,11 @@ git config --global alias.current-branch "rev-parse --abbrev-ref HEAD"
 abbr -a - "cd -"
 
 
-alias gproxy "sudo ssh -f -nNT gitproxy 2> /dev/null && echo \"Successfully connected with gproxy 😎\""
+alias gproxy "sudo ssh -f -nNT gitproxy 2> /dev/null; and echo \"Successfully connected with gproxy 😎\""
 alias gproxy-status "sudo ssh -O check gitproxy"
 alias gproxy-off "sudo ssh -O exit gitproxy"
 
-alias reload-fish-config "source ~/.config/fish/config.fish && echo \"Fish config reloaded 🐟 🚀\""
+alias reload-fish-config "source ~/.config/fish/config.fish; and echo \"Fish config reloaded 🐟 🚀\""
 
 function get-lb-dns
     aws elbv2  describe-load-balancers --names $argv[1] --query "LoadBalancers[0].DNSName" | xargs dig +short
@@ -108,8 +108,8 @@ end
 
 function assume-aws-role
     set profile $argv[1]
-    aada login --profile $profile \
-      && use-aws-role $profile
+    aada login --profile $profile; \
+     and use-aws-role $profile
 end
 
 complete -f -c assume-aws-role -a "(__aada_profile_completion)"
@@ -165,8 +165,8 @@ function jq
 end
 
 function http
-    if isatty stdout; and not contains -- --download $argv and not contains -- -d $argv
-        command http  --check-status --pretty all $argv | bat --plain
+    if isatty stdout; and not contains -- --download $argv; and not contains -- -d $argv
+        command http --pretty=all --print=hb $argv | less -RXF;
     else
         command http $argv
     end
@@ -224,7 +224,7 @@ function bootLocal
     set appName (repo-name)
     fish_title_once "🥾 $appName $port"
 
-    mvn spring-boot:run -Dspring-boot.run.jvmArguments="$jvmArgs"
+    mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="$jvmArgs"
 end
 
 function test-one
@@ -247,9 +247,8 @@ function op
         if test $status -ne 0
             echo "Re-auth required"
             op signin my
-            command op $argv
+            command op $argv 2> /dev/null
         end
-
     end
 end
 
@@ -275,3 +274,9 @@ complete --command aws --no-files --arguments '(begin; set --local --export COMP
 abbr -a mcv "mvn clean verify"
 
 abbr -a pitests "mvn org.pitest:pitest-maven:mutationCoverage -DwithHistory"
+
+# tabtab source for packages
+# uninstall by removing these lines
+[ -f ~/.config/tabtab/__tabtab.fish ]; and . ~/.config/tabtab/__tabtab.fish; or true
+set -g fish_user_paths "/usr/local/opt/terraform@0.12/bin" $fish_user_paths
+set -g fish_user_paths "/usr/local/opt/openssl@1.1/bin" $fish_user_paths
