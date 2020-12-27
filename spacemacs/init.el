@@ -14,9 +14,6 @@ values."
    ;; or `spacemacs'. (default 'spacemacs)
    dotspacemacs-distribution 'spacemacs
 
-   ;; Re-enable when https://github.com/domtronn/spaceline-all-the-icons.el/issues/100 is resolved
-   dotspacemacs-mode-line-theme 'all-the-icons
-
 
    ;; Lazy installation of layers (i.e. layers are installed only when a file
    ;; with a supported type is opened). Possible values are `all', `unused'
@@ -38,10 +35,15 @@ values."
    ;; List of configuration layers to load.
 
    dotspacemacs-configuration-layers
-   '(shell-scripts
+   '(go
+     (shell-scripts :variables
+
+                    )
      vimscript
      (python :variables
              python-backend 'anaconda
+             python-format-on-save t
+             python-test-runner 'pytest
              )
      nginx
      (csv :variables
@@ -74,17 +76,23 @@ values."
                  )
      (typescript :variables
                  typescript-backend 'lsp
-                 typescript-fmt-on-save nil
+                 typescript-fmt-on-save t
                  typescript-fmt-tool 'prettier
                  typescript-indent-level 2
       )
      react
      (treemacs :variables
+               treemacs-position 'left
                treemacs-use-collapsed-directories 3
                treemacs-use-all-the-icons-theme t
                )
 
-     groovy
+     plantuml
+
+     (groovy :variables
+             groovy-backend 'company-groovy
+
+      )
      kotlin
 
      evil-commentary
@@ -121,7 +129,10 @@ values."
           ivy-enable-advanced-buffer-information t
           )
      (auto-completion :variables
-                      auto-completion-return-key-behavior nil
+                      auto-completion-return-key-behavior 'complete
+                      auto-completion-tab-key-behavior 'complete
+                      ;; Company-mode really slows down fish shell buffers for some reason, so yank it out
+                      :disabled-for shell-scripts
       )
      emacs-lisp
      (git :variables
@@ -132,7 +143,12 @@ values."
                markdown-live-preview-engine 'vmd)
 
      (org :variables
-          org-enable-github-support t)
+          org-todo-keywords '((sequence "TODO" "DOING" "BLOCKED" "REVIEW" "DELEGATED" "|" "DONE"))
+          org-want-todo-bindings t
+          org-enable-github-support t
+          org-enable-reveal-js-support t
+          org-re-reveal-root (concat "file://" (expand-file-name "reveal.js" (getenv "HOME"))))
+
      (ranger :variables
              ranger-show-preview t
              ranger-override-dired t
@@ -165,7 +181,9 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '()
+   dotspacemacs-additional-packages '(
+                                      svelte-mode
+                                      )
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -198,8 +216,8 @@ values."
    ;; (default t)
 
 
-   dotspacemacs-mode-line-theme 'all-the-icons
-   ;; dotspacemacs-mode-line-theme 'spacemacs
+   ;; dotspacemacs-mode-line-theme 'all-the-icons
+   dotspacemacs-mode-line-theme 'spacemacs
 
    dotspacemacs-elpa-https t
    ;; Maximum allowed time in seconds to contact an ELPA repository.
@@ -219,7 +237,7 @@ values."
    ;; with `:variables' keyword (similar to layers). Check the editing styles
    ;; section of the documentation for details on available variables.
    ;; (default 'vim)
-   dotspacemacs-editing-style '(hybrid :variables
+   dotspacemacs-editing-style '(vim :variables
                                        hybrid-style-visual-feedback t
                                        hybrid-style-enable-evilified-state t
                                        hybrid-style-enable-hjkl-bindings t
@@ -354,7 +372,7 @@ values."
    ;; If non nil the frame is maximized when Emacs starts up.
    ;; Takes effect only if `dotspacemacs-fullscreen-at-startup' is nil.
    ;; (default nil) (Emacs 24.4+ only)
-   dotspacemacs-maximized-at-startup t
+   dotspacemacs-maximized-at-startup nil
    ;; A value from the range (0..100), in increasing opacity, which describes
    ;; the transparency level of a frame when it's active or selected.
    ;; Transparency can be toggled through `toggle-transparency'. (default 90)
@@ -379,7 +397,7 @@ values."
    dotspacemacs-line-numbers t
    ;; Code folding method. Possible values are `evil' and `origami'.
    ;; (default 'evil)
-   dotspacemacs-folding-method 'origami
+   dotspacemacs-folding-method 'evil
    ;; If non-nil smartparens-strict-mode will be enabled in programming modes.
    ;; (default nil)
    dotspacemacs-smartparens-strict-mode nil
@@ -425,6 +443,7 @@ before packages are loaded. If you are unsure, you should try in setting them in
    ;; js2-mode
    js2-basic-offset 2
    js2-indent-level 2
+   js-indent-level 2
 
    ;; web-mode
    css-indent-offset 2
@@ -453,6 +472,7 @@ you should place your code here."
   ;; Uncomment this line to enable prettier on save for react-mode buffers
   (add-hook 'js2-mode-hook 'prettier-js-mode)
   (add-hook 'rjsx-mode-hook 'prettier-js-mode)
+  (add-hook 'typescript-mode 'prettier-js-mode)
   ;; (spacemacs/enable-flycheck 'rjsx-mode)
 
   ;; (add-hook 'json-mode-hook 'prettier-js-mode)
@@ -471,9 +491,13 @@ you should place your code here."
   (define-key evil-normal-state-map (kbd "g s") (kbd "m ` A ; <escape> ` `"))
   (define-key evil-normal-state-map (kbd "g o") (kbd "g s o"))
 
+  (spacemacs/set-leader-keys-for-major-mode 'org-mode "r" 'org-re-reveal-export-to-html)
+
   ;; Emojis!
   (add-hook 'magit-mode-hook #'global-emojify-mode)
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+
+
 
 
   (defun browse-in-bitbucket ()
@@ -488,27 +512,20 @@ you should place your code here."
     (interactive)
     (shell-command "view-pull-request"))
 
+  (defun jump-to-jenkins ()
+    (interactive)
+    (shell-command "view-ci-build"))
+
   (spacemacs/set-leader-keys
     "ob" 'browse-in-bitbucket
     "oc" 'compare-in-bitbucket
+    "oj" 'jump-to-jenkins
     )
-)
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
-This is an auto-generated function, do not modify its content directly, use
-Emacs customize menu instead.
-This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(treemacs-all-the-icons zenburn-theme zen-and-art-theme yasnippet-snippets yapfify yaml-mode xterm-color xkcd ws-butler writeroom-mode winum white-sand-theme which-key wgrep web-mode web-beautify vterm volatile-highlights vmd-mode vimrc-mode vi-tilde-fringe uuidgen use-package underwater-theme ujelly-theme twilight-theme twilight-bright-theme twilight-anti-bright-theme treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil toxi-theme toc-org tide terminal-here tao-theme tangotango-theme tango-plus-theme tango-2-theme tagedit symon symbol-overlay sunny-day-theme sublime-themes subatomic256-theme subatomic-theme string-inflection sql-indent spray spotify spaceline-all-the-icons spacegray-theme soothe-theme solarized-theme soft-stone-theme soft-morning-theme soft-charcoal-theme smyx-theme smex smeargle slim-mode shell-pop seti-theme scss-mode sass-mode rjsx-mode reverse-theme reveal-in-osx-finder restart-emacs rebecca-theme ranger rainbow-mode rainbow-identifiers rainbow-delimiters railscasts-theme pytest pyenv-mode py-isort purple-haze-theme pug-mode professional-theme prettier-js planet-theme pippel pipenv pip-requirements phoenix-dark-pink-theme phoenix-dark-mono-theme pcre2el password-generator paradox ox-gfm overseer osx-trash osx-dictionary osx-clipboard origami orgit organic-green-theme org-superstar org-projectile org-present org-pomodoro org-mime org-download org-cliplink org-brain open-junk-file omtose-phellack-theme oldlace-theme occidental-theme obsidian-theme ob-restclient ob-http nodejs-repl noctilux-theme nginx-mode naquadah-theme nameless mvn mustang-theme multi-term move-text monokai-theme monochrome-theme molokai-theme moe-theme modus-vivendi-theme modus-operandi-theme mmm-mode minimal-theme meghanada maven-test-mode material-theme markdown-toc majapahit-theme magit-svn magit-section magit-gitflow madhat2r-theme macrostep lush-theme lsp-ui lsp-python-ms lsp-java lsp-ivy lorem-ipsum livid-mode live-py-mode link-hint light-soap-theme launchctl kotlin-mode kaolin-themes json-navigator js2-refactor js-doc jbeans-theme jazz-theme ivy-yasnippet ivy-xref ivy-rich ivy-purpose ivy-hydra ir-black-theme insert-shebang inkpot-theme indent-guide importmagic impatient-mode ibuffer-projectile hybrid-mode hungry-delete hl-todo highlight-parentheses highlight-numbers highlight-indentation heroku-theme hemisu-theme helm-make hc-zenburn-theme gruvbox-theme gruber-darker-theme groovy-mode groovy-imports grandshell-theme gotham-theme google-translate golden-ratio gnuplot gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe gh-md gandalf-theme fuzzy font-lock+ flyspell-correct-ivy flycheck-pos-tip flycheck-package flycheck-kotlin flycheck-elsa flycheck-elm flycheck-bashate flx-ido flatui-theme flatland-theme fish-mode farmhouse-theme fancy-battery eziam-theme eyebrowse expand-region exotica-theme evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-snipe evil-org evil-numbers evil-mc evil-matchit evil-magit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-commentary evil-cleverparens evil-args evil-anzu eval-sexp-fu espresso-theme eshell-z eshell-prompt-extras esh-help engine-mode emr emojify emoji-cheat-sheet-plus emmet-mode elm-test-runner elm-mode elisp-slime-nav elfeed-org elfeed-goodies editorconfig dumb-jump dracula-theme dotenv-mode doom-themes dockerfile-mode docker django-theme diminish devdocs darktooth-theme darkokai-theme darkmine-theme darkburn-theme dakrone-theme dactyl-mode cython-mode cyberpunk-theme csv-mode counsel-spotify counsel-projectile counsel-css company-web company-terraform company-shell company-restclient company-emoji company-anaconda column-enforce-mode color-theme-sanityinc-tomorrow color-theme-sanityinc-solarized color-identifiers-mode clues-theme clean-aindent-mode chocolate-theme cherry-blossom-theme centered-cursor-mode busybee-theme bubbleberry-theme browse-at-remote blacken birds-of-paradise-plus-theme badwolf-theme auto-yasnippet auto-highlight-symbol auto-dictionary auto-compile apropospriate-theme anti-zenburn-theme ample-zen-theme ample-theme alect-themes aggressive-indent afternoon-theme ace-link ac-ispell)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+
+  (require 'lsp)
+  ;; Setup hashicorp lsp for terraform
+  (lsp-register-client
+   (make-lsp-client :new-connection (lsp-stdio-connection '("terraform-ls" "serve"))
+                    :major-modes '(terraform-mode)
+                    :server-id 'terraform-ls))
 )
