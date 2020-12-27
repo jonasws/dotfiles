@@ -4,3 +4,5 @@ FabioAntunes/fish-nvm
 edc/bass
 0rax/fish-bd
 matchai/fish-mock
+lilyball/nix-env.fish
+oh-my-fish/plugin-direnv

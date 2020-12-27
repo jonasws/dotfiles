@@ -33,9 +33,9 @@ function fish_prompt
     fish_starship_prompt | \
       perl -p -e "
         s/❯/$gproxyStatusIcon ❯/;    \
-        s/\(?eu-west-1\)?/ 🇮🇪 /;    \
-        s/\(?eu-central-1\)?/ 🇩🇪 /; \
-        s/\(?eu-north-1\)?/ 🇸🇪 /"
+        s/\(eu-west-1\)/ 🇮🇪 /;    \
+        s/\(eu-central-1\)/ 🇩🇪 /; \
+        s/\(eu-north-1\)/ 🇸🇪 /"
 end
 
 function hybrid_bindings --description "Vi-style bindings that inherit emacs-style bindings in all modes"
@@ -67,6 +67,7 @@ abbr -a gpsup "git push -u origin (git current-branch)"
 
 abbr -a gupa "git pull --rebase --autostash"
 abbr -a gsm "git switch master"
+abbr -a gpf "git push --force-with-lease"
 
 alias git hub
 
@@ -100,23 +101,18 @@ function __aada_profile_completion
     rg "\[profile (.*?)\]" $HOME/.aws/config -Nor "\$1"
 end
 
-function use-aws-role
-    set profile $argv[1]
-    set -gx AWS_PROFILE $profile \
-    ;  set -gx AWS_DEFAULT_REGION eu-west-1
-end
-
 function assume-aws-role
     set profile $argv[1]
-    aada login --profile $profile; \
-     and use-aws-role $profile
+    set -gx AWS_PROFILE $profile
+    set -gx AWS_DEFAULT_REGION eu-west-1
+
+    aws sts get-caller-identity &> /dev/null; and echo "Your cached credentials for $profile are still valid.";  \
+    or aada login --profile $profile; \
 end
 
 complete -f -c assume-aws-role -a "(__aada_profile_completion)"
-complete -f -c use-aws-role -a "(__aada_profile_completion)"
 
 alias assume assume-aws-role
-alias use use-aws-role
 
 
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
@@ -147,12 +143,17 @@ alias ll "exa --long --git"
 alias l "exa --long --git"
 alias la "exa --long --all"
 
+# Calendar
+alias month="gcal --starting-day=1"
+
 # Tig aliases
 alias t tig
 alias tst "tig status"
 
 alias code code-insiders
 alias vsc "code ."
+
+alias tf terraform
 
 pyenv init - | source
 
@@ -280,3 +281,23 @@ abbr -a pitests "mvn org.pitest:pitest-maven:mutationCoverage -DwithHistory"
 [ -f ~/.config/tabtab/__tabtab.fish ]; and . ~/.config/tabtab/__tabtab.fish; or true
 set -g fish_user_paths "/usr/local/opt/terraform@0.12/bin" $fish_user_paths
 set -g fish_user_paths "/usr/local/opt/openssl@1.1/bin" $fish_user_paths
+
+function switch_terraform --on-event fish_postexec
+    string match --regex '^cd\s' "$argv" > /dev/null
+    set --local is_command_cd $status
+
+    if test $is_command_cd -eq 0
+        if count *.tf > /dev/null
+
+        grep -c "required_version" *.tf > /dev/null
+        set --local tf_contains_version $status
+
+        if test $tf_contains_version -eq 0
+            command tfswitch
+        end
+        end
+    end
+end
+
+set -x PATH "$HOME/.jenv/bin:$PATH"
+jenv init - | source
