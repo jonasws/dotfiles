@@ -90,8 +90,6 @@ alias fp 'fzf --preview="bat {} --color=always" --print0 | xargs -0 bat'
 alias fpd 'fzf --preview="bat {} --color=always" --preview-window down --print0 | xargs -0 | xargs bat'
 
 
-set -g fish_user_paths "/usr/local/bin" $fish_user_paths
-
 
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 
@@ -212,8 +210,6 @@ complete --command aws --no-files --arguments '(begin; set --local --export COMP
 # tabtab source for packages
 # uninstall by removing these lines
 [ -f ~/.config/tabtab/__tabtab.fish ]; and . ~/.config/tabtab/__tabtab.fish; or true
-set -g fish_user_paths "/usr/local/opt/terraform@0.12/bin" $fish_user_paths
-set -g fish_user_paths "/usr/local/opt/openssl@1.1/bin" $fish_user_paths
 
 function switch_terraform --on-event fish_postexec
     string match --regex '^cd\s' "$argv" > /dev/null
@@ -228,6 +224,17 @@ function switch_terraform --on-event fish_postexec
         if test $tf_contains_version -eq 0
             command tfswitch
         end
+        end
+    end
+end
+
+function switch_nvm --on-event fish_postexec
+    if test -f .nvmrc
+        set currentVersion (nvm current)
+        set desiredVersion (cat .nvmrc)
+
+        if test $desiredVersion != $currentVersion
+            nvm use
         end
     end
 end
