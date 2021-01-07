@@ -22,17 +22,9 @@ functions --erase fish_starship_prompt
 functions --copy fish_prompt fish_starship_prompt
 
 function fish_prompt
-    set gproxyProcess (ps -u root | grep "ssh -f -nNT gitproxy" | grep -v "grep")
-    if test -n "$gproxyProcess"
-        set gproxyStatusIcon  "📡"
-    else
-        set gproxyStatusIcon "⛔"
-    end
-
     # Fun with flags
     fish_starship_prompt | \
       perl -p -e "
-        s/❯/$gproxyStatusIcon ❯/;    \
         s/\(eu-west-1\)/ 🇮🇪 /;    \
         s/\(eu-central-1\)/ 🇩🇪 /; \
         s/\(eu-north-1\)/ 🇸🇪 /"
@@ -58,7 +50,7 @@ function current-branch
     git rev-parse --abbrev-ref HEAD
 end
 
-abbr -a delete-merged "git branch --merged | grep -v master | xargs git branch -d"
+abbr -a delete-merged "git branch --merged | grep -v '*' | xargs git branch -d"
 
 abbr -a gsw "git switch"
 
