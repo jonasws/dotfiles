@@ -36,9 +36,7 @@ values."
 
    dotspacemacs-configuration-layers
    '(go
-     (shell-scripts :variables
-
-                    )
+     shell-scripts
      vimscript
      (python :variables
              python-backend 'anaconda
@@ -276,7 +274,7 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font `("Dank Mono"
+   dotspacemacs-default-font `("Jetbrains Mono"
                                :size 16
                                ;; :size 32
                                :weight normal
@@ -512,9 +510,9 @@ you should place your code here."
     (interactive)
     (shell-command "view-pull-request"))
 
-  (defun jump-to-jenkins ()
-    (interactive)
-    (shell-command "view-ci-build"))
+  ;; (defun jump-to-jenkins ()
+  ;;   (interactive)
+  ;;   (shell-command "view-ci-build"))
 
   (spacemacs/set-leader-keys
     "ob" 'browse-in-bitbucket
