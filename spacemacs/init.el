@@ -135,7 +135,7 @@ values."
      emacs-lisp
      (git :variables
           magit-repository-directories `(
-                                         (,(expand-file-name "OpenBanking" (getenv "HOME")) . 1)
+                                         (,"~/Platform/" . 1)
                                          ))
      (markdown :variables
                markdown-live-preview-engine 'vmd)
@@ -235,7 +235,7 @@ values."
    ;; with `:variables' keyword (similar to layers). Check the editing styles
    ;; section of the documentation for details on available variables.
    ;; (default 'vim)
-   dotspacemacs-editing-style '(vim :variables
+   dotspacemacs-editing-style '(hybrid :variables
                                        hybrid-style-visual-feedback t
                                        hybrid-style-enable-evilified-state t
                                        hybrid-style-enable-hjkl-bindings t
@@ -494,6 +494,8 @@ you should place your code here."
   ;; Emojis!
   (add-hook 'magit-mode-hook #'global-emojify-mode)
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
+
+  (setq projectile-project-search-path '("~/Platform"))
 
 
 
