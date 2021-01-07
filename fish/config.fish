@@ -11,7 +11,7 @@ alias grt "cd (git rev-parse --show-toplevel)"
 source $HOME/dotfiles/fish/local.fish
 
 
-# To now slow down Emacs searching/projectile magic while on macOS
+# To not slow down Emacs searching/projectile magic while on macOS
 if not builtin status is-interactive
     exit
 end
@@ -30,14 +30,7 @@ function fish_prompt
         s/\(eu-north-1\)/ 🇸🇪 /"
 end
 
-function hybrid_bindings --description "Vi-style bindings that inherit emacs-style bindings in all modes"
-    for mode in default insert visual
-        fish_default_key_bindings -M $mode
-    end
-    fish_vi_key_bindings --no-erase
-end
-
-set -g fish_key_bindings hybrid_bindings
+set -g fish_key_bindings fish_hybrid_key_bindings
 
 set fish_color_command yellow
 set fish_color_autosuggestion white
@@ -68,16 +61,7 @@ git config --global alias.current-branch "rev-parse --abbrev-ref HEAD"
 
 abbr -a - "cd -"
 
-
-alias gproxy "sudo ssh -f -nNT gitproxy 2> /dev/null; and echo \"Successfully connected with gproxy 😎\""
-alias gproxy-status "sudo ssh -O check gitproxy"
-alias gproxy-off "sudo ssh -O exit gitproxy"
-
 alias reload-fish-config "source ~/.config/fish/config.fish; and echo \"Fish config reloaded 🐟 🚀\""
-
-function get-lb-dns
-    aws elbv2  describe-load-balancers --names $argv[1] --query "LoadBalancers[0].DNSName" | xargs dig +short
-end
 
 function browse-ssm-params
     aws ssm describe-parameters --output=json \
@@ -85,31 +69,12 @@ function browse-ssm-params
         | fzf --preview="aws ssm get-parameters --names={} | bat --color=always --language=json" \
         | xargs -I {} aws ssm get-parameters --names={} \
         | jq
-
 end
-
-
-function __aada_profile_completion
-    rg "\[profile (.*?)\]" $HOME/.aws/config -Nor "\$1"
-end
-
-function assume-aws-role
-    set profile $argv[1]
-    set -gx AWS_PROFILE $profile
-    set -gx AWS_DEFAULT_REGION eu-west-1
-
-    aws sts get-caller-identity &> /dev/null; and echo "Your cached credentials for $profile are still valid.";  \
-    or aada login --profile $profile; \
-end
-
-complete -f -c assume-aws-role -a "(__aada_profile_completion)"
-
-alias assume assume-aws-role
 
 
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 
-set -x PATH (dirname (nvm which node)) (dirname (pyenv which python)) /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bin $PATH
+set -x PATH (dirname (nvm which node)) (dirname (pyenv which python)) (brew --prefix)/opt/python/libexec/bin /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bin $PATH
 set -x BD_OPT 'insensitive'
 
 set -U FZF_DEFAULT_COMMAND "fd --type f"
@@ -125,7 +90,7 @@ alias fp 'fzf --preview="bat {} --color=always" --print0 | xargs -0 bat'
 alias fpd 'fzf --preview="bat {} --color=always" --preview-window down --print0 | xargs -0 | xargs bat'
 
 
-set -g fish_user_paths "/usr/local/sbin" $fish_user_paths
+set -g fish_user_paths "/usr/local/bin" $fish_user_paths
 
 
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
@@ -202,46 +167,11 @@ function tree
     end
 end
 
-function fish_title_once
-    echo -ne "\033]0;$argv[1]\a"
-end
-
-function bootLocal
-    set port $argv[1]
-    if test -z $port
-        set port 8080
-    end
-
-    set jvmArgs "-Dspring.profiles.active=local -Dserver.port=$port"
-
-    set appName (repo-name)
-    fish_title_once "🥾 $appName $port"
-
-    mvn clean spring-boot:run -Dspring-boot.run.jvmArguments="$jvmArgs"
-end
-
 function test-one
     set testName (fd --type f -e java "" src/test | fzf | xargs -J {} basename {} .java)
 
     if test -n "$testName"
         commandline "mvn test -Dtest=$testName"
-    end
-end
-
-function op
-    if contains signin $argv
-        set token (command op $argv --raw)
-        set name $argv[2]
-
-        set -gx OP_SESSION_$name $token
-    else
-        command op $argv 2> /dev/null
-
-        if test $status -ne 0
-            echo "Re-auth required"
-            op signin my
-            command op $argv 2> /dev/null
-        end
     end
 end
 
@@ -260,13 +190,24 @@ function findpass
   echo "Copied password for entry" $name "to clipbaord"
 end
 
+function gradlew
+    ./gradlew $argv
+end
+
+alias gw gradlew
+
+
+function gradle
+    # command -q gradle $argv;
+    if test -f ./gradlew
+        ./gradlew $argv
+    else
+        gradle $argv
+    end
+end
+
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
 
-
-
-abbr -a mcv "mvn clean verify"
-
-abbr -a pitests "mvn org.pitest:pitest-maven:mutationCoverage -DwithHistory"
 
 # tabtab source for packages
 # uninstall by removing these lines
