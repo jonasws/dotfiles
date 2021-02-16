@@ -8,7 +8,8 @@ end
 
 alias grt "cd (git rev-parse --show-toplevel)"
 
-source $HOME/dotfiles/fish/local.fish
+
+test -f $HOME/dotfiles/fish/local.fish; and source $HOME/dotfiles/fish/local.fish
 
 
 # To not slow down Emacs searching/projectile magic while on macOS
@@ -37,13 +38,14 @@ set fish_color_autosuggestion white
 
 # Vim duh
 set -x EDITOR vim
+# set -x EDITOR "emacsclient --alternate-editor vim"
 
 # some git stuff that were missing atm
 function current-branch
     git rev-parse --abbrev-ref HEAD
 end
 
-abbr -a delete-merged "git branch --merged | grep -v '*' | xargs git branch -d"
+abbr -a delete-merged "git branch --merged | grep -v 'master' | xargs git branch -d"
 
 abbr -a gsw "git switch"
 
@@ -66,15 +68,13 @@ alias reload-fish-config "source ~/.config/fish/config.fish; and echo \"Fish con
 function browse-ssm-params
     aws ssm describe-parameters --output=json \
         | jq -r ".Parameters[].Name" \
-        | fzf --preview="aws ssm get-parameters --names={} | bat --color=always --language=json" \
-        | xargs -I {} aws ssm get-parameters --names={} \
-        | jq
+        | fzf
 end
 
 
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 
-set -x PATH (dirname (nvm which node)) (dirname (pyenv which python)) (brew --prefix)/opt/python/libexec/bin /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bin $PATH
+set -x PATH $HOME/.jenv/bin (dirname (nvm which node)) (brew --prefix)/opt/python/libexec/bin /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bin $PATH
 set -x BD_OPT 'insensitive'
 
 set -U FZF_DEFAULT_COMMAND "fd --type f"
@@ -188,22 +188,6 @@ function findpass
   echo "Copied password for entry" $name "to clipbaord"
 end
 
-function gradlew
-    ./gradlew $argv
-end
-
-alias gw gradlew
-
-
-function gradle
-    # command -q gradle $argv;
-    if test -f ./gradlew
-        ./gradlew $argv
-    else
-        gradle $argv
-    end
-end
-
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
 
 
@@ -229,9 +213,11 @@ function switch_terraform --on-event fish_postexec
 end
 
 function switch_nvm --on-event fish_postexec
-    if test -f .nvmrc
+    string match --regex '^(cd|__z)\s' "$argv" > /dev/null
+    set --local is_command_cd $status
+    if test $is_command_cd -eq 0; and test -f .nvmrc
         set currentVersion (nvm current)
-        set desiredVersion (cat .nvmrc)
+        set desiredVersion (nvm version (cat .nvmrc))
 
         if test $desiredVersion != $currentVersion
             nvm use
@@ -239,5 +225,12 @@ function switch_nvm --on-event fish_postexec
     end
 end
 
-set -x PATH "$HOME/.jenv/bin:$PATH"
 jenv init - | source
+
+function start-my-day
+    echo "Updating homebrew 🍺"
+    brew update && brew upgrade && brew upgrade --cask
+
+    git -C ~/.emacs.d pull --rebase
+    git -C ~/.intellimacs pull --rebase
+end
