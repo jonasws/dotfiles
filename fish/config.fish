@@ -45,7 +45,7 @@ function current-branch
     git rev-parse --abbrev-ref HEAD
 end
 
-abbr -a delete-merged "git branch --merged | grep -v 'master' | xargs git branch -d"
+abbr -a delete-merged "git branch --merged | grep -v master | grep -v (git current-branch) | xargs git branch -d"
 
 abbr -a gsw "git switch"
 
