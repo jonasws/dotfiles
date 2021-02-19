@@ -26,11 +26,6 @@
     "when": "listFocus && !inputFocus"
   },
   {
-    "key": "ctrl+l",
-    "command": "list.expand",
-    "when": "listFocus && !inputFocus"
-  },
-  {
     "key": "ctrl+j",
     "command": "list.focusDown",
     "when": "listFocus && !inputFocus"
@@ -39,5 +34,15 @@
     "key": "ctrl+k",
     "command": "list.focusUp",
     "when": "listFocus && !inputFocus"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "-extension.vim_navigateCtrlL",
+    "when": "editorTextFocus && vim.active && vim.use<C-l> && !inDebugRepl"
+  },
+  {
+    "key": "ctrl+l",
+    "command": "acceptSelectedSuggestion",
+    "when": "acceptSuggestionOnEnter && suggestWidgetVisible && suggestionMakesTextEdit && textInputFocus"
   }
 ]
