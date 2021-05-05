@@ -1,0 +1,11 @@
+1password
+1password-cli
+adobe-acrobat-reader
+aws-vault
+docker
+drawio
+insomnia
+intellij-idea
+iterm2
+rectangle
+slack
