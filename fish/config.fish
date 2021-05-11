@@ -40,26 +40,24 @@ set fish_color_autosuggestion white
 set -x EDITOR vim
 # set -x EDITOR "emacsclient --alternate-editor vim"
 
-# some git stuff that were missing atm
-function current-branch
-    git rev-parse --abbrev-ref HEAD
-end
+alias top "vtop --theme nord"
+alias oldtop "/usr/bin/top"
 
-abbr -a delete-merged "git branch --merged | grep -v master | grep -v (git current-branch) | xargs git branch -d"
+abbr -a delete-merged "git branch --merged | grep -v master | grep -v main | grep -v (git branch --show-current) | xargs git branch -d"
 
 abbr -a gsw "git switch"
 
 
-abbr -a gpsup "git push -u origin (git current-branch)"
+abbr -a gpsup "git push -u origin (git branch --show-current)"
 
 abbr -a gupa "git pull --rebase --autostash"
 abbr -a gsm "git switch master"
+abbr -a gsma "git switch main"
 abbr -a gpf "git push --force-with-lease"
 
 alias git hub
 
 git config --global alias.newest-tag "describe --abbrev=0"
-git config --global alias.current-branch "rev-parse --abbrev-ref HEAD"
 
 abbr -a - "cd -"
 
@@ -74,7 +72,11 @@ end
 
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 
-set -x PATH $HOME/.jenv/bin (dirname (nvm which node)) (brew --prefix)/opt/python/libexec/bin /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bin $PATH
+
+set -x GOPATH $HOME/.go
+set -x GOROOT (brew --prefix golang)/libexec
+set -x PATH $GOPATH $GOROOT/bin $HOME/.jenv/bin (dirname (nvm which node)) (brew --prefix)/opt/python/libexec/bin /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bin $PATH
+
 set -x BD_OPT 'insensitive'
 
 set -U FZF_DEFAULT_COMMAND "fd --type f"
