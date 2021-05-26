@@ -963,7 +963,7 @@
         }
     ],
     "vim.easymotion": true,
-    "workbench.colorTheme": "Dracula",
+    "workbench.colorTheme": "Dracula Pro",
     "editor.suggestSelection": "first",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
     "python.jediEnabled": false,
