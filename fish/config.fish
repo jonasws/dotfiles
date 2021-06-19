@@ -8,14 +8,14 @@ end
 
 alias grt "cd (git rev-parse --show-toplevel)"
 
-
-test -f $HOME/dotfiles/fish/local.fish; and source $HOME/dotfiles/fish/local.fish
-
+set -x PATH ~/doom-emacs/bin /usr/local/bin $PATH
 
 # To not slow down Emacs searching/projectile magic while on macOS
 if not builtin status is-interactive
     exit
 end
+
+test -f $HOME/dotfiles/fish/local.fish; and source $HOME/dotfiles/fish/local.fish
 
 starship init fish | source
 
@@ -75,7 +75,10 @@ set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 
 set -x GOPATH $HOME/.go
 set -x GOROOT (brew --prefix golang)/libexec
-set -x PATH $GOPATH $GOROOT/bin $HOME/.jenv/bin (dirname (nvm which node)) (brew --prefix)/opt/python/libexec/bin /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bin $PATH
+set -x PATH ~/.flutter/platform-tools ~/.flutter/flutter/bin $GOPATH $GOROOT/bin $HOME/.jenv/bin (dirname (nvm which node)) (brew --prefix)/opt/python/libexec/bin /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bin $PATH
+
+
+set -x ANDROID_HOME /Users/jstromsodd/Library/Android/sdk
 
 set -x BD_OPT 'insensitive'
 
@@ -112,7 +115,7 @@ alias vsc "code ."
 
 alias tf terraform
 
-pyenv init - | source
+pyenv init --path | source
 
 function jq
     if isatty stdout
@@ -233,6 +236,10 @@ function start-my-day
     echo "Updating homebrew 🍺"
     brew update && brew upgrade && brew upgrade --cask
 
-    git -C ~/.emacs.d pull --rebase
+    # git -C ~/.emacs.d pull --rebase
+    echo "Updating doom"
+    doom upgrade
+
+    echo "Updating intellimacs"
     git -C ~/.intellimacs pull --rebase
 end
