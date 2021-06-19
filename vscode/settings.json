@@ -991,4 +991,12 @@
     "workbench.startupEditor": "newUntitledFile",
     "python.languageServer": "Microsoft",
     "workbench.tree.indent": 16,
+    "vim.camelCaseMotion.enable": true,
+    "vim.useSystemClipboard": true,
+    "editor.tabSize": 8,
+    "editor.cursorStyle": "line",
+    "editor.insertSpaces": false,
+    "editor.lineNumbers": "on",
+    "editor.wordSeparators": "/\\()\"':,.;<>~!@#$%^&*|+=[]{}`?-",
+    "editor.wordWrap": "off",
 }
