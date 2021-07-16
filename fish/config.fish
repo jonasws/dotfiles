@@ -234,7 +234,9 @@ jenv init - | source
 
 function start-my-day
     echo "Updating homebrew 🍺"
-    brew update && brew upgrade && brew upgrade --cask
+    brew update
+    brew upgrade
+    brew upgrade --cask
 
     # git -C ~/.emacs.d pull --rebase
     echo "Updating doom"
