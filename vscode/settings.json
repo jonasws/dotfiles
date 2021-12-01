@@ -966,7 +966,10 @@
     "workbench.colorTheme": "Dracula Pro",
     "editor.suggestSelection": "first",
     "vsintellicode.modify.editor.suggestSelection": "automaticallyOverrodeDefaultValue",
-    "python.jediEnabled": false,
+    "[python]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true
+    },
     "[javascript]": {
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
@@ -989,7 +992,6 @@
         "*.js": "javascriptreact"
     },
     "workbench.startupEditor": "newUntitledFile",
-    "python.languageServer": "Microsoft",
     "workbench.tree.indent": 16,
     "vim.camelCaseMotion.enable": true,
     "vim.useSystemClipboard": true,
@@ -1015,4 +1017,13 @@
         "editor.wordBasedSuggestions": false
     },
     "dart.openDevTools": "flutter",
+    "json.schemas": [],
+    "aws.profile": "profile:juss-jonas2",
+    "editor.inlineSuggest.enabled": true,
+    "github.copilot.enable": {
+        "*": true,
+        "yaml": false,
+        "plaintext": false,
+        "markdown": false
+    },
 }
