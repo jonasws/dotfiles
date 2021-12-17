@@ -989,7 +989,8 @@
         "editor.defaultFormatter": "esbenp.prettier-vscode"
     },
     "files.associations": {
-        "*.js": "javascriptreact"
+        "*.js": "javascriptreact",
+        "*.graphql": "graphql"
     },
     "workbench.startupEditor": "newUntitledFile",
     "workbench.tree.indent": 16,
