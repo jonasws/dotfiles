@@ -18,6 +18,7 @@ values."
    ;; Lazy installation of layers (i.e. layers are installed only when a file
    ;; with a supported type is opened). Possible values are `all', `unused'
    ;; and `nil'. `unused' will lazy install only unused layers (i.e. layers
+
    ;; not listed in variable `dotspacemacs-configuration-layers'), `all' will
    ;; lazy install any layer that support lazy installation even the layers
    ;; listed in `dotspacemacs-configuration-layers'. `nil' disable the lazy
@@ -35,8 +36,17 @@ values."
    ;; List of configuration layers to load.
 
    dotspacemacs-configuration-layers
-   '(shell-scripts
+   '(rust
+     nginx
+     python
+     shell-scripts
      ;; rust
+     (dart :variables
+           dart-backend 'lsp
+           dart-server-enable-analysis-server nil
+           ;; lsp-dart-sdk-dir "/usr/local/Caskroom/flutter/2.0.5/flutter/"
+           lsp-enable-on-type-formatting t
+           )
      (go :variables
          go-backend 'lsp
          go-format-before-save t
@@ -80,6 +90,9 @@ values."
      (typescript :variables
                  typescript-backend 'lsp
                  typescript-fmt-on-save t
+                 typescript-linter 'eslint
+                 typescript-lsp-linter nil
+                 node-add-modules-path t
                  typescript-fmt-tool 'prettier
                  typescript-indent-level 2
       )
@@ -503,7 +516,8 @@ you should place your code here."
   (add-hook 'magit-mode-hook #'global-emojify-mode)
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
 
-  (setq projectile-project-search-path '("~/Platform" "~/npm-modules"))
+  ;; (setq projectile-project-search-path '("~/Platform" "~/npm-modules"))
+  (setq projectile-project-search-path '("~/plexispot"))
 
   (remove-hook 'fish-mode-hook 'company-mode)
 
@@ -534,30 +548,10 @@ you should place your code here."
     "op" 'view-ci-build
     )
 
-  (require 'lsp)
-  ;; Setup hashicorp lsp for terraform
-  (lsp-register-client
-   (make-lsp-client :new-connection (lsp-stdio-connection '("terraform-ls" "serve"))
-                    :major-modes '(terraform-mode)
-                    :server-id 'terraform-ls))
-)
-(defun dotspacemacs/emacs-custom-settings ()
-  "Emacs custom settings.
-This is an auto-generated function, do not modify its content directly, use
-Emacs customize menu instead.
-This function is called at the very end of Spacemacs initialization."
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(evil-want-Y-yank-to-eol t)
- '(package-selected-packages
-   '(insert-shebang helm-gtags ggtags flycheck-bashate fish-mode counsel-gtags company-shell hl-todo forge company auto-compile packed ivy lsp-mode helm-core markdown-mode evil yasnippet-snippets yaml-mode xterm-color ws-butler writeroom-mode winum which-key wgrep web-mode web-beautify vterm volatile-highlights vmd-mode vi-tilde-fringe uuidgen use-package undo-tree treemacs-projectile treemacs-persp treemacs-magit treemacs-icons-dired treemacs-evil treemacs-all-the-icons toc-org tide terminal-here tagedit symon symbol-overlay string-inflection string-edit sql-indent spaceline-all-the-icons smex smeargle slim-mode shell-pop scss-mode sass-mode reveal-in-osx-finder restart-emacs request ranger rainbow-mode rainbow-identifiers rainbow-delimiters quickrun pug-mode prettier-js popwin pcre2el password-generator paradox ox-gfm overseer osx-trash osx-dictionary osx-clipboard orgit-forge org-superstar org-rich-yank org-re-reveal org-projectile org-present org-pomodoro org-mime org-download org-cliplink org-brain open-junk-file npm-mode nodejs-repl nameless multi-term multi-line mmm-mode markdown-toc magit-section macrostep lsp-ui lsp-origami lsp-ivy lorem-ipsum livid-mode link-hint launchctl json-navigator json-mode js2-refactor js-doc ivy-yasnippet ivy-xref ivy-rich ivy-purpose ivy-hydra ivy-avy indent-guide impatient-mode ibuffer-projectile hybrid-mode hungry-delete highlight-parentheses highlight-numbers highlight-indentation helm-make goto-chg google-translate golden-ratio godoctor go-tag go-rename go-impl go-guru go-gen-test go-fill-struct go-eldoc gnuplot gitignore-templates gitignore-mode gitconfig-mode gitattributes-mode git-timemachine git-messenger git-link git-gutter-fringe ghub gh-md gandalf-theme fuzzy font-lock+ flycheck-pos-tip flycheck-package flycheck-elsa flx-ido fancy-battery eyebrowse expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-tutor evil-textobj-line evil-surround evil-snipe evil-org evil-numbers evil-mc evil-matchit evil-lisp-state evil-lion evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-escape evil-ediff evil-easymotion evil-commentary evil-collection evil-cleverparens evil-args evil-anzu eval-sexp-fu eshell-z eshell-prompt-extras esh-help emr emojify emoji-cheat-sheet-plus emmet-mode elisp-slime-nav editorconfig dumb-jump drag-stuff dracula-theme dotenv-mode dired-quick-sort diminish devdocs dap-mode csv-mode counsel-projectile counsel-css company-web company-terraform company-go company-emoji column-enforce-mode color-identifiers-mode closql clean-aindent-mode centered-cursor-mode browse-at-remote auto-yasnippet auto-highlight-symbol aggressive-indent ace-link ac-ispell)))
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
+  ;; (require 'lsp)
+  ;; ;; Setup hashicorp lsp for terraform
+  ;; (lsp-register-client
+  ;;  (make-lsp-client :new-connection (lsp-stdio-connection '("terraform-ls" "serve"))
+  ;;                   :major-modes '(terraform-mode)
+  ;;                   :server-id 'terraform-ls))
 )
