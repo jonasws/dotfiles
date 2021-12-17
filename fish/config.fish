@@ -55,8 +55,6 @@ abbr -a gsm "git switch master"
 abbr -a gsma "git switch main"
 abbr -a gpf "git push --force-with-lease"
 
-alias git hub
-
 git config --global alias.newest-tag "describe --abbrev=0"
 
 abbr -a - "cd -"
@@ -77,8 +75,6 @@ set -x GOPATH $HOME/.go
 set -x GOROOT (brew --prefix golang)/libexec
 set -x PATH ~/.flutter/platform-tools ~/.flutter/flutter/bin $GOPATH $GOROOT/bin $HOME/.jenv/bin (dirname (nvm which node)) (brew --prefix)/opt/python/libexec/bin /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bin $PATH
 
-
-set -x ANDROID_HOME /Users/jstromsodd/Library/Android/sdk
 
 set -x BD_OPT 'insensitive'
 
@@ -102,6 +98,8 @@ set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 alias ll "exa --long --git"
 alias l "exa --long --git"
 alias la "exa --long --all"
+
+abbr -a dc "docker compose"
 
 # Calendar
 alias month="gcal --starting-day=1"
@@ -193,7 +191,7 @@ function findpass
   echo "Copied password for entry" $name "to clipbaord"
 end
 
-complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
+# complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
 
 
 # tabtab source for packages
@@ -230,7 +228,7 @@ function switch_nvm --on-event fish_postexec
     end
 end
 
-jenv init - | source
+# jenv init - | source
 
 function start-my-day
     echo "Updating homebrew 🍺"
@@ -238,10 +236,13 @@ function start-my-day
     brew upgrade
     brew upgrade --cask
 
-    # git -C ~/.emacs.d pull --rebase
-    echo "Updating doom"
-    doom upgrade
+    echo "Updating spacemacs"
+    git -C ~/.emacs.d pull --rebase
+    # echo "Updating doom"
+    #doom upgrade
 
     echo "Updating intellimacs"
     git -C ~/.intellimacs pull --rebase
 end
+
+zoxide init fish | source
