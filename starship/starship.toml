@@ -1,3 +1,9 @@
-# Don't print a new line at the start of the prompt
-add_newline = false
+[gcloud]
+disabled = true
+
+[custom.amplify]
+command = "jq -r .envName (git rev-parse --show-toplevel)/amplify/.config/local-env-info.json"
+symbol = "🎤 "
+style = "yellow"
+when = "git rev-parse --is-inside-work-tree &> /dev/null; and test -e (git rev-parse --show-toplevel)/amplify/.config/local-env-info.json"
 
