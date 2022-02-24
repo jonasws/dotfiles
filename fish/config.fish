@@ -1,6 +1,7 @@
 set -x LC_ALL en_US.UTF-8
 
-function __fish_describe_command; end
+function __fish_describe_command
+end
 
 function repo-name
     basename (git rev-parse --show-toplevel)
@@ -24,8 +25,7 @@ functions --copy fish_prompt fish_starship_prompt
 
 function fish_prompt
     # Fun with flags
-    fish_starship_prompt | \
-      perl -p -e "
+    fish_starship_prompt | perl -p -e "
         s/\(eu-west-1\)/ 🇮🇪 /;    \
         s/\(eu-central-1\)/ 🇩🇪 /; \
         s/\(eu-north-1\)/ 🇸🇪 /"
@@ -41,7 +41,7 @@ set -x EDITOR vim
 # set -x EDITOR "emacsclient --alternate-editor vim"
 
 alias top "vtop --theme nord"
-alias oldtop "/usr/bin/top"
+alias oldtop /usr/bin/top
 
 abbr -a delete-merged "git branch --merged | grep -v master | grep -v main | grep -v (git branch --show-current) | xargs git branch -d"
 
@@ -67,16 +67,15 @@ function browse-ssm-params
         | fzf
 end
 
-
-set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
-
-
-set -x GOPATH $HOME/.go
-set -x GOROOT (brew --prefix golang)/libexec
-set -x PATH ~/.flutter/platform-tools ~/.flutter/flutter/bin $GOPATH $GOROOT/bin $HOME/.jenv/bin (dirname (nvm which node)) (brew --prefix)/opt/python/libexec/bin /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bin $PATH
+alias man batman
 
 
-set -x BD_OPT 'insensitive'
+#set -x GOPATH $HOME/.go
+# set -x GOROOT (brew --prefix golang)/libexec
+set -x PATH /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bin $PATH
+
+
+set -x BD_OPT insensitive
 
 set -U FZF_DEFAULT_COMMAND "fd --type f"
 set -U FZF_FIND_FILE_COMMAND "fd --type f . \$dir"
@@ -113,7 +112,7 @@ alias vsc "code ."
 
 alias tf terraform
 
-pyenv init --path | source
+# pyenv init --path | source
 
 function jq
     if isatty stdout
@@ -125,7 +124,7 @@ end
 
 function http
     if isatty stdout; and not contains -- --download $argv; and not contains -- -d $argv
-        command http --pretty=all --print=hb $argv | less -RXF;
+        command http --pretty=all --print=hb $argv | less -RXF
     else
         command http $argv
     end
@@ -162,7 +161,7 @@ end
 
 function tree
     if isatty stdout
-        command exa --tree --color=always $argv |  less -RXF
+        command exa --tree --color=always $argv | less -RXF
     else
         command exa --tree $argv
     end
@@ -177,18 +176,18 @@ function test-one
 end
 
 function findpass
-  set entry (op list items \
+    set entry (op list items \
         | jq -r ".[] | [.uuid, .overview.url, .overview.title] | @tsv" \
         | fzf)
 
-  set name (printf $entry | cut -f 3)
-  set uuid (printf $entry | cut -f 1)
+    set name (printf $entry | cut -f 3)
+    set uuid (printf $entry | cut -f 1)
 
-  op get item $uuid \
-      | jq -r '.details.fields[] | select(.designation=="password").value' \
-      | pbcopy
+    op get item $uuid \
+        | jq -r '.details.fields[] | select(.designation=="password").value' \
+        | pbcopy
 
-  echo "Copied password for entry" $name "to clipbaord"
+    echo "Copied password for entry" $name "to clipbaord"
 end
 
 # complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
@@ -199,24 +198,24 @@ end
 [ -f ~/.config/tabtab/__tabtab.fish ]; and . ~/.config/tabtab/__tabtab.fish; or true
 
 function switch_terraform --on-event fish_postexec
-    string match --regex '^cd\s' "$argv" > /dev/null
+    string match --regex '^cd\s' "$argv" >/dev/null
     set --local is_command_cd $status
 
     if test $is_command_cd -eq 0
-        if count *.tf > /dev/null
+        if count *.tf >/dev/null
 
-        grep -c "required_version" *.tf > /dev/null
-        set --local tf_contains_version $status
+            grep -c required_version *.tf >/dev/null
+            set --local tf_contains_version $status
 
-        if test $tf_contains_version -eq 0
-            command tfswitch
-        end
+            if test $tf_contains_version -eq 0
+                command tfswitch
+            end
         end
     end
 end
 
 function switch_nvm --on-event fish_postexec
-    string match --regex '^(cd|__z)\s' "$argv" > /dev/null
+    string match --regex '^(cd|__z)\s' "$argv" >/dev/null
     set --local is_command_cd $status
     if test $is_command_cd -eq 0; and test -f .nvmrc
         set currentVersion (nvm current)
@@ -230,7 +229,20 @@ end
 
 # jenv init - | source
 
+function get-repo-name
+    gh repo view --json nameWithOwner --jq .nameWithOwner | string trim
+end
+
+
+function get-branch-codespace
+    set repoName (get-repo-name)
+    set branch (git rev-parse --abbrev-ref HEAD)
+    gh codespace list --json name,repository,gitStatus --jq (printf '.[] | select(.repository == "%s" and .gitStatus.ref == "%s") | .name' $repoName $branch)
+end
+
 function start-my-day
+    echo "Updating dnf dependencies"
+    sudo dnf update
     echo "Updating homebrew 🍺"
     brew update
     brew upgrade
@@ -241,8 +253,13 @@ function start-my-day
     # echo "Updating doom"
     #doom upgrade
 
-    echo "Updating intellimacs"
-    git -C ~/.intellimacs pull --rebase
+    # echo "Updating intellimacs"
+    # git -C ~/.intellimacs pull --rebase
 end
 
 zoxide init fish | source
+
+/home/linuxbrew/.linuxbrew/bin/brew shellenv | source
+
+# Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
+complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
