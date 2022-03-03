@@ -292,7 +292,7 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font `("Jetbrains Mono"
+   dotspacemacs-default-font `("JetBrainsMono Nerd Font"
                                :size 16
                                ;; :size 32
                                :weight normal
@@ -520,34 +520,6 @@ you should place your code here."
   (setq projectile-project-search-path '("~/plexispot"))
 
   (remove-hook 'fish-mode-hook 'company-mode)
-
-
-  (defun browse-in-bitbucket ()
-    (interactive)
-    (shell-command "browse-in-bitbucket"))
-
-  (defun create-pr-in-bitbucket ()
-    (interactive)
-    (shell-command "create-pull-request"))
-
-  (defun view-pr-in-bitbucket ()
-    (interactive)
-    (shell-command "view-pull-request"))
-
-  (defun view-ci-build ()
-    (interactive)
-    (shell-command "view-ci-build"))
-
-  ;; (defun jump-to-jenkins ()
-  ;;   (interactive)
-  ;;   (shell-command "view-ci-build"))
-
-  (spacemacs/set-leader-keys
-    "ov" 'view-pr-in-bitbucket
-    "on" 'create-pr-in-bitbucket
-    "op" 'view-ci-build
-    )
-
   ;; (require 'lsp)
   ;; ;; Setup hashicorp lsp for terraform
   ;; (lsp-register-client
