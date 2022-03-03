@@ -9,4 +9,4 @@ ln -s $GIT_ROOT/ripgrep/.ripgreprc ~/.ripgreprc
 mkdir -p ~/.config/bat
 ln -s bat/config $HOME/.config/bat/config
 
-sudo apt install -y -o Dpkg::Options::="--force-overwrite" tig bat ripgrep
+# sudo apt install -y -o Dpkg::Options::="--force-overwrite" tig bat ripgrep

@@ -9,7 +9,7 @@ end
 
 alias grt "cd (git rev-parse --show-toplevel)"
 
-set -x PATH ~/doom-emacs/bin /usr/local/bin $PATH
+set -x PATH /opt/homebrew/bin $PATH
 
 # To not slow down Emacs searching/projectile magic while on macOS
 if not builtin status is-interactive
@@ -258,8 +258,6 @@ function start-my-day
 end
 
 zoxide init fish | source
-
-/home/linuxbrew/.linuxbrew/bin/brew shellenv | source
 
 # Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'

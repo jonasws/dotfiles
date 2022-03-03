@@ -17,12 +17,8 @@
 ;; + `doom-big-font' -- used for `doom-big-font-mode'; use this for
 ;;   presentations or streaming.
 ;;
-(setq doom-font (font-spec :family"JetBrains Mono" :size 16))
+(setq doom-font (font-spec :family"JetBrainsMono Nerd Font" :size 16))
 
-(setq magit-repository-directories `(
-        (,"~/Platform/" . 1)
-        (,"~/npm-modules/" . 1)))
-;;
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
 ;; (setq doom-font (font-spec :family "monospace" :size 12 :weight 'semi-light)
@@ -40,6 +36,12 @@
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.
 (setq display-line-numbers-type t)
+
+(map! (:when (featurep! :completion company)
+       (:after company
+        (:map company-active-map
+         "C-l" #'company-complete-selection
+         ))))
 
 
 ;; Here are some additional functions/macros that could help you configure Doom:
