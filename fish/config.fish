@@ -9,7 +9,7 @@ end
 
 alias grt "cd (git rev-parse --show-toplevel)"
 
-set -x PATH /opt/homebrew/bin $PATH
+set -x PATH ~/.emacs.d/bin $HOME/.cargo/bin /opt/homebrew/bin $PATH
 
 # To not slow down Emacs searching/projectile magic while on macOS
 if not builtin status is-interactive
@@ -39,9 +39,6 @@ set fish_color_autosuggestion white
 # Vim duh
 set -x EDITOR vim
 # set -x EDITOR "emacsclient --alternate-editor vim"
-
-alias top "vtop --theme nord"
-alias oldtop /usr/bin/top
 
 abbr -a delete-merged "git branch --merged | grep -v master | grep -v main | grep -v (git branch --show-current) | xargs git branch -d"
 
@@ -78,8 +75,10 @@ set -x PATH /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bi
 set -x BD_OPT insensitive
 
 set -U FZF_DEFAULT_COMMAND "fd --type f"
-set -U FZF_FIND_FILE_COMMAND "fd --type f . \$dir"
+set -U FZF_CTRL_T_COMMAND "fd --type f"
+set -U FZF_ALT_C_COMMAND "fd --type d"
 set -U FZF_OPEN_COMMAND "fd --type f . \$dir"
+set -U FZF_PREVIEW_DIR_CMD exa
 
 set -U FZF_PREVIEW_FILE_CMD "bat --plain --color=always --line-range :10"
 set -U FZF_ENABLE_OPEN_PREVIEW 1
@@ -104,11 +103,9 @@ abbr -a dc "docker compose"
 alias month="gcal --starting-day=1"
 
 # Tig aliases
-alias t tig
+abbr -a t tig
 alias tst "tig status"
 
-alias code code-insiders
-alias vsc "code ."
 
 alias tf terraform
 
@@ -130,14 +127,6 @@ function http
     end
 end
 
-function jql
-    if isatty stdout
-        command jql $argv | less -RXF
-    else
-        command jql $argv
-    end
-end
-
 function rg
     if isatty stdout
         command rg -p $argv | less -RXF
@@ -156,14 +145,6 @@ function awslogs
         end
     else
         command awslogs $argv
-    end
-end
-
-function tree
-    if isatty stdout
-        command exa --tree --color=always $argv | less -RXF
-    else
-        command exa --tree $argv
     end
 end
 
@@ -214,16 +195,26 @@ function switch_terraform --on-event fish_postexec
     end
 end
 
-function switch_nvm --on-event fish_postexec
-    string match --regex '^(cd|__z)\s' "$argv" >/dev/null
-    set --local is_command_cd $status
-    if test $is_command_cd -eq 0; and test -f .nvmrc
-        set currentVersion (nvm current)
-        set desiredVersion (nvm version (cat .nvmrc))
-
-        if test $desiredVersion != $currentVersion
-            nvm use
+# Runs npm start if possible
+function s 
+    if test -f package.json
+        if test -f yarn.lock
+            command yarn start $argv
+        else
+            command npm start $argv
         end
+    else
+        echo "No package.json found"
+        exit 1
+    end
+end
+
+function up
+    if test -f docker-compose.yml
+        command docker-compose up $argv
+    else
+        echo "No docker-compose.yml found"
+        exit 1
     end
 end
 
@@ -240,24 +231,41 @@ function get-branch-codespace
     gh codespace list --json name,repository,gitStatus --jq (printf '.[] | select(.repository == "%s" and .gitStatus.ref == "%s") | .name' $repoName $branch)
 end
 
-function start-my-day
-    echo "Updating dnf dependencies"
-    sudo dnf update
-    echo "Updating homebrew 🍺"
-    brew update
-    brew upgrade
-    brew upgrade --cask
-
-    echo "Updating spacemacs"
-    git -C ~/.emacs.d pull --rebase
-    # echo "Updating doom"
-    #doom upgrade
-
-    # echo "Updating intellimacs"
-    # git -C ~/.intellimacs pull --rebase
+function tre
+    command tre $argv -e; and source /tmp/tre_aliases_$USER ^/dev/null
 end
 
 zoxide init fish | source
 
 # Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
+
+# pnpm
+set -gx PNPM_HOME "/Users/jonasws/Library/pnpm"
+set -gx PATH "$PNPM_HOME" $PATH
+# pnpm end
+
+# Add gnutar to front of path
+set -gx PATH /opt/homebrew/opt/gnu-tar/libexec/gnubin $PATH
+
+set -gx DOCKER_DEFAULT_PLATFORM linux/amd64
+
+alias lg lazygit
+test -e {$HOME}/.iterm2_shell_integration.fish ; and source {$HOME}/.iterm2_shell_integration.fish
+
+set -gx PATH "/Users/jonasws/Library/Caches/fnm_multishells/27328_1681738441313/bin" $PATH;
+set -gx FNM_DIR "/Users/jonasws/Library/Application Support/fnm";
+set -gx FNM_VERSION_FILE_STRATEGY "local";
+set -gx FNM_MULTISHELL_PATH "/Users/jonasws/Library/Caches/fnm_multishells/27328_1681738441313";
+set -gx FNM_LOGLEVEL "info";
+set -gx FNM_NODE_DIST_MIRROR "https://nodejs.org/dist";
+set -gx FNM_ARCH "arm64";
+function _fnm_autoload_hook --on-variable PWD --description 'Change Node version on directory change'
+    status --is-command-substitution; and return
+    if test -f .node-version -o -f .nvmrc
+    fnm use --log-level=quiet
+end
+
+end
+
+_fnm_autoload_hook
