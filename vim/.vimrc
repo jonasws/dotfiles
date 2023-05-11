@@ -28,3 +28,7 @@ set softtabstop=2
 set expandtab
 
 map Y y$
+
+packadd! dracula
+syntax enable
+colorscheme dracula

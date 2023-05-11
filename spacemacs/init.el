@@ -37,10 +37,8 @@ values."
 
    dotspacemacs-configuration-layers
    '(rust
-     nginx
      python
-     shell-scripts
-     ;; rust
+     rust
      (dart :variables
            dart-backend 'lsp
            dart-server-enable-analysis-server nil
@@ -51,14 +49,14 @@ values."
          go-backend 'lsp
          go-format-before-save t
          )
-     ;; shell-scripts
+     shell-scripts
      ;; vimscript
      ;; (python :variables
      ;;         python-backend 'anaconda
      ;;         python-format-on-save t
      ;;         python-test-runner 'pytest
      ;;         )
-     ;; nginx
+     nginx
      (csv :variables
           csv-separators '(";")
           )
@@ -197,11 +195,12 @@ values."
    ;; wrapped in a layer. If you need some configuration for these
    ;; packages, then consider creating a layer. You can also put the
    ;; configuration in `dotspacemacs/user-config'.
-   dotspacemacs-additional-packages '(
-                                      ;; svelte-mode
-                                      )
-
    ;; A list of packages that cannot be updated.
+   dotspacemacs-additional-packages
+   '((copilot :location (recipe
+                         :fetcher github
+                         :repo "zerolfx/copilot.el"
+                         :files ("*.el" "dist"))))
    dotspacemacs-frozen-packages '()
    ;; A list of packages that will not be installed and loaded.
    dotspacemacs-excluded-packages '()
@@ -285,7 +284,7 @@ values."
    ;; Press <SPC> T n to cycle to the next theme in the list (works great
    ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(
-                         dracula
+                         dracula-pro-buffy
                          gandalf
                          )
    ;; If non nil the cursor color matches the state color in GUI Emacs.
@@ -453,6 +452,10 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   (setq-default
+
+   git-magit-status-fullscreen t
+
+
    vc-follow-symlinks t
 
    ;; js2-mode
@@ -467,6 +470,8 @@ before packages are loaded. If you are unsure, you should try in setting them in
    web-mode-code-indent-offset 2
    web-mode-attr-indent-offset 2
    )
+
+  (add-to-list 'custom-theme-load-path "~/.emacs.d/private/themes/dracula-pro/")
   )
 
 
@@ -477,6 +482,12 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
+
+  (advice-add 'json-parse-buffer :around
+              (lambda (orig &rest rest)
+                (while (re-search-forward "\\u0000" nil t)
+                  (replace-match ""))
+                (apply orig rest)))
 
   ;; (global-git-commit-mode t)
   (setq create-lockfiles nil)
@@ -516,9 +527,6 @@ you should place your code here."
   (add-hook 'magit-mode-hook #'global-emojify-mode)
   (add-hook 'doc-view-mode-hook 'auto-revert-mode)
 
-  ;; (setq projectile-project-search-path '("~/Platform" "~/npm-modules"))
-  (setq projectile-project-search-path '("~/plexispot"))
-
   (remove-hook 'fish-mode-hook 'company-mode)
   ;; (require 'lsp)
   ;; ;; Setup hashicorp lsp for terraform
@@ -526,4 +534,40 @@ you should place your code here."
   ;;  (make-lsp-client :new-connection (lsp-stdio-connection '("terraform-ls" "serve"))
   ;;                   :major-modes '(terraform-mode)
   ;;                   :server-id 'terraform-ls))
+
+
+  ;; accept completion from copilot and fallback to company
+  (with-eval-after-load 'company
+    ;; disable inline previews
+    (delq 'company-preview-if-just-one-frontend company-frontends))
+
+
+  (require 'copilot)
+  (define-key copilot-completion-map (kbd "<tab>") 'copilot-accept-completion)
+  (define-key copilot-completion-map (kbd "TAB") 'copilot-accept-completion)
+
+
+  (add-hook 'prog-mode-hook 'copilot-mode)
+
+  (define-key evil-insert-state-map (kbd "C-<tab>") 'copilot-accept-completion-by-word)
+  (define-key evil-insert-state-map (kbd "C-TAB") 'copilot-accept-completion-by-word)
+
+)
+(defun dotspacemacs/emacs-custom-settings ()
+  "Emacs custom settings.
+This is an auto-generated function, do not modify its content directly, use
+Emacs customize menu instead.
+This function is called at the very end of Spacemacs initialization."
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(warning-suppress-types '((emacsql))))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
 )
