@@ -23,6 +23,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "vim.camelCaseMotion.enable": true,
+  "vim.smartcase": true,
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -728,7 +729,7 @@
   "editor.fontLigatures": true,
   "editor.fontSize": 16,
   "[dockerfile]": {
-    "editor.defaultFormatter": "foxundermoon.shell-format"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "[python]": {
     "editor.insertSpaces": true,
@@ -782,9 +783,7 @@
   "python.experiments.enabled": false,
   "python.formatting.blackPath": "/opt/homebrew/bin/black",
   "git.openRepositoryInParentFolders": "never",
-  "errorLens.excludeBySource": [
-    "eslint(import/default)"
-  ],
+  "errorLens.excludeBySource": ["eslint(import/default)"],
   "autodesk.forge.environments": [
     {
       "title": "jonas-local",
@@ -792,5 +791,8 @@
       "clientSecret": "h1YxjLkYEqAEyEdJ",
       "region": "EMEA"
     }
-  ]
+  ],
+  "[ignore]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  }
 }
