@@ -196,7 +196,7 @@ function switch_terraform --on-event fish_postexec
 end
 
 # Runs npm start if possible
-function s 
+function s
     if test -f package.json
         if test -f yarn.lock
             command yarn start $argv
@@ -205,7 +205,6 @@ function s
         end
     else
         echo "No package.json found"
-        exit 1
     end
 end
 
@@ -214,7 +213,6 @@ function up
         command docker-compose up $argv
     else
         echo "No docker-compose.yml found"
-        exit 1
     end
 end
 
@@ -241,7 +239,7 @@ zoxide init fish | source
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
 
 # pnpm
-set -gx PNPM_HOME "/Users/jonasws/Library/pnpm"
+set -gx PNPM_HOME /Users/jonasws/Library/pnpm
 set -gx PATH "$PNPM_HOME" $PATH
 # pnpm end
 
@@ -251,20 +249,20 @@ set -gx PATH /opt/homebrew/opt/gnu-tar/libexec/gnubin $PATH
 set -gx DOCKER_DEFAULT_PLATFORM linux/amd64
 
 alias lg lazygit
-test -e {$HOME}/.iterm2_shell_integration.fish ; and source {$HOME}/.iterm2_shell_integration.fish
+test -e {$HOME}/.iterm2_shell_integration.fish; and source {$HOME}/.iterm2_shell_integration.fish
 
-set -gx PATH "/Users/jonasws/Library/Caches/fnm_multishells/27328_1681738441313/bin" $PATH;
-set -gx FNM_DIR "/Users/jonasws/Library/Application Support/fnm";
-set -gx FNM_VERSION_FILE_STRATEGY "local";
-set -gx FNM_MULTISHELL_PATH "/Users/jonasws/Library/Caches/fnm_multishells/27328_1681738441313";
-set -gx FNM_LOGLEVEL "info";
-set -gx FNM_NODE_DIST_MIRROR "https://nodejs.org/dist";
-set -gx FNM_ARCH "arm64";
+set -gx PATH /Users/jonasws/Library/Caches/fnm_multishells/27328_1681738441313/bin $PATH
+set -gx FNM_DIR "/Users/jonasws/Library/Application Support/fnm"
+set -gx FNM_VERSION_FILE_STRATEGY local
+set -gx FNM_MULTISHELL_PATH /Users/jonasws/Library/Caches/fnm_multishells/27328_1681738441313
+set -gx FNM_LOGLEVEL info
+set -gx FNM_NODE_DIST_MIRROR "https://nodejs.org/dist"
+set -gx FNM_ARCH arm64
 function _fnm_autoload_hook --on-variable PWD --description 'Change Node version on directory change'
     status --is-command-substitution; and return
     if test -f .node-version -o -f .nvmrc
-    fnm use --log-level=quiet
-end
+        fnm use --log-level=quiet
+    end
 
 end
 
