@@ -2,6 +2,7 @@ return {
   {
     "gbprod/substitute.nvim",
     opts = {},
+    vscode = true,
     keys = {
       {
         "gs",
