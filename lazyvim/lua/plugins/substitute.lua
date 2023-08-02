@@ -1,7 +1,9 @@
 return {
   {
     "gbprod/substitute.nvim",
-    opts = {},
+    opts = {
+      on_substitute = require("yanky.integration").substitute(),
+    },
     vscode = true,
     keys = {
       {
