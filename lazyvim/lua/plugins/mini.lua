@@ -8,10 +8,6 @@ return {
     },
   },
   {
-    "echasnovski/mini.animate",
-    enabled = false,
-  },
-  {
     "echasnovski/mini.files",
     opts = {
       windows = {
