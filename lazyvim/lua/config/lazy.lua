@@ -1,4 +1,3 @@
-vim.g.node_host_prog = "/Users/jonasws/Library/Caches/fnm_multishells/27328_1681738441313/bin/neovim-node-host"
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 
 -- bootstrap lazy.nvim
@@ -19,8 +18,9 @@ require("lazy").setup({
   spec = {
     -- add LazyVim and import its plugins
     { "LazyVim/LazyVim", import = "lazyvim.plugins" },
-    { import = "lazyvim.plugins.extras.lang.json" },
     -- import any extras modules here
+    { import = "lazyvim.plugins.extras.ui.edgy" },
+    { import = "lazyvim.plugins.extras.lang.json" },
     { import = "lazyvim.plugins.extras.lang.docker" },
     { import = "lazyvim.plugins.extras.formatting.prettier" },
     { import = "lazyvim.plugins.extras.lang.typescript" },
