@@ -34,7 +34,14 @@ function fish_prompt
         s/\(eu-north-1\)/ 🇸🇪 /"
 end
 
-set -g fish_key_bindings fish_hybrid_key_bindings
+function fish_custom_key_bindings
+    fish_hybrid_key_bindings
+    fzf_key_bindings
+    bind \ec fzf-git-aware-cd-widget
+    bind -M insert \ec fzf-git-aware-cd-widget
+end
+
+set -g fish_key_bindings fish_custom_key_bindings
 
 set fish_color_command yellow
 set fish_color_autosuggestion white
@@ -99,6 +106,7 @@ alias fpd 'fzf --preview="bat {} --color=always" --preview-window down --print0 
 function fzf-git-aware-cd-widget -d "Change directory (git root aware)"
     set -l commandline (__fzf_parse_commandline)
     set -l dir (git-dir-or-pwd)
+    echo $dir
     set -l fzf_query $commandline[2]
     set -l prefix $commandline[3]
 
@@ -118,9 +126,6 @@ function fzf-git-aware-cd-widget -d "Change directory (git root aware)"
 
     commandline -f repaint
 end
-
-bind \ec "fzf-git-aware-cd-widget (git-dir-or-pwd)"
-bind -M insert \ec "fzf-git-aware-cd-widget (git-dir-or-pwd)"
 
 
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
