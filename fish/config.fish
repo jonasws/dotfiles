@@ -69,6 +69,10 @@ end
 
 alias man batman
 
+function git-dir-or-pwd
+    git rev-parse --show-toplevel 2>/dev/null; or pwd
+end
+
 
 #set -x GOPATH $HOME/.go
 # set -x GOROOT (brew --prefix golang)/libexec
@@ -79,7 +83,6 @@ set -x BD_OPT insensitive
 
 set -U FZF_DEFAULT_COMMAND "fd --type f"
 set -U FZF_CTRL_T_COMMAND "fd --type f"
-set -U FZF_ALT_C_COMMAND "fd --type d"
 set -U FZF_OPEN_COMMAND "fd --type f . \$dir"
 set -U FZF_PREVIEW_DIR_CMD exa
 
@@ -91,6 +94,33 @@ set -U FZF_COMPLETE 2
 alias fp 'fzf --preview="bat {} --color=always" --print0 | xargs -0 bat'
 alias fpd 'fzf --preview="bat {} --color=always" --preview-window down --print0 | xargs -0 | xargs bat'
 
+
+# This makes the fzf cd widget start from the git root if you're in a git repo
+function fzf-git-aware-cd-widget -d "Change directory (git root aware)"
+    set -l commandline (__fzf_parse_commandline)
+    set -l dir (git-dir-or-pwd)
+    set -l fzf_query $commandline[2]
+    set -l prefix $commandline[3]
+
+    test -n "$FZF_TMUX_HEIGHT"; or set FZF_TMUX_HEIGHT 40%
+    begin
+        set -lx FZF_DEFAULT_OPTS "--height $FZF_TMUX_HEIGHT --reverse --bind=ctrl-z:ignore $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS"
+        eval "fd --type d --base-directory $dir | "(__fzfcmd)' +m --query "'$fzf_query'"' | read -l result
+
+        if [ -n "$result" ]
+            cd -- $dir/$result
+
+            # Remove last token from commandline.
+            commandline -t ""
+            commandline -it -- $prefix
+        end
+    end
+
+    commandline -f repaint
+end
+
+bind \ec "fzf-git-aware-cd-widget (git-dir-or-pwd)"
+bind -M insert \ec "fzf-git-aware-cd-widget (git-dir-or-pwd)"
 
 
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
@@ -246,6 +276,7 @@ set -gx PNPM_HOME /Users/jonasws/Library/pnpm
 set -gx PATH "$PNPM_HOME" $PATH
 # pnpm end
 
+alias fishconfig "nvim ~/dotfiles/fish/config.fish; and reload-fish-config"
 # Add gnutar to front of path
 set -gx PATH /opt/homebrew/opt/gnu-tar/libexec/gnubin $PATH
 
@@ -268,5 +299,6 @@ function _fnm_autoload_hook --on-variable PWD --description 'Change Node version
     end
 
 end
+
 
 _fnm_autoload_hook
