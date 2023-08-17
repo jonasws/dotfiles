@@ -1,3 +1,5 @@
+local Util = require("lazyvim.util")
+
 return {
   {
     "nvim-telescope/telescope.nvim",
@@ -10,35 +12,19 @@ return {
       end,
     },
     keys = {
-      -- change a keymap
-      -- add a keymap to browse plugin files
-      { "<C-p>", "<cmd>Telescope find_files<CR>", desc = "Find Files" },
       {
         "<leader>fp",
         function()
-          require("telescope.builtin").find_files({ cwd = require("lazy.core.config").options.root })
+          local git_dir = vim.fn.systemlist("git rev-parse --show-toplevel")
+
+          -- Use nil if the previous command failed
+          if vim.v.shell_error ~= 0 then
+            Util.telescope("find_files", {})()
+          else
+            Util.telescope("find_files", { cwd = git_dir[1] })()
+          end
         end,
-        desc = "Find Plugin File",
-      },
-      -- This is using b because it used to be fzf's :Buffers
-      {
-        "<cmd>Telescope oldfiles<cr>",
-        "<leader>b",
-        desc = "Recent",
-      },
-    },
-    opts = {
-      defaults = {
-        mappings = {
-          i = {
-            ["<C-J>"] = function(...)
-              require("telescope.actions").move_selection_next(...)
-            end,
-            ["<C-K>"] = function(...)
-              require("telescope.actions").move_selection_previous(...)
-            end,
-          },
-        },
+        desc = "Find project files",
       },
     },
   },
