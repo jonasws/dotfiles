@@ -27,5 +27,19 @@ return {
         desc = "Find project files",
       },
     },
+    opts = {
+      defaults = {
+        mappings = {
+          i = {
+            ["<C-J>"] = function(...)
+              require("telescope.actions").move_selection_next(...)
+            end,
+            ["<C-K>"] = function(...)
+              require("telescope.actions").move_selection_previous(...)
+            end,
+          },
+        },
+      },
+    },
   },
 }
