@@ -145,7 +145,7 @@ abbr -a t tig
 alias tst "tig status"
 
 
-alias tf terraform
+abbr -a tf terraform
 
 # pyenv init --path | source
 
