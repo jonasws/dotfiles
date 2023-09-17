@@ -1,3 +1,6 @@
 spacemacs/.spacemacs.env
-/doom/private.el
-/fish/local.fish
+doom/private.el
+fish/local.fish
+
+lazyvim/spell
+
