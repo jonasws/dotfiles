@@ -20,9 +20,6 @@ test -f $HOME/dotfiles/fish/local.fish; and source $HOME/dotfiles/fish/local.fis
 
 starship init fish | source
 
-# Just for it not to hang. Remove when we don't use this repo on this system anymore
-git -C ~/sparkel-cdk-app/ fsmonitor--daemon start 2&>/dev/null; or echo "already running fsmonitor in sparkel-cdk-app"
-
 functions --erase fish_starship_prompt
 functions --copy fish_prompt fish_starship_prompt
 
