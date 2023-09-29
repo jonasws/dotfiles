@@ -1,5 +1,8 @@
 set -x LC_ALL en_US.UTF-8
 
+
+fish_config theme choose "Dracula Official"
+
 function __fish_describe_command
 end
 
@@ -124,13 +127,29 @@ function fzf-git-aware-cd-widget -d "Change directory (git root aware)"
     commandline -f repaint
 end
 
+set -gx EXA_COLORS "\
+gu=37:\
+sn=32:\
+sb=32:\
+da=34:\
+ur=34:\
+uw=35:\
+ux=36:\
+ue=36:\
+gr=34:\
+gw=35:\
+gx=36:\
+tr=34:\
+tw=35:\
+tx=36:"
+
 
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 
 # Exa is cooler than ls, duh
-alias ll "exa --long --git"
-alias l "exa --long --git"
-alias la "exa --long --all"
+alias ll "exa --long --git --icons"
+alias l "exa --long --git --icons"
+alias la "exa --long --all --icons"
 
 abbr -a dc "docker compose"
 
