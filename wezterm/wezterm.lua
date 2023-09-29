@@ -3,7 +3,10 @@ local act = wezterm.action
 
 local config = {}
 
-config.color_scheme = "Dracula"
+config.color_scheme = "Dracula (Official)"
+config.tab_bar_at_bottom = true
+config.use_fancy_tab_bar = false
+config.window_decorations = "RESIZE"
 config.font_size = 14.0
 
 config.keys = {
