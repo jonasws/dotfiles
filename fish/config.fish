@@ -151,6 +151,8 @@ alias ll "exa --long --git --icons"
 alias l "exa --long --git --icons"
 alias la "exa --long --all --icons"
 
+alias tree "exa --tree --git --long"
+
 abbr -a dc "docker compose"
 
 # Calendar
@@ -232,22 +234,22 @@ end
 # uninstall by removing these lines
 [ -f ~/.config/tabtab/__tabtab.fish ]; and . ~/.config/tabtab/__tabtab.fish; or true
 
-function switch_terraform --on-event fish_postexec
-    string match --regex '^cd\s' "$argv" >/dev/null
-    set --local is_command_cd $status
-
-    if test $is_command_cd -eq 0
-        if count *.tf >/dev/null
-
-            grep -c required_version *.tf >/dev/null
-            set --local tf_contains_version $status
-
-            if test $tf_contains_version -eq 0
-                command tfswitch
-            end
-        end
-    end
-end
+# function switch_terraform --on-event fish_postexec
+#     string match --regex '^cd\s' "$argv" >/dev/null
+#     set --local is_command_cd $status
+#
+#     if test $is_command_cd -eq 0
+#         if count *.tf >/dev/null
+#
+#             grep -c required_version *.tf >/dev/null
+#             set --local tf_contains_version $status
+#
+#             if test $tf_contains_version -eq 0
+#                 command tfswitch
+#             end
+#         end
+#     end
+# end
 
 # Runs npm start if possible
 function s
@@ -322,4 +324,5 @@ function _fnm_autoload_hook --on-variable PWD --description 'Change Node version
 end
 
 
-_fnm_autoload_hook
+# _fnm_autoload_hook
+# source /Users/jonasws/.config/op/plugins.sh
