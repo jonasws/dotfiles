@@ -8,8 +8,8 @@ end
 
 function repo-name
     basename (git rev-parse --show-toplevel)
-end
 
+end
 alias grt "cd (git rev-parse --show-toplevel)"
 
 set -x PATH ~/.emacs.d/bin $HOME/.cargo/bin /opt/homebrew/bin $PATH
@@ -26,6 +26,7 @@ starship init fish | source
 functions --erase fish_starship_prompt
 functions --copy fish_prompt fish_starship_prompt
 
+
 function fish_prompt
     # Fun with flags
     fish_starship_prompt | perl -p -e "
@@ -34,14 +35,40 @@ function fish_prompt
         s/\(eu-north-1\)/ 🇸🇪 /"
 end
 
-function fish_custom_key_bindings
-    fish_hybrid_key_bindings
+
+function fish_user_key_bindings
     fzf_key_bindings
     bind \ec fzf-git-aware-cd-widget
     bind -M insert \ec fzf-git-aware-cd-widget
 end
 
-set -g fish_key_bindings fish_custom_key_bindings
+set -g fish_key_bindings fish_hybrid_key_bindings
+
+# This makes the fzf cd widget start from the git root if you're in a git repo
+function fzf-git-aware-cd-widget -d "Change directory (git root aware)"
+    set -l commandline (__fzf_parse_commandline)
+    set -l dir (git-dir-or-pwd)
+    echo $dir
+    set -l fzf_query $commandline[2]
+    set -l prefix $commandline[3]
+
+    test -n "$FZF_TMUX_HEIGHT"; or set FZF_TMUX_HEIGHT 40%
+    begin
+        set -lx FZF_DEFAULT_OPTS "--height $FZF_TMUX_HEIGHT --reverse --bind=ctrl-z:ignore $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS"
+        eval "fd --type d --base-directory $dir | "(__fzfcmd)' +m --query "'$fzf_query'"' | read -l result
+
+        if [ -n "$result" ]
+            cd -- $dir/$result
+
+            # Remove last token from commandline.
+            commandline -t ""
+            commandline -it -- $prefix
+        end
+    end
+
+    commandline -f repaint
+end
+
 
 set fish_color_command yellow
 set fish_color_autosuggestion white
@@ -91,7 +118,7 @@ set -x BD_OPT insensitive
 set -U FZF_DEFAULT_COMMAND "fd --type f"
 set -U FZF_CTRL_T_COMMAND "fd --type f"
 set -U FZF_OPEN_COMMAND "fd --type f . \$dir"
-set -U FZF_PREVIEW_DIR_CMD exa
+set -U FZF_PREVIEW_DIR_CMD eza
 
 set -U FZF_PREVIEW_FILE_CMD "bat --plain --color=always --line-range :10"
 set -U FZF_ENABLE_OPEN_PREVIEW 1
@@ -101,31 +128,6 @@ set -U FZF_COMPLETE 2
 alias fp 'fzf --preview="bat {} --color=always" --print0 | xargs -0 bat'
 alias fpd 'fzf --preview="bat {} --color=always" --preview-window down --print0 | xargs -0 | xargs bat'
 
-
-# This makes the fzf cd widget start from the git root if you're in a git repo
-function fzf-git-aware-cd-widget -d "Change directory (git root aware)"
-    set -l commandline (__fzf_parse_commandline)
-    set -l dir (git-dir-or-pwd)
-    echo $dir
-    set -l fzf_query $commandline[2]
-    set -l prefix $commandline[3]
-
-    test -n "$FZF_TMUX_HEIGHT"; or set FZF_TMUX_HEIGHT 40%
-    begin
-        set -lx FZF_DEFAULT_OPTS "--height $FZF_TMUX_HEIGHT --reverse --bind=ctrl-z:ignore $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS"
-        eval "fd --type d --base-directory $dir | "(__fzfcmd)' +m --query "'$fzf_query'"' | read -l result
-
-        if [ -n "$result" ]
-            cd -- $dir/$result
-
-            # Remove last token from commandline.
-            commandline -t ""
-            commandline -it -- $prefix
-        end
-    end
-
-    commandline -f repaint
-end
 
 set -gx EXA_COLORS "\
 gu=37:\
@@ -146,12 +148,12 @@ tx=36:"
 
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 
-# Exa is cooler than ls, duh
-alias ll "exa --long --git --icons"
-alias l "exa --long --git --icons"
-alias la "exa --long --all --icons"
+# Eza is cooler than ls, duh
+alias ll "eza --long --icons"
+alias l "eza --long --icons"
+alias la "eza --long --all --icons"
 
-alias tree "exa --tree --git --long"
+alias tree "eza --tree --long"
 
 abbr -a dc "docker compose"
 
@@ -294,10 +296,6 @@ zoxide init fish | source
 # Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
 
-# pnpm
-set -gx PNPM_HOME /Users/jonasws/Library/pnpm
-set -gx PATH "$PNPM_HOME" $PATH
-# pnpm end
 
 alias fishconfig "nvim ~/dotfiles/fish/config.fish; and reload-fish-config"
 # Add gnutar to front of path
@@ -306,7 +304,6 @@ set -gx PATH /opt/homebrew/opt/gnu-tar/libexec/gnubin $PATH
 set -gx DOCKER_DEFAULT_PLATFORM linux/amd64
 
 alias lg lazygit
-test -e {$HOME}/.iterm2_shell_integration.fish; and source {$HOME}/.iterm2_shell_integration.fish
 
 set -gx PATH /Users/jonasws/Library/Caches/fnm_multishells/27328_1681738441313/bin $PATH
 set -gx FNM_DIR "/Users/jonasws/Library/Application Support/fnm"
@@ -323,6 +320,4 @@ function _fnm_autoload_hook --on-variable PWD --description 'Change Node version
 
 end
 
-
-# _fnm_autoload_hook
-# source /Users/jonasws/.config/op/plugins.sh
+set -gx PATH ~/.local/bin $PATH
