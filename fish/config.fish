@@ -35,51 +35,21 @@ function fish_prompt
         s/\(eu-north-1\)/ 🇸🇪 /"
 end
 
-
-function fish_user_key_bindings
-    fzf_key_bindings
-    bind \ec fzf-git-aware-cd-widget
-    bind -M insert \ec fzf-git-aware-cd-widget
-end
+fzf_configure_bindings --directory=\cf --git_status=\eg --git_log=\el
 
 set -g fish_key_bindings fish_hybrid_key_bindings
 
-# This makes the fzf cd widget start from the git root if you're in a git repo
-function fzf-git-aware-cd-widget -d "Change directory (git root aware)"
-    set -l commandline (__fzf_parse_commandline)
-    set -l dir (git-dir-or-pwd)
-    echo $dir
-    set -l fzf_query $commandline[2]
-    set -l prefix $commandline[3]
-
-    test -n "$FZF_TMUX_HEIGHT"; or set FZF_TMUX_HEIGHT 40%
-    begin
-        set -lx FZF_DEFAULT_OPTS "--height $FZF_TMUX_HEIGHT --reverse --bind=ctrl-z:ignore $FZF_DEFAULT_OPTS $FZF_ALT_C_OPTS"
-        eval "fd --type d --base-directory $dir | "(__fzfcmd)' +m --query "'$fzf_query'"' | read -l result
-
-        if [ -n "$result" ]
-            cd -- $dir/$result
-
-            # Remove last token from commandline.
-            commandline -t ""
-            commandline -it -- $prefix
-        end
-    end
-
-    commandline -f repaint
+function fish_user_key_bindings
+    bind \ec fzf_cd_directory
+    bind -M insert \ec fzf_cd_directory
 end
 
 
 set fish_color_command yellow
 set fish_color_autosuggestion white
 
-# Vim duh
 set -x EDITOR nvim
-# set -x EDITOR "emacsclient --alternate-editor vim"
-
-abbr -a delete-merged "git branch --merged | grep -v master | grep -v main | grep -v (git branch --show-current) | xargs git branch -d"
-
-abbr -a gsw "git switch"
+set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
 
 
 abbr -a gpsup "git push -u origin (git branch --show-current)"
@@ -118,18 +88,21 @@ set -x BD_OPT insensitive
 set -U FZF_DEFAULT_COMMAND "fd --type f"
 set -U FZF_CTRL_T_COMMAND "fd --type f"
 set -U FZF_OPEN_COMMAND "fd --type f . \$dir"
-set -U FZF_PREVIEW_DIR_CMD eza
 
-set -U FZF_PREVIEW_FILE_CMD "bat --plain --color=always --line-range :10"
 set -U FZF_ENABLE_OPEN_PREVIEW 1
 set -U FZF_LEGACY_KEYBINDINGS 0
 set -U FZF_COMPLETE 2
 
-alias fp 'fzf --preview="bat {} --color=always" --print0 | xargs -0 bat'
-alias fpd 'fzf --preview="bat {} --color=always" --preview-window down --print0 | xargs -0 | xargs bat'
+set -U FZF_CTRL_T_OPTS "
+  --preview 'bat -n --color=always {}'
+"
+
+set -U FZF_ALT_C_OPTS "
+   --preview 'eza -l --color=always {}'
+"
 
 
-set -gx EXA_COLORS "\
+set -gx EZA_COLORS "\
 gu=37:\
 sn=32:\
 sb=32:\
@@ -229,30 +202,6 @@ function findpass
     echo "Copied password for entry" $name "to clipbaord"
 end
 
-# complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
-
-
-# tabtab source for packages
-# uninstall by removing these lines
-[ -f ~/.config/tabtab/__tabtab.fish ]; and . ~/.config/tabtab/__tabtab.fish; or true
-
-# function switch_terraform --on-event fish_postexec
-#     string match --regex '^cd\s' "$argv" >/dev/null
-#     set --local is_command_cd $status
-#
-#     if test $is_command_cd -eq 0
-#         if count *.tf >/dev/null
-#
-#             grep -c required_version *.tf >/dev/null
-#             set --local tf_contains_version $status
-#
-#             if test $tf_contains_version -eq 0
-#                 command tfswitch
-#             end
-#         end
-#     end
-# end
-
 # Runs npm start if possible
 function s
     if test -f package.json
@@ -293,10 +242,6 @@ end
 
 zoxide init fish | source
 
-# Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
-complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
-
-
 alias fishconfig "nvim ~/dotfiles/fish/config.fish; and reload-fish-config"
 # Add gnutar to front of path
 set -gx PATH /opt/homebrew/opt/gnu-tar/libexec/gnubin $PATH
@@ -305,19 +250,60 @@ set -gx DOCKER_DEFAULT_PLATFORM linux/amd64
 
 alias lg lazygit
 
-set -gx PATH /Users/jonasws/Library/Caches/fnm_multishells/27328_1681738441313/bin $PATH
-set -gx FNM_DIR "/Users/jonasws/Library/Application Support/fnm"
-set -gx FNM_VERSION_FILE_STRATEGY local
-set -gx FNM_MULTISHELL_PATH /Users/jonasws/Library/Caches/fnm_multishells/27328_1681738441313
-set -gx FNM_LOGLEVEL info
-set -gx FNM_NODE_DIST_MIRROR "https://nodejs.org/dist"
+set -gx PATH /Users/jonasws/Library/Caches/fnm_multishells/24689_1699519900266/bin $PATH
 set -gx FNM_ARCH arm64
+set -gx FNM_VERSION_FILE_STRATEGY local
+set -gx FNM_LOGLEVEL info
+set -gx FNM_COREPACK_ENABLED false
+set -gx FNM_RESOLVE_ENGINES false
+set -gx FNM_MULTISHELL_PATH /Users/jonasws/Library/Caches/fnm_multishells/24689_1699519900266
+set -gx FNM_NODE_DIST_MIRROR "https://nodejs.org/dist"
+set -gx FNM_DIR "/Users/jonasws/Library/Application Support/fnm"
+
 function _fnm_autoload_hook --on-variable PWD --description 'Change Node version on directory change'
     status --is-command-substitution; and return
     if test -f .node-version -o -f .nvmrc
         fnm use --log-level=quiet
     end
-
 end
 
 set -gx PATH ~/.local/bin $PATH
+
+# Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
+complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
+
+
+function fzf_cd_directory --description "Change directory Replace the current token with the selected file paths."
+    # Inspired by https://github.com/PatrickF1/fzf.fish/blob/main/functions/_fzf_search_directory.fish
+    # Directly use fd binary to avoid output buffering delay caused by a fd alias, if any.
+    # Debian-based distros install fd as fdfind and the fd package is something else, so
+    # check for fdfind first. Fall back to "fd" for a clear error message.
+    set -f fd_cmd (command -v fdfind || command -v fd  || echo "fd")
+    set -f --append fd_cmd --color=always $fzf_fd_opts
+
+    set -f fzf_arguments --select-1 --preview='eza --all --color=always {}' --ansi $fzf_directory_opts
+    set -f token (commandline --current-token)
+    # expand any variables or leading tilde (~) in the token
+    set -f expanded_token (eval echo -- $token)
+    # unescape token because it's already quoted so backslashes will mess up the path
+    set -f unescaped_exp_token (string unescape -- $expanded_token)
+
+    # If the current token is a directory and has a trailing slash,
+    # then use it as fd's base directory.
+    if string match --quiet -- "*/" $unescaped_exp_token && test -d "$unescaped_exp_token"
+        set --append fd_cmd --base-directory=$unescaped_exp_token
+        # use the directory name as fzf's prompt to indicate the search is limited to that directory
+        set --prepend fzf_arguments --prompt="Change Directory $unescaped_exp_token> " --preview="_fzf_preview_file $expanded_token{}"
+        set -f dir_path_selected $unescaped_exp_token($fd_cmd --type d 2>/dev/null | _fzf_wrapper $fzf_arguments)
+    else
+        set --prepend fzf_arguments --prompt="Change Directory> " --query="$unescaped_exp_token" --preview='_fzf_preview_file {}'
+        set -f dir_path_selected ($fd_cmd --type d 2>/dev/null | _fzf_wrapper $fzf_arguments)
+    end
+
+
+    if test $status -eq 0
+        cd (string escape -- $dir_path_selected | string join ' ')
+    end
+
+    commandline --function repaint
+end
