@@ -52,15 +52,6 @@ set -x EDITOR nvim
 set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
 
 
-abbr -a gpsup "git push -u origin (git branch --show-current)"
-
-abbr -a gupa "git pull --rebase --autostash"
-abbr -a gsm "git switch master"
-abbr -a gsma "git switch main"
-abbr -a gpf "git push --force-with-lease"
-
-git config --global alias.newest-tag "describe --abbrev=0"
-
 abbr -a - "cd -"
 
 alias reload-fish-config "source ~/.config/fish/config.fish; and echo \"Fish config reloaded 🐟 🚀\""
@@ -249,6 +240,8 @@ set -gx PATH /opt/homebrew/opt/gnu-tar/libexec/gnubin $PATH
 set -gx DOCKER_DEFAULT_PLATFORM linux/amd64
 
 alias lg lazygit
+
+abbr -a gp!! "git push --force"
 
 set -gx PATH /Users/jonasws/Library/Caches/fnm_multishells/24689_1699519900266/bin $PATH
 set -gx FNM_ARCH arm64
