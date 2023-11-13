@@ -746,7 +746,7 @@
     "editor.suggest.snippetsPreventQuickSuggestions": false,
     "editor.tabCompletion": "onlySnippets",
     "editor.suggestSelection": "first",
-    "editor.wordBasedSuggestions": false,
+    "editor.wordBasedSuggestions": "off",
     "editor.selectionHighlight": false,
     "editor.formatOnSave": true,
     "editor.formatOnType": true,
