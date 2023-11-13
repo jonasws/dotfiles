@@ -162,7 +162,7 @@ alias spin tspin
 
 function lambdalogs
     awslogs groups -p /aws/lambda | grep -v suat | fzf -1 -d / --with-nth 4 \
-        --bind "ctrl-w:execute(awslogs get {} ALL $argv --watch | tspin)"
+        --bind "ctrl-w:execute(awslogs get {} ALL $argv --watch | tspin),enter:execute(awslogs get {} ALL $argv | tspin)+abort"
 end
 
 function test-one
