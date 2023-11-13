@@ -159,15 +159,7 @@ end
 
 
 function awslogs
-    if isatty stdout
-        if contains -- -w $argv or contains -- --watch $argv
-            command awslogs $argv --color=always | bat --plain --language log --paging=never
-        else
-            command awslogs $argv --color=always | bat --plain --language log
-        end
-    else
-        command awslogs $argv
-    end
+    command awslogs $argv | tspin
 end
 
 function test-one
