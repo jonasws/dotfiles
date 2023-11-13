@@ -158,8 +158,11 @@ function rg
 end
 
 
-function awslogs
-    command awslogs $argv | tspin
+alias spin tspin
+
+function lambdalogs
+    awslogs groups -p /aws/lambda | grep -v suat | fzf -1 -d / --with-nth 4 \
+        --bind "ctrl-w:execute(awslogs get {} ALL $argv --watch | tspin)"
 end
 
 function test-one
