@@ -76,19 +76,19 @@ set -x PATH /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bi
 
 set -x BD_OPT insensitive
 
-set -U FZF_DEFAULT_COMMAND "fd --type f"
-set -U FZF_CTRL_T_COMMAND "fd --type f"
-set -U FZF_OPEN_COMMAND "fd --type f . \$dir"
+set -gx FZF_DEFAULT_COMMAND "fd --type f"
+set -gx FZF_CTRL_T_COMMAND "fd --type f"
+set -gx FZF_OPEN_COMMAND "fd --type f . \$dir"
 
-set -U FZF_ENABLE_OPEN_PREVIEW 1
-set -U FZF_LEGACY_KEYBINDINGS 0
-set -U FZF_COMPLETE 2
+set -gx FZF_ENABLE_OPEN_PREVIEW 1
+set -gx FZF_LEGACY_KEYBINDINGS 0
+set -gx FZF_COMPLETE 2
 
-set -U FZF_CTRL_T_OPTS "
+set -gx FZF_CTRL_T_OPTS "
   --preview 'bat -n --color=always {}'
 "
 
-set -U FZF_ALT_C_OPTS "
+set -gx FZF_ALT_C_OPTS "
    --preview 'eza -l --color=always {}'
 "
 
@@ -162,7 +162,7 @@ alias spin tspin
 
 function lambdalogs
     awslogs groups -p /aws/lambda | grep -v suat | fzf -1 -d / --with-nth 4 \
-        --bind "ctrl-w:execute(awslogs get {} ALL $argv --watch | tspin),enter:execute(awslogs get {} ALL $argv | tspin)+abort"
+        --bind "ctrl-w:execute(awslogs get {} ALL $argv --watch | tspin),ctrl+enter:execute(awslogs get {} ALL $argv | tspin)+abort"
 end
 
 function test-one
