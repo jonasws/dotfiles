@@ -1,5 +1,5 @@
 set -x LC_ALL en_US.UTF-8
-
+set -gx LESS R
 
 fish_config theme choose "Dracula Official"
 
@@ -128,6 +128,9 @@ alias month="gcal --starting-day=1"
 abbr -a t tig
 alias tst "tig status"
 
+# Git alises
+abbr -a gsm "git switch master; and git pull --rebase"
+
 
 abbr -a tf terraform
 
@@ -135,7 +138,7 @@ abbr -a tf terraform
 
 function jq
     if isatty stdout
-        command jq -C $argv | less -RXF
+        command jq -C $argv | less -R
     else
         command jq $argv
     end
@@ -143,7 +146,7 @@ end
 
 function http
     if isatty stdout; and not contains -- --download $argv; and not contains -- -d $argv
-        command http --pretty=all --print=hb $argv | less -RXF
+        command http --pretty=all --print=hb $argv | less -R
     else
         command http $argv
     end
@@ -151,7 +154,7 @@ end
 
 function rg
     if isatty stdout
-        command rg -p $argv | less -RXF
+        command rg -p $argv | less -R
     else
         command rg $argv
     end
@@ -162,7 +165,7 @@ alias spin tspin
 
 function lambdalogs
     awslogs groups -p /aws/lambda | grep -v suat | fzf -1 -d / --with-nth 4 \
-        --bind "ctrl-w:execute(awslogs get {} ALL $argv --watch | tspin),ctrl+enter:execute(awslogs get {} ALL $argv | tspin)+abort"
+        --bind "ctrl-w:execute(awslogs get {} ALL $argv --watch | tspin),enter:execute(awslogs get {} ALL $argv | tspin)+abort"
 end
 
 function test-one
@@ -294,4 +297,46 @@ function fzf_cd_directory --description "Change directory Replace the current to
     end
 
     commandline --function repaint
+end
+
+function mr
+    set -l query '
+query CurrentBranchMergeRequest($projectPath: ID!, $authorUsername: String!, $sourceBranch: String!) {
+  project(fullPath: $projectPath) {
+    name
+    mergeRequests(authorUsername: $authorUsername, sourceBranches: [$sourceBranch]) {
+      nodes {
+        headPipeline {
+        	status
+          jobs {
+            nodes {
+              name
+              status
+              webPath
+            }
+          }
+          
+        }
+        title
+        state
+        approvedBy {
+          edges {
+            node {
+              username
+            }
+          }
+        }
+      }
+    }
+  }
+}
+  '
+
+    glab api graphql -f query=$query \
+        -f projectPath="dnb/nmb/server-side/dnb-server-side" \
+        -f authorUsername="Jonas.Stromsodd" \
+        -f sourceBranch=(__git.current_branch) \
+        | jq .data.project.mergeRequests.nodes[] \
+        | fx
+
 end

@@ -771,7 +771,7 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
   "editor.codeActionsOnSave": {
-    "source.sortImports": false
+    "source.sortImports": "never"
   },
   "python.formatting.provider": "none",
   "terminal.integrated.inheritEnv": false,
@@ -800,5 +800,6 @@
   },
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
-  }
+  },
+  "security.promptForLocalFileProtocolHandling": false
 }
