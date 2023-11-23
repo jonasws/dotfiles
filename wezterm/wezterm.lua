@@ -3,6 +3,8 @@ local act = wezterm.action
 
 local config = {}
 
+config.font = wezterm.font("JetBrainsMono Nerd Font")
+
 config.color_scheme = "Dracula (Official)"
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
@@ -34,6 +36,11 @@ config.keys = {
 		key = ".",
 		mods = "SUPER",
 		action = act.PaneSelect,
+	},
+	{
+		key = "p",
+		mods = "SUPER",
+		action = wezterm.action.ActivateCommandPalette,
 	},
 }
 
