@@ -727,7 +727,7 @@
   "vim.easymotion": true,
   "workbench.tree.indent": 16,
   "editor.fontLigatures": true,
-  "editor.fontSize": 16,
+  "editor.fontSize": 14,
   "[dockerfile]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
