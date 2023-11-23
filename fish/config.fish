@@ -55,9 +55,10 @@ set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
 abbr -a - "cd -"
 
 alias reload-fish-config "source ~/.config/fish/config.fish; and echo \"Fish config reloaded 🐟 🚀\""
+alias as-tree "command tree --fromfile"
 
 function browse-ssm-params
-    aws ssm describe-parameters --output=json \
+    aws ssm describe-parameter --output=json \
         | jq -r ".Parameters[].Name" \
         | fzf
 end
@@ -135,30 +136,6 @@ abbr -a gsm "git switch master; and git pull --rebase"
 abbr -a tf terraform
 
 # pyenv init --path | source
-
-function jq
-    if isatty stdout
-        command jq -C $argv | less -R
-    else
-        command jq $argv
-    end
-end
-
-function http
-    if isatty stdout; and not contains -- --download $argv; and not contains -- -d $argv
-        command http --pretty=all --print=hb $argv | less -R
-    else
-        command http $argv
-    end
-end
-
-function rg
-    if isatty stdout
-        command rg -p $argv | less -R
-    else
-        command rg $argv
-    end
-end
 
 
 alias spin tspin
