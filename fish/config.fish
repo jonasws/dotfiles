@@ -278,42 +278,53 @@ end
 
 function mr
     set -l query '
-query CurrentBranchMergeRequest($projectPath: ID!, $authorUsername: String!, $sourceBranch: String!) {
-  project(fullPath: $projectPath) {
-    name
-    mergeRequests(authorUsername: $authorUsername, sourceBranches: [$sourceBranch]) {
-      nodes {
-        headPipeline {
-        	status
-          jobs {
+      query CurrentBranchMergeRequest($projectPath: ID!, $authorUsername: String!, $sourceBranch: String!) {
+        project(fullPath: $projectPath) {
+          name
+          mergeRequests(authorUsername: $authorUsername, sourceBranches: [$sourceBranch]) {
             nodes {
-              name
-              status
-              webPath
-            }
-          }
-          
-        }
-        title
-        state
-        approvedBy {
-          edges {
-            node {
-              username
+              headPipeline {
+                status
+                jobs {
+                  nodes {
+                    name
+                    status
+                    webPath
+                  }
+                }
+                
+              }
+              title
+              state
+              approvedBy {
+                edges {
+                  node {
+                    username
+                  }
+                }
+              }
             }
           }
         }
       }
-    }
-  }
-}
   '
 
+
+
+    set -l remoteUrl (git remote -v | grep '^upstream' | awk '{print $2}' | uniq)
+
+    # If 'upstream' does not exist, use 'origin'
+    if test -z "$remoteUrl"
+        set remoteUrl (git remote -v | grep '^origin' | awk '{print $2}' | uniq)
+    end
+
+    set -l projectPath (echo $remoteUrl | awk -F'/' '{print $(NF-2)"/"$(NF-1)"/"$NF}' | sed 's/\.git$//')
+
+
     glab api graphql -f query=$query \
-        -f projectPath="dnb/nmb/server-side/dnb-server-side" \
+        -f projectPath=$projectPath \
         -f authorUsername="Jonas.Stromsodd" \
         -f sourceBranch=(__git.current_branch) \
-        | jq .data.project.mergeRequests.nodes[] \
-        | fx
+        | jq .data.project.mergeRequests.nodes[]
 
 end
