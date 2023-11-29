@@ -1,22 +1,92 @@
 let leader=" "
-" Selected IntelliSpace modules
-source ~/.intellimacs/spacemacs.vim
-source ~/.intellimacs/extra.vim
-source ~/.intellimacs/major.vim
-source ~/.intellimacs/hybrid.vim
+ " Selected IntelliSpace modules
 
-set visualbell
-set commentary
-set surround
-set argtextobj
+""" This file contains default spacemacs settings and key bindings
+
+
+source ~/.intellimacs/spacemacs/settings.vim
+" Key bindings
+source ~/.intellimacs/spacemacs/leader.vim
+
+let g:WhichKeyDesc_Quit = "<leader>q    +quit"
+source ~/.intellimacs/spacemacs/quit.vim
+
+let g:WhichKeyDesc_SearchSymbol = "<leader>s    +search/symbol"
+source ~/.intellimacs/spacemacs/search-symbol.vim
+
+let g:WhichKeyDesc_Windows = "<leader>w    +windows"
+source ~/.intellimacs/spacemacs/windows.vim
+source ~/.intellimacs/extra/windows.vim
+
+let g:WhichKeyDesc_Files = "<leader>f    +files"
+source ~/.intellimacs/spacemacs/files.vim
+source ~/.intellimacs/extra/files.vim
+
+let g:WhichKeyDesc_Buffers = "<leader>b    +buffers"
+source ~/.intellimacs/spacemacs/buffers.vim
+
+let g:WhichKeyDesc_GitVcs = "<leader>g    +git/version-control"
+source ~/.intellimacs/spacemacs/git-vcs.vim
+source ~/.intellimacs/extra/git-vcs.vim
+
+" source ~/.intellimacs/extra.vim
+" source ~/.intellimacs/major.vim
+source ~/.intellimacs/which-key.vim
+
+set sneak
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
+Plug 'preservim/nerdtree'
+Plug 'machakann/vim-highlightedyank'
+Plug 'vim-scripts/argtextobj.vim'
+Plug 'tommcdo/vim-exchange'
+Plug 'kana/vim-textobj-entire'
 
 
 nnoremap Y y$
 
-nnoremap <leader>gb :action Annotate<CR>
-vnoremap <leader>gb :action Annotate<CR>
+nnoremap <leader>ga :action Annotate<CR>
+vnoremap <leader>ga :action Annotate<CR>
 
 
 " Comma for major mode
 nmap , <leader>m
 vmap , <leader>m
+
+" Make the neovim shortcuts work
+let g:WhichKeyDesc_Projects_Tree  = "<leader>e file-tree"
+nnoremap <leader>e   :NERDTree<CR>
+vnoremap <leader>e   :NERDTree<CR>
+
+" Show usages for symbol.
+" Ideally this should be FindInPath the current word, but I think that it is
+" not possible.
+let g:WhichKeyDesc_Leader_ShowUsages = "gr show-usages"
+nnoremap gr    :action ShowUsages<CR>
+vnoremap gr    :action ShowUsages<CR>
+
+" Go to next error
+let g:WhichKeyDesc_Errors_NextError = "]e next-error"
+nnoremap ]e    :action GotoNextError<CR>
+vnoremap ]e    <Esc>:action GotoNextError<CR>
+
+" Go to previous error
+let g:WhichKeyDesc_Errors_PreviousError = "[e previous-error"
+nnoremap [e    :action GotoPreviousError<CR>
+vnoremap [e    <Esc>:action GotoPreviousError<CR>
+
+
+nnoremap L     :action NextTab<CR>
+nnoremap H     :action PreviousTab<CR>
+
+" Jump to class
+let g:WhichKeyDesc_JumpJoinSplit_JumpToClass = "<leader>jc jump-to-class"
+nnoremap <leader>jc   :action GotoClass<CR>
+vnoremap <leader>jc   :action GotoClass<CR>
+
+" Jump to symbol
+let g:WhichKeyDesc_JumpJoinSplit_JumpToSymbol = "<leader>js jump-to-symbol"
+nnoremap <leader>js    :action GotoSymbol<CR>
+vnoremap <leader>js    :action GotoSymbol<CR>
+
+nnoremap <leader>jj    :action AceAction<CR>
