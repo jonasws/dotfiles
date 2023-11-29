@@ -130,7 +130,7 @@ abbr -a t tig
 alias tst "tig status"
 
 # Git alises
-abbr -a gsm "git switch master; and git pull --rebase"
+abbr -a gsm "git switch master"
 
 
 abbr -a tf terraform
@@ -218,28 +218,11 @@ alias lg lazygit
 
 abbr -a gp!! "git push --force"
 
-set -gx PATH /Users/jonasws/Library/Caches/fnm_multishells/24689_1699519900266/bin $PATH
-set -gx FNM_ARCH arm64
-set -gx FNM_VERSION_FILE_STRATEGY local
-set -gx FNM_LOGLEVEL info
-set -gx FNM_COREPACK_ENABLED false
-set -gx FNM_RESOLVE_ENGINES false
-set -gx FNM_MULTISHELL_PATH /Users/jonasws/Library/Caches/fnm_multishells/24689_1699519900266
-set -gx FNM_NODE_DIST_MIRROR "https://nodejs.org/dist"
-set -gx FNM_DIR "/Users/jonasws/Library/Application Support/fnm"
-
-function _fnm_autoload_hook --on-variable PWD --description 'Change Node version on directory change'
-    status --is-command-substitution; and return
-    if test -f .node-version -o -f .nvmrc
-        fnm use --log-level=quiet
-    end
-end
 
 set -gx PATH ~/.local/bin $PATH
 
 # Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
-
 
 function fzf_cd_directory --description "Change directory Replace the current token with the selected file paths."
     # Inspired by https://github.com/PatrickF1/fzf.fish/blob/main/functions/_fzf_search_directory.fish
@@ -328,3 +311,8 @@ function mr
         | jq .data.project.mergeRequests.nodes[]
 
 end
+
+
+# Use fnm
+# NOTE: Try to keep  this at the bottom of  the file, to ensure fnm appears at "front" of the PATH variable
+fnm env --use-on-cd | source
