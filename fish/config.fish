@@ -280,10 +280,8 @@ function mr
               title
               state
               approvedBy {
-                edges {
-                  node {
-                    username
-                  }
+                nodes {
+                  username
                 }
               }
             }
@@ -292,24 +290,13 @@ function mr
       }
   '
 
-
-
-    set -l remoteUrl (git remote -v | grep '^upstream' | awk '{print $2}' | uniq)
-
-    # If 'upstream' does not exist, use 'origin'
-    if test -z "$remoteUrl"
-        set remoteUrl (git remote -v | grep '^origin' | awk '{print $2}' | uniq)
-    end
-
-    set -l projectPath (echo $remoteUrl | awk -F'/' '{print $(NF-2)"/"$(NF-1)"/"$NF}' | sed 's/\.git$//')
-
+    set -l projectPath (git remote -v | perl -ln -E 'say /\/([\w-\/\.]+)\.git/' | uniq | grep -v "Jonas.Stromsodd")
 
     glab api graphql -f query=$query \
         -f projectPath=$projectPath \
         -f authorUsername="Jonas.Stromsodd" \
         -f sourceBranch=(__git.current_branch) \
-        | jq .data.project.mergeRequests.nodes[]
-
+        | jq ".data.project.mergeRequests.nodes[0]"
 end
 
 
