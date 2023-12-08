@@ -212,8 +212,6 @@ alias fishconfig "nvim ~/dotfiles/fish/config.fish; and reload-fish-config"
 # Add gnutar to front of path
 set -gx PATH /opt/homebrew/opt/gnu-tar/libexec/gnubin $PATH
 
-set -gx DOCKER_DEFAULT_PLATFORM linux/amd64
-
 alias lg lazygit
 
 abbr -a gp!! "git push --force"
@@ -299,7 +297,42 @@ function mr
         | jq ".data.project.mergeRequests.nodes[0]"
 end
 
+function bjorvika
+    set -l query '
+    query GetDepartures{
+      quay(
+        id: "NSR:Quay:7169"
+      ) {
+        name
+        estimatedCalls(
+          timeRange: 3600,
+          numberOfDepartures: 10,
+          whiteListed: {
+            lines: ["RUT:Line:4071", "RUT:Line:300"]
+          }
+        ) {
+          aimedDepartureTime
+          expectedDepartureTime
+          destinationDisplay {
+            frontText
+          }
+        }
+      }
+    }
+  '
 
+    http POST https://api.entur.io/journey-planner/v3/graphql query=$query "ET-Client-Name: jonas-laptop-cli" \
+        | jq -r '
+            .data.quay.estimatedCalls[] 
+            | [.expectedDepartureTime, .destinationDisplay.frontText]
+            | @tsv' \
+        # Only show the time, including display Norwegian characters
+        | perl -Mutf8 -CS -ne 'print "\e[34m$2\e[0m\t\e[32m$3\e[0m\n"
+              if /(\d{4}-\d{2}-\d{2}T)(\d{2}:\d{2}):\d{2}\+\d{2}:\d{2}\s+(\p{L}+)/'
+end
+
+
+set -gx DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
 # Use fnm
 # NOTE: Try to keep  this at the bottom of  the file, to ensure fnm appears at "front" of the PATH variable
 fnm env --use-on-cd | source
