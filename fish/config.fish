@@ -297,7 +297,7 @@ function mr
         | jq ".data.project.mergeRequests.nodes[0]"
 end
 
-function bjorvika
+function manglerud
     set -l query '
     query GetDepartures{
       quay(
@@ -308,7 +308,7 @@ function bjorvika
           timeRange: 3600,
           numberOfDepartures: 10,
           whiteListed: {
-            lines: ["RUT:Line:4071", "RUT:Line:300"]
+            lines: ["RUT:Line:71", "RUT:Line:300"]
           }
         ) {
           aimedDepartureTime
@@ -331,6 +331,39 @@ function bjorvika
               if /(\d{4}-\d{2}-\d{2}T)(\d{2}:\d{2}):\d{2}\+\d{2}:\d{2}\s+(\p{L}+)/'
 end
 
+function nittedal
+    set -l query '
+    query GetDepartures{
+      quay(
+        id: "NSR:Quay:550"
+      ) {
+        name
+        estimatedCalls(
+          timeRange: 7200,
+          numberOfDepartures: 10,
+          whiteListed: {
+            lines: ["GJB:Line:R30", "GJB:Line:L3"]
+          }
+        ) {
+          aimedDepartureTime
+          expectedDepartureTime
+          destinationDisplay {
+            frontText
+          }
+        }
+      }
+    }
+  '
+
+    http POST https://api.entur.io/journey-planner/v3/graphql query=$query "ET-Client-Name: jonas-laptop-cli" \
+        | jq -r '
+            .data.quay.estimatedCalls[] 
+            | [.expectedDepartureTime, .destinationDisplay.frontText]
+            | @tsv' \
+        # Only show the time, including display Norwegian characters
+        | perl -Mutf8 -CS -ne 'print "\e[34m$2\e[0m\t\e[32m$3\e[0m\n"
+              if /(\d{4}-\d{2}-\d{2}T)(\d{2}:\d{2}):\d{2}\+\d{2}:\d{2}\s+(\p{L}+)/'
+end
 
 set -gx DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
 # Use fnm
