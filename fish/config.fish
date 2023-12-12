@@ -56,6 +56,7 @@ abbr -a - "cd -"
 
 alias reload-fish-config "source ~/.config/fish/config.fish; and echo \"Fish config reloaded 🐟 🚀\""
 alias as-tree "command tree --fromfile"
+alias bg batgrep
 
 function browse-ssm-params
     aws ssm describe-parameter --output=json \
@@ -375,3 +376,8 @@ set -gx DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
 # Use fnm
 # NOTE: Try to keep  this at the bottom of  the file, to ensure fnm appears at "front" of the PATH variable
 fnm env --use-on-cd | source
+
+batpipe | source
+set -gx FX_THEME 2
+set -gx BATDIFF_USE_DELTA true
+alias man batman
