@@ -257,6 +257,12 @@ function fzf_cd_directory --description "Change directory Replace the current to
     commandline --function repaint
 end
 
+
+function check-commits
+    git fetch upstream
+    ./gradlew -p (git rev-parse --show-toplevel)/frontline-apis toolkits:verifyCommits --source-branch=(git rev-parse HEAD) --target-branch=upstream/master
+end
+
 function mr
     set -l query '
       query CurrentBranchMergeRequest($projectPath: ID!, $authorUsername: String!, $sourceBranch: String!) {
