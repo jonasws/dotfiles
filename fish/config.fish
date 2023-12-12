@@ -72,7 +72,7 @@ end
 
 #set -x GOPATH $HOME/.go
 # set -x GOROOT (brew --prefix golang)/libexec
-set -x PATH /usr/local/opt/git/share/git-core/contrib/diff-highlight ~/.local/bin $PATH
+set -x PATH ~/.local/bin $PATH
 
 
 set -x BD_OPT insensitive
