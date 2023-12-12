@@ -266,33 +266,44 @@ end
 
 function mr
     set -l query '
-      query CurrentBranchMergeRequest($projectPath: ID!, $authorUsername: String!, $sourceBranch: String!) {
-        project(fullPath: $projectPath) {
-          name
-          mergeRequests(authorUsername: $authorUsername, sourceBranches: [$sourceBranch]) {
-            nodes {
-              headPipeline {
-                status
-                jobs {
-                  nodes {
-                    name
-                    status
-                    webPath
+        query CurrentBranchMergeRequest($projectPath: ID!, $authorUsername: String!, $sourceBranch: String!) {
+          project(fullPath: $projectPath) {
+            name
+            mergeRequests(authorUsername: $authorUsername, sourceBranches: [$sourceBranch]) {
+              nodes {
+                headPipeline {
+                  id
+                  jobs(statuses: [RUNNING, FAILED]) {
+                    nodes {
+                      name
+                      status
+                      webPath
+                      downstreamPipeline {
+                        jobs(statuses: [RUNNING, FAILED]) {
+                          nodes {
+                            name
+                            status
+                            downstreamPipeline {
+                              path
+                            }
+                          }
+                        }
+                      }
+                      
+                    }
                   }
                 }
-                
-              }
-              title
-              state
-              approvedBy {
-                nodes {
-                  username
+                title
+                state
+                approvedBy {
+                  nodes {
+                    username
+                  }
                 }
               }
             }
           }
         }
-      }
   '
 
     set -l projectPath (git remote -v | perl -ln -E 'say /\/([\w-\/\.]+)\.git/' | uniq | grep -v "Jonas.Stromsodd")
@@ -302,6 +313,11 @@ function mr
         -f authorUsername="Jonas.Stromsodd" \
         -f sourceBranch=(__git.current_branch) \
         | jq ".data.project.mergeRequests.nodes[0]"
+end
+
+function villain
+    set -l failedPipelineStage (mr | jq '.headPipeline.jobs.nodes[].downstreamPipeline.jobs.nodes | select(map(.status == "FAILED"))[].downstreamPipeline.path' -r)
+    printf https://gitlab.tech.dnb.no%s $failedPipelineStage
 end
 
 function manglerud
