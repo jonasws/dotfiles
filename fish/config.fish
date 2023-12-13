@@ -316,8 +316,8 @@ function mr
 end
 
 function villain
-    set -l failedPipelineStage (mr | jq '.headPipeline.jobs.nodes[].downstreamPipeline.jobs.nodes | select(map(.status == "FAILED"))[].downstreamPipeline.path' -r)
-    printf https://gitlab.tech.dnb.no%s $failedPipelineStage
+    mr | jq '.headPipeline.jobs.nodes[].downstreamPipeline.jobs.nodes | select(map(.status == "FAILED"))[].downstreamPipeline.path' -r \
+        | xargs -I {} echo https://gitlab.tech.dnb.no{}
 end
 
 function manglerud
