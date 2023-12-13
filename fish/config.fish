@@ -1,5 +1,6 @@
 set -x LC_ALL en_US.UTF-8
 set -gx LESS R
+set -gx PATH /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/.local/bin /opt/homebrew/bin $PATH
 
 fish_config theme choose "Dracula Official"
 
@@ -11,8 +12,6 @@ function repo-name
 
 end
 alias grt "cd (git rev-parse --show-toplevel)"
-
-set -x PATH ~/.emacs.d/bin $HOME/.cargo/bin /opt/homebrew/bin $PATH
 
 # To not slow down Emacs searching/projectile magic while on macOS
 if not builtin status is-interactive
@@ -69,12 +68,6 @@ alias man batman
 function git-dir-or-pwd
     git rev-parse --show-toplevel 2>/dev/null; or pwd
 end
-
-
-#set -x GOPATH $HOME/.go
-# set -x GOROOT (brew --prefix golang)/libexec
-set -x PATH ~/.local/bin $PATH
-
 
 set -x BD_OPT insensitive
 
@@ -136,8 +129,6 @@ abbr -a gsm "git switch master"
 
 abbr -a tf terraform
 
-# pyenv init --path | source
-
 
 alias spin tspin
 
@@ -190,28 +181,9 @@ function up
     end
 end
 
-# jenv init - | source
-
-function get-repo-name
-    gh repo view --json nameWithOwner --jq .nameWithOwner | string trim
-end
-
-
-function get-branch-codespace
-    set repoName (get-repo-name)
-    set branch (git rev-parse --abbrev-ref HEAD)
-    gh codespace list --json name,repository,gitStatus --jq (printf '.[] | select(.repository == "%s" and .gitStatus.ref == "%s") | .name' $repoName $branch)
-end
-
-function tre
-    command tre $argv -e; and source /tmp/tre_aliases_$USER ^/dev/null
-end
-
 zoxide init fish | source
 
 alias fishconfig "nvim ~/dotfiles/fish/config.fish; and reload-fish-config"
-# Add gnutar to front of path
-set -gx PATH /opt/homebrew/opt/gnu-tar/libexec/gnubin $PATH
 
 alias lg lazygit
 
@@ -262,62 +234,6 @@ end
 function check-commits
     git fetch upstream
     ./gradlew -p (git rev-parse --show-toplevel)/frontline-apis toolkits:verifyCommits --source-branch=(git rev-parse HEAD) --target-branch=upstream/master
-end
-
-function mr
-    set -l query '
-        query CurrentBranchMergeRequest($projectPath: ID!, $authorUsername: String!, $sourceBranch: String!) {
-          project(fullPath: $projectPath) {
-            name
-            mergeRequests(authorUsername: $authorUsername, sourceBranches: [$sourceBranch]) {
-              nodes {
-                headPipeline {
-                  id
-                  jobs(statuses: [RUNNING, FAILED]) {
-                    nodes {
-                      name
-                      status
-                      webPath
-                      downstreamPipeline {
-                        jobs(statuses: [RUNNING, FAILED]) {
-                          nodes {
-                            name
-                            status
-                            downstreamPipeline {
-                              path
-                            }
-                          }
-                        }
-                      }
-                      
-                    }
-                  }
-                }
-                title
-                state
-                approvedBy {
-                  nodes {
-                    username
-                  }
-                }
-              }
-            }
-          }
-        }
-  '
-
-    set -l projectPath (git remote -v | perl -ln -E 'say /\/([\w-\/\.]+)\.git/' | uniq | grep -v "Jonas.Stromsodd")
-
-    glab api graphql -f query=$query \
-        -f projectPath=$projectPath \
-        -f authorUsername="Jonas.Stromsodd" \
-        -f sourceBranch=(__git.current_branch) \
-        | jq ".data.project.mergeRequests.nodes[0]"
-end
-
-function villain
-    mr | jq '.headPipeline.jobs.nodes[].downstreamPipeline.jobs.nodes | select(map(.status == "FAILED"))[].downstreamPipeline.path' -r \
-        | xargs -I {} echo https://gitlab.tech.dnb.no{}
 end
 
 function manglerud
