@@ -1,5 +1,4 @@
 set -x LC_ALL en_US.UTF-8
-set -gx LESS R
 set -gx PATH /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/.local/bin /opt/homebrew/bin $PATH
 
 fish_config theme choose "Dracula Official"
@@ -313,3 +312,5 @@ batpipe | source
 set -gx FX_THEME 2
 set -gx BATDIFF_USE_DELTA true
 alias man batman
+
+set -gx GLAMOUR_STYLE dracula
