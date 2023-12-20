@@ -29,6 +29,9 @@ let g:WhichKeyDesc_GitVcs = "<leader>g    +git/version-control"
 source ~/.intellimacs/spacemacs/git-vcs.vim
 source ~/.intellimacs/extra/git-vcs.vim
 
+let g:WhichKeyDesc_Files = "<leader>f    +files"
+source ~/.intellimacs/spacemacs/files.vim
+
 " source ~/.intellimacs/extra.vim
 " source ~/.intellimacs/major.vim
 source ~/.intellimacs/which-key.vim
@@ -41,6 +44,9 @@ Plug 'machakann/vim-highlightedyank'
 Plug 'vim-scripts/argtextobj.vim'
 Plug 'tommcdo/vim-exchange'
 Plug 'kana/vim-textobj-entire'
+Plug 'vim-scripts/ReplaceWithRegister'
+
+xmap S   <Plug>VSurround
 
 
 nnoremap Y y$
