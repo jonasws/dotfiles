@@ -307,6 +307,8 @@ set -gx DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
 # Use fnm
 # NOTE: Try to keep  this at the bottom of  the file, to ensure fnm appears at "front" of the PATH variable
 fnm env --use-on-cd | source
+direnv hook fish | source
+thefuck --alias | source
 
 batpipe | source
 set -gx FX_THEME 2
@@ -314,3 +316,4 @@ set -gx BATDIFF_USE_DELTA true
 alias man batman
 
 set -gx GLAMOUR_STYLE dracula
+set -gx PAGER less
