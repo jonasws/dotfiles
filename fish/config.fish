@@ -235,39 +235,6 @@ function check-commits
     ./gradlew -p (git rev-parse --show-toplevel)/frontline-apis toolkits:verifyCommits --source-branch=(git rev-parse HEAD) --target-branch=upstream/master
 end
 
-function manglerud
-    set -l query '
-    query GetDepartures{
-      quay(
-        id: "NSR:Quay:7169"
-      ) {
-        name
-        estimatedCalls(
-          timeRange: 3600,
-          numberOfDepartures: 10,
-          whiteListed: {
-            lines: ["RUT:Line:71", "RUT:Line:300"]
-          }
-        ) {
-          aimedDepartureTime
-          expectedDepartureTime
-          destinationDisplay {
-            frontText
-          }
-        }
-      }
-    }
-  '
-
-    http POST https://api.entur.io/journey-planner/v3/graphql query=$query "ET-Client-Name: jonas-laptop-cli" \
-        | jq -r '
-            .data.quay.estimatedCalls[] 
-            | [.expectedDepartureTime, .destinationDisplay.frontText]
-            | @tsv' \
-        # Only show the time, including display Norwegian characters
-        | perl -Mutf8 -CS -ne 'print "\e[34m$2\e[0m\t\e[32m$3\e[0m\n"
-              if /(\d{4}-\d{2}-\d{2}T)(\d{2}:\d{2}):\d{2}\+\d{2}:\d{2}\s+(\p{L}+)/'
-end
 
 function nittedal
     set -l query '
@@ -306,7 +273,7 @@ end
 set -gx DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
 # Use fnm
 # NOTE: Try to keep  this at the bottom of  the file, to ensure fnm appears at "front" of the PATH variable
-fnm env --use-on-cd | source
+fnm env --use-on-cd --corepack-enabled | source
 direnv hook fish | source
 thefuck --alias | source
 
@@ -317,3 +284,7 @@ alias man batman
 
 set -gx GLAMOUR_STYLE dracula
 set -gx PAGER less
+
+# tabtab source for packages
+# uninstall by removing these lines
+[ -f ~/.config/tabtab/fish/__tabtab.fish ]; and . ~/.config/tabtab/fish/__tabtab.fish; or true
