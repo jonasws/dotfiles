@@ -34,7 +34,7 @@ source ~/.intellimacs/spacemacs/files.vim
 
 " source ~/.intellimacs/extra.vim
 " source ~/.intellimacs/major.vim
-source ~/.intellimacs/which-key.vim
+" source ~/.intellimacs/which-key.vim
 
 set sneak
 Plug 'tpope/vim-commentary'
