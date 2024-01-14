@@ -51,6 +51,7 @@ set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
 
 
 abbr -a - "cd -"
+abbr -a gsma "git switch main"
 
 alias reload-fish-config "source ~/.config/fish/config.fish; and echo \"Fish config reloaded 🐟 🚀\""
 alias as-tree "command tree --fromfile"
@@ -233,6 +234,22 @@ end
 function check-commits
     git fetch upstream
     ./gradlew -p (git rev-parse --show-toplevel)/frontline-apis toolkits:verifyCommits --source-branch=(git rev-parse HEAD) --target-branch=upstream/master
+end
+
+function urlescape
+    if isatty stdin
+        string replace -a / %2F $argv
+    else
+        cat | string replace -a / %2F $argv
+    end
+end
+
+function view-mr-pipeline
+    set -l projectPath (urlescape (git remote -v | perl -ln -E 'say /\/([\w-\/\.]+)\.git/' | uniq | grep -v "Jonas.Stromsodd"))
+    set -l branch (urlescape (__git.current_branch))
+    set -l mrId (glab api projects/$projectPath/merge_requests\?source_branch=$branch | jq -r ".[0].iid")
+    set -l sha (glab api projects/$projectPath/merge_requests/$mrId/pipelines | jq -r ".[0].sha")
+    glab pipeline view $sha $argv
 end
 
 
