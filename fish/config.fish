@@ -301,6 +301,7 @@ alias man batman
 
 set -gx GLAMOUR_STYLE dracula
 set -gx PAGER less
+set -gx AWS_PAGER "bat --plain --language json"
 
 # tabtab source for packages
 # uninstall by removing these lines
