@@ -34,7 +34,7 @@ source ~/.intellimacs/spacemacs/files.vim
 
 " source ~/.intellimacs/extra.vim
 " source ~/.intellimacs/major.vim
-" source ~/.intellimacs/which-key.vim
+source ~/.intellimacs/which-key.vim
 
 set sneak
 Plug 'tpope/vim-commentary'
@@ -46,8 +46,7 @@ Plug 'tommcdo/vim-exchange'
 Plug 'kana/vim-textobj-entire'
 Plug 'vim-scripts/ReplaceWithRegister'
 
-xmap S   <Plug>VSurround
-
+xmap S <Plug>VSurround
 
 nnoremap Y y$
 
