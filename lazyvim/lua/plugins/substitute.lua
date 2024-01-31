@@ -72,4 +72,21 @@ return {
       },
     },
   },
+  -- rename surround mappings from gs to gz to prevent conflict with substitute
+  -- inspired by https://github.com/LazyVim/LazyVim/blob/a50f92f7550fb6e9f21c0852e6cb190e6fcd50f5/lua/lazyvim/plugins/extras/editor/leap.lua#L38C1-L52C5
+  -- which is meant to fix conflicting binds for leap
+  {
+    "echasnovski/mini.surround",
+    opts = {
+      mappings = {
+        add = "gza", -- Add surrounding in Normal and Visual modes
+        delete = "gzd", -- Delete surrounding
+        find = "gzf", -- Find surrounding (to the right)
+        find_left = "gzF", -- Find surrounding (to the left)
+        highlight = "gzh", -- Highlight surrounding
+        replace = "gzr", -- Replace surrounding
+        update_n_lines = "gzn", -- Update `n_lines`
+      },
+    },
+  },
 }
