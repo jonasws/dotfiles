@@ -230,10 +230,41 @@ function fzf_cd_directory --description "Change directory Replace the current to
     commandline --function repaint
 end
 
+function gradlew
+    set -l current_dir (pwd)
+
+    while true
+        # Check if 'gradlew' exists in the current directory
+        if test -x "$current_dir/gradlew"
+            # 'gradlew' found, print the path and exit
+            echo "Using gradlew in $current_dir"
+            pushd $current_dir
+            command ./gradlew $argv
+            # If you're feeling really brave, switch out for the line below to use 8GB of max heap
+            # command ./gradlew $argv -Dorg.gradle.jvmargs="-Xmx8g"
+            set -l gradleExitCode $status
+            popd
+            return $gradleExitCode
+
+        else if [ "$current_dir" = / ]
+            # Reached the root directory, stop
+            echo "No 'gradlew' found in any parent directory."
+            return 1
+        end
+
+        # Move up to the parent directory
+        set current_dir (dirname $current_dir)
+    end
+end
+
 
 function check-commits
     git fetch upstream
-    ./gradlew -p (git rev-parse --show-toplevel)/frontline-apis toolkits:verifyCommits --source-branch=(git rev-parse HEAD) --target-branch=upstream/master
+    pushd (git rev-parse --show-toplevel)/frontline-apis
+    set -l sourceBranch (git rev-parse HEAD)
+    set -l targetBranch upstream/master
+    ./gradlew -p build-common/toolkits verifyCommits --source-branch=$sourceBranch --target-branch=$targetBranch
+    popd
 end
 
 function urlescape
@@ -252,39 +283,51 @@ function view-mr-pipeline
     glab pipeline view $sha $argv
 end
 
+function start-my-day
+    echo "Good morning!"
+
+    echo "Updating your brew"
+    brew update; and brew upgrade
+
+    echo "Updating wezterm"
+    brew upgrade --cask wezterm-nightly --no-quarantine --greedy-latest
+
+    echo "Updating your lazy.nvim plugins"
+    nvim --headless "+Lazy! sync" +qa
+    echo
+
+    echo "Updating intellimacs"
+    git -C ~/.intellimacs pull --rebase
+end
+
 
 function nittedal
     set -l query '
-    query GetDepartures{
-      quay(
-        id: "NSR:Quay:550"
-      ) {
-        name
-        estimatedCalls(
-          timeRange: 7200,
-          numberOfDepartures: 10,
-          whiteListed: {
+query GetDepartures {
+  stopPlace(id: "NSR:StopPlace:337") {
+    estimatedCalls(whiteListed: {
             lines: ["GJB:Line:R30", "GJB:Line:L3"]
-          }
-        ) {
-          aimedDepartureTime
-          expectedDepartureTime
-          destinationDisplay {
-            frontText
-          }
-        }
+    }) {
+      expectedDepartureTime
+      destinationDisplay {
+        frontText
+      }
+      quay {
+        publicCode
       }
     }
+  }
+}
   '
 
     http POST https://api.entur.io/journey-planner/v3/graphql query=$query "ET-Client-Name: jonas-laptop-cli" \
         | jq -r '
-            .data.quay.estimatedCalls[] 
-            | [.expectedDepartureTime, .destinationDisplay.frontText]
+            .data.stopPlace.estimatedCalls[] 
+            | [.expectedDepartureTime, .destinationDisplay.frontText, .quay.publicCode]
             | @tsv' \
         # Only show the time, including display Norwegian characters
-        | perl -Mutf8 -CS -ne 'print "\e[34m$2\e[0m\t\e[32m$3\e[0m\n"
-              if /(\d{4}-\d{2}-\d{2}T)(\d{2}:\d{2}):\d{2}\+\d{2}:\d{2}\s+(\p{L}+)/'
+        | perl -Mutf8 -CS -ne 'print "\e[34m$2\e[0m\t\e[32m$3\e[0m\t\e[33m$4\n"
+              if /(\d{4}-\d{2}-\d{2}T)(\d{2}:\d{2}):\d{2}\+\d{2}:\d{2}\s+(\p{L}+)\s+(\d+)/'
 end
 
 set -gx DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
