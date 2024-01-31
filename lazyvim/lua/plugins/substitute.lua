@@ -89,4 +89,13 @@ return {
       },
     },
   },
+  {
+    "folke/which-key.nvim",
+    optional = true,
+    opts = {
+      defaults = {
+        ["gz"] = { name = "+surround" },
+      },
+    },
+  },
 }
