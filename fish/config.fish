@@ -195,6 +195,8 @@ set -gx PATH ~/.local/bin $PATH
 # Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
 
+set -g fzf_history_opts --with-nth="4.." --preview-window="down,30%,border-top,wrap"
+
 function fzf_cd_directory --description "Change directory Replace the current token with the selected file paths."
     # Inspired by https://github.com/PatrickF1/fzf.fish/blob/main/functions/_fzf_search_directory.fish
     # Directly use fd binary to avoid output buffering delay caused by a fd alias, if any.
