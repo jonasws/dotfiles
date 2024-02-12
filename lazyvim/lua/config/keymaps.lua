@@ -5,6 +5,5 @@
 vim.keymap.set("i", "jk", "<ESC>", { noremap = true, silent = true, desc = "<ESC>" })
 vim.keymap.set({ "n", "v" }, "<leader>k", "K", { noremap = true, desc = "Keyword" })
 vim.keymap.set({ "n", "v" }, "<leader>j", "J", { noremap = true, desc = "Join lines" })
-
--- C-P classic
-vim.keymap.set("n", "<C-P>", "<leader>ff")
+vim.keymap.set("c", "<C-j>", "<Down>", { noremap = true, desc = "Down" })
+vim.keymap.set("c", "<C-k>", "<Up>", { noremap = true, desc = "Up" })
