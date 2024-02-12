@@ -311,6 +311,11 @@ query GetDepartures {
             lines: ["GJB:Line:R30", "GJB:Line:L3"]
     }) {
       expectedDepartureTime
+      serviceJourney {
+        line {
+          publicCode
+        }
+      }
       destinationDisplay {
         frontText
       }
@@ -325,11 +330,12 @@ query GetDepartures {
     http POST https://api.entur.io/journey-planner/v3/graphql query=$query "ET-Client-Name: jonas-laptop-cli" \
         | jq -r '
             .data.stopPlace.estimatedCalls[] 
-            | [.expectedDepartureTime, .destinationDisplay.frontText, .quay.publicCode]
+            | [.expectedDepartureTime, .destinationDisplay.frontText, .quay.publicCode, .serviceJourney.line.publicCode]
             | @tsv' \
         # Only show the time, including display Norwegian characters
-        | perl -Mutf8 -CS -ne 'print "\e[34m$2\e[0m\t\e[32m$3\e[0m\t\e[33m$4\n"
-              if /(\d{4}-\d{2}-\d{2}T)(\d{2}:\d{2}):\d{2}\+\d{2}:\d{2}\s+(\p{L}+)\s+(\d+)/'
+        | perl -Mutf8 -CS -ne 'print "\e[34m$2\e[0m\t\e[32m$3\e[0m\t\e[33m$4\t\e[0m$5\n"
+              if /(\d{4}-\d{2}-\d{2}T)(\d{2}:\d{2}):\d{2}\+\d{2}:\d{2}\s+(\p{L}+)\s+(\d+)\s+(.+)/' \
+        | column -t
 end
 
 set -gx DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
