@@ -1,5 +1,5 @@
 set -x LC_ALL en_US.UTF-8
-set -gx PATH /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/.local/bin /opt/homebrew/bin $PATH
+set -gx PATH /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
 
 fish_config theme choose "Dracula Official"
 
@@ -62,8 +62,6 @@ function browse-ssm-params
         | jq -r ".Parameters[].Name" \
         | fzf
 end
-
-alias man batman
 
 function git-dir-or-pwd
     git rev-parse --show-toplevel 2>/dev/null; or pwd
@@ -190,8 +188,6 @@ alias lg lazygit
 abbr -a gp!! "git push --force"
 
 
-set -gx PATH ~/.local/bin $PATH
-
 # Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
 
@@ -291,6 +287,14 @@ function start-my-day
     echo "Updating your brew"
     brew update; and brew upgrade
 
+    if command -v go &>foo.txt
+        echo "Updating glab cli"
+        go install gitlab.com/gitlab-org/cli/cmd/glab@main
+    else
+        echo "Go not available. Skipping go binary installs"
+    end
+
+
     echo "Updating wezterm"
     brew upgrade --cask wezterm-nightly --no-quarantine --greedy-latest
 
@@ -345,9 +349,15 @@ fnm env --use-on-cd --corepack-enabled | source
 direnv hook fish | source
 thefuck --alias | source
 
-batpipe | source
+set -x LESSOPEN "|/opt/homebrew/Cellar/bat-extras/2024.02.12/bin/batpipe %s"
+set -e LESSCLOSE
+
+# The following will enable colors when using batpipe with less:
+set -x LESS -XFRi
+set -x BATPIPE color
 set -gx FX_THEME 2
 set -gx BATDIFF_USE_DELTA true
+
 alias man batman
 
 set -gx GLAMOUR_STYLE dracula
