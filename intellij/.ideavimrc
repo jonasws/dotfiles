@@ -36,15 +36,6 @@ source ~/.intellimacs/spacemacs/files.vim
 " source ~/.intellimacs/major.vim
 source ~/.intellimacs/which-key.vim
 
-set sneak
-Plug 'tpope/vim-commentary'
-Plug 'tpope/vim-surround'
-Plug 'preservim/nerdtree'
-Plug 'machakann/vim-highlightedyank'
-Plug 'vim-scripts/argtextobj.vim'
-Plug 'tommcdo/vim-exchange'
-Plug 'kana/vim-textobj-entire'
-Plug 'vim-scripts/ReplaceWithRegister'
 
 xmap S <Plug>VSurround
 
@@ -68,7 +59,6 @@ vnoremap <leader>e   :NERDTree<CR>
 " not possible.
 let g:WhichKeyDesc_Leader_ShowUsages = "gr show-usages"
 nnoremap gr    :action ShowUsages<CR>
-vnoremap gr    :action ShowUsages<CR>
 
 " Go to next error
 let g:WhichKeyDesc_Errors_NextError = "]e next-error"
@@ -95,3 +85,13 @@ nnoremap <leader>js    :action GotoSymbol<CR>
 vnoremap <leader>js    :action GotoSymbol<CR>
 
 nnoremap <leader>jj    :action AceAction<CR>
+
+set sneak
+Plug 'tpope/vim-commentary'
+Plug 'tpope/vim-surround'
+Plug 'preservim/nerdtree'
+Plug 'machakann/vim-highlightedyank'
+Plug 'vim-scripts/argtextobj.vim'
+Plug 'tommcdo/vim-exchange'
+Plug 'kana/vim-textobj-entire'
+" Plug 'vim-scripts/ReplaceWithRegister'
