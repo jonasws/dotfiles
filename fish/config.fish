@@ -315,6 +315,12 @@ query GetDepartures {
             lines: ["GJB:Line:R30", "GJB:Line:L3"]
     }) {
       expectedDepartureTime
+      situations {
+      	summary {
+      	  language
+          value
+        }
+      }
       serviceJourney {
         line {
           publicCode
@@ -334,12 +340,12 @@ query GetDepartures {
     http POST https://api.entur.io/journey-planner/v3/graphql query=$query "ET-Client-Name: jonas-laptop-cli" \
         | jq -r '
             .data.stopPlace.estimatedCalls[] 
-            | [.expectedDepartureTime, .destinationDisplay.frontText, .quay.publicCode, .serviceJourney.line.publicCode]
+            | [.expectedDepartureTime, .destinationDisplay.frontText, .quay.publicCode, .serviceJourney.line.publicCode, .situations[0].summary[0].value]
             | @tsv' \
         # Only show the time, including display Norwegian characters
-        | perl -Mutf8 -CS -ne 'print "\e[34m$2\e[0m\t\e[32m$3\e[0m\t\e[33m$4\t\e[0m$5\n"
-              if /(\d{4}-\d{2}-\d{2}T)(\d{2}:\d{2}):\d{2}\+\d{2}:\d{2}\s+(\p{L}+)\s+(\d+)\s+(.+)/' \
-        | column -t
+        | perl -Mutf8 -CS -ne 'print "\e[34m$2\e[0m\t\e[96m$3\e[0m\t\e[92m$4\e[0m\t\e[95m$5\e[0m\t\e[93m$6\e[0m\n"
+              if /(\d{4}-\d{2}-\d{2}T)(\d{2}:\d{2}):\d{2}\+\d{2}:\d{2}\t(\p{L}+)\t(\d+)\t(.+)\t(.*)/' \
+        | column -t -s (echo -n \t)
 end
 
 set -gx DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
