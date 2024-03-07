@@ -1,5 +1,5 @@
 set -x LC_ALL en_US.UTF-8
-set -gx PATH /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
+set -gx PATH /opt/homebrew/opt/grep/libexec/gnubin /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
 
 fish_config theme choose "Dracula Official"
 
@@ -253,16 +253,6 @@ function gradlew
         # Move up to the parent directory
         set current_dir (dirname $current_dir)
     end
-end
-
-
-function check-commits
-    git fetch upstream
-    pushd (git rev-parse --show-toplevel)/frontline-apis
-    set -l sourceBranch (git rev-parse HEAD)
-    set -l targetBranch upstream/master
-    ./gradlew -p build-common/toolkits verifyCommits --source-branch=$sourceBranch --target-branch=$targetBranch
-    popd
 end
 
 function urlescape
