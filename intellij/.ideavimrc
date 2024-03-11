@@ -32,6 +32,9 @@ source ~/.intellimacs/extra/git-vcs.vim
 let g:WhichKeyDesc_Files = "<leader>f    +files"
 source ~/.intellimacs/spacemacs/files.vim
 
+nmap ]g :action VcsShowNextChangeMarker<CR><ESC>
+nmap [g :action VcsShowPrevChangeMarker<CR><ESC>
+
 " source ~/.intellimacs/extra.vim
 " source ~/.intellimacs/major.vim
 source ~/.intellimacs/which-key.vim

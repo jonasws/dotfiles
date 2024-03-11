@@ -277,7 +277,7 @@ function start-my-day
     echo "Updating your brew"
     brew update; and brew upgrade
 
-    if command -v go &>foo.txt
+    if command -v go &> /dev/null
         echo "Updating glab cli"
         go install gitlab.com/gitlab-org/cli/cmd/glab@main
     else
