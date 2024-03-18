@@ -1,5 +1,5 @@
 set -x LC_ALL en_US.UTF-8
-set -gx PATH /opt/homebrew/opt/grep/libexec/gnubin /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
+set -gx PATH ~/.cargo/bin /opt/homebrew/opt/grep/libexec/gnubin /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
 
 fish_config theme choose "Dracula Official"
 
@@ -162,8 +162,13 @@ end
 function s
     if test -f package.json
         if test -f yarn.lock
+            echo yarn start $argv
             command yarn start $argv
+        else if test -f (git rev-parse --show-toplevel)/pnpm-lock.yaml
+            echo pnpm start $argv
+            command pnpm start $argv
         else
+            echo npm start $argv
             command npm start $argv
         end
     else
@@ -277,7 +282,7 @@ function start-my-day
     echo "Updating your brew"
     brew update; and brew upgrade
 
-    if command -v go &> /dev/null
+    if command -v go &>/dev/null
         echo "Updating glab cli"
         go install gitlab.com/gitlab-org/cli/cmd/glab@main
     else
