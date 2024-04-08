@@ -282,6 +282,9 @@ function start-my-day
     echo "Updating your brew"
     brew update; and brew upgrade
 
+    echo "Update fisher plugins"
+    fisher update
+
     if command -v go &>/dev/null
         echo "Updating glab cli"
         go install gitlab.com/gitlab-org/cli/cmd/glab@main
