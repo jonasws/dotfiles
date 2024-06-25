@@ -9,7 +9,7 @@ config.color_scheme = "Dracula (Official)"
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 config.window_decorations = "RESIZE"
-config.font_size = 14.0
+config.font_size = 16.0
 
 config.keys = {
 	{
