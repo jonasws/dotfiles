@@ -636,6 +636,7 @@ require('lazy').setup {
         json = { { 'prettierd', 'prettier' } },
         javascript = { { 'prettierd', 'prettier' } },
         typescript = { { 'prettierd', 'prettier' } },
+        typescriptreact = { { 'prettierd', 'prettier' } },
       },
     },
   },
@@ -764,7 +765,7 @@ require('lazy').setup {
       -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
       -- - sd'   - [S]urround [D]elete [']quotes
       -- - sr)'  - [S]urround [R]eplace [)] [']
-      require('mini.surround').setup()
+      -- require('mini.surround').setup()
 
       -- Simple and easy statusline.
       --  You could remove this setup call if you don't like it,
@@ -803,6 +804,7 @@ require('lazy').setup {
           'vimdoc',
           'javascript',
           'typescript',
+          'tsx',
           'json',
           'yaml',
           'fish',
@@ -813,7 +815,9 @@ require('lazy').setup {
         auto_install = false,
         highlight = { enable = true },
         indent = { enable = true },
-        incremental_selection = { enable = true },
+        incremental_selection = {
+          enable = true,
+        },
       }
 
       -- There are additional nvim-treesitter modules that you can use to interact

@@ -6,7 +6,7 @@ return {
 
     'nvim-telescope/telescope.nvim',
   },
-  branch = 'nightly',
+  branch = 'master',
   config = true,
   keys = {
     {
