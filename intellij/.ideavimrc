@@ -97,6 +97,7 @@ Plug 'machakann/vim-highlightedyank'
 Plug 'vim-scripts/argtextobj.vim'
 Plug 'tommcdo/vim-exchange'
 Plug 'kana/vim-textobj-entire'
+Plug 'terryma/vim-multiple-cursors'
 " Plug 'vim-scripts/ReplaceWithRegister'
 "
 "
@@ -105,3 +106,20 @@ nnoremap <C-j>         <C-w>j
 nnoremap <C-k>         <C-w>k
 nnoremap <C-l>         <C-w>l
 nnoremap <C-h>         <C-w>h
+
+
+" Multiple cursor support
+nmap <C-n> <Plug>NextWholeOccurrence
+xmap <C-n> <Plug>NextWholeOccurrence
+omap <C-n> <Plug>NextWholeOccurrence
+nmap g<C-n> <Plug>NextOccurrence
+xmap g<C-n> <Plug>NextOccurrence
+omap g<C-n> <Plug>NextOccurrence
+xmap <C-x> <Plug>SkipOccurrence
+xmap <C-p> <Plug>RemoveOccurrence
+nmap <A-n> <Plug>AllWholeOccurrences
+xmap <A-n> <Plug>AllWholeOccurrences
+omap <A-n> <Plug>AllWholeOccurrences
+nmap g<A-n> <Plug>AllWholeOccurrences
+xmap g<A-n> <Plug>AllWholeOccurrences
+omap g<A-n> <Plug>AllWholeOccurrences

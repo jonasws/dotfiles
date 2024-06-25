@@ -1,4 +1,4 @@
-set -x LC_ALL en_US.UTF-8
+set -gx LC_ALL en_US.UTF-8
 set -gx PATH ~/.cargo/bin /opt/homebrew/opt/grep/libexec/gnubin /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
 
 fish_config theme choose "Dracula Official"
@@ -46,7 +46,7 @@ end
 set fish_color_command yellow
 set fish_color_autosuggestion white
 
-set -x EDITOR nvim
+set -gx EDITOR nvim
 set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
 
 
@@ -56,6 +56,8 @@ abbr -a gsma "git switch main"
 alias reload-fish-config "source ~/.config/fish/config.fish; and echo \"Fish config reloaded 🐟 🚀\""
 alias as-tree "command tree --fromfile"
 alias bg batgrep
+
+alias zp "zed-preview"
 
 function browse-ssm-params
     aws ssm describe-parameter --output=json \
@@ -67,7 +69,7 @@ function git-dir-or-pwd
     git rev-parse --show-toplevel 2>/dev/null; or pwd
 end
 
-set -x BD_OPT insensitive
+set -gx BD_OPT insensitive
 
 set -gx FZF_DEFAULT_COMMAND "fd --type f"
 set -gx FZF_CTRL_T_COMMAND "fd --type f"
@@ -103,7 +105,7 @@ tw=35:\
 tx=36:"
 
 
-set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
+set -gx RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 
 # Eza is cooler than ls, duh
 alias ll "eza --long --icons"
@@ -268,6 +270,44 @@ function urlescape
     end
 end
 
+function get-easytoken
+    set -l env $argv[1]
+    set -l user $argv[2]
+
+    set -l functionName  $env-tokenproxy-easytoken-get
+    set -l profileName si-$env
+
+    set -l payload (jq -n --arg user $user '{user: $user } | @base64')
+    set -l responseOutputFile (mktemp)
+    aws lambda invoke \
+        --function-name $functionName \
+        --invocation-type RequestResponse \
+        --output json \
+        --profile $profileName \
+        --payload $payload  \
+        $responseOutputFile &> /dev/null
+
+    if test $status -eq 0
+        jq -r .data.accessToken $responseOutputFile
+    end
+    rm $responseOutputFile
+end
+
+function introspect_raw
+    set -l token $argv[1]
+    http --ignore-stdin --form https://api.uat.ciam.tech-03.net/as/introspect.oauth2 token=$token
+end
+
+function introspect
+    introspect_raw $argv \
+        | yq --input-format json '
+      .scope |= split(" ")
+    | .exp |= (from_unix | format_datetime("15:04:05")) 
+    | .iat |= (from_unix | format_datetime("15:04:05")) 
+    '
+end
+
+
 function view-mr-pipeline
     set -l projectPath (urlescape (git remote -v | perl -ln -E 'say /\/([\w-\/\.]+)\.git/' | uniq | grep -v "Jonas.Stromsodd"))
     set -l branch (urlescape (__git.current_branch))
@@ -285,16 +325,8 @@ function start-my-day
     echo "Update fisher plugins"
     fisher update
 
-    if command -v go &>/dev/null
-        echo "Updating glab cli"
-        go install gitlab.com/gitlab-org/cli/cmd/glab@main
-    else
-        echo "Go not available. Skipping go binary installs"
-    end
-
-
     echo "Updating wezterm"
-    brew upgrade --cask wezterm-nightly --no-quarantine --greedy-latest
+    brew upgrade --cask wezterm@nightly --no-quarantine --greedy-latest
 
     echo "Updating your lazy.nvim plugins"
     nvim --headless "+Lazy! sync" +qa
@@ -335,7 +367,7 @@ query GetDepartures {
 }
   '
 
-    http POST https://api.entur.io/journey-planner/v3/graphql query=$query "ET-Client-Name: jonas-laptop-cli" \
+    http --ignore-stdin POST https://api.entur.io/journey-planner/v3/graphql query=$query "ET-Client-Name: jonas-laptop-cli" \
         | jq -r '
             .data.stopPlace.estimatedCalls[] 
             | [.expectedDepartureTime, .destinationDisplay.frontText, .quay.publicCode, .serviceJourney.line.publicCode, .situations[0].summary[0].value]
@@ -346,20 +378,31 @@ query GetDepartures {
         | column -t -s (echo -n \t)
 end
 
+function xray-traceid
+    set -l traceId $argv[1]
+    if test -z $traceId
+        set -a traceId (uuidgen | string lower)
+    end
+    printf 'Root=1-%x-%s' (date +%s) (string replace -a "-" "" $traceId)
+end
+
 set -gx DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
+set -gx DOCKER_DEFAULT_PLATFORM linux/amd64
+set -gx DOCKER_HIDE_LEGACY_COMMANDS 1
+
 # Use fnm
 # NOTE: Try to keep  this at the bottom of  the file, to ensure fnm appears at "front" of the PATH variable
 fnm env --use-on-cd --corepack-enabled | source
 direnv hook fish | source
-thefuck --alias | source
 
-set -x LESSOPEN "|/opt/homebrew/Cellar/bat-extras/2024.02.12/bin/batpipe %s"
+set -gx LESSOPEN "|/opt/homebrew/Cellar/bat-extras/2024.02.12/bin/batpipe %s"
 set -e LESSCLOSE
 
 # The following will enable colors when using batpipe with less:
-set -x LESS -XFRi
-set -x BATPIPE color
-set -gx FX_THEME 2
+set -gx LESS -XFRi
+set -gx BATPIPE color
+set -gx FX_THEME 1
+set -gx FX_SHOW_SIZE true
 set -gx BATDIFF_USE_DELTA true
 
 alias man batman
@@ -367,7 +410,10 @@ alias man batman
 set -gx GLAMOUR_STYLE dracula
 set -gx PAGER less
 set -gx AWS_PAGER "bat --plain --language json"
+set -gx AWS_DEFAULT_OUTPUT json
 
 # tabtab source for packages
 # uninstall by removing these lines
 [ -f ~/.config/tabtab/fish/__tabtab.fish ]; and . ~/.config/tabtab/fish/__tabtab.fish; or true
+
+source ~/.config/op/plugins.sh
