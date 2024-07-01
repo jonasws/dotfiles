@@ -302,8 +302,6 @@ function introspect
     introspect_raw $argv \
         | yq --input-format json '
       .scope |= split(" ")
-    | .exp |= (from_unix | format_datetime("15:04:05")) 
-    | .iat |= (from_unix | format_datetime("15:04:05")) 
     '
 end
 
