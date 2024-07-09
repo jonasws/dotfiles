@@ -318,13 +318,16 @@ function start-my-day
     echo "Good morning!"
 
     echo "Updating your brew"
-    brew update; and brew upgrade
+    brew update; and brew upgrade --fetch-HEAD
 
     echo "Update fisher plugins"
     fisher update
 
     echo "Updating wezterm"
     brew upgrade --cask wezterm@nightly --no-quarantine --greedy-latest
+
+    # echo "Updating neovim"
+    # brew upgrade neovim --fetch-HEAD
 
     echo "Updating your lazy.nvim plugins"
     nvim --headless "+Lazy! sync" +qa
