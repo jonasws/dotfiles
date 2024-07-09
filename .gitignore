@@ -5,7 +5,7 @@ fish/local.fish
 lazyvim/spell
 
 
-zed/.tmp2n6kxG
-zed/.tmpVgHMU0
+zed/.*
+zed/.*
 zed/embeddings/
 zed/prompts/
