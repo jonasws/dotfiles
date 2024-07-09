@@ -1,0 +1,9 @@
+[
+  {
+    "context": "Editor && VimControl && !VimWaiting && !menu",
+    "bindings": {
+      "shift-l": "pane::ActivateNextItem",
+      "shift-h": "pane::ActivatePrevItem"
+    }
+  }
+]

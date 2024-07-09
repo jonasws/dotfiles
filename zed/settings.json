@@ -1,0 +1,8 @@
+{
+  "theme": {
+    "mode": "dark",
+    "dark": "Dracula",
+    "light": "One Light"
+  },
+  "vim_mode": true
+}
