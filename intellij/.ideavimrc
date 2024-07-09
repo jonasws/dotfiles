@@ -37,7 +37,8 @@ nmap [g :action VcsShowPrevChangeMarker<CR><ESC>
 
 " source ~/.intellimacs/extra.vim
 " source ~/.intellimacs/major.vim
-source ~/.intellimacs/which-key.vim
+source ~/.intellimacs/major/refactoring.vim
+" source ~/.intellimacs/which-key.vim
 
 
 xmap S <Plug>VSurround
