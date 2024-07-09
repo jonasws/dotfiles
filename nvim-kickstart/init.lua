@@ -91,7 +91,9 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 vim.opt.foldmethod = 'expr'
-vim.opt.foldexpr = 'nvim_treesitter#foldexpr()'
+vim.opt.foldexpr = 'v:lua.vim.treesitter.foldexpr()'
+vim.opt.foldtext = ''
+vim.opt.fillchars = 'fold: '
 vim.opt.foldenable = false
 
 -- [[ Setting options ]]
@@ -557,6 +559,8 @@ require('lazy').setup {
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         tsserver = {},
+        yamlls = {},
+        gitlab_ci_ls = {},
         regal = {
           root_dir = require('lspconfig.util').root_pattern '.git',
         },

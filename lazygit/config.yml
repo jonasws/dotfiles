@@ -1,8 +1,16 @@
-# yaml-language-server: $schema=https://json.schemastore.org/lazygit.json
+# yaml-language-server: $schema=./schema.json
 gui:
   showFileTree: false # for rendering changes files in a tree format
+  shortTimeFormat: "15:04"
+  nerdFontsVersion: "3"
+
 
 git:
   paging:
-    colorAarg: always
-    pager: delta --paging=never --color-only
+    colorArg: always
+    pager: delta --dark --color-only --paging=never
+    useConfig: false
+    externalDiffCommand: difft --color=always
+
+update:
+  method: never
