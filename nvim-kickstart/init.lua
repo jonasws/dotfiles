@@ -181,6 +181,19 @@ vim.keymap.set('n', '<up>', '<cmd>echo "Use k to move!!"<CR>')
 vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 --
 
+vim.filetype.add {
+  filename = {
+    ['gitlab-ci.yml'] = 'yaml.gitlab',
+    ['gitlab-ci.yaml'] = 'yaml.gitlab',
+    ['.gitlab-ci.yml'] = 'yaml.gitlab',
+    ['.gitlab-ci.yaml'] = 'yaml.gitlab',
+  },
+  pattern = {
+    ['*/.gitlab/*.yml'] = 'yaml.gitlab',
+    ['*/.gitlab/*.yaml'] = 'yaml.gitlab',
+  },
+}
+
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
 
