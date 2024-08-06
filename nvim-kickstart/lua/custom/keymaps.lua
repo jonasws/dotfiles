@@ -15,6 +15,8 @@ vim.keymap.set('n', '<leader>w|', '<C-w>v', { desc = 'Split window vertically' }
 vim.keymap.set('n', '<leader>ww', '<C-w>w', { desc = 'Move to other window' })
 vim.keymap.set('n', '<leader>wd', '<C-w>q', { desc = 'Close window' })
 
+vim.keymap.set('n', '<leader>j', ':Telescope jumplist<CR>', { desc = '[J]umplist Telescope' })
+
 vim.keymap.set('n', '<leader>qq', ':qa<Enter>', { desc = 'Quit Neovim' })
 vim.keymap.set('c', '<C-h>', '<Left>', { noremap = true, desc = 'Left' })
 vim.keymap.set('c', '<C-l>', '<Right>', { noremap = true, desc = 'Right' })
