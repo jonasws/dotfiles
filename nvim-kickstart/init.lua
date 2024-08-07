@@ -572,8 +572,9 @@ require('lazy').setup {
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
         tsserver = {},
-        eslint = {},
+        -- eslint = {},
         yamlls = {},
+        biome = {},
         gitlab_ci_ls = {},
         regal = {
           root_dir = require('lspconfig.util').root_pattern '.git',
@@ -621,7 +622,6 @@ require('lazy').setup {
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format lua code
-        'biome',
         'prettierd',
         'prettier',
       })
