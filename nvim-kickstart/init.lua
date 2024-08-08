@@ -355,7 +355,7 @@ require('lazy').setup {
       -- This opens a window that shows you all of the keymaps for the current
       -- telescope picker. This is really useful to discover what Telescope can
       -- do as well as how to actually do it!
-
+      --
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
       require('telescope').setup {
@@ -397,6 +397,7 @@ require('lazy').setup {
       vim.keymap.set('n', '<leader>sf', builtin.find_files, { desc = '[S]earch [F]iles' })
       vim.keymap.set('n', '<leader>ss', builtin.builtin, { desc = '[S]earch [S]elect Telescope' })
       vim.keymap.set('n', '<leader>sw', builtin.grep_string, { desc = '[S]earch current [W]ord' })
+      vim.keymap.set('v', '<leader>s', builtin.grep_string, { desc = '[S]earch current selection' })
       vim.keymap.set('n', '<leader>sg', builtin.live_grep, { desc = '[S]earch by [G]rep' })
       vim.keymap.set('n', '<leader>sd', builtin.diagnostics, { desc = '[S]earch [D]iagnostics' })
       vim.keymap.set('n', '<leader>sr', builtin.resume, { desc = '[S]earch [R]esume' })
@@ -658,10 +659,10 @@ require('lazy').setup {
         --
         -- You can use a sub-list to tell conform to run *until* a formatter
         -- is found.
-        json = { 'biome', 'prettierd', 'prettier', stop_after_first = true },
-        javascript = { 'biome', 'prettierd', 'prettier', stop_after_first = true },
-        typescript = { 'biome', 'prettierd', 'prettier', stop_after_first = true },
-        typescriptreact = { 'biome', 'prettierd', 'prettier', stop_after_first = true },
+        json = { 'prettierd', 'prettier', stop_after_first = true },
+        javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
       },
     },
   },
