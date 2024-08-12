@@ -344,7 +344,7 @@ end
 
 function nittedal
     set -l query '
-query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400, $numberOfDepartures: Int = 5, $startTime: DateTime!) {
+query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400, $numberOfDepartures: Int = 5, $startTime: DateTime) {
   stopPlace(id: $stopPlace) {
     estimatedCalls(timeRange: $timeRange, numberOfDepartures: $numberOfDepartures, startTime: $startTime, whiteListed: {
             lines: $lines,
@@ -357,6 +357,11 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
         }
       }
       serviceJourney {
+        journeyPattern {
+          quays  {
+            name
+          }
+        }
         line {
           publicCode
         }
@@ -364,13 +369,14 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
       destinationDisplay {
         frontText
       }
+      
       quay {
         publicCode
       }
     }
   }
 }
-  '
+    '
     set -l numberOfDepartures $argv[1]
 
     if test -n "$argv[2]"
@@ -390,7 +396,8 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
 
     http --ignore-stdin POST https://api.entur.io/journey-planner/v3/graphql variables:=$variables query=$query "ET-Client-Name: jonas-laptop-cli" \
         | jq -r '
-            .data.stopPlace.estimatedCalls[] 
+            .data.stopPlace.estimatedCalls[]
+            | select(.serviceJourney.journeyPattern.quays[] | select(.name == "Nittedal stasjon"))
             | [.expectedDepartureTime, .destinationDisplay.frontText, .quay.publicCode, .serviceJourney.line.publicCode, .situations[0].summary[0].value]
             | @tsv' \
         # Only show the time, including display Norwegian characters
@@ -405,6 +412,12 @@ function xray-traceid
         set traceId (uuidgen | string lower)
     end
     printf 'Root=1-%x-%s' (date +%s) (string replace -a "-" "" $traceId)
+end
+
+function verify-commits
+    pushd (git rev-parse --show-toplevel)/frontline-apis
+    gradle --no-daemon -p build-common/toolkits :verifyCommits --source-branch=(git rev-parse HEAD) --target-branch=upstream/master
+    popd
 end
 
 set -gx DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
