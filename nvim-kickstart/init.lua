@@ -211,6 +211,9 @@ vim.filetype.add {
     ['*/.gitlab/*.yml'] = 'yaml.gitlab',
     ['*/.gitlab/*.yaml'] = 'yaml.gitlab',
   },
+  extension = {
+    ['http'] = 'http',
+  },
 }
 
 -- [[ Basic Autocommands ]]
@@ -507,7 +510,6 @@ require('lazy').setup {
           --  This is where a variable was first declared, or where a function is defined, etc.
           --  To jump back, press <C-T>.
           map('gd', require('telescope.builtin').lsp_definitions, '[G]oto [D]efinition')
-
           -- Find references for the word under your cursor.
           map('gr', require('telescope.builtin').lsp_references, '[G]oto [R]eferences')
 
@@ -591,7 +593,13 @@ require('lazy').setup {
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        tsserver = {},
+        tsserver = {
+          on_attach = function(client)
+            -- this is important, otherwise tsserver will format ts/js
+            -- files which we *really* don't want.
+            client.server_capabilities.documentFormattingProvider = false
+          end,
+        },
         -- eslint = {},
         yamlls = {},
         biome = {},
@@ -642,7 +650,6 @@ require('lazy').setup {
       local ensure_installed = vim.tbl_keys(servers or {})
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format lua code
-        'biome',
         'prettierd',
         'prettier',
       })
@@ -666,6 +673,18 @@ require('lazy').setup {
 
   { -- Autoformat
     'stevearc/conform.nvim',
+    event = { 'BufWritePre' },
+    cmd = { 'ConformInfo' },
+    keys = {
+      {
+        '<leader>f',
+        function()
+          require('conform').format { async = true, lsp_fallback = true }
+        end,
+        mode = '',
+        desc = '[F]ormat buffer',
+      },
+    },
     opts = {
       notify_on_error = false,
       format_on_save = function(bufnr)
@@ -673,8 +692,16 @@ require('lazy').setup {
         if vim.g.disable_autoformat or vim.b[bufnr].disable_autoformat then
           return
         end
-        return { timeout_ms = 500, lsp_fallback = true }
+        return {
+          timeout_ms = 500,
+          lsp_format = 'fallback',
+        }
       end,
+      formatters = {
+        biome = {
+          require_cwd = true,
+        },
+      },
       formatters_by_ft = {
         lua = { 'stylua' },
         -- Conform can also run multiple formatters sequentially
@@ -859,6 +886,7 @@ require('lazy').setup {
           'fish',
           'git_rebase',
           'diff',
+          'http',
         },
         -- Autoinstall languages that are not installed
         auto_install = false,
