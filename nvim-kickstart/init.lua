@@ -593,13 +593,7 @@ require('lazy').setup {
         --    https://github.com/pmizio/typescript-tools.nvim
         --
         -- But for many setups, the LSP (`tsserver`) will work just fine
-        tsserver = {
-          on_attach = function(client)
-            -- this is important, otherwise tsserver will format ts/js
-            -- files which we *really* don't want.
-            client.server_capabilities.documentFormattingProvider = false
-          end,
-        },
+        tsserver = {},
         -- eslint = {},
         yamlls = {},
         biome = {},
