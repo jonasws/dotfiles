@@ -1,5 +1,6 @@
-set -gx LC_ALL en_US.UTF-8
-set -gx PATH ~/.cargo/bin /opt/homebrew/opt/grep/libexec/gnubin /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
+set -x LC_ALL en_US.UTF-8
+set -x PATH ~/.cargo/bin /opt/homebrew/opt/grep/libexec/gnubin /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
+# set -x PATH ~/.local-fish/bin ~/.local-nvim/bin $PATH
 
 fish_config theme choose "Dracula Official"
 
@@ -8,8 +9,8 @@ end
 
 function repo-name
     basename (git rev-parse --show-toplevel)
-
 end
+
 alias grt "cd (git rev-parse --show-toplevel)"
 
 # To not slow down Emacs searching/projectile magic while on macOS
@@ -35,7 +36,7 @@ end
 
 fzf_configure_bindings --directory=\cf --git_status=\eg --git_log=\el
 
-set -g fish_key_bindings fish_hybrid_key_bindings
+set fish_key_bindings fish_hybrid_key_bindings
 
 function fish_user_key_bindings
     bind \ec fzf_cd_directory
@@ -46,8 +47,8 @@ end
 set fish_color_command yellow
 set fish_color_autosuggestion white
 
-set -gx EDITOR nvim
-set fzf_directory_opts --bind "ctrl-o:execute($EDITOR {} &> /dev/tty)"
+set -x EDITOR nvim
+set fzf_directory_opts --multi --bind "ctrl-o:execute($EDITOR {+} &> /dev/tty),alt-o:become($EDITOR {+} &> /dev/tty)"
 
 
 abbr -a - "cd -"
@@ -69,26 +70,26 @@ function git-dir-or-pwd
     git rev-parse --show-toplevel 2>/dev/null; or pwd
 end
 
-set -gx BD_OPT insensitive
+set -x BD_OPT insensitive
 
-set -gx FZF_DEFAULT_COMMAND "fd --type f"
-set -gx FZF_CTRL_T_COMMAND "fd --type f"
-set -gx FZF_OPEN_COMMAND "fd --type f . \$dir"
+set -x FZF_DEFAULT_COMMAND "fd --type f"
+set -x FZF_CTRL_T_COMMAND "fd --type f"
+set -x FZF_OPEN_COMMAND "fd --type f . \$dir"
 
-set -gx FZF_ENABLE_OPEN_PREVIEW 1
-set -gx FZF_LEGACY_KEYBINDINGS 0
-set -gx FZF_COMPLETE 2
+set -x FZF_ENABLE_OPEN_PREVIEW 1
+set -x FZF_LEGACY_KEYBINDINGS 0
+set -x FZF_COMPLETE 2
 
-set -gx FZF_CTRL_T_OPTS "
+set -x FZF_CTRL_T_OPTS "
   --preview 'bat -n --color=always {}'
 "
 
-set -gx FZF_ALT_C_OPTS "
+set -x FZF_ALT_C_OPTS "
    --preview 'eza -l --color=always {}'
 "
 
 
-set -gx EZA_COLORS "\
+set -x EZA_COLORS "\
 gu=37:\
 sn=32:\
 sb=32:\
@@ -105,7 +106,7 @@ tw=35:\
 tx=36:"
 
 
-set -gx RIPGREP_CONFIG_PATH $HOME/.ripgreprc
+set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 
 # Eza is cooler than ls, duh
 alias ll "eza --long --icons"
@@ -198,7 +199,7 @@ abbr -a gp!! "git push --force"
 # Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
 
-set -g fzf_history_opts --with-nth="4.." --preview-window="down,30%,border-top,wrap"
+set fzf_history_opts --with-nth="4.." --preview-window="down,30%,border-top,wrap"
 
 function fzf_cd_directory --description "Change directory Replace the current token with the selected file paths."
     # Inspired by https://github.com/PatrickF1/fzf.fish/blob/main/functions/_fzf_search_directory.fish
@@ -326,9 +327,6 @@ function start-my-day
     echo "Updating wezterm"
     brew upgrade --cask wezterm@nightly --no-quarantine --greedy-latest
 
-    # echo "Updating neovim"
-    # brew upgrade neovim --fetch-HEAD
-
     echo "Updating your lazy.nvim plugins"
     nvim --headless "+Lazy! sync" +qa
     echo
@@ -369,9 +367,13 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
       destinationDisplay {
         frontText
       }
-      
+
       quay {
         publicCode
+        stopPlace {
+            name
+            description
+        }
       }
     }
   }
@@ -380,7 +382,7 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
     set -l numberOfDepartures $argv[1]
 
     if test -n "$argv[2]"
-        set -l parsedTime (string split : $argv[2]) 
+        set -l parsedTime (string split : $argv[2])
         set -f startTime (date -Iminutes -v$parsedTime[1]H -v$parsedTime[2]M)
     else
         set -f startTime (date -Iminutes)
@@ -394,15 +396,15 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
         startTime: $startTime
     } | @json')
 
-    http --ignore-stdin POST https://api.entur.io/journey-planner/v3/graphql variables:=$variables query=$query "ET-Client-Name: jonas-laptop-cli" \
+    http --ignore-stdin POST https://api.entur.io/journey-planner/v3/graphql variables:=$variables query=$query "ET-Client-Name: jonas-laptop-cli"  \
         | jq -r '
             .data.stopPlace.estimatedCalls[]
             | select(.serviceJourney.journeyPattern.quays[] | select(.name == "Nittedal stasjon"))
-            | [.expectedDepartureTime, .destinationDisplay.frontText, .quay.publicCode, .serviceJourney.line.publicCode, .situations[0].summary[0].value]
+            | [.expectedDepartureTime, .destinationDisplay.frontText, .quay.publicCode, .serviceJourney.line.publicCode, ([.quay.stopPlace.name, .quay.stopPlace.description] | join(" - ")), .situations[0].summary[0].value]
             | @tsv' \
         # Only show the time, including display Norwegian characters
-        | perl -Mutf8 -CS -ne 'print "\e[34m$2\e[0m\t\e[96m$3\e[0m\t\e[92m$4\e[0m\t\e[95m$5\e[0m\t\e[93m$6\e[0m\n"
-              if /(\d{4}-\d{2}-\d{2}T)(\d{2}:\d{2}):\d{2}\+\d{2}:\d{2}\t(\p{L}+)\t(\d+)?\t(.+)\t(.*)/' \
+        | perl -Mutf8 -CS -ne 'print "\e[34m$2\e[0m\t\e[96m$3\e[0m\t\e[92m$4\e[0m\t\e[95m$5\e[0m\t\e[93m$6\e[0m\t$7\n"
+              if /(\d{4}-\d{2}-\d{2}T)(\d{2}:\d{2}):\d{2}\+\d{2}:\d{2}\t(\p{L}+)\t(\d+)?\t(.+)\t(.+)\t(.*)/' \
         | column -t -s (echo -n \t)
 end
 
@@ -420,35 +422,34 @@ function verify-commits
     popd
 end
 
-set -gx DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
-set -gx DOCKER_DEFAULT_PLATFORM linux/amd64
-set -gx DOCKER_HIDE_LEGACY_COMMANDS 1
+set -x DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
+set -x DOCKER_DEFAULT_PLATFORM linux/amd64
+set -x DOCKER_HIDE_LEGACY_COMMANDS 1
 
 # Use fnm
 # NOTE: Try to keep  this at the bottom of  the file, to ensure fnm appears at "front" of the PATH variable
 fnm env --use-on-cd --corepack-enabled | source
 direnv hook fish | source
 
-set -gx LESSOPEN "|/opt/homebrew/Cellar/bat-extras/2024.02.12/bin/batpipe %s"
+set -x LESSOPEN "|/opt/homebrew/Cellar/bat-extras/2024.02.12/bin/batpipe %s"
 set -e LESSCLOSE
 
 # The following will enable colors when using batpipe with less:
-set -gx LESS -XFRi
-set -gx BATPIPE color
-set -gx FX_THEME 1
-set -gx FX_SHOW_SIZE true
-set -gx BATDIFF_USE_DELTA true
+set -x LESS -XFRi
+set -x BATPIPE color
+set -x FX_THEME 1
+set -x FX_SHOW_SIZE true
+set -x BATDIFF_USE_DELTA true
 
 alias man batman
 
-set -gx GLAMOUR_STYLE dracula
-set -gx PAGER less
-set -gx AWS_PAGER "bat --plain --language json"
-set -gx AWS_DEFAULT_OUTPUT json
+set -x GLAMOUR_STYLE dracula
+set -x PAGER less
+set -x AWS_PAGER "bat --plain --language json"
+set -x AWS_DEFAULT_OUTPUT json
 
 # tabtab source for packages
 # uninstall by removing these lines
 [ -f ~/.config/tabtab/fish/__tabtab.fish ]; and . ~/.config/tabtab/fish/__tabtab.fish; or true
 
 source ~/.config/op/plugins.sh
-
