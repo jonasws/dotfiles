@@ -601,6 +601,7 @@ require('lazy').setup {
         regal = {
           root_dir = require('lspconfig.util').root_pattern '.git',
         },
+        terraformls = {},
         --
 
         lua_ls = {
@@ -747,7 +748,9 @@ require('lazy').setup {
       local cmp = require 'cmp'
       local luasnip = require 'luasnip'
       luasnip.filetype_extend('typescript', { 'javascript' })
+
       require('luasnip.loaders.from_vscode').lazy_load()
+      require('luasnip.loaders.from_vscode').lazy_load { paths = '~/my-snippets/vscode-jest-snippets/' }
       luasnip.config.setup {}
       luasnip.config.set_config {
         store_selection_keys = '<C-s>',
@@ -858,6 +861,7 @@ require('lazy').setup {
 
   { -- Highlight, edit, and navigate code
     'nvim-treesitter/nvim-treesitter',
+    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
     build = ':TSUpdate',
     config = function()
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
@@ -881,6 +885,7 @@ require('lazy').setup {
           'git_rebase',
           'diff',
           'http',
+          'hcl',
         },
         -- Autoinstall languages that are not installed
         auto_install = false,
@@ -888,6 +893,15 @@ require('lazy').setup {
         indent = { enable = true },
         incremental_selection = {
           enable = true,
+        },
+        textobjects = {
+          move = {
+            enable = true,
+            goto_next_start = { [']f'] = '@function.outer', [']c'] = '@class.outer' },
+            goto_next_end = { [']F'] = '@function.outer', [']C'] = '@class.outer' },
+            goto_previous_start = { ['[f'] = '@function.outer', ['[c'] = '@class.outer' },
+            goto_previous_end = { ['[F'] = '@function.outer', ['[C'] = '@class.outer' },
+          },
         },
       }
 
