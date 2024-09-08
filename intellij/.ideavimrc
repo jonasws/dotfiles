@@ -5,6 +5,7 @@ let leader=" "
 
 
 source ~/.intellimacs/spacemacs/settings.vim
+" source ~/.intellimacs/spacemacs/misc.vim
 " Key bindings
 source ~/.intellimacs/spacemacs/leader.vim
 
@@ -38,7 +39,7 @@ nmap [g :action VcsShowPrevChangeMarker<CR><ESC>
 " source ~/.intellimacs/extra.vim
 " source ~/.intellimacs/major.vim
 source ~/.intellimacs/major/refactoring.vim
-" source ~/.intellimacs/which-key.vim
+source ~/.intellimacs/which-key.vim
 
 
 xmap S <Plug>VSurround
@@ -52,6 +53,9 @@ vnoremap <leader>ga :action Annotate<CR>
 " Comma for major mode
 nmap , <leader>m
 vmap , <leader>m
+
+" Use C-y for accepting completins
+imap <C-y>           :action EditorChooseLookupItemReplace<CR>
 
 " Make the neovim shortcuts work
 let g:WhichKeyDesc_Projects_Tree  = "<leader>e file-tree"
