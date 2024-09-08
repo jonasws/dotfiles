@@ -13,11 +13,6 @@ end
 
 alias grt "cd (git rev-parse --show-toplevel)"
 
-# To not slow down Emacs searching/projectile magic while on macOS
-if not builtin status is-interactive
-    exit
-end
-
 test -f $HOME/dotfiles/fish/local.fish; and source $HOME/dotfiles/fish/local.fish
 
 starship init fish | source
@@ -48,6 +43,7 @@ set fish_color_command yellow
 set fish_color_autosuggestion white
 
 set -x EDITOR nvim
+alias vim nvim
 set fzf_directory_opts --multi --bind "ctrl-o:execute($EDITOR {+} &> /dev/tty),alt-o:become($EDITOR {+} &> /dev/tty)"
 
 
@@ -272,8 +268,8 @@ function urlescape
 end
 
 function get-easytoken
-    set -l env $argv[1]
-    set -l user $argv[2]
+    set -l env sit
+    set -l user $argv[1]
 
     set -l functionName  $env-tokenproxy-easytoken-get
     set -l profileName si-$env
@@ -292,6 +288,28 @@ function get-easytoken
         jq -r .data.accessToken $responseOutputFile
     end
     rm $responseOutputFile
+end
+
+
+function get-atc
+    set -l user $argv[1]
+
+    # Check the existing cookie.txt for a valid cookie
+    if test -f ./cookie.txt
+        set -l introspected (introspect_raw (cat ./cookie.txt))
+        echo $introspected | grep -q -F "urn:publicid:person:no:nin:$user" 
+        if test $status -eq 0
+            cat ./cookie.txt
+            return
+        end
+    end
+
+    pnpm --package=@dnb-shared-tools/api-proxy@latest dlx create-atc --login-ssn $user \
+        | tee /dev/tty \
+        | grep "^ATC" \
+        | cut -d: -f2 \
+        > ./cookie.txt
+    cat ./cookie.txt
 end
 
 function introspect_raw
@@ -324,8 +342,8 @@ function start-my-day
     echo "Update fisher plugins"
     fisher update
 
-    echo "Updating wezterm"
-    brew upgrade --cask wezterm@nightly --no-quarantine --greedy-latest
+    # echo "Updating wezterm"
+    # brew upgrade --cask wezterm@nightly --no-quarantine --greedy-latest
 
     echo "Updating your lazy.nvim plugins"
     nvim --headless "+Lazy! sync" +qa
@@ -380,6 +398,11 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
 }
     '
     set -l numberOfDepartures $argv[1]
+    if test -n "$argv[1]"
+        set -f numberOfDepartures $argv[1]
+    else
+        set -f numberOfDepartures 5
+    end
 
     if test -n "$argv[2]"
         set -l parsedTime (string split : $argv[2])
