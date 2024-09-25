@@ -8,9 +8,12 @@ gui:
 git:
   paging:
     colorArg: always
-    pager: delta --dark --color-only --paging=never
+    pager: delta --dark --paging=never
     useConfig: false
     externalDiffCommand: difft --color=always
+
+services:
+  gitlab.tech.dnb.no: 'gitlab:gitlab.tech.dnb.no'
 
 update:
   method: never

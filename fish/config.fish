@@ -183,6 +183,11 @@ function up
     end
 end
 
+function ghe --wraps gh
+    set -x GH_HOST dnb.ghe.com
+    command gh $argv
+end
+
 zoxide init fish | source
 
 alias fishconfig "nvim ~/dotfiles/fish/config.fish; and reload-fish-config"
@@ -261,9 +266,9 @@ end
 
 function urlescape
     if isatty stdin
-        string replace -a / %2F $argv
+        echo $argv | string replace -a / %2F | string replace -a : %3A
     else
-        cat | string replace -a / %2F $argv
+        cat | string replace -a / %2F | string replace -a %3A
     end
 end
 
@@ -294,27 +299,41 @@ end
 function get-atc
     set -l user $argv[1]
 
-    # Check the existing cookie.txt for a valid cookie
-    if test -f ./cookie.txt
-        set -l introspected (introspect_raw (cat ./cookie.txt))
+    set -l key (op item get --vault Work "ATC encryption key" --field key)
+    # Check the existing encrypted for a valid cookie
+    if test -f cookie.encrypted && test -f iv.txt
+        set -l iv (cat iv.txt)
+        cat cookie.encrypted \
+            | openssl enc -d -chacha20 -in cookie.encrypted -iv $iv -K $key \
+            | read -l token
+        set -l introspected (introspect_raw $token)
         echo $introspected | grep -q -F "urn:publicid:person:no:nin:$user" 
         if test $status -eq 0
-            cat ./cookie.txt
+            echo $token
             return
         end
     end
 
+
+    set -l iv (openssl rand -hex 16)
+
     pnpm --package=@dnb-shared-tools/api-proxy@latest dlx create-atc --login-ssn $user \
+        | tspin \
         | tee /dev/tty \
         | grep "^ATC" \
         | cut -d: -f2 \
-        > ./cookie.txt
-    cat ./cookie.txt
+        | read -l token
+
+    echo $token \
+        | openssl enc -chacha20 -out cookie.encrypted -K $key -iv $iv \
+        > cookie.encrypted
+    echo $iv > iv.txt
+    echo $token
 end
 
 function introspect_raw
     set -l token $argv[1]
-    http --ignore-stdin --form https://api.uat.ciam.tech-03.net/as/introspect.oauth2 token=$token
+    http --ignore-stdin --session=~/.local/state/atc/session.json  --form https://api.uat.ciam.tech-03.net/as/introspect.oauth2 token=$token
 end
 
 function introspect
@@ -431,6 +450,28 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
         | column -t -s (echo -n \t)
 end
 
+function console
+    set -l profile $argv[1]
+    if test -z $profile
+        echo "Usage: console <profile> [<region>]"
+        return
+    end
+
+    set -l region $argv[2]
+    if test -z $region
+        set region eu-north-1
+    end
+    # https://d-9367049f98.awsapps.com/start/#/console?account_id=915006023413&role_name=Core-Test-EngineerAdminRole
+    set -l accountId (aws configure get --profile $profile sso_account_id)
+    set -l roleName (aws configure get --profile $profile sso_role_name)
+    set -l destinationUrl (urlescape "https://$region.console.aws.amazon.com")
+    echo Opening "https://d-9367049f98.awsapps.com/start/#/console?account_id=$accountId&role_name=$roleName&destination=$destinationUrl" in the browser
+    open "https://d-9367049f98.awsapps.com/start/#/console?account_id=$accountId&role_name=$roleName&destination=$destinationUrl"
+end
+
+complete -f -c console -a "$(aws configure list-profiles)"
+
+
 function xray-traceid
     set -l traceId $argv[1]
     if test -z $traceId
@@ -454,7 +495,7 @@ set -x DOCKER_HIDE_LEGACY_COMMANDS 1
 fnm env --use-on-cd --corepack-enabled | source
 direnv hook fish | source
 
-set -x LESSOPEN "|/opt/homebrew/Cellar/bat-extras/2024.02.12/bin/batpipe %s"
+# set -x LESSOPEN "|/opt/homebrew/Cellar/bat-extras/2024.02.12/bin/batpipe %s"
 set -e LESSCLOSE
 
 # The following will enable colors when using batpipe with less:

@@ -801,5 +801,9 @@
   "[jsonc]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
-  "security.promptForLocalFileProtocolHandling": false
+  "security.promptForLocalFileProtocolHandling": false,
+  "github-enterprise.uri": "https://dnb.ghe.com",
+  "github.copilot.advanced": {
+    "authProvider": "github-enterprise"
+  }
 }

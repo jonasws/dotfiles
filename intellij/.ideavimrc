@@ -30,11 +30,11 @@ let g:WhichKeyDesc_GitVcs = "<leader>g    +git/version-control"
 source ~/.intellimacs/spacemacs/git-vcs.vim
 source ~/.intellimacs/extra/git-vcs.vim
 
-let g:WhichKeyDesc_Files = "<leader>f    +files"
-source ~/.intellimacs/spacemacs/files.vim
-
 nmap ]g :action VcsShowNextChangeMarker<CR><ESC>
 nmap [g :action VcsShowPrevChangeMarker<CR><ESC>
+
+nnoremap ]] *
+nnoremap [[ #
 
 " source ~/.intellimacs/extra.vim
 " source ~/.intellimacs/major.vim
