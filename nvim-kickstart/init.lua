@@ -230,6 +230,32 @@ vim.api.nvim_create_autocmd('TextYankPost', {
   end,
 })
 
+-- Fish indentation setup
+vim.api.nvim_create_augroup('Fish', { clear = true })
+vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
+  group = 'Fish',
+  pattern = '*fish*',
+  callback = function()
+    vim.bo.expandtab = true -- Convert tabs to spaces
+    vim.bo.shiftwidth = 4 -- Use 4 spaces for indentation
+    vim.bo.softtabstop = 4 -- Use 4 spaces for a tab press
+    vim.bo.tabstop = 4 -- Width of a tab character
+  end,
+})
+
+-- json indentation setup
+vim.api.nvim_create_augroup('json', { clear = true })
+vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
+  group = 'json',
+  pattern = '*.json',
+  callback = function()
+    vim.bo.expandtab = true -- Convert tabs to spaces
+    vim.bo.shiftwidth = 2 -- Use 2 spaces for indentation
+    vim.bo.softtabstop = 2 -- Use 2 spaces for a tab press
+    vim.bo.tabstop = 2 -- Width of a tab character
+  end,
+})
+
 -- [[ Install `lazy.nvim` plugin manager ]]
 --    See `:help lazy.nvim.txt` or https://github.com/folke/lazy.nvim for more info
 local lazypath = vim.fn.stdpath 'data' .. '/lazy/lazy.nvim'
@@ -811,6 +837,7 @@ require('lazy').setup {
           end, { 'i', 's' }),
         },
         sources = {
+          { name = 'copilot' },
           { name = 'nvim_lsp' },
           { name = 'luasnip' },
           { name = 'path' },
