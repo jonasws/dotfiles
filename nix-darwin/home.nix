@@ -101,6 +101,22 @@
     #   org.gradle.console=verbose
     #   org.gradle.daemon.idletimeout=3600000
     # '';
+
+    ".wezterm.lua" = {
+      source = ../wezterm/wezterm.lua;
+    };
+
+    ".config/fish/config.fish" = {
+      source = ../fish/config.fish;
+    };
+
+    ".config/nvim" = {
+      source = ../nvim-kickstart;
+    };
+
+    ".ripgreprc" = {
+      source = ../ripgrep/.ripgreprc;
+    };
   };
 
   # You can also manage environment variables but you will have to manually
