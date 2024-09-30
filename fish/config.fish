@@ -1,6 +1,7 @@
 set -x LC_ALL en_US.UTF-8
-set -x PATH ~/.cargo/bin /opt/homebrew/opt/grep/libexec/gnubin /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
+# set -x PATH ~/.cargo/bin /opt/homebrew/opt/grep/libexec/gnubin /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
 # set -x PATH ~/.local-fish/bin ~/.local-nvim/bin $PATH
+set -x PATH  /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profiles/per-user/jonasws/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin /Users/jonasws/.sdkman/candidates/micronaut/current/bin /Users/jonasws/.sdkman/candidates/java/current/bin /Users/jonasws/.sdkman/candidates/gradle/current/bin /opt/homebrew/opt/sphinx-doc/bin /Users/jonasws/.emacs.d/bin /Applications/IntelliJ IDEA 2023.3 EAP.app/Contents/MacOS /opt/homebrew/opt/libiconv/bin /opt/homebrew/sbin /opt/homebrew/opt/sqlite/bin /opt/homebrew/opt/make/libexec/gnubin /Applications/WezTerm.app/Contents/MacOS /opt/homebrew/opt/jpeg/bin /opt/homebrew/opt/fzf/bin /usr/local/bin /System/Cryptexes/App/usr/bin /usr/bin /bin /usr/sbin /sbin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin
 
 fish_config theme choose "Dracula Official"
 
@@ -198,7 +199,9 @@ abbr -a gp!! "git push --force"
 
 
 # Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
+
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
+
 
 set fzf_history_opts --with-nth="4.." --preview-window="down,30%,border-top,wrap"
 
@@ -355,9 +358,6 @@ end
 function start-my-day
     echo "Good morning!"
 
-    echo "Updating your brew"
-    brew update; and brew upgrade --fetch-HEAD
-
     echo "Update fisher plugins"
     fisher update
 
@@ -482,7 +482,7 @@ end
 
 function verify-commits
     pushd (git rev-parse --show-toplevel)/frontline-apis
-    gradle --no-daemon -p build-common/toolkits :verifyCommits --source-branch=(git rev-parse HEAD) --target-branch=upstream/master
+    gradlew --no-daemon -p build-common/toolkits :verifyCommits --source-branch=(git rev-parse HEAD) --target-branch=upstream/master
     popd
 end
 
