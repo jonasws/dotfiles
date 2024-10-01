@@ -503,7 +503,8 @@ set -x LESS -XFRi
 set -x BATPIPE color
 set -x FX_THEME 1
 set -x FX_SHOW_SIZE true
-set -x BATDIFF_USE_DELTA true
+# set -x BATDIFF_USE_DELTA true
+set fzf_diff_highlighter delta --paging=never --width=20
 
 alias man batman
 
