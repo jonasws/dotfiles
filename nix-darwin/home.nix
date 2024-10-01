@@ -59,7 +59,7 @@
     gh
     glab
     delta
-    tig
+    # tig
     lazygit
 
     awscli2
