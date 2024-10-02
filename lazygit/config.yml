@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=./schema.json
 gui:
-  showFileTree: false # for rendering changes files in a tree format
+  showFileTree: true # for rendering changes files in a tree format
   shortTimeFormat: "15:04"
   nerdFontsVersion: "3"
 
