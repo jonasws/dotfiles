@@ -28,6 +28,11 @@
     lazydocker
     difftastic
 
+    open-policy-agent
+    regal
+
+    csvlens
+
     # TODO: Use nix developer to manage node and java versions
     fnm
     direnv
@@ -36,6 +41,8 @@
     
     neovim
     git
+    coreutils
+    openssl
 
     bat
     bat-extras.batman
@@ -46,15 +53,13 @@
     curl
     fd
     jq
-    yq
+    yq-go
     fx
     ripgrep
     tailspin
     rm-improved
     eza
     fzf
-
-    openssl
 
     gh
     glab
@@ -72,10 +77,6 @@
 
     ookla-speedtest
     moreutils
-
-    # ssh
-    # git
-    # gitAndTools.delta
 
     # # It is sometimes useful to fine-tune packages, for example, by applying
     # # overrides. You can do that directly here, just don't forget the
