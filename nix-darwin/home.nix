@@ -28,10 +28,12 @@
     lazydocker
     difftastic
 
+    pre-commit
     open-policy-agent
     regal
 
     csvlens
+    glow
 
     # TODO: Use nix developer to manage node and java versions
     fnm
