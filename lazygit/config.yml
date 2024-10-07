@@ -1,15 +1,25 @@
 # yaml-language-server: $schema=./schema.json
+#
+os:
+  editPreset: nvim
 gui:
-  showFileTree: true # for rendering changes files in a tree format
+  showRandomTip: false
   shortTimeFormat: "15:04"
   nerdFontsVersion: "3"
 
+disableStartupPopups: true
 
 git:
+  autoFetch: false
+  log:
+    order: default
   paging:
     colorArg: always
     pager: delta --dark --paging=never --side-by-side
     useConfig: false
+  commit:
+    signOff: false
+  parseEmoji: true
     # externalDiffCommand: difft --color=always
 
 services:
