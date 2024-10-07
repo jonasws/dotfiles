@@ -229,6 +229,15 @@ vim.api.nvim_create_autocmd('TextYankPost', {
     vim.highlight.on_yank()
   end,
 })
+-- Autocommand for setting keybindings only in diff mode
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'diff',
+  callback = function()
+    vim.api.nvim_set_keymap('n', '[c', ':cprev<CR>', { noremap = true, silent = true })
+    vim.api.nvim_set_keymap('n', ']c', ':cnext<CR>', { noremap = true, silent = true })
+    -- Add any additional diff-specific keybindings here
+  end,
+})
 
 -- Fish indentation setup
 vim.api.nvim_create_augroup('Fish', { clear = true })
