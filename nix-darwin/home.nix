@@ -26,7 +26,9 @@
     docker-buildx
     docker-compose
     lazydocker
+
     difftastic
+    grc
 
     pre-commit
     open-policy-agent
@@ -119,11 +121,6 @@
   };
 
     xdg.configFile = {
-      fish = {
-        source = ../fish/config.fish;
-        target = "fish/config.fish";
-      };
-
       neovim = {
         source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/nvim-kickstart";
         target = "nvim";
@@ -149,5 +146,47 @@
   # Let Home Manager install and manage itself.
   programs = {
     home-manager.enable = true;
+
+    fish = {
+      enable = true;
+      # Set the init shell options from the one in dotfiles
+      interactiveShellInit = builtins.readFile ../fish/config.fish;
+      plugins = [
+        {
+          name = "grc";
+          src = pkgs.fishPlugins.grc.src;
+        }
+        {
+          name = "bass";
+          src = pkgs.fishPlugins.bass.src;
+        }
+        {
+          name = "bd";
+          src = pkgs.fishPlugins.fish-bd.src;
+        }
+        {
+          name = "fzf-fish";
+          src = pkgs.fishPlugins.fzf-fish.src;
+        }
+        {
+          name = "git";
+          src = pkgs.fishPlugins.plugin-git.src;
+        }
+        {
+          name = "sdkman";
+          src = pkgs.fishPlugins.sdkman-for-fish.src;
+        }
+        {
+          name = "dracula";
+          src = pkgs.fetchFromGitHub {
+            owner = "dracula";
+            repo = "fish";
+            rev = "269cd7d76d5104fdc2721db7b8848f6224bdf554";
+            sha256 = "Hyq4EfSmWmxwCYhp3O8agr7VWFAflcUe8BUKh50fNfY=";
+          };
+        }
+      ];
+
+    };
   };
 }
