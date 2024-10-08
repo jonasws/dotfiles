@@ -29,6 +29,7 @@
 
     difftastic
     grc
+    doggo
 
     pre-commit
     open-policy-agent
@@ -37,10 +38,7 @@
     csvlens
     glow
 
-    # TODO: Use nix developer to manage node and java versions
-    fnm
-    direnv
-    nodejs_20
+    # nodejs_20
     pnpm
     
     neovim
@@ -151,6 +149,17 @@
       enable = true;
       # Set the init shell options from the one in dotfiles
       interactiveShellInit = builtins.readFile ../fish/config.fish;
+      functions = {
+        _tide_item_sdkman_java = {
+          body = ''
+            if path is $_tide_parent_dirs/.sdkmanrc
+              sdk current java | string match -qr "Using java version (?<v>[\d.]+)"
+                # print item       with this name   and this icon           with this text
+                _tide_print_item   sdkman_java          $tide_java_icon' '   $v
+            end
+                '';
+        };
+      };
       plugins = [
         {
           name = "tide";

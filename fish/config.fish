@@ -1,16 +1,20 @@
 set -x LC_ALL en_US.UTF-8
 # set -x PATH ~/.cargo/bin /opt/homebrew/opt/grep/libexec/gnubin /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
 # set -x PATH ~/.local-fish/bin ~/.local-nvim/bin $PATH
-set -x PATH  /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profiles/per-user/jonasws/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin /opt/homebrew/bin /Users/jonasws/.sdkman/candidates/micronaut/current/bin /Users/jonasws/.sdkman/candidates/java/current/bin /Users/jonasws/.sdkman/candidates/gradle/current/bin /opt/homebrew/opt/sphinx-doc/bin /Users/jonasws/.emacs.d/bin /Applications/IntelliJ IDEA 2023.3 EAP.app/Contents/MacOS /opt/homebrew/opt/libiconv/bin /opt/homebrew/sbin /opt/homebrew/opt/sqlite/bin /opt/homebrew/opt/make/libexec/gnubin /Applications/WezTerm.app/Contents/MacOS /opt/homebrew/opt/jpeg/bin /opt/homebrew/opt/fzf/bin /usr/local/bin /System/Cryptexes/App/usr/bin /usr/bin /bin /usr/sbin /sbin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin
+set -x PATH /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profiles/per-user/jonasws/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin /opt/homebrew/bin /opt/homebrew/opt/sphinx-doc/bin /Users/jonasws/.emacs.d/bin /Applications/IntelliJ IDEA 2023.3 EAP.app/Contents/MacOS /opt/homebrew/opt/libiconv/bin /opt/homebrew/sbin /opt/homebrew/opt/sqlite/bin /opt/homebrew/opt/make/libexec/gnubin /Applications/WezTerm.app/Contents/MacOS /opt/homebrew/opt/jpeg/bin /opt/homebrew/opt/fzf/bin /usr/local/bin /System/Cryptexes/App/usr/bin /usr/bin /bin /usr/sbin /sbin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin $PATH
 
 fish_config theme choose "Dracula Official"
 
-function __fish_describe_command
-end
+# tide configure --auto --style=Rainbow --prompt_colors='True color' --show_time=No --rainbow_prompt_separators=Angled --powerline_prompt_heads=Sharp --powerline_prompt_tails=Flat --powerline_prompt_style='Two lines, character' --prompt_connection=Disconnected --powerline_right_prompt_frame=No --prompt_spacing=Sparse --icons='Few icons' --transient=No
+# tide reload
+
+# set -g tide_sdkman_java_color $tide_java_color
+# set -g tide_sdkman_java_bg_color $tide_java_bg_color
 
 function repo-name
     basename (git rev-parse --show-toplevel)
 end
+
 
 alias grt "cd (git rev-parse --show-toplevel)"
 
@@ -29,7 +33,7 @@ end
 set fish_color_command yellow
 set fish_color_autosuggestion white
 
-set -x EDITOR vim
+set -x EDITOR nvim
 alias vim nvim
 set fzf_directory_opts --multi --bind "ctrl-o:execute($EDITOR {+} &> /dev/tty),alt-o:become($EDITOR {+} &> /dev/tty)"
 
@@ -476,10 +480,10 @@ set -x DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
 set -x DOCKER_DEFAULT_PLATFORM linux/amd64
 set -x DOCKER_HIDE_LEGACY_COMMANDS 1
 
-# Use fnm
-# NOTE: Try to keep  this at the bottom of  the file, to ensure fnm appears at "front" of the PATH variable
-fnm env --use-on-cd --corepack-enabled | source
-direnv hook fish | source
+# # Use fnm
+# # NOTE: Try to keep  this at the bottom of  the file, to ensure fnm appears at "front" of the PATH variable
+# fnm env --use-on-cd --corepack-enabled | source
+# direnv hook fish | source
 
 # set -x LESSOPEN "|/opt/homebrew/Cellar/bat-extras/2024.02.12/bin/batpipe %s"
 set -e LESSCLOSE
@@ -495,7 +499,7 @@ set fzf_diff_highlighter delta --paging=never --width=20
 alias man batman
 
 set -x GLAMOUR_STYLE dracula
-set -x PAGER less
+set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 set -x AWS_PAGER "bat --plain --language json"
 set -x AWS_DEFAULT_OUTPUT json
 

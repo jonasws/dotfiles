@@ -45,6 +45,9 @@
               "monitorcontrol"
               "wezterm"
             ];
+            brews = [
+              "fnm"
+            ];
           };
 
 
