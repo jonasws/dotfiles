@@ -53,7 +53,7 @@
     httpie
     hurl
     zoxide
-    starship
+    # starship
     curl
     fd
     jq
@@ -152,6 +152,10 @@
       # Set the init shell options from the one in dotfiles
       interactiveShellInit = builtins.readFile ../fish/config.fish;
       plugins = [
+        {
+          name = "tide";
+          src = pkgs.fishPlugins.tide.src;
+        }
         {
           name = "grc";
           src = pkgs.fishPlugins.grc.src;

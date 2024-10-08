@@ -16,20 +16,6 @@ alias grt "cd (git rev-parse --show-toplevel)"
 
 test -f $HOME/dotfiles/fish/local.fish; and source $HOME/dotfiles/fish/local.fish
 
-starship init fish | source
-
-functions --erase fish_starship_prompt
-functions --copy fish_prompt fish_starship_prompt
-
-
-function fish_prompt
-    # Fun with flags
-    fish_starship_prompt | perl -p -e "
-        s/\(eu-west-1\)/ 🇮🇪 /;    \
-        s/\(eu-central-1\)/ 🇩🇪 /; \
-        s/\(eu-north-1\)/ 🇸🇪 /"
-end
-
 fzf_configure_bindings --directory=\cf --git_status=\eg --git_log=\el
 
 set fish_key_bindings fish_hybrid_key_bindings
@@ -43,7 +29,7 @@ end
 set fish_color_command yellow
 set fish_color_autosuggestion white
 
-set -x EDITOR nvim
+set -x EDITOR vim
 alias vim nvim
 set fzf_directory_opts --multi --bind "ctrl-o:execute($EDITOR {+} &> /dev/tty),alt-o:become($EDITOR {+} &> /dev/tty)"
 
