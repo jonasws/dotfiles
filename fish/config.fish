@@ -180,10 +180,9 @@ function ghe --wraps gh
 end
 
 zoxide init fish | source
+status is-interactive && /opt/homebrew/bin/fnm env --use-on-cd --corepack-enabled --shell fish | source
 
-alias fishconfig "nvim ~/dotfiles/fish/config.fish; and reload-fish-config"
-
-alias lg lazygit
+abbr -a lg lazygit
 
 abbr -a gp!! "git push --force"
 
