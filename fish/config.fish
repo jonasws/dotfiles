@@ -5,6 +5,11 @@ set -x PATH /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profi
 
 fish_config theme choose "Dracula Official"
 
+# Exit if not running interactively
+if not status is-interactive
+    exit 0
+end
+
 # tide configure --auto --style=Rainbow --prompt_colors='True color' --show_time=No --rainbow_prompt_separators=Angled --powerline_prompt_heads=Sharp --powerline_prompt_tails=Flat --powerline_prompt_style='Two lines, character' --prompt_connection=Disconnected --powerline_right_prompt_frame=No --prompt_spacing=Sparse --icons='Few icons' --transient=No
 # tide reload
 
@@ -179,8 +184,6 @@ function ghe --wraps gh
     command gh $argv
 end
 
-zoxide init fish | source
-status is-interactive && /opt/homebrew/bin/fnm env --use-on-cd --corepack-enabled --shell fish | source
 
 abbr -a lg lazygit
 
@@ -309,12 +312,7 @@ function get-atc
 
     set -l iv (openssl rand -hex 16)
 
-    pnpm --package=@dnb-shared-tools/api-proxy@latest dlx create-atc --login-ssn $user \
-        | tspin \
-        | tee /dev/tty \
-        | grep "^ATC" \
-        | cut -d: -f2 \
-        | read -l token
+    set -l token (web-auth-token bankid $user)
 
     echo $token \
         | openssl enc -chacha20 -out cookie.encrypted -K $key -iv $iv \
@@ -507,3 +505,6 @@ set -x AWS_DEFAULT_OUTPUT json
 [ -f ~/.config/tabtab/fish/__tabtab.fish ]; and . ~/.config/tabtab/fish/__tabtab.fish; or true
 
 source ~/.config/op/plugins.sh
+
+zoxide init fish | source
+fnm env --use-on-cd --corepack-enabled --shell fish | source

@@ -39,7 +39,9 @@
           homebrew = {
             enable = true;
             casks = [
-              "aerospace"
+              "rectangle"
+              "raycast"
+              "karabiner-elements"
               "firefox@nightly"
               "mitmproxy"
               "monitorcontrol"

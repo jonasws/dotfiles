@@ -52,6 +52,7 @@
     hurl
     zoxide
     # starship
+    go
     curl
     fd
     jq
@@ -109,12 +110,12 @@
     # '';
 
     ".wezterm.lua" = {
-      source = ../wezterm/wezterm.lua;
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/wezterm/wezterm.lua";
     };
 
 
     ".ripgreprc" = {
-      source = ../ripgrep/.ripgreprc;
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/ripgrep/.ripgreprc";
     };
   };
 

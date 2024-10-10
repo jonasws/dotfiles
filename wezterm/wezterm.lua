@@ -10,7 +10,8 @@ config.font = wezterm.font 'JetBrainsMono Nerd Font'
 config.color_scheme = 'Dracula (Official)'
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
-config.window_decorations = 'RESIZE'
+config.window_decorations = 'RESIZE | MACOS_FORCE_ENABLE_SHADOW'
+-- config.window_decorations = 'RESIZE'
 config.font_size = 16.0
 
 config.window_background_opacity = 0.80
