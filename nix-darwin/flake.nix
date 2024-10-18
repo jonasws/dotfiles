@@ -34,7 +34,11 @@
           };
           # List packages installed in system profile. To search by name, run:
           # $ nix-env -qaP | grep wget
-          environment.systemPackages = [ ];
+          environment.systemPackages = with pkgs; [
+            docker-client
+            docker-buildx
+            docker-compose
+          ];
 
           homebrew = {
             enable = true;
@@ -43,12 +47,13 @@
               "raycast"
               "karabiner-elements"
               "firefox@nightly"
-              "mitmproxy"
-              "monitorcontrol"
               "wezterm"
             ];
             brews = [
               "fnm"
+            ];
+            whalebrews = [
+              "openpolicyagent/opa:0.67.1"
             ];
           };
 

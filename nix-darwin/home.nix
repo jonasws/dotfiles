@@ -22,23 +22,25 @@
     # # Adds the 'hello' command to your environment. It prints a friendly
     # Docker stuff
     colima
-    docker-client
-    docker-buildx
-    docker-compose
     lazydocker
+
+    fastfetch
 
     difftastic
     grc
     doggo
+    btop
+
+    wget
+    tree-sitter
 
     pre-commit
-    open-policy-agent
+    # open-policy-agent
     regal
 
-    csvlens
+    # csvlens
     glow
 
-    # nodejs_20
     pnpm
     
     neovim
@@ -71,6 +73,7 @@
     lazygit
 
     awscli2
+    ssm-session-manager-plugin
     awslogs
 
     gradle
