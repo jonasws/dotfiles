@@ -1,14 +1,76 @@
 set -x LC_ALL en_US.UTF-8
 # set -x PATH ~/.cargo/bin /opt/homebrew/opt/grep/libexec/gnubin /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
 # set -x PATH ~/.local-fish/bin ~/.local-nvim/bin $PATH
-set -x PATH /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profiles/per-user/jonasws/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin /opt/homebrew/bin /opt/homebrew/opt/sphinx-doc/bin /Users/jonasws/.emacs.d/bin /Applications/IntelliJ IDEA 2023.3 EAP.app/Contents/MacOS /opt/homebrew/opt/libiconv/bin /opt/homebrew/sbin /opt/homebrew/opt/sqlite/bin /opt/homebrew/opt/make/libexec/gnubin /Applications/WezTerm.app/Contents/MacOS /opt/homebrew/opt/jpeg/bin /opt/homebrew/opt/fzf/bin /usr/local/bin /System/Cryptexes/App/usr/bin /usr/bin /bin /usr/sbin /sbin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin $PATH
+set -x PATH /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profiles/per-user/jonasws/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin /opt/whalebrew/bin /opt/homebrew/bin /opt/homebrew/opt/sphinx-doc/bin /Users/jonasws/.emacs.d/bin /Applications/IntelliJ IDEA 2023.3 EAP.app/Contents/MacOS /opt/homebrew/opt/libiconv/bin /opt/homebrew/sbin /opt/homebrew/opt/sqlite/bin /opt/homebrew/opt/make/libexec/gnubin /Applications/WezTerm.app/Contents/MacOS /opt/homebrew/opt/jpeg/bin /opt/homebrew/opt/fzf/bin /usr/local/bin /System/Cryptexes/App/usr/bin /usr/bin /bin /usr/sbin /sbin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin $PATH
+
+
+set -x DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
+set -x DOCKER_DEFAULT_PLATFORM linux/amd64
+set -x DOCKER_HIDE_LEGACY_COMMANDS 1
+
+
+function get-atc
+    set -l user $argv[1]
+
+    set -l key (op item get --vault Work "ATC encryption key" --field key)
+    # Check the existing encrypted for a valid cookie
+    if test -f cookie.encrypted && test -f iv.txt
+        set -l iv (cat iv.txt)
+        cat cookie.encrypted \
+            | openssl enc -d -chacha20 -in cookie.encrypted -iv $iv -K $key \
+            | read -l token
+        set -l introspected (introspect_raw $token)
+        echo $introspected | grep -q -F "urn:publicid:person:no:nin:$user" 
+        if test $status -eq 0
+            echo $token
+            return
+        end
+    end
+
+
+    set -l iv (openssl rand -hex 16)
+
+    set -l token (web-auth-token bankid $user)
+
+    echo $token \
+        | openssl enc -chacha20 -out cookie.encrypted -K $key -iv $iv \
+        > cookie.encrypted
+    echo $iv > iv.txt
+    echo $token
+end
+
+function introspect_raw
+    set -l token $argv[1]
+    http --ignore-stdin --session=~/.local/state/atc/session.json  --form https://api.uat.ciam.tech-03.net/as/introspect.oauth2 token=$token
+end
+
+function introspect
+    introspect_raw $argv \
+        | yq --input-format json '
+      .scope |= split(" ")
+    '
+end
+
+
+function view-mr-pipeline
+    set -l projectPath (urlescape (git remote -v | perl -ln -E 'say /\/([\w-\/\.]+)\.git/' | uniq | grep -v "Jonas.Stromsodd"))
+    set -l branch (urlescape (__git.current_branch))
+    set -l mrId (glab api projects/$projectPath/merge_requests\?source_branch=$branch | jq -r ".[0].iid")
+    set -l sha (glab api projects/$projectPath/merge_requests/$mrId/pipelines | jq -r ".[0].sha")
+    glab pipeline view $sha $argv
+end
+
+
+function repo-name
+    basename (git rev-parse --show-toplevel)
+end
+
+# # Exit if not running interactively
+# if not status is-interactive
+#     exit 0
+# end
 
 fish_config theme choose "Dracula Official"
-
-# Exit if not running interactively
-if not status is-interactive
-    exit 0
-end
 
 # tide configure --auto --style=Rainbow --prompt_colors='True color' --show_time=No --rainbow_prompt_separators=Angled --powerline_prompt_heads=Sharp --powerline_prompt_tails=Flat --powerline_prompt_style='Two lines, character' --prompt_connection=Disconnected --powerline_right_prompt_frame=No --prompt_spacing=Sparse --icons='Few icons' --transient=No
 # tide reload
@@ -16,29 +78,30 @@ end
 # set -g tide_sdkman_java_color $tide_java_color
 # set -g tide_sdkman_java_bg_color $tide_java_bg_color
 
-function repo-name
-    basename (git rev-parse --show-toplevel)
-end
-
 
 alias grt "cd (git rev-parse --show-toplevel)"
+alias top btop
 
 test -f $HOME/dotfiles/fish/local.fish; and source $HOME/dotfiles/fish/local.fish
 
 fzf_configure_bindings --directory=\cf --git_status=\eg --git_log=\el
 
-set fish_key_bindings fish_hybrid_key_bindings
+# set fish_key_bindings fish_hybrid_key_bindings
+set fish_key_bindings fish_vi_key_bindings
 
 function fish_user_key_bindings
-    bind \ec fzf_cd_directory
-    bind -M insert \ec fzf_cd_directory
+    bind --preset \ec fzf_cd_directory
+    bind --preset -M insert \ec fzf_cd_directory
 end
 
 
 set fish_color_command yellow
 set fish_color_autosuggestion white
 
+
+set -x VISUAL nvim
 set -x EDITOR nvim
+
 alias vim nvim
 set fzf_directory_opts --multi --bind "ctrl-o:execute($EDITOR {+} &> /dev/tty),alt-o:become($EDITOR {+} &> /dev/tty)"
 
@@ -51,16 +114,6 @@ alias as-tree "command tree --fromfile"
 alias bg batgrep
 
 alias zp "zed-preview"
-
-function browse-ssm-params
-    aws ssm describe-parameter --output=json \
-        | jq -r ".Parameters[].Name" \
-        | fzf
-end
-
-function git-dir-or-pwd
-    git rev-parse --show-toplevel 2>/dev/null; or pwd
-end
 
 set -x BD_OPT insensitive
 
@@ -121,63 +174,6 @@ abbr -a gsm "git switch master"
 
 
 abbr -a tf terraform
-
-
-alias spin tspin
-
-function lambdalogs
-    awslogs groups -p /aws/lambda | grep -v suat | fzf -1 -d / --with-nth 4 \
-        --bind "ctrl-w:execute(awslogs get {} ALL $argv --watch | tspin),enter:execute(awslogs get {} ALL $argv | tspin)+abort"
-end
-
-function test-one
-    set testName (fd --type f -e java "" src/test | fzf | xargs -J {} basename {} .java)
-
-    if test -n "$testName"
-        commandline "mvn test -Dtest=$testName"
-    end
-end
-
-function findpass
-    set entry (op list items \
-        | jq -r ".[] | [.uuid, .overview.url, .overview.title] | @tsv" \
-        | fzf)
-
-    set name (printf $entry | cut -f 3)
-    set uuid (printf $entry | cut -f 1)
-
-    op get item $uuid \
-        | jq -r '.details.fields[] | select(.designation=="password").value' \
-        | pbcopy
-
-    echo "Copied password for entry" $name "to clipbaord"
-end
-
-# Runs npm start if possible
-function s
-    if test -f package.json
-        if test -f yarn.lock
-            echo yarn start $argv
-            command yarn start $argv
-        else if test -f (git rev-parse --show-toplevel)/pnpm-lock.yaml
-            echo pnpm start $argv
-            command pnpm start $argv
-        else
-            echo npm start $argv
-            command npm start $argv
-        end
-    else
-        echo "No package.json found"
-    end
-end
-
-function up
-    if test -f docker-compose.yml
-        command docker-compose up $argv
-    else
-        echo "No docker-compose.yml found"
-    end
-end
 
 function ghe --wraps gh
     set -x GH_HOST dnb.ghe.com
@@ -267,102 +263,6 @@ function urlescape
     end
 end
 
-function get-easytoken
-    set -l env sit
-    set -l user $argv[1]
-
-    set -l functionName  $env-tokenproxy-easytoken-get
-    set -l profileName si-$env
-
-    set -l payload (jq -n --arg user $user '{user: $user } | @base64')
-    set -l responseOutputFile (mktemp)
-    aws lambda invoke \
-        --function-name $functionName \
-        --invocation-type RequestResponse \
-        --output json \
-        --profile $profileName \
-        --payload $payload  \
-        $responseOutputFile &> /dev/null
-
-    if test $status -eq 0
-        jq -r .data.accessToken $responseOutputFile
-    end
-    rm $responseOutputFile
-end
-
-
-function get-atc
-    set -l user $argv[1]
-
-    set -l key (op item get --vault Work "ATC encryption key" --field key)
-    # Check the existing encrypted for a valid cookie
-    if test -f cookie.encrypted && test -f iv.txt
-        set -l iv (cat iv.txt)
-        cat cookie.encrypted \
-            | openssl enc -d -chacha20 -in cookie.encrypted -iv $iv -K $key \
-            | read -l token
-        set -l introspected (introspect_raw $token)
-        echo $introspected | grep -q -F "urn:publicid:person:no:nin:$user" 
-        if test $status -eq 0
-            echo $token
-            return
-        end
-    end
-
-
-    set -l iv (openssl rand -hex 16)
-
-    set -l token (web-auth-token bankid $user)
-
-    echo $token \
-        | openssl enc -chacha20 -out cookie.encrypted -K $key -iv $iv \
-        > cookie.encrypted
-    echo $iv > iv.txt
-    echo $token
-end
-
-function introspect_raw
-    set -l token $argv[1]
-    http --ignore-stdin --session=~/.local/state/atc/session.json  --form https://api.uat.ciam.tech-03.net/as/introspect.oauth2 token=$token
-end
-
-function introspect
-    introspect_raw $argv \
-        | yq --input-format json '
-      .scope |= split(" ")
-    '
-end
-
-
-function view-mr-pipeline
-    set -l projectPath (urlescape (git remote -v | perl -ln -E 'say /\/([\w-\/\.]+)\.git/' | uniq | grep -v "Jonas.Stromsodd"))
-    set -l branch (urlescape (__git.current_branch))
-    set -l mrId (glab api projects/$projectPath/merge_requests\?source_branch=$branch | jq -r ".[0].iid")
-    set -l sha (glab api projects/$projectPath/merge_requests/$mrId/pipelines | jq -r ".[0].sha")
-    glab pipeline view $sha $argv
-end
-
-function start-my-day
-    echo "Good morning!"
-
-    echo "Update fisher plugins"
-    fisher update
-
-    # echo "Updating wezterm"
-    # brew upgrade --cask wezterm@nightly --no-quarantine --greedy-latest
-
-    echo "Updating your lazy.nvim plugins"
-    nvim --headless "+Lazy! sync" +qa
-    echo
-
-    echo "Updating your Mason tools"
-    nvim --headless "+MasonUpdate" +qa
-    echo
-
-    echo "Updating intellimacs"
-    git -C ~/.intellimacs pull --rebase
-end
-
 
 function nittedal
     set -l query '
@@ -412,9 +312,9 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
 
     if test -n "$argv[2]"
         set -l parsedTime (string split : $argv[2])
-        set -f startTime (date -Iminutes -v$parsedTime[1]H -v$parsedTime[2]M)
+        set -f startTime (/bin/date -Iminutes -v$parsedTime[1]H -v$parsedTime[2]M)
     else
-        set -f startTime (date -Iminutes)
+        set -f startTime (/bin/date -Iminutes)
     end
 
     set -l variables (jq -n --arg numberOfDepartures $numberOfDepartures --arg startTime $startTime '
@@ -473,32 +373,19 @@ function verify-commits
     popd
 end
 
-set -x DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
-set -x DOCKER_DEFAULT_PLATFORM linux/amd64
-set -x DOCKER_HIDE_LEGACY_COMMANDS 1
-
-# # Use fnm
-# # NOTE: Try to keep  this at the bottom of  the file, to ensure fnm appears at "front" of the PATH variable
-# fnm env --use-on-cd --corepack-enabled | source
-# direnv hook fish | source
-
-# set -x LESSOPEN "|/opt/homebrew/Cellar/bat-extras/2024.02.12/bin/batpipe %s"
-set -e LESSCLOSE
 
 # The following will enable colors when using batpipe with less:
-set -x LESS -XFRi
-set -x BATPIPE color
 set -x FX_THEME 1
 set -x FX_SHOW_SIZE true
-# set -x BATDIFF_USE_DELTA true
+set -x BATDIFF_USE_DELTA true
 set fzf_diff_highlighter delta --paging=never --width=20
-
-alias man batman
 
 set -x GLAMOUR_STYLE dracula
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
-set -x AWS_PAGER "bat --plain --language json"
+set -x AWS_PAGER "bat --plain"
 set -x AWS_DEFAULT_OUTPUT json
+
+batman --export-env | source
 
 # tabtab source for packages
 # uninstall by removing these lines

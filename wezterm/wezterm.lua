@@ -1,5 +1,6 @@
+local os = require 'os'
 local wezterm = require 'wezterm'
-
+-- local mux = wezterm.mux
 local act = wezterm.action
 
 local config = wezterm.config_builder()
@@ -10,12 +11,25 @@ config.font = wezterm.font 'JetBrainsMono Nerd Font'
 config.color_scheme = 'Dracula (Official)'
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
-config.window_decorations = 'RESIZE | MACOS_FORCE_ENABLE_SHADOW'
--- config.window_decorations = 'RESIZE'
+
+config.adjust_window_size_when_changing_font_size = false
+config.hide_tab_bar_if_only_one_tab = true
+config.window_decorations = 'RESIZE'
 config.font_size = 16.0
+config.native_macos_fullscreen_mode = true
 
 config.window_background_opacity = 0.80
 config.macos_window_background_blur = 10
+
+config.command_palette_bg_color = '#282a36'
+config.command_palette_fg_color = '#f8f8f2'
+config.command_palette_font_size = 16.0
+config.command_palette_rows = 14
+
+config.use_dead_keys = false
+config.scrollback_lines = 5000
+
+config.leader = { key = 'b', mods = 'CMD', timeout_milliseconds = 2000 }
 
 config.keys = {
   {
@@ -46,8 +60,9 @@ config.keys = {
   {
     key = 'p',
     mods = 'SUPER',
-    action = wezterm.action.ActivateCommandPalette,
+    action = act.ActivateCommandPalette,
   },
+  { key = 'Enter', mods = 'LEADER', action = act.ActivateCopyMode },
 }
 
 config.ssh_domains = {
@@ -79,5 +94,8 @@ wezterm.on('update-status', function(window, pane)
   overrides.color_scheme = DOMAIN_TO_SCHEME[domain]
   window:set_config_overrides(overrides)
 end)
+
+local smart_splits = wezterm.plugin.require 'https://github.com/mrjones2014/smart-splits.nvim'
+smart_splits.apply_to_config(config)
 
 return config

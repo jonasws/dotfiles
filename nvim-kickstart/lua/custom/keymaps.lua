@@ -1,9 +1,10 @@
 -- Keybinds to make split navigation easier.
 --  Use CTRL+<hjkl> to switch between windows
-vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = 'Move focus to the left window' })
-vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-k>', '<C-w>k', { desc = 'Move focus to the upper window' })
+-- vim.keymap.set('n', '<C-h>', '<C-w>h', { desc = 'Move focus to the left window' })
+-- vim.keymap.set('n', '<C-l>', '<C-w>l', { desc = 'Move focus to the right window' })
+-- vim.keymap.set('n', '<C-j>', '<C-w>j', { desc = 'Move focus to the lower window' })
+-- vim.keymap.set('n', '<C-k>', '<C-w>k', { desc = 'Move focus to the upper window' })
+--
 
 --  Use space+<hjkl> to switch between windows (like in spacemacs)
 vim.keymap.set('n', '<leader>wh', '<C-w>h', { desc = 'Move focus to the left window' })
@@ -46,3 +47,14 @@ vim.keymap.set('n', ']e', diagnostic_goto(true, 'ERROR'), { desc = 'Next Error' 
 vim.keymap.set('n', '[e', diagnostic_goto(false, 'ERROR'), { desc = 'Prev Error' })
 vim.keymap.set('n', ']w', diagnostic_goto(true, 'WARN'), { desc = 'Next Warning' })
 vim.keymap.set('n', '[w', diagnostic_goto(false, 'WARN'), { desc = 'Prev Warning' })
+--
+vim.keymap.set('n', '<A-h>', require('smart-splits').resize_left)
+vim.keymap.set('n', '<A-j>', require('smart-splits').resize_down)
+vim.keymap.set('n', '<A-k>', require('smart-splits').resize_up)
+vim.keymap.set('n', '<A-l>', require('smart-splits').resize_right)
+-- moving between splits
+vim.keymap.set('n', '<C-h>', require('smart-splits').move_cursor_left)
+vim.keymap.set('n', '<C-j>', require('smart-splits').move_cursor_down)
+vim.keymap.set('n', '<C-k>', require('smart-splits').move_cursor_up)
+vim.keymap.set('n', '<C-l>', require('smart-splits').move_cursor_right)
+vim.keymap.set('n', '<C-\\>', require('smart-splits').move_cursor_previous)
