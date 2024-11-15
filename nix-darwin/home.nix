@@ -30,19 +30,19 @@
     grc
     doggo
     btop
+    yazi
+    # spotify-player
 
     wget
     tree-sitter
 
     pre-commit
     # open-policy-agent
-    regal
+    # regal
 
     # csvlens
     glow
 
-    pnpm
-    
     neovim
     git
     coreutils
@@ -53,6 +53,7 @@
     httpie
     hurl
     zoxide
+    zellij
     # starship
     go
     curl
@@ -72,12 +73,13 @@
     # tig
     lazygit
 
+    awslogs
     awscli2
     ssm-session-manager-plugin
-    awslogs
+
 
     gradle
-    _1password
+    _1password-cli
     lnav
     ranger
 
@@ -154,10 +156,10 @@
       # Set the init shell options from the one in dotfiles
       interactiveShellInit = builtins.readFile ../fish/config.fish;
       functions = {
-        _tide_item_sdkman_java = {
+        _tide_item_mise_java = {
           body = ''
-            if path is $_tide_parent_dirs/.sdkmanrc
-              sdk current java | string match -qr "Using java version (?<v>[\d.]+)"
+            if path is $_tide_parent_dirs/.mise.local.toml
+              set -l v (mise current java)
                 # print item       with this name   and this icon           with this text
                 _tide_print_item   sdkman_java          $tide_java_icon' '   $v
             end
@@ -188,10 +190,6 @@
         {
           name = "git";
           src = pkgs.fishPlugins.plugin-git.src;
-        }
-        {
-          name = "sdkman";
-          src = pkgs.fishPlugins.sdkman-for-fish.src;
         }
         {
           name = "dracula";

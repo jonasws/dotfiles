@@ -43,17 +43,28 @@
           homebrew = {
             enable = true;
             casks = [
+              "slack"
               "rectangle"
               "raycast"
               "karabiner-elements"
               "firefox@nightly"
-              "wezterm"
+              "wezterm@nightly"
             ];
             brews = [
+              "mise"
               "fnm"
+              "ymtdzzz/tap/otel-tui"
+              "pkg-config"
+              "cairo"
+              "pango"
+              "libpng"
+              "jpeg"
+              "giflib"
+              "librsvg"
             ];
             whalebrews = [
               "openpolicyagent/opa:0.67.1"
+              "ghcr.io/styrainc/regal:0.27.0"
             ];
           };
 
