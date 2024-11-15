@@ -29,7 +29,14 @@ config.command_palette_rows = 14
 config.use_dead_keys = false
 config.scrollback_lines = 5000
 
-config.leader = { key = 'b', mods = 'CMD', timeout_milliseconds = 2000 }
+-- config.window_padding = {
+--   left = 2,
+--   right = 2,
+--   top = 0,
+--   bottom = 0,
+-- }
+
+config.leader = { key = 'l', mods = 'CMD', timeout_milliseconds = 2000 }
 
 config.keys = {
   {
@@ -43,16 +50,6 @@ config.keys = {
     action = act.SplitHorizontal { domain = 'CurrentPaneDomain' },
   },
   {
-    key = ']',
-    mods = 'SUPER',
-    action = act.ActivatePaneDirection 'Next',
-  },
-  {
-    key = '[',
-    mods = 'SUPER',
-    action = act.ActivatePaneDirection 'Prev',
-  },
-  {
     key = '.',
     mods = 'SUPER',
     action = act.PaneSelect,
@@ -63,6 +60,77 @@ config.keys = {
     action = act.ActivateCommandPalette,
   },
   { key = 'Enter', mods = 'LEADER', action = act.ActivateCopyMode },
+  {
+    key = '9',
+    mods = 'ALT',
+    action = act.ShowLauncherArgs { flags = 'FUZZY|WORKSPACES' },
+  },
+  {
+    key = 'Tab',
+    mods = 'ALT',
+    action = act.SwitchWorkspaceRelative(1),
+  },
+  {
+    key = 'o',
+    mods = 'SUPER',
+    action = act.QuickSelectArgs {
+      label = 'open url',
+      patterns = {
+        [[https?:\/\/[^\s"'<>,]+]], -- URL with http or https, excluding trailing commas
+      },
+      action = wezterm.action_callback(function(window, pane)
+        local url = window:get_selection_text_for_pane(pane)
+        wezterm.open_with(url)
+      end),
+    },
+  },
+  {
+    key = 'w',
+    mods = 'LEADER',
+    action = wezterm.action_callback(function(window, pane)
+      -- Here you can dynamically construct a longer list if needed
+
+      local home = wezterm.home_dir
+      local workspaces = {
+        { id = home .. '/dnb-server-side/frontline-apis/savings-and-investments/pension-forms', label = 'Pension forms backend' },
+        { id = home .. '/dnb-web-wm-apps/', label = 'Frontend monorepo' },
+        { id = home .. '/dotfiles', label = 'Dotfiles' },
+      }
+
+      window:perform_action(
+        act.InputSelector {
+          action = wezterm.action_callback(function(inner_window, inner_pane, id, label)
+            if not id and not label then
+              wezterm.log_info 'cancelled'
+            else
+              wezterm.log_info('id = ' .. id)
+              wezterm.log_info('label = ' .. label)
+              inner_window:perform_action(
+                act.SwitchToWorkspace {
+                  name = label,
+                  spawn = {
+                    label = 'Workspace: ' .. label,
+                    cwd = id,
+                  },
+                },
+                inner_pane
+              )
+            end
+          end),
+          title = 'Choose Workspace',
+          choices = workspaces,
+          fuzzy = true,
+          fuzzy_description = 'Fuzzy find and/or make a workspace',
+        },
+        pane
+      )
+    end),
+  },
+  {
+    key = 'T',
+    mods = 'SUPER|SHIFT',
+    action = act.Search { Regex = '[0-9a-f]{32}' },
+  },
 }
 
 config.ssh_domains = {
