@@ -60,11 +60,8 @@
               "libpng"
               "jpeg"
               "giflib"
+              "superfile"
               "librsvg"
-            ];
-            whalebrews = [
-              "openpolicyagent/opa:0.67.1"
-              "ghcr.io/styrainc/regal:0.27.0"
             ];
           };
 

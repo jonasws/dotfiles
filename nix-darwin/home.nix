@@ -55,7 +55,7 @@
     zoxide
     zellij
     # starship
-    go
+    # go
     curl
     fd
     jq

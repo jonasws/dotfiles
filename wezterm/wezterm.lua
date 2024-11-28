@@ -93,7 +93,7 @@ config.keys = {
       local home = wezterm.home_dir
       local workspaces = {
         { id = home .. '/dnb-server-side/frontline-apis/savings-and-investments/pension-forms', label = 'Pension forms backend' },
-        { id = home .. '/dnb-web-wm-apps/', label = 'Frontend monorepo' },
+        { id = home .. '/dnb-web-wm-apps/apps/pension', label = 'Frontend monorepo (pension)' },
         { id = home .. '/dotfiles', label = 'Dotfiles' },
       }
 
