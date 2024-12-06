@@ -80,7 +80,7 @@
 
     gradle
     _1password-cli
-    lnav
+    # lnav
     ranger
 
     ookla-speedtest

@@ -51,6 +51,7 @@
               "wezterm@nightly"
             ];
             brews = [
+              "lnav"
               "mise"
               "fnm"
               "ymtdzzz/tap/otel-tui"
