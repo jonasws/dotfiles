@@ -110,6 +110,7 @@ set -x EDITOR nvim
 
 alias vim nvim
 alias n nvim
+abbr -a p pnpm
 set fzf_directory_opts --multi --bind "ctrl-o:execute($EDITOR {+} &> /dev/tty),alt-o:become($EDITOR {+} &> /dev/tty)"
 
 
