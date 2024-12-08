@@ -411,7 +411,7 @@ batman --export-env | source
 # uninstall by removing these lines
 [ -f ~/.config/tabtab/fish/__tabtab.fish ]; and . ~/.config/tabtab/fish/__tabtab.fish; or true
 
-source ~/.config/op/plugins.sh
+[ -f ~/.config/tabtab/fish/__tabtab.fish ]; and source ~/.config/op/plugins.sh; or true
 
 zoxide init fish | source
-# fnm env --use-on-cd --corepack-enabled --shell fish | source
+/opt/homebrew/bin/mise activate fish | source
