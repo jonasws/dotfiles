@@ -35,6 +35,28 @@ config.scrollback_lines = 5000
 --   top = 0,
 --   bottom = 0,
 -- }
+--
+
+local scroll_interval = 5
+config.key_tables = {
+  scrolling = {
+    { key = 'j', mods = 'NONE', action = act.ScrollByLine(scroll_interval) },
+    { key = 'k', mods = 'NONE', action = act.ScrollByLine(-scroll_interval) },
+
+    { key = 'u', mods = 'CTRL', action = act.ScrollByPage(-0.5) },
+    { key = 'd', mods = 'CTRL', action = act.ScrollByPage(0.5) },
+
+    { key = 'b', mods = 'CTRL', action = act.ScrollByPage(-1) },
+    { key = 'f', mods = 'CTRL', action = act.ScrollByPage(1) },
+
+    { key = 'g', mods = 'SHIFT', action = act.ScrollToBottom },
+    { key = 'g', mods = 'NONE', action = act.ScrollToTop },
+
+    { key = '/', mods = 'NONE', action = act.Search { CaseSensitiveString = '' } },
+    { key = 'Escape', mods = 'NONE', action = act.PopKeyTable },
+    { key = 'q', mods = 'NONE', action = act.PopKeyTable },
+  },
+}
 
 config.leader = { key = 'l', mods = 'CMD', timeout_milliseconds = 2000 }
 
@@ -83,6 +105,27 @@ config.keys = {
         wezterm.open_with(url)
       end),
     },
+  },
+  {
+    key = 's',
+    mods = 'SUPER',
+    action = act.ActivateKeyTable {
+      name = 'scrolling',
+      one_shot = false, -- Stays in the mode until Escape is pressed
+    },
+    -- action = function(window, pane)
+    --   -- Store the current scroll position
+    --   original_scroll_position = pane:get_scrollback_lines(0) -- Get the current scroll position
+    --   -- Activate the scrolling key table
+    --   window:perform_action(
+    --     wezterm.action.ActivateKeyTable {
+    --       name = 'scrolling',
+    --       one_shot = false, -- Stay in scrolling mode until Escape is pressed
+    --     },
+    --     pane
+    --   )
+    --
+    -- end,
   },
   {
     key = 'w',
