@@ -37,7 +37,9 @@ nnoremap ]] *
 nnoremap [[ #
 
 " source ~/.intellimacs/extra.vim
-" source ~/.intellimacs/major.vim
+source ~/.intellimacs/major.vim
+
+let g:WhichKeyDesc_Major_Refactoring = "<leader>mr +refactor"
 source ~/.intellimacs/major/refactoring.vim
 source ~/.intellimacs/which-key.vim
 
@@ -93,6 +95,9 @@ nnoremap <leader>js    :action GotoSymbol<CR>
 vnoremap <leader>js    :action GotoSymbol<CR>
 
 nnoremap <leader>jj    :action AceAction<CR>
+
+set ideajoin
+set ideaput
 
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'
