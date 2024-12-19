@@ -324,7 +324,7 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
     set -l variables (jq -n --arg numberOfDepartures $numberOfDepartures --arg startTime $startTime '
     {
         stopPlace: "NSR:StopPlace:59872",
-        lines: ["GJB:Line:R30", "GJB:Line:L3"],
+        lines: ["VYG:Line:RE30", "VYG:Line:R31"],
         numberOfDepartures: $numberOfDepartures | tonumber,
         startTime: $startTime
     } | @json')
