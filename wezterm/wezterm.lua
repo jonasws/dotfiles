@@ -127,48 +127,6 @@ config.keys = {
     -- end,
   },
   {
-    key = 'w',
-    mods = 'LEADER',
-    action = wezterm.action_callback(function(window, pane)
-      -- Here you can dynamically construct a longer list if needed
-
-      local home = wezterm.home_dir
-      local workspaces = {
-        { id = home .. '/dnb-server-side/frontline-apis/savings-and-investments/pension-forms', label = 'Pension forms backend' },
-        { id = home .. '/dnb-web-wm-apps/apps/pension', label = 'Frontend monorepo (pension)' },
-        { id = home .. '/dotfiles', label = 'Dotfiles' },
-      }
-
-      window:perform_action(
-        act.InputSelector {
-          action = wezterm.action_callback(function(inner_window, inner_pane, id, label)
-            if not id and not label then
-              wezterm.log_info 'cancelled'
-            else
-              wezterm.log_info('id = ' .. id)
-              wezterm.log_info('label = ' .. label)
-              inner_window:perform_action(
-                act.SwitchToWorkspace {
-                  name = label,
-                  spawn = {
-                    label = 'Workspace: ' .. label,
-                    cwd = id,
-                  },
-                },
-                inner_pane
-              )
-            end
-          end),
-          title = 'Choose Workspace',
-          choices = workspaces,
-          fuzzy = true,
-          fuzzy_description = 'Fuzzy find and/or make a workspace',
-        },
-        pane
-      )
-    end),
-  },
-  {
     key = 'T',
     mods = 'SUPER|SHIFT',
     action = act.Search { Regex = '[0-9a-f]{32}' },

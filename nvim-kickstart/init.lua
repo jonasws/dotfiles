@@ -203,16 +203,6 @@ vim.keymap.set('n', '<down>', '<cmd>echo "Use j to move!!"<CR>')
 --
 
 vim.filetype.add {
-  filename = {
-    ['gitlab-ci.yml'] = 'yaml.gitlab',
-    ['gitlab-ci.yaml'] = 'yaml.gitlab',
-    ['.gitlab-ci.yml'] = 'yaml.gitlab',
-    ['.gitlab-ci.yaml'] = 'yaml.gitlab',
-  },
-  pattern = {
-    ['*/.gitlab/*.yml'] = 'yaml.gitlab',
-    ['*/.gitlab/*.yaml'] = 'yaml.gitlab',
-  },
   extension = {
     ['http'] = 'http',
   },
@@ -259,6 +249,18 @@ vim.api.nvim_create_augroup('json', { clear = true })
 vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
   group = 'json',
   pattern = '*.json',
+  callback = function()
+    vim.bo.expandtab = true -- Convert tabs to spaces
+    vim.bo.shiftwidth = 2 -- Use 2 spaces for indentation
+    vim.bo.softtabstop = 2 -- Use 2 spaces for a tab press
+    vim.bo.tabstop = 2 -- Width of a tab character
+  end,
+})
+
+vim.api.nvim_create_augroup('TS', { clear = true })
+vim.api.nvim_create_autocmd({ 'BufNewFile', 'BufRead' }, {
+  group = 'TS',
+  pattern = '*.ts',
   callback = function()
     vim.bo.expandtab = true -- Convert tabs to spaces
     vim.bo.shiftwidth = 2 -- Use 2 spaces for indentation
@@ -621,7 +623,7 @@ require('lazy').setup {
       --        For example, to see the options for `lua_ls`, you could go to: https://luals.github.io/wiki/settings/
       local servers = {
         -- clangd = {},
-        gopls = {},
+        -- gopls = {},
         -- pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
@@ -634,10 +636,9 @@ require('lazy').setup {
         -- eslint = {},
         yamlls = {},
         biome = {},
-        gitlab_ci_ls = {},
-        regal = {
-          root_dir = require('lspconfig.util').root_pattern '.git',
-        },
+        -- regal = {
+        --   root_dir = require('lspconfig.util').root_pattern '.git',
+        -- },
         terraformls = {},
         --
 
@@ -699,7 +700,7 @@ require('lazy').setup {
           end,
         },
       }
-      require('lspconfig').regal.setup(servers.regal)
+      -- require('lspconfig').regal.setup(servers.regal)
     end,
   },
 
