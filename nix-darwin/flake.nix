@@ -49,6 +49,7 @@
               "karabiner-elements"
               "firefox@nightly"
               "wezterm@nightly"
+              "ghostty"
             ];
             brews = [
               "lnav"
