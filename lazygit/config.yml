@@ -1,4 +1,4 @@
-# yaml-language-server: $schema=./schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
 #
 os:
   editPreset: nvim-remote
@@ -21,9 +21,6 @@ git:
     signOff: false
   parseEmoji: true
     # externalDiffCommand: difft --color=always
-
-services:
-  gitlab.tech.dnb.no: 'gitlab:gitlab.tech.dnb.no'
 
 update:
   method: never

@@ -3,6 +3,8 @@ set -x LC_ALL en_US.UTF-8
 # set -x PATH ~/.local-fish/bin ~/.local-nvim/bin $PATH
 set -x PATH /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profiles/per-user/jonasws/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin /opt/whalebrew/bin /opt/homebrew/bin /opt/homebrew/opt/sphinx-doc/bin /Users/jonasws/.emacs.d/bin /Applications/IntelliJ IDEA 2023.3 EAP.app/Contents/MacOS /opt/homebrew/opt/libiconv/bin /opt/homebrew/sbin /opt/homebrew/opt/sqlite/bin /opt/homebrew/opt/make/libexec/gnubin /Applications/WezTerm.app/Contents/MacOS /opt/homebrew/opt/jpeg/bin /opt/homebrew/opt/fzf/bin /usr/local/bin /System/Cryptexes/App/usr/bin /usr/bin /bin /usr/sbin /sbin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin $PATH
 
+set -x XDG_CONFIG_HOME "$HOME/.config"
+
 
 set -x DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
 
@@ -31,6 +33,15 @@ set fish_color_autosuggestion white
 
 set -x VISUAL nvim
 set -x EDITOR nvim
+
+# Maven 1password integration goodies
+function mvn
+    if isatty stdout
+        op run -- mvn --color=always $argv
+    else
+        op run -- mvn $argv
+    end
+end
 
 alias vim nvim
 alias n nvim
@@ -106,6 +117,20 @@ abbr -a lg lazygit
 
 abbr -a gp!! "git push --force"
 
+function console
+    set -l profile $argv[1]
+    if test -z $profile
+        echo "Usage: console <profile>"
+        return
+    end
+
+    set -l roleArn (command aws configure get --profile $profile role_arn)
+    set -l signinUrl (echo $roleArn | awk -F: -v displayName=$profile '{split($NF, role, "/"); printf "https://signin.aws.amazon.com/switchrole?account=%s&roleName=%s&displayName=%s\n", $5, role[2], displayName}')
+    echo Opening $signinUrl in the browser
+    open -u $signinUrl
+end
+
+complete -f -c console -a "$(command aws configure list-profiles | grep -v \\-auth)"
 
 # Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
 
@@ -243,3 +268,5 @@ batman --export-env | source
 
 zoxide init fish | source
 /opt/homebrew/bin/mise activate fish | source
+
+source ~/.config/op/plugins.sh
