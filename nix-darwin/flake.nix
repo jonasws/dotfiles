@@ -63,6 +63,8 @@
               "jpeg"
               "giflib"
               "superfile"
+              "bat"
+              "bat-extras"
               "librsvg"
             ];
           };

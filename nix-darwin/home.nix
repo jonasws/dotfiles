@@ -48,8 +48,8 @@
     coreutils
     openssl
 
-    bat
-    bat-extras.batman
+    # bat
+    # bat-extras.batman
     httpie
     hurl
     zoxide
