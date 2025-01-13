@@ -75,7 +75,6 @@
 
     awslogs
     awscli2
-    aws-vault
     ssm-session-manager-plugin
 
 
