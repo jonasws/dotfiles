@@ -4,6 +4,8 @@ local act = wezterm.action
 
 local config = wezterm.config_builder()
 
+config.term = 'wezterm'
+
 -- config.font = wezterm.font 'JetBrainsMono Nerd Font'
 -- config.default_prog = { '/Users/jonasws/.local-fish/bin/fish', '-l' }
 

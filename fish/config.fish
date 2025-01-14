@@ -6,7 +6,7 @@ set -x PATH /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profi
 set -x XDG_CONFIG_HOME "$HOME/.config"
 
 
-set -x DOCKER_HOST "unix://$HOME/.colima/default/docker.sock"
+# set -x DOCKER_HOST "unix://$HOME/.config/colima/default/docker.sock"
 
 fish_config theme choose "Dracula Official"
 
@@ -125,9 +125,11 @@ function console
     end
 
     set -l roleArn (command aws configure get --profile $profile role_arn)
-    set -l signinUrl (echo $roleArn | awk -F: -v displayName=$profile '{split($NF, role, "/"); printf "https://signin.aws.amazon.com/switchrole?account=%s&roleName=%s&displayName=%s\n", $5, role[2], displayName}')
-    echo Opening $signinUrl in the browser
-    open -u $signinUrl
+    set -l color (command aws configure get --profile $profile color; or echo purple)
+
+    set -l containerName (echo $profile | awk -F'-' 'BEGIN{OFS=FS} {NF--; print}')
+    set -l signinUrl (echo $roleArn | awk -F: -v displayName=$profile '{split($NF, role, "/"); printf "https://signin.aws.amazon.com/switchrole?account=%s&roleName=%s&displayName=%s\n", $5, role[2], displayName}' | string escape --style=url)
+    /Applications/Firefox\ Nightly.app/Contents/MacOS/firefox "ext+container:name=$containerName&color=$color&url=$signinUrl"
 end
 
 complete -f -c console -a "$(command aws configure list-profiles | grep -v \\-auth)"
@@ -255,8 +257,8 @@ set fzf_diff_highlighter delta --paging=never --width=20
 
 set -x GLAMOUR_STYLE dracula
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
-set -x AWS_PAGER "bat --plain"
-set -x AWS_DEFAULT_OUTPUT json
+# set -x AWS_PAGER "bat --plain"
+# set -x AWS_DEFAULT_OUTPUT json
 
 batman --export-env | source
 
@@ -268,5 +270,6 @@ batman --export-env | source
 
 zoxide init fish | source
 /opt/homebrew/bin/mise activate fish | source
-
 source ~/.config/op/plugins.sh
+
+# source ~/.config/op/plugins.sh

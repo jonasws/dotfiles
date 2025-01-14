@@ -36,6 +36,9 @@ nmap [g :action VcsShowPrevChangeMarker<CR><ESC>
 nnoremap ]] *
 nnoremap [[ #
 
+set visualbell
+set noerrorbells
+
 " source ~/.intellimacs/extra.vim
 source ~/.intellimacs/major.vim
 

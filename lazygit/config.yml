@@ -10,7 +10,7 @@ gui:
 disableStartupPopups: true
 
 git:
-  autoFetch: false
+  autoFetch: true
   log:
     order: default
   paging:
