@@ -10,8 +10,50 @@ set -x XDG_CONFIG_HOME "$HOME/.config"
 
 fish_config theme choose "Dracula Official"
 
-# tide configure --auto --style=Rainbow --prompt_colors='True color' --show_time=No --rainbow_prompt_separators=Angled --powerline_prompt_heads=Sharp --powerline_prompt_tails=Flat --powerline_prompt_style='Two lines, character' --prompt_connection=Disconnected --powerline_right_prompt_frame=No --prompt_spacing=Sparse --icons='Few icons' --transient=No
-# tide reload
+
+set -l white f8f8f2
+set -l orange ffb86c
+set -l green 50fa7b
+set -l blue 6272a4
+set -l draculaBg 282a36
+
+
+set -U tide_mise_java_color $draculaBg
+set -U tide_mise_java_bg_color $orange
+
+set -U tide_pwd_color_anchors $white
+set -U tide_pwd_color_dirs $white
+set -U tide_pwd_color_truncated_dirs $white
+set -U tide_pwd_bg_color $blue
+
+set -U tide_time_color $draculaBg
+
+set -U tide_git_bg_color $green
+set -U tide_git_color_branch $draculaBg
+set -U tide_git_bg_color_unstable $orange
+set -U tide_git_color_upsream $draculaBg
+set -U tide_git_color_untracked $draculaBg
+set -U tide_git_color_stash $draculaBg
+set -U tide_git_color_staged $draculaBg
+set -U tide_git_color_operation $draculaBg
+set -U tide_git_color_dirty $draculaBg
+set -U tide_git_color_conflicted $draculaBg
+set -U tide_git_color_branch $draculaBg
+
+set -U tide_git_color $draculaBg
+
+set -U tide_time_color $draculaBg
+set -U tide_time_bg_color $white
+
+set -U tide_aws_vault_color $draculaBg
+set -U tide_aws_vault_bg_color $white
+
+set -U tide_character_color 50fa7b
+set -U tide_character_color_failure ff5555
+
+set -U tide_right_prompt_items status cmd_duration context jobs node python rustc pulumi go terraform nix_shell time aws_vault mise_java
+
+# tide configure --auto --style=Rainbow --prompt_colors='True color' --show_time='24-hour format' --rainbow_prompt_separators=Angled --powerline_prompt_heads=Sharp --powerline_prompt_tails=Flat --powerline_prompt_style='Two lines, character' --prompt_connection=Disconnected --powerline_right_prompt_frame=No --prompt_spacing=Sparse --icons='Few icons' --transient=No
 
 alias grt "cd (git rev-parse --show-toplevel)"
 alias top btop
@@ -124,15 +166,24 @@ function console
         return
     end
 
-    set -l roleArn (command aws configure get --profile $profile role_arn)
-    set -l color (command aws configure get --profile $profile color; or echo purple)
+    set -l roleArn (aws configure get --profile $profile role_arn)
+    set -l color (aws configure get --profile $profile color; or echo purple)
 
     set -l containerName (echo $profile | awk -F'-' 'BEGIN{OFS=FS} {NF--; print}')
     set -l signinUrl (echo $roleArn | awk -F: -v displayName=$profile '{split($NF, role, "/"); printf "https://signin.aws.amazon.com/switchrole?account=%s&roleName=%s&displayName=%s\n", $5, role[2], displayName}' | string escape --style=url)
     /Applications/Firefox\ Nightly.app/Contents/MacOS/firefox "ext+container:name=$containerName&color=$color&url=$signinUrl"
 end
 
-complete -f -c console -a "$(command aws configure list-profiles | grep -v \\-auth)"
+complete -f -c console -a "(aws-vault list --profiles | grep -v mixin)"
+complete --command aws-vault \
+    --arguments 'help add list rotate exec remove login' \
+    --condition 'not __fish_seen_subcommand_from add list rotate exec remove login' \
+    --exclusive
+
+complete --command aws-vault \
+    --condition '__fish_seen_subcommand_from exec' \
+    --exclusive \
+    --arguments '(aws-vault list --profiles | grep -v mixin)'
 
 # Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
 

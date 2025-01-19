@@ -160,8 +160,14 @@
           body = ''
             if path is $_tide_parent_dirs/.mise.local.toml
               set -l v (mise current java)
-                # print item       with this name   and this icon           with this text
-                _tide_print_item   sdkman_java          $tide_java_icon' '   $v
+                _tide_print_item   mise_java          "$tide_java_icon $v"
+            end
+                '';
+        };
+        _tide_item_aws_vault = {
+          body = ''
+            if test -n "$AWS_VAULT"
+                _tide_print_item  aws_vault           "$tide_aws_icon $AWS_VAULT $AWS_REGION"
             end
                 '';
         };

@@ -636,10 +636,8 @@ require('lazy').setup {
         -- eslint = {},
         yamlls = {},
         biome = {},
-        -- regal = {
-        --   root_dir = require('lspconfig.util').root_pattern '.git',
-        -- },
         terraformls = {},
+        --
         --
 
         lua_ls = {
@@ -700,7 +698,6 @@ require('lazy').setup {
           end,
         },
       }
-      -- require('lspconfig').regal.setup(servers.regal)
     end,
   },
 
