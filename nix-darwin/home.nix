@@ -189,10 +189,10 @@
           name = "bd";
           src = pkgs.fishPlugins.fish-bd.src;
         }
-        {
-          name = "fzf-fish";
-          src = pkgs.fishPlugins.fzf-fish.src;
-        }
+        # {
+        #   name = "fzf-fish";
+        #   src = pkgs.fishPlugins.fzf-fish.src;
+        # }
         {
           name = "git";
           src = pkgs.fishPlugins.plugin-git.src;

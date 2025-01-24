@@ -1,7 +1,7 @@
 set -x LC_ALL en_US.UTF-8
 # set -x PATH ~/.cargo/bin /opt/homebrew/opt/grep/libexec/gnubin /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
 # set -x PATH ~/.local-fish/bin ~/.local-nvim/bin $PATH
-set -x PATH /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profiles/per-user/jonasws/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin /opt/whalebrew/bin /opt/homebrew/bin /opt/homebrew/opt/sphinx-doc/bin /Users/jonasws/.emacs.d/bin /Applications/IntelliJ IDEA 2023.3 EAP.app/Contents/MacOS /opt/homebrew/opt/libiconv/bin /opt/homebrew/sbin /opt/homebrew/opt/sqlite/bin /opt/homebrew/opt/make/libexec/gnubin /Applications/WezTerm.app/Contents/MacOS /opt/homebrew/opt/jpeg/bin /opt/homebrew/opt/fzf/bin /usr/local/bin /System/Cryptexes/App/usr/bin /usr/bin /bin /usr/sbin /sbin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin $PATH
+set -x PATH /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profiles/per-user/jonasws/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin /opt/whalebrew/bin /opt/homebrew/bin /opt/homebrew/opt/sphinx-doc/bin /Users/jonasws/.emacs.d/bin /opt/homebrew/opt/libiconv/bin /opt/homebrew/sbin /opt/homebrew/opt/sqlite/bin /opt/homebrew/opt/make/libexec/gnubin /Applications/WezTerm.app/Contents/MacOS /opt/homebrew/opt/jpeg/bin /opt/homebrew/opt/fzf/bin /usr/local/bin /System/Cryptexes/App/usr/bin /usr/bin /bin /usr/sbin /sbin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin $PATH
 
 set -x XDG_CONFIG_HOME "$HOME/.config"
 
@@ -28,6 +28,7 @@ set -U tide_pwd_bg_color $blue
 
 set -U tide_time_color $draculaBg
 
+set -U tide_git_color $draculaBg
 set -U tide_git_bg_color $green
 set -U tide_git_color_branch $draculaBg
 set -U tide_git_bg_color_unstable $orange
@@ -40,18 +41,16 @@ set -U tide_git_color_dirty $draculaBg
 set -U tide_git_color_conflicted $draculaBg
 set -U tide_git_color_branch $draculaBg
 
-set -U tide_git_color $draculaBg
+set -U tide_aws_color $draculaBg
+set -U tide_aws_bg_color $white
 
 set -U tide_time_color $draculaBg
 set -U tide_time_bg_color $white
 
-set -U tide_aws_vault_color $draculaBg
-set -U tide_aws_vault_bg_color $white
-
 set -U tide_character_color 50fa7b
 set -U tide_character_color_failure ff5555
 
-set -U tide_right_prompt_items status cmd_duration context jobs node python rustc pulumi go terraform nix_shell time aws_vault mise_java
+set -U tide_right_prompt_items status cmd_duration context jobs node python rustc pulumi go terraform nix_shell time aws mise_java
 
 # tide configure --auto --style=Rainbow --prompt_colors='True color' --show_time='24-hour format' --rainbow_prompt_separators=Angled --powerline_prompt_heads=Sharp --powerline_prompt_tails=Flat --powerline_prompt_style='Two lines, character' --prompt_connection=Disconnected --powerline_right_prompt_frame=No --prompt_spacing=Sparse --icons='Few icons' --transient=No
 
@@ -88,8 +87,6 @@ end
 alias vim nvim
 alias n nvim
 abbr -a p pnpm
-set fzf_directory_opts --multi --bind "ctrl-o:execute($EDITOR {+} &> /dev/tty),alt-o:become($EDITOR {+} &> /dev/tty)"
-
 
 abbr -a - "cd -"
 abbr -a gsma "git switch main"
@@ -107,7 +104,7 @@ set -x FZF_OPEN_COMMAND "fd --type f . \$dir"
 
 set -x FZF_ENABLE_OPEN_PREVIEW 1
 set -x FZF_LEGACY_KEYBINDINGS 0
-set -x FZF_COMPLETE 2
+set -x FZF_COMPLETE 0
 
 set -x FZF_CTRL_T_OPTS "
   --preview 'bat -n --color=always {}'
@@ -159,34 +156,8 @@ abbr -a lg lazygit
 
 abbr -a gp!! "git push --force"
 
-function console
-    set -l profile $argv[1]
-    if test -z $profile
-        echo "Usage: console <profile>"
-        return
-    end
-
-    set -l roleArn (aws configure get --profile $profile role_arn)
-    set -l color (aws configure get --profile $profile color; or echo purple)
-
-    set -l containerName (echo $profile | awk -F'-' 'BEGIN{OFS=FS} {NF--; print}')
-    set -l signinUrl (echo $roleArn | awk -F: -v displayName=$profile '{split($NF, role, "/"); printf "https://signin.aws.amazon.com/switchrole?account=%s&roleName=%s&displayName=%s\n", $5, role[2], displayName}' | string escape --style=url)
-    /Applications/Firefox\ Nightly.app/Contents/MacOS/firefox "ext+container:name=$containerName&color=$color&url=$signinUrl"
-end
-
-complete -f -c console -a "(aws-vault list --profiles | grep -v mixin)"
-complete --command aws-vault \
-    --arguments 'help add list rotate exec remove login' \
-    --condition 'not __fish_seen_subcommand_from add list rotate exec remove login' \
-    --exclusive
-
-complete --command aws-vault \
-    --condition '__fish_seen_subcommand_from exec' \
-    --exclusive \
-    --arguments '(aws-vault list --profiles | grep -v mixin)'
 
 # Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
-
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
 
 
@@ -308,8 +279,12 @@ set fzf_diff_highlighter delta --paging=never --width=20
 
 set -x GLAMOUR_STYLE dracula
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
-# set -x AWS_PAGER "bat --plain"
-# set -x AWS_DEFAULT_OUTPUT json
+set -x AWS_PAGER "bat --plain --language json"
+# set -x AWS_DEFAULT_REGION eu-west-1
+set -x AWS_DEFAULT_OUTPUT json
+set -x AWS_CLI_AUTO_PROMPT on-partial
+set -x AWS_VAULT_FILE_PASSPHRASE "op://Employee/aws-vault password/password"
+set -x AWS_VAULT_BACKEND file
 
 batman --export-env | source
 
@@ -323,4 +298,44 @@ zoxide init fish | source
 /opt/homebrew/bin/mise activate fish | source
 source ~/.config/op/plugins.sh
 
-# source ~/.config/op/plugins.sh
+function tv_smart_autocomplete
+    set -l current_prompt (commandline -cp)
+
+    set -l output (tv --autocomplete-prompt "$current_prompt")
+
+    if test -n "$output"
+        # add a space if the prompt does not end with one (unless the prompt is an implicit cd, e.g. '\.')
+        string match -r '.*( |./)$' -- "$current_prompt" || set current_prompt "$current_prompt "
+        commandline -r "$current_prompt$output"
+    end
+end
+
+function tv_shell_history
+    set -l current_prompt (commandline -cp)
+
+    set -l output (tv fish-history --input "$current_prompt")
+
+    if test -n "$output"
+        commandline -r "$output"
+    end
+end
+
+function tv_find_files_with_prefilled_input
+    set -l current_prompt (commandline -ct)
+
+    set -l output (tv files --input "$current_prompt")
+    #
+    if test -n "$output"
+        # add a space if the prompt does not end with one (unless the prompt is an implicit cd, e.g. '\.')
+        set -l output (echo $output | sed "s/^$current_prompt//")
+        commandline -i "$output"
+    end
+end
+
+bind \cf tv_find_files_with_prefilled_input
+bind -M insert \cf tv_find_files_with_prefilled_input
+
+bind \ct tv_smart_autocomplete
+bind \cr tv_shell_history
+bind -M insert \ct tv_smart_autocomplete
+bind -M insert \cr tv_shell_history
