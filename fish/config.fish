@@ -288,12 +288,6 @@ set -x AWS_VAULT_BACKEND file
 
 batman --export-env | source
 
-# tabtab source for packages
-# uninstall by removing these lines
-[ -f ~/.config/tabtab/fish/__tabtab.fish ]; and . ~/.config/tabtab/fish/__tabtab.fish; or true
-
-[ -f ~/.config/tabtab/fish/__tabtab.fish ]; and source ~/.config/op/plugins.sh; or true
-
 zoxide init fish | source
 /opt/homebrew/bin/mise activate fish | source
 source ~/.config/op/plugins.sh
@@ -319,22 +313,6 @@ function tv_shell_history
         commandline -r "$output"
     end
 end
-
-function tv_find_files_with_prefilled_input
-    set -l current_prompt (commandline -ct)
-
-    set -l output (tv files --input "$current_prompt")
-    #
-    if test -n "$output"
-        # add a space if the prompt does not end with one (unless the prompt is an implicit cd, e.g. '\.')
-        set -l output (echo $output | sed "s/^$current_prompt//")
-        commandline -i "$output"
-    end
-end
-
-bind \cf tv_find_files_with_prefilled_input
-bind -M insert \cf tv_find_files_with_prefilled_input
-
 bind \ct tv_smart_autocomplete
 bind \cr tv_shell_history
 bind -M insert \ct tv_smart_autocomplete
