@@ -6,7 +6,10 @@ set -x PATH /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profi
 set -x XDG_CONFIG_HOME "$HOME/.config"
 
 
-# set -x DOCKER_HOST "unix://$HOME/.config/colima/default/docker.sock"
+set -x DOCKER_HOST "unix://$HOME/.config/colima/default/docker.sock"
+set -x TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE /var/run/docker.sock
+set -x TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE /var/run/docker.sock
+set -x TESTCONTAINERS_HOST_OVERRIDE 192.168.64.6
 
 fish_config theme choose "Dracula Official"
 
@@ -75,14 +78,14 @@ set fish_color_autosuggestion white
 set -x VISUAL nvim
 set -x EDITOR nvim
 
-# Maven 1password integration goodies
-function mvn
-    if isatty stdout
-        op run -- mvn --color=always $argv
-    else
-        op run -- mvn $argv
-    end
-end
+# # Maven 1password integration goodies
+# function mvn
+#     if isatty stdout
+#         op run -- mvn --color=always $argv
+#     else
+#         op run -- mvn $argv
+#     end
+# end
 
 alias vim nvim
 alias n nvim
