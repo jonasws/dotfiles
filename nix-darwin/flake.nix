@@ -51,6 +51,7 @@
               "wezterm@nightly"
             ];
             brews = [
+              "starship"
               "lnav"
               "mise"
               "fnm"

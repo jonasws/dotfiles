@@ -6,9 +6,7 @@ set -x PATH /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profi
 set -x XDG_CONFIG_HOME "$HOME/.config"
 
 
-set -x DOCKER_HOST "unix://$HOME/.config/colima/default/docker.sock"
-set -x TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE /var/run/docker.sock
-set -x TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE /var/run/docker.sock
+set -x TESCONTAINERS_DOCKER_SOCKET_OVERRIDE /var/run/docker.sock
 set -x TESTCONTAINERS_HOST_OVERRIDE 192.168.64.6
 
 fish_config theme choose "Dracula Official"
@@ -156,6 +154,7 @@ abbr -a gsm "git switch master"
 abbr -a tf terraform
 
 abbr -a lg lazygit
+abbr -a lzd lazydocker
 
 abbr -a gp!! "git push --force"
 
@@ -289,34 +288,10 @@ set -x AWS_CLI_AUTO_PROMPT on-partial
 set -x AWS_VAULT_FILE_PASSPHRASE "op://Employee/aws-vault password/password"
 set -x AWS_VAULT_BACKEND file
 
-batman --export-env | source
+if status --is-interactive
+    batman --export-env | source
 
-zoxide init fish | source
-/opt/homebrew/bin/mise activate fish | source
-source ~/.config/op/plugins.sh
-
-function tv_smart_autocomplete
-    set -l current_prompt (commandline -cp)
-
-    set -l output (tv --autocomplete-prompt "$current_prompt")
-
-    if test -n "$output"
-        # add a space if the prompt does not end with one (unless the prompt is an implicit cd, e.g. '\.')
-        string match -r '.*( |./)$' -- "$current_prompt" || set current_prompt "$current_prompt "
-        commandline -r "$current_prompt$output"
-    end
+    zoxide init fish | source
+    /opt/homebrew/bin/mise activate fish | source
+    source ~/.config/op/plugins.sh
 end
-
-function tv_shell_history
-    set -l current_prompt (commandline -cp)
-
-    set -l output (tv fish-history --input "$current_prompt")
-
-    if test -n "$output"
-        commandline -r "$output"
-    end
-end
-bind \ct tv_smart_autocomplete
-bind \cr tv_shell_history
-bind -M insert \ct tv_smart_autocomplete
-bind -M insert \cr tv_shell_history
