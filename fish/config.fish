@@ -6,8 +6,8 @@ set -x PATH /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profi
 set -x XDG_CONFIG_HOME "$HOME/.config"
 
 
-set -x TESCONTAINERS_DOCKER_SOCKET_OVERRIDE /var/run/docker.sock
-set -x TESTCONTAINERS_HOST_OVERRIDE 192.168.64.6
+# set -x TESCONTAINERS_DOCKER_SOCKET_OVERRIDE /var/run/docker.sock
+# set -x TESTCONTAINERS_HOST_OVERRIDE 192.168.64.6
 
 fish_config theme choose "Dracula Official"
 

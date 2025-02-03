@@ -13,6 +13,8 @@ config.color_scheme = 'Dracula (Official)'
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 
+config.enable_kitty_keyboard = true
+
 config.adjust_window_size_when_changing_font_size = false
 config.hide_tab_bar_if_only_one_tab = true
 config.window_decorations = 'RESIZE'
@@ -62,6 +64,11 @@ config.key_tables = {
 config.leader = { key = 'l', mods = 'CMD', timeout_milliseconds = 2000 }
 
 config.keys = {
+  {
+    key = 'Enter',
+    mods = 'ALT',
+    action = wezterm.action.DisableDefaultAssignment,
+  },
   {
     key = 'd',
     mods = 'SUPER',
