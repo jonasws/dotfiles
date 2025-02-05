@@ -86,6 +86,7 @@ set -x EDITOR nvim
 # end
 
 alias vim nvim
+alias http xh
 alias n nvim
 abbr -a p pnpm
 
