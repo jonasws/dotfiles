@@ -49,7 +49,8 @@
 
     # bat
     # bat-extras.batman
-    httpie
+    # httpie
+    xh
     hurl
     zoxide
     zellij
