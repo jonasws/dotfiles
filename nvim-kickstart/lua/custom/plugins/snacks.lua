@@ -30,7 +30,6 @@ return {
       statuscolumn = { enabled = true },
       words = { enabled = true },
     },
-
     keys = {
       -- Top Pickers & Explorer
       {

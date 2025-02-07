@@ -36,6 +36,7 @@
     tree-sitter
 
     pre-commit
+    carapace
     # open-policy-agent
     # regal
 

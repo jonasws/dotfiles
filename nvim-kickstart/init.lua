@@ -905,6 +905,7 @@ require('lazy').setup {
       ---@diagnostic disable-next-line: missing-fields
       require('nvim-treesitter.configs').setup {
         ensure_installed = {
+          'nu',
           'xml',
           'bash',
           'c',
