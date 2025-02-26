@@ -4,8 +4,7 @@ fish/local.fish
 
 lazyvim/spell
 
-
-zed/.*
 zed/.*
 zed/embeddings/
 zed/prompts/
+yazi/flavors/
