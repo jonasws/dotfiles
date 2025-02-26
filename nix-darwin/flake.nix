@@ -26,7 +26,7 @@
       configuration =
         { pkgs, ... }:
         {
-          security.pam.enableSudoTouchIdAuth =  true;
+          security.pam.services.sudo_local.touchIdAuth =  true;
 
           nixpkgs.config = {
             allowUnfree = true;
@@ -62,6 +62,7 @@
               "pango"
               "libpng"
               "jpeg"
+              "tailspin"
               "giflib"
               "superfile"
               "bat"
@@ -71,8 +72,6 @@
           };
 
 
-          # Auto upgrade nix package and the daemon service.
-          services.nix-daemon.enable = true;
           nix.package = pkgs.nix;
           nix.channel.enable = true;
 
@@ -105,7 +104,7 @@
       darwinConfigurations."Jonass-MacBook-Pro" = nix-darwin.lib.darwinSystem {
         modules = [
           configuration
-          home-manager.darwinModule
+          home-manager.darwinModules.home-manager
           {
             home-manager = {
               useGlobalPkgs = true;

@@ -96,7 +96,7 @@ abbr -a gsma "git switch main"
 alias as-tree "command tree --fromfile"
 alias bg batgrep
 
-alias zp "zed-preview"
+alias zp zed-preview
 
 set -x BD_OPT insensitive
 
@@ -262,7 +262,7 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
         startTime: $startTime
     } | @json')
 
-    http --ignore-stdin POST https://api.entur.io/journey-planner/v3/graphql variables:=$variables query=$query "ET-Client-Name: jonas-laptop-cli"  \
+    http --ignore-stdin POST https://api.entur.io/journey-planner/v3/graphql variables:=$variables query=$query "ET-Client-Name: jonas-laptop-cli" \
         | jq -r '
             .data.stopPlace.estimatedCalls[]
             | select(.serviceJourney.journeyPattern.quays[] | select(.name == "Nittedal stasjon"))
@@ -289,7 +289,18 @@ set -x AWS_CLI_AUTO_PROMPT on-partial
 set -x AWS_VAULT_FILE_PASSPHRASE "op://Employee/aws-vault password/password"
 set -x AWS_VAULT_BACKEND file
 
+function y
+    set tmp (mktemp -t "yazi-cwd.XXXXXX")
+    yazi $argv --cwd-file="$tmp"
+    if set cwd (command cat -- "$tmp"); and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
+        builtin cd -- "$cwd"
+    end
+    rm -f -- "$tmp"
+end
+
 if status --is-interactive
+    #set -x ZELLIJ_AUTO_EXIT true
+    #eval (zellij setup --generate-auto-start fish | string collect)
     batman --export-env | source
 
     zoxide init fish | source

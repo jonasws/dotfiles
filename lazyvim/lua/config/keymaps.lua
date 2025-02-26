@@ -2,10 +2,15 @@
 -- Default keymaps that are always set: https://github.com/LazyVim/LazyVim/blob/main/lua/lazyvim/config/keymaps.lua
 -- Add any additional keymaps here
 --
-vim.keymap.set("i", "jk", "<ESC>", { noremap = true, silent = true, desc = "<ESC>" })
-vim.keymap.set({ "n", "v" }, "<leader>k", "K", { noremap = true, desc = "Keyword" })
-vim.keymap.set({ "n", "v" }, "<leader>j", "J", { noremap = true, desc = "Join lines" })
-vim.keymap.set("c", "<C-j>", "<Down>", { noremap = true, desc = "Down" })
-vim.keymap.set("c", "<C-k>", "<Up>", { noremap = true, desc = "Up" })
-vim.keymap.set("c", "<C-h>", "<Left>", { noremap = true, desc = "Left" })
-vim.keymap.set("c", "<C-l>", "<Right>", { noremap = true, desc = "Right" })
+local splits = require("smart-splits")
+
+vim.keymap.set("n", "<A-h>", splits.resize_left)
+vim.keymap.set("n", "<A-j>", splits.resize_down)
+vim.keymap.set("n", "<A-k>", splits.resize_up)
+vim.keymap.set("n", "<A-l>", splits.resize_right)
+-- moving between splits
+vim.keymap.set("n", "<C-h>", splits.move_cursor_left)
+vim.keymap.set("n", "<C-j>", splits.move_cursor_down)
+vim.keymap.set("n", "<C-k>", splits.move_cursor_up)
+vim.keymap.set("n", "<C-l>", splits.move_cursor_right)
+vim.keymap.set("n", "<C-\\>", splits.move_cursor_previous)

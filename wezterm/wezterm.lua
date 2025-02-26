@@ -12,6 +12,7 @@ config.term = 'wezterm'
 config.color_scheme = 'Dracula (Official)'
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
+config.line_height = 1.1
 
 config.enable_kitty_keyboard = true
 
@@ -26,7 +27,7 @@ config.macos_window_background_blur = 10
 
 config.command_palette_bg_color = '#282a36'
 config.command_palette_fg_color = '#f8f8f2'
-config.command_palette_font_size = 16.0
+config.command_palette_font_size = 14.0
 config.command_palette_rows = 14
 
 config.use_dead_keys = false

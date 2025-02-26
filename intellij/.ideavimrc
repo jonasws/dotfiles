@@ -101,6 +101,8 @@ nnoremap <leader>jj    :action AceAction<CR>
 
 set ideajoin
 set ideaput
+set mini-ai
+set peekaboo
 
 Plug 'tpope/vim-commentary'
 Plug 'tpope/vim-surround'

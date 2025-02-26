@@ -63,7 +63,7 @@
     yq-go
     fx
     ripgrep
-    tailspin
+    # tailspin
     rm-improved
     eza
     fzf
@@ -127,7 +127,7 @@
 
     xdg.configFile = {
       neovim = {
-        source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/nvim-kickstart";
+        source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/lazyvim";
         target = "nvim";
         recursive = true;
       };
@@ -155,7 +155,9 @@
     fish = {
       enable = true;
       # Set the init shell options from the one in dotfiles
-      interactiveShellInit = builtins.readFile ../fish/config.fish;
+      loginShellInit = ''
+        source ~/dotfiles/fish/config.fish
+      '';
       functions = {
         _tide_item_mise_java = {
           body = ''
