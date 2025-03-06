@@ -7,9 +7,9 @@ local config = wezterm.config_builder()
 config.term = 'wezterm'
 
 -- config.font = wezterm.font 'JetBrainsMono Nerd Font'
--- config.default_prog = { '/Users/jonasws/.local-fish/bin/fish', '-l' }
+config.default_prog = { '/opt/homebrew/bin/fish', '-l' }
 
-config.color_scheme = 'Dracula (Official)'
+config.color_scheme = 'Catppuccin Mocha'
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 config.line_height = 1.1
