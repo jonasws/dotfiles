@@ -9,51 +9,53 @@ set -x XDG_CONFIG_HOME "$HOME/.config"
 # set -x TESCONTAINERS_DOCKER_SOCKET_OVERRIDE /var/run/docker.sock
 # set -x TESTCONTAINERS_HOST_OVERRIDE 192.168.64.6
 
-fish_config theme choose "Dracula Official"
-
-
-set -l white f8f8f2
-set -l orange ffb86c
-set -l green 50fa7b
-set -l blue 6272a4
-set -l draculaBg 282a36
-
-
-set -U tide_mise_java_color $draculaBg
-set -U tide_mise_java_bg_color $orange
-
-set -U tide_pwd_color_anchors $white
-set -U tide_pwd_color_dirs $white
-set -U tide_pwd_color_truncated_dirs $white
-set -U tide_pwd_bg_color $blue
-
-set -U tide_time_color $draculaBg
-
-set -U tide_git_color $draculaBg
-set -U tide_git_bg_color $green
-set -U tide_git_color_branch $draculaBg
-set -U tide_git_bg_color_unstable $orange
-set -U tide_git_color_upsream $draculaBg
-set -U tide_git_color_untracked $draculaBg
-set -U tide_git_color_stash $draculaBg
-set -U tide_git_color_staged $draculaBg
-set -U tide_git_color_operation $draculaBg
-set -U tide_git_color_dirty $draculaBg
-set -U tide_git_color_conflicted $draculaBg
-set -U tide_git_color_branch $draculaBg
-
-set -U tide_aws_color $draculaBg
-set -U tide_aws_bg_color $white
-
-set -U tide_time_color $draculaBg
-set -U tide_time_bg_color $white
-
-set -U tide_character_color 50fa7b
-set -U tide_character_color_failure ff5555
-
-set -U tide_right_prompt_items status cmd_duration context jobs node python rustc pulumi go terraform nix_shell time aws mise_java
-
+fish_config theme choose "Catppuccin Mocha"
+#
+#
+#set -l white f8f8f2
+#set -l orange ffb86c
+#set -l green 50fa7b
+#set -l blue 6272a4
+#set -l draculaBg 282a36
+#
+#
+#set -U tide_mise_java_color $draculaBg
+#set -U tide_mise_java_bg_color $orange
+#
+#set -U tide_pwd_color_anchors $white
+#set -U tide_pwd_color_dirs $white
+#set -U tide_pwd_color_truncated_dirs $white
+#set -U tide_pwd_bg_color $blue
+#
+#set -U tide_time_color $draculaBg
+#
+#set -U tide_git_color $draculaBg
+#set -U tide_git_bg_color $green
+#set -U tide_git_color_branch $draculaBg
+#set -U tide_git_bg_color_unstable $orange
+#set -U tide_git_color_upsream $draculaBg
+#set -U tide_git_color_untracked $draculaBg
+#set -U tide_git_color_stash $draculaBg
+#set -U tide_git_color_staged $draculaBg
+#set -U tide_git_color_operation $draculaBg
+#set -U tide_git_color_dirty $draculaBg
+#set -U tide_git_color_conflicted $draculaBg
+#set -U tide_git_color_branch $draculaBg
+#
+#set -U tide_aws_color $draculaBg
+#set -U tide_aws_bg_color $white
+#
+#set -U tide_time_color $draculaBg
+#set -U tide_time_bg_color $white
+#
+#set -U tide_character_color 50fa7b
+#set -U tide_character_color_failure ff5555
+#
+#set -U tide_right_prompt_items status cmd_duration context jobs node python rustc pulumi go terraform nix_shell time aws mise_java
+#
 # tide configure --auto --style=Rainbow --prompt_colors='True color' --show_time='24-hour format' --rainbow_prompt_separators=Angled --powerline_prompt_heads=Sharp --powerline_prompt_tails=Flat --powerline_prompt_style='Two lines, character' --prompt_connection=Disconnected --powerline_right_prompt_frame=No --prompt_spacing=Sparse --icons='Few icons' --transient=No
+#
+set -x LS_COLORS (vivid generate catppuccin-mocha)
 
 alias grt "cd (git rev-parse --show-toplevel)"
 alias top btop
@@ -62,12 +64,6 @@ fzf_configure_bindings --directory=\cf --git_status=\eg --git_log=\el
 
 # set fish_key_bindings fish_hybrid_key_bindings
 set fish_key_bindings fish_vi_key_bindings
-
-function fish_user_key_bindings
-    bind --preset \ec fzf_cd_directory
-    bind --preset -M insert \ec fzf_cd_directory
-end
-
 
 set fish_color_command yellow
 set fish_color_autosuggestion white
@@ -90,6 +86,8 @@ alias http xh
 alias n nvim
 abbr -a p pnpm
 
+abbr -a mcv "mvn clean spotless:apply verify"
+
 abbr -a - "cd -"
 abbr -a gsma "git switch main"
 
@@ -100,39 +98,7 @@ alias zp zed-preview
 
 set -x BD_OPT insensitive
 
-set -x FZF_DEFAULT_COMMAND "fd --type f"
-set -x FZF_CTRL_T_COMMAND "fd --type f"
-set -x FZF_OPEN_COMMAND "fd --type f . \$dir"
-
-set -x FZF_ENABLE_OPEN_PREVIEW 1
-set -x FZF_LEGACY_KEYBINDINGS 0
-set -x FZF_COMPLETE 0
-
-set -x FZF_CTRL_T_OPTS "
-  --preview 'bat -n --color=always {}'
-"
-
-set -x FZF_ALT_C_OPTS "
-   --preview 'eza -l --color=always {}'
-"
-
-
-set -x EZA_COLORS "\
-gu=37:\
-sn=32:\
-sb=32:\
-da=34:\
-ur=34:\
-uw=35:\
-ux=36:\
-ue=36:\
-gr=34:\
-gw=35:\
-gx=36:\
-tr=34:\
-tw=35:\
-tx=36:"
-
+set fzf_preview_dir_cmd eza --all --color=always
 
 set -x RIPGREP_CONFIG_PATH $HOME/.ripgreprc
 
@@ -154,8 +120,8 @@ abbr -a gsm "git switch master"
 
 abbr -a tf terraform
 
-abbr -a lg lazygit
-abbr -a lzd lazydocker
+alias lzd lazydocker
+alias lg lazygit
 
 abbr -a gp!! "git push --force"
 
@@ -165,41 +131,6 @@ complete --command aws --no-files --arguments '(begin; set --local --export COMP
 
 
 set fzf_history_opts --with-nth="4.." --preview-window="down,30%,border-top,wrap"
-
-function fzf_cd_directory --description "Change directory Replace the current token with the selected file paths."
-    # Inspired by https://github.com/PatrickF1/fzf.fish/blob/main/functions/_fzf_search_directory.fish
-    # Directly use fd binary to avoid output buffering delay caused by a fd alias, if any.
-    # Debian-based distros install fd as fdfind and the fd package is something else, so
-    # check for fdfind first. Fall back to "fd" for a clear error message.
-    set -f fd_cmd (command -v fdfind || command -v fd  || echo "fd")
-    set -f --append fd_cmd --color=always $fzf_fd_opts
-
-    set -f fzf_arguments --select-1 --preview='eza --all --color=always {}' --ansi $fzf_directory_opts
-    set -f token (commandline --current-token)
-    # expand any variables or leading tilde (~) in the token
-    set -f expanded_token (eval echo -- $token)
-    # unescape token because it's already quoted so backslashes will mess up the path
-    set -f unescaped_exp_token (string unescape -- $expanded_token)
-
-    # If the current token is a directory and has a trailing slash,
-    # then use it as fd's base directory.
-    if string match --quiet -- "*/" $unescaped_exp_token && test -d "$unescaped_exp_token"
-        set --append fd_cmd --base-directory=$unescaped_exp_token
-        # use the directory name as fzf's prompt to indicate the search is limited to that directory
-        set --prepend fzf_arguments --prompt="Change Directory $unescaped_exp_token> " --preview="_fzf_preview_file $expanded_token{}"
-        set -f dir_path_selected $unescaped_exp_token($fd_cmd --type d 2>/dev/null | _fzf_wrapper $fzf_arguments)
-    else
-        set --prepend fzf_arguments --prompt="Change Directory> " --query="$unescaped_exp_token" --preview='_fzf_preview_file {}'
-        set -f dir_path_selected ($fd_cmd --type d 2>/dev/null | _fzf_wrapper $fzf_arguments)
-    end
-
-
-    if test $status -eq 0
-        cd (string escape -- $dir_path_selected | string join ' ')
-    end
-
-    commandline --function repaint
-end
 
 function nittedal
     set -l query '
@@ -298,12 +229,10 @@ function y
     rm -f -- "$tmp"
 end
 
-if status --is-interactive
-    #set -x ZELLIJ_AUTO_EXIT true
-    #eval (zellij setup --generate-auto-start fish | string collect)
-    batman --export-env | source
+#eval (zellij setup --generate-auto-start fish | string collect)
+batman --export-env | source
+starship init fish | source
 
-    zoxide init fish | source
-    /opt/homebrew/bin/mise activate fish | source
-    source ~/.config/op/plugins.sh
-end
+zoxide init fish | source
+/opt/homebrew/bin/mise activate fish | source
+source ~/.config/op/plugins.sh

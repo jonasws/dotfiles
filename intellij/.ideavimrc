@@ -116,10 +116,14 @@ Plug 'terryma/vim-multiple-cursors'
 "
 "
 " Custom window shortcuts
-nnoremap <C-j>         <C-w>j
-nnoremap <C-k>         <C-w>k
-nnoremap <C-l>         <C-w>l
-nnoremap <C-h>         <C-w>h
+sethandler <c-h> i-v:vim
+sethandler <c-l> i-v:vim
+sethandler <c-j> i-v:vim
+sethandler <c-k> i-v:vim
+nnoremap <c-h> <c-w>h
+nnoremap <c-l> <c-w>l
+nnoremap <c-j> <c-w>j
+nnoremap <c-k> <c-w>k
 
 
 " Multiple cursor support
