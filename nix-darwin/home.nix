@@ -1,7 +1,6 @@
 # home.nix
 
 { config, pkgs, ... }:
-
 {
 
   # Home Manager needs a bit of information about you and the paths it should
@@ -23,9 +22,9 @@
     # Docker stuff
     lazydocker
 
-    fastfetch
+    # fastfetch
 
-    difftastic
+    # difftastic
     grc
     doggo
     btop
@@ -63,7 +62,9 @@
     yq-go
     fx
     ripgrep
+    # TODO: Enable after https://github.com/NixOS/nixpkgs/pull/385327 is merged
     # tailspin
+    vivid
     rm-improved
     eza
     fzf
@@ -154,8 +155,9 @@
 
     fish = {
       enable = true;
+      package = pkgs.fish;
       # Set the init shell options from the one in dotfiles
-      loginShellInit = ''
+      interactiveShellInit = ''
         source ~/dotfiles/fish/config.fish
       '';
       functions = {

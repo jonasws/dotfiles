@@ -4,8 +4,9 @@
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin = {
-      url = "github:LnL7/nix-darwin";
+      url = "github:LnL7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
+
     };
     home-manager = {
       url = "github:nix-community/home-manager";
@@ -62,6 +63,7 @@
               "pango"
               "libpng"
               "jpeg"
+              "lnav"
               "tailspin"
               "giflib"
               "superfile"
@@ -73,13 +75,13 @@
 
 
           nix.package = pkgs.nix;
-          nix.channel.enable = true;
+          nix.channel.enable = false;
 
           # Necessary for using flakes on this system.
           nix.settings.experimental-features = "nix-command flakes";
 
           programs.fish.enable = true;
-          environment.shells = [ pkgs.fish ];
+          # environment.shells = [ pkgs.fish ];
           users.users.jonasws = {
             home = "/Users/jonasws";
             shell = pkgs.fish;
@@ -90,7 +92,7 @@
 
           # Used for backwards compatibility, please read the changelog before changing.
           # $ darwin-rebuild changelog
-          system.stateVersion = 5;
+          system.stateVersion = 6;
 
           # The platform the configuration will be used on.
           nixpkgs.hostPlatform = "aarch64-darwin";
@@ -117,15 +119,5 @@
 
       # Expose the package set, including overlays, for convenience.
       darwinPackages = self.darwinConfigurations."Jonass-MacBook-Pro".pkgs;
-
-      devShell.${system} = pkgs.mkShell {
-        buildInputs = [
-          pkgs.fish # Install Fish shell
-        ];
-
-        shellHook = ''
-          fish -l  # Switch to Fish shell when entering the shell
-        '';
-      };
     };
 }
