@@ -35,11 +35,11 @@
           };
           # List packages installed in system profile. To search by name, run:
           # $ nix-env -qaP | grep wget
-          environment.systemPackages = with pkgs; [
-            docker-client
-            docker-buildx
-            docker-compose
-          ];
+          # environment.systemPackages = with pkgs; [
+          #   docker-client
+          #   docker-buildx
+          #   docker-compose
+          # ];
 
           homebrew = {
             enable = true;
@@ -49,9 +49,12 @@
               "raycast"
               "karabiner-elements"
               "firefox@nightly"
-              "wezterm@nightly"
+              # "wezterm@nightly"
             ];
             brews = [
+              "docker"
+              "docker-compose"
+              "docker-buildx"
               "nushell"
               "starship"
               "lnav"
@@ -80,11 +83,11 @@
           # Necessary for using flakes on this system.
           nix.settings.experimental-features = "nix-command flakes";
 
-          programs.fish.enable = true;
+          programs.fish.enable = false;
           # environment.shells = [ pkgs.fish ];
           users.users.jonasws = {
             home = "/Users/jonasws";
-            shell = pkgs.fish;
+            # shell = pkgs.fish;
           };
 
           # Set Git commit hash for darwin-version.

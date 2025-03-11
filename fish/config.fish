@@ -1,10 +1,9 @@
 set -x LC_ALL en_US.UTF-8
-# set -x PATH ~/.cargo/bin /opt/homebrew/opt/grep/libexec/gnubin /opt/homebrew/opt/gnu-tar/libexec/gnubin ~/go/bin ~/.local/bin /opt/homebrew/bin $PATH
-# set -x PATH ~/.local-fish/bin ~/.local-nvim/bin $PATH
 set -x PATH /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profiles/per-user/jonasws/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin /opt/whalebrew/bin /opt/homebrew/bin /opt/homebrew/opt/sphinx-doc/bin /Users/jonasws/.emacs.d/bin /opt/homebrew/opt/libiconv/bin /opt/homebrew/sbin /opt/homebrew/opt/sqlite/bin /opt/homebrew/opt/make/libexec/gnubin /Applications/WezTerm.app/Contents/MacOS /opt/homebrew/opt/jpeg/bin /opt/homebrew/opt/fzf/bin /usr/local/bin /System/Cryptexes/App/usr/bin /usr/bin /bin /usr/sbin /sbin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin $PATH
 
-set -x XDG_CONFIG_HOME "$HOME/.config"
+/opt/homebrew/bin/brew shellenv | source
 
+set -x XDG_CONFIG_HOME "$HOME/.config"
 
 # set -x TESCONTAINERS_DOCKER_SOCKET_OVERRIDE /var/run/docker.sock
 # set -x TESTCONTAINERS_HOST_OVERRIDE 192.168.64.6
@@ -62,12 +61,13 @@ alias top btop
 
 fzf_configure_bindings --directory=\cf --git_status=\eg --git_log=\el
 
+function fish_user_key_bindings
+    bind --preset ctrl-alt-l clear-screen
+    bind --preset -M insert ctrl-alt-l clear-screen
+    bind --preset -M visual ctrl-alt-l clear-screen
+end
 # set fish_key_bindings fish_hybrid_key_bindings
 set fish_key_bindings fish_vi_key_bindings
-
-set fish_color_command yellow
-set fish_color_autosuggestion white
-
 
 set -x VISUAL nvim
 set -x EDITOR nvim
@@ -117,7 +117,6 @@ alias month="gcal --starting-day=1"
 # Git alises
 abbr -a gsm "git switch master"
 
-
 abbr -a tf terraform
 
 alias lzd lazydocker
@@ -125,10 +124,8 @@ alias lg lazygit
 
 abbr -a gp!! "git push --force"
 
-
 # Enable AWS CLI autocompletion: github.com/aws/aws-cli/issues/1079
 complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
-
 
 set fzf_history_opts --with-nth="4.." --preview-window="down,30%,border-top,wrap"
 

@@ -153,66 +153,66 @@
   programs = {
     home-manager.enable = true;
 
-    fish = {
-      enable = true;
-      package = pkgs.fish;
-      # Set the init shell options from the one in dotfiles
-      interactiveShellInit = ''
-        source ~/dotfiles/fish/config.fish
-      '';
-      functions = {
-        _tide_item_mise_java = {
-          body = ''
-            if path is $_tide_parent_dirs/.mise.local.toml
-              set -l v (mise current java)
-                _tide_print_item   mise_java          "$tide_java_icon $v"
-            end
-                '';
-        };
-        _tide_item_aws_vault = {
-          body = ''
-            if test -n "$AWS_VAULT"
-                _tide_print_item  aws_vault           "$tide_aws_icon $AWS_VAULT $AWS_REGION"
-            end
-                '';
-        };
-      };
-      plugins = [
-        {
-          name = "tide";
-          src = pkgs.fishPlugins.tide.src;
-        }
-        {
-          name = "grc";
-          src = pkgs.fishPlugins.grc.src;
-        }
-        {
-          name = "bass";
-          src = pkgs.fishPlugins.bass.src;
-        }
-        {
-          name = "bd";
-          src = pkgs.fishPlugins.fish-bd.src;
-        }
-        {
-          name = "fzf-fish";
-          src = pkgs.fishPlugins.fzf-fish.src;
-        }
-        {
-          name = "git";
-          src = pkgs.fishPlugins.plugin-git.src;
-        }
-        {
-          name = "dracula";
-          src = pkgs.fetchFromGitHub {
-            owner = "dracula";
-            repo = "fish";
-            rev = "269cd7d76d5104fdc2721db7b8848f6224bdf554";
-            sha256 = "Hyq4EfSmWmxwCYhp3O8agr7VWFAflcUe8BUKh50fNfY=";
-          };
-        }
-      ];
-
-    };
+    # fish = {
+    #   enable = false;
+    #   package = pkgs.fish;
+    #   # Set the init shell options from the one in dotfiles
+    #   interactiveShellInit = ''
+    #     source ~/dotfiles/fish/config.fish
+    #   '';
+    #   functions = {
+    #     _tide_item_mise_java = {
+    #       body = ''
+    #         if path is $_tide_parent_dirs/.mise.local.toml
+    #           set -l v (mise current java)
+    #             _tide_print_item   mise_java          "$tide_java_icon $v"
+    #         end
+    #             '';
+    #     };
+    #     _tide_item_aws_vault = {
+    #       body = ''
+    #         if test -n "$AWS_VAULT"
+    #             _tide_print_item  aws_vault           "$tide_aws_icon $AWS_VAULT $AWS_REGION"
+    #         end
+    #             '';
+    #     };
+    #   };
+    #   plugins = [
+    #     {
+    #       name = "tide";
+    #       src = pkgs.fishPlugins.tide.src;
+    #     }
+    #     {
+    #       name = "grc";
+    #       src = pkgs.fishPlugins.grc.src;
+    #     }
+    #     {
+    #       name = "bass";
+    #       src = pkgs.fishPlugins.bass.src;
+    #     }
+    #     {
+    #       name = "bd";
+    #       src = pkgs.fishPlugins.fish-bd.src;
+    #     }
+    #     {
+    #       name = "fzf-fish";
+    #       src = pkgs.fishPlugins.fzf-fish.src;
+    #     }
+    #     {
+    #       name = "git";
+    #       src = pkgs.fishPlugins.plugin-git.src;
+    #     }
+    #     {
+    #       name = "dracula";
+    #       src = pkgs.fetchFromGitHub {
+    #         owner = "dracula";
+    #         repo = "fish";
+    #         rev = "269cd7d76d5104fdc2721db7b8848f6224bdf554";
+    #         sha256 = "Hyq4EfSmWmxwCYhp3O8agr7VWFAflcUe8BUKh50fNfY=";
+    #       };
+    #     }
+    #   ];
+    #
+    # };
   };
 }
