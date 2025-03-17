@@ -15,6 +15,7 @@ config.use_fancy_tab_bar = false
 config.line_height = 1.1
 
 config.enable_kitty_keyboard = true
+config.audible_bell = 'Disabled'
 
 config.adjust_window_size_when_changing_font_size = false
 config.hide_tab_bar_if_only_one_tab = true

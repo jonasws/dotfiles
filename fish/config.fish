@@ -213,8 +213,9 @@ set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 set -x AWS_PAGER "bat --plain --language json"
 # set -x AWS_DEFAULT_REGION eu-west-1
 set -x AWS_DEFAULT_OUTPUT json
-set -x AWS_CLI_AUTO_PROMPT on-partial
+#set -x AWS_CLI_AUTO_PROMPT on-partial
 set -x AWS_VAULT_FILE_PASSPHRASE "op://Employee/aws-vault password/password"
+set -x AWS_VAULT_OTP "op://Employee/AWS - Capra Auth/one-time password"
 set -x AWS_VAULT_BACKEND file
 
 function y

@@ -34,7 +34,7 @@
     wget
     tree-sitter
 
-    pre-commit
+    # pre-commit
     carapace
     # open-policy-agent
     # regal
@@ -82,7 +82,7 @@
 
     gradle
     _1password-cli
-    # lnav
+    lnav
     ranger
 
     ookla-speedtest

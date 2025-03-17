@@ -35,11 +35,9 @@
           };
           # List packages installed in system profile. To search by name, run:
           # $ nix-env -qaP | grep wget
-          # environment.systemPackages = with pkgs; [
-          #   docker-client
-          #   docker-buildx
-          #   docker-compose
-          # ];
+          environment.systemPackages = with pkgs; [
+            fish
+          ];
 
           homebrew = {
             enable = true;
@@ -49,7 +47,7 @@
               "raycast"
               "karabiner-elements"
               "firefox@nightly"
-              # "wezterm@nightly"
+              "wezterm@nightly"
             ];
             brews = [
               "docker"
@@ -57,7 +55,7 @@
               "docker-buildx"
               "nushell"
               "starship"
-              "lnav"
+              # "lnav"
               "mise"
               "fnm"
               "ymtdzzz/tap/otel-tui"
@@ -69,7 +67,6 @@
               "lnav"
               "tailspin"
               "giflib"
-              "superfile"
               "bat"
               "bat-extras"
               "librsvg"
