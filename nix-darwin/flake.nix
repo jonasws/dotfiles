@@ -27,7 +27,7 @@
       configuration =
         { pkgs, ... }:
         {
-          security.pam.services.sudo_local.touchIdAuth =  true;
+          security.pam.services.sudo_local.touchIdAuth = true;
 
           nixpkgs.config = {
             allowUnfree = true;
@@ -37,17 +37,27 @@
           # $ nix-env -qaP | grep wget
           environment.systemPackages = with pkgs; [
             fish
+            nixfmt-rfc-style
           ];
 
           homebrew = {
             enable = true;
+            onActivation = {
+              upgrade = true;
+            };
             casks = [
               "slack"
               "rectangle"
               "raycast"
               "karabiner-elements"
-              "firefox@nightly"
-              "wezterm@nightly"
+              {
+                name = "firefox@nightly";
+                greedy = true;
+              }
+              {
+                name = "wezterm@nightly";
+                greedy = true;
+              }
             ];
             brews = [
               "docker"
@@ -72,7 +82,6 @@
               "librsvg"
             ];
           };
-
 
           nix.package = pkgs.nix;
           nix.channel.enable = false;

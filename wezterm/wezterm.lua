@@ -2,14 +2,14 @@ local wezterm = require 'wezterm'
 -- local mux = wezterm.mux
 local act = wezterm.action
 
+local catppuccin = wezterm.plugin.require 'https://github.com/catppuccin/wezterm'
 local config = wezterm.config_builder()
+catppuccin.apply_to_config(config, {
+  flavor = 'mocha',
+})
 
 config.term = 'wezterm'
 
--- config.font = wezterm.font 'JetBrainsMono Nerd Font'
--- config.default_prog = { '/opt/homebrew/bin/fish', '-l' }
-
-config.color_scheme = 'Catppuccin Mocha'
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 config.line_height = 1.1
@@ -26,8 +26,6 @@ config.native_macos_fullscreen_mode = true
 config.window_background_opacity = 0.90
 config.macos_window_background_blur = 10
 
-config.command_palette_bg_color = '#282a36'
-config.command_palette_fg_color = '#f8f8f2'
 config.command_palette_font_size = 14.0
 config.command_palette_rows = 14
 
