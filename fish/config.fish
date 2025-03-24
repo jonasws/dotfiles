@@ -62,9 +62,8 @@ alias top btop
 fzf_configure_bindings --directory=\cf --git_status=\eg --git_log=\el
 
 function fish_user_key_bindings
-    bind --preset ctrl-alt-l clear-screen
-    bind --preset -M insert ctrl-alt-l clear-screen
-    bind --preset -M visual ctrl-alt-l clear-screen
+    bind -M insert ctrl-alt-l clear-screen
+    bind -M visual ctrl-alt-l clear-screen
 end
 # set fish_key_bindings fish_hybrid_key_bindings
 set fish_key_bindings fish_vi_key_bindings
@@ -82,6 +81,7 @@ set -x EDITOR nvim
 # end
 
 alias vim nvim
+alias c clear
 alias http xh
 alias n nvim
 abbr -a p pnpm
@@ -206,9 +206,10 @@ end
 set -x FX_THEME 1
 set -x FX_SHOW_SIZE true
 set -x BATDIFF_USE_DELTA true
+set -x BAT_THEME "Catppuccin Mocha"
 set fzf_diff_highlighter delta --paging=never --width=20
 
-set -x GLAMOUR_STYLE dracula
+set -x GLAMOUR_STYLE "$HOME/catppuccin/glamour/themes/catppuccin-mocha.json"
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 set -x AWS_PAGER "bat --plain --language json"
 # set -x AWS_DEFAULT_REGION eu-west-1
@@ -217,6 +218,45 @@ set -x AWS_DEFAULT_OUTPUT json
 #set -x AWS_VAULT_FILE_PASSPHRASE "op://Employee/aws-vault password/password"
 #set -x AWS_VAULT_OTP "op://Employee/AWS - Capra Auth/one-time password"
 #set -x AWS_VAULT_BACKEND file
+#
+
+function console
+    set -l profile $argv[1]
+    #set -l destination $argv[2]
+    set -l color (aws configure get color --profile $profile)
+    aws configure export-credentials --format process --profile $profile \
+        | jq -c '
+        {
+          sessionId: .AccessKeyId,
+          sessionKey: .SecretAccessKey,
+          sessionToken: .SessionToken
+        }' \
+        | read -l session
+    if test $status -ne 0
+        return
+    end
+    http POST -f https://eu-west-1.signin.aws.amazon.com/federation Action=getSigninToken SessionDuration=3599 Session=$session \
+        | jq .SigninToken -r \
+        | read -l signinToken
+    set -l destionationUrl (string escape --style=url https://eu-west-1.console.aws.amazon.com/console/home?region=eu-west-1)
+
+    set -l loginUrl "https://eu-west-1.signin.aws.amazon.com/federation?Action=login&Issuer=aws-console-wrapper&SigninToken=$signinToken&Destination=$destionationUrl"
+    firefox-container --$color --name $profile $loginUrl
+end
+complete -c console -x -a "(aws configure list-profiles | grep cnops)"
+
+function gcal --wraps=gcalcli
+    set -x GCALCLI_CONFIG $XDG_CONFIG_HOME/gcalcli/config.toml
+    set -x COLUMNS (tput cols)
+    gcalcli --client-id=(op read "op://Employee/gcalcli/username") --client-secret=(op read "op://Employee/gcalcli/credential") \
+        $argv | less -S -F -r
+end
+
+function view-ci
+    set -l rev (git rev-parse HEAD)
+    set -l runId (gh run list --commit $rev --json databaseId -q .[0].databaseId)
+    gh run watch $runId
+end
 
 function y
     set tmp (mktemp -t "yazi-cwd.XXXXXX")

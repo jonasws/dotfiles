@@ -46,20 +46,14 @@
               upgrade = true;
             };
             casks = [
+              "nordvpn"
               "slack"
               "rectangle"
               "raycast"
               "karabiner-elements"
-              {
-                name = "firefox@nightly";
-                greedy = true;
-              }
-              {
-                name = "wezterm@nightly";
-                greedy = true;
-              }
             ];
             brews = [
+              "pngpaste"
               "docker"
               "docker-compose"
               "docker-buildx"

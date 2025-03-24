@@ -1,11 +1,13 @@
 let leader=" "
- " Selected IntelliSpace modules
+ " Selected Intellimacs modules
 
 """ This file contains default spacemacs settings and key bindings
 
+source ~/.intellimacs/spacemacs/text.vim
+source ~/.intellimacs/spacemacs/errors.vim
 
 source ~/.intellimacs/spacemacs/settings.vim
-" source ~/.intellimacs/spacemacs/misc.vim
+source ~/.intellimacs/spacemacs/misc.vim
 " Key bindings
 source ~/.intellimacs/spacemacs/leader.vim
 
@@ -14,6 +16,8 @@ source ~/.intellimacs/spacemacs/quit.vim
 
 let g:WhichKeyDesc_SearchSymbol = "<leader>s    +search/symbol"
 source ~/.intellimacs/spacemacs/search-symbol.vim
+source ~/.intellimacs/extra/search.vim
+
 
 let g:WhichKeyDesc_Windows = "<leader>w    +windows"
 source ~/.intellimacs/spacemacs/windows.vim
@@ -45,7 +49,6 @@ source ~/.intellimacs/major.vim
 let g:WhichKeyDesc_Major_Refactoring = "<leader>mr +refactor"
 source ~/.intellimacs/major/refactoring.vim
 source ~/.intellimacs/which-key.vim
-
 
 xmap S <Plug>VSurround
 
@@ -87,10 +90,8 @@ vnoremap [e    <Esc>:action GotoPreviousError<CR>
 nnoremap L     :action NextTab<CR>
 nnoremap H     :action PreviousTab<CR>
 
-" Jump to class
-let g:WhichKeyDesc_JumpJoinSplit_JumpToClass = "<leader>jc jump-to-class"
-nnoremap <leader>jc   :action GotoClass<CR>
-vnoremap <leader>jc   :action GotoClass<CR>
+source ~/.intellimacs/spacemacs/insertion.vim
+source ~/.intellimacs/spacemacs/jump-join-split.vim
 
 " Jump to symbol
 let g:WhichKeyDesc_JumpJoinSplit_JumpToSymbol = "<leader>js jump-to-symbol"

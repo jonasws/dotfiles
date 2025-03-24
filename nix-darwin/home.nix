@@ -79,11 +79,10 @@
     awscli2
     ssm-session-manager-plugin
 
-
     gradle
     _1password-cli
     lnav
-    ranger
+    # ranger
 
     ookla-speedtest
     moreutils
@@ -120,19 +119,18 @@
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/wezterm/wezterm.lua";
     };
 
-
     ".ripgreprc" = {
       source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/ripgrep/.ripgreprc";
     };
   };
 
-    xdg.configFile = {
-      neovim = {
-        source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/lazyvim";
-        target = "nvim";
-        recursive = true;
-      };
+  xdg.configFile = {
+    neovim = {
+      source = config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/dotfiles/lazyvim";
+      target = "nvim";
+      recursive = true;
     };
+  };
 
   # You can also manage environment variables but you will have to manually
   # source
@@ -147,7 +145,6 @@
   home.sessionVariables = {
     # EDITOR = "emacs";
   };
-
 
   # Let Home Manager install and manage itself.
   programs = {
