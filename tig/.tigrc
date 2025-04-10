@@ -1,2 +1,2 @@
 color cursor black green
-set diff-highlight = /opt/homebrew/share/git-core/contrib/diff-highlight/diff-highlight
+set diff-highlight = true

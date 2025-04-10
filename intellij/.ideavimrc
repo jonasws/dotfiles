@@ -92,11 +92,9 @@ nnoremap H     :action PreviousTab<CR>
 
 source ~/.intellimacs/spacemacs/insertion.vim
 source ~/.intellimacs/spacemacs/jump-join-split.vim
+nnoremap s    :action AceAction<CR>
 
-" Jump to symbol
-let g:WhichKeyDesc_JumpJoinSplit_JumpToSymbol = "<leader>js jump-to-symbol"
-nnoremap <leader>js    :action GotoSymbol<CR>
-vnoremap <leader>js    :action GotoSymbol<CR>
+source ~/.intellimacs/extra/jump.vim
 
 nnoremap <leader>jj    :action AceAction<CR>
 
@@ -126,6 +124,8 @@ nnoremap <c-l> <c-w>l
 nnoremap <c-j> <c-w>j
 nnoremap <c-k> <c-w>k
 
+vunmap <A-x>
+
 
 " Multiple cursor support
 nmap <C-n> <Plug>NextWholeOccurrence
@@ -142,3 +142,4 @@ omap <A-n> <Plug>AllWholeOccurrences
 nmap g<A-n> <Plug>AllWholeOccurrences
 xmap g<A-n> <Plug>AllWholeOccurrences
 omap g<A-n> <Plug>AllWholeOccurrences
+

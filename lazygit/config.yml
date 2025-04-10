@@ -38,8 +38,7 @@ git:
     order: default
   paging:
     colorArg: always
-    pager: delta --dark --paging=never --side-by-side
-    useConfig: false
+    pager: delta --dark --paging=never
   commit:
     signOff: false
   parseEmoji:

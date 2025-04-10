@@ -1,5 +1,5 @@
 set -x LC_ALL en_US.UTF-8
-set -x PATH /Users/jonasws/.local/bin /Users/jonasws/.nix-profile/bin /etc/profiles/per-user/jonasws/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin /opt/whalebrew/bin /opt/homebrew/bin /opt/homebrew/opt/sphinx-doc/bin /Users/jonasws/.emacs.d/bin /opt/homebrew/opt/libiconv/bin /opt/homebrew/sbin /opt/homebrew/opt/sqlite/bin /opt/homebrew/opt/make/libexec/gnubin /Applications/WezTerm.app/Contents/MacOS /opt/homebrew/opt/jpeg/bin /opt/homebrew/opt/fzf/bin /usr/local/bin /System/Cryptexes/App/usr/bin /usr/bin /bin /usr/sbin /sbin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin $PATH
+set -x PATH /Users/jonasws/.local/bin /etc/profiles/per-user/jonasws/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin /opt/whalebrew/bin /opt/homebrew/bin /opt/homebrew/opt/sphinx-doc/bin /Users/jonasws/.emacs.d/bin /opt/homebrew/opt/libiconv/bin /opt/homebrew/sbin /opt/homebrew/opt/sqlite/bin /opt/homebrew/opt/make/libexec/gnubin /Applications/WezTerm.app/Contents/MacOS /opt/homebrew/opt/jpeg/bin /opt/homebrew/opt/fzf/bin /usr/local/bin /System/Cryptexes/App/usr/bin /usr/bin /bin /usr/sbin /sbin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin $PATH
 
 /opt/homebrew/bin/brew shellenv | source
 
@@ -119,6 +119,7 @@ abbr -a gsm "git switch master"
 
 abbr -a tf terraform
 
+# alias lazygit "TERM=xterm-256color command lazygit"
 alias lzd lazydocker
 alias lg lazygit
 
@@ -219,10 +220,20 @@ set -x AWS_DEFAULT_OUTPUT json
 #set -x AWS_VAULT_OTP "op://Employee/AWS - Capra Auth/one-time password"
 #set -x AWS_VAULT_BACKEND file
 #
+#
 
-function console
-    set -l profile $argv[1]
-    #set -l destination $argv[2]
+function log-viewer -a logFile
+    nu -c "
+  open $logFile --raw |
+  from json --objects |
+  select @timestamp level logger_name message |
+  update @timestamp { date humanize } |
+  update logger_name { split row '.' | slice (-2).. | str join '.' } |
+  explore --tail
+  "
+end
+
+function console -a profile destination
     set -l color (aws configure get color --profile $profile)
     aws configure export-credentials --format process --profile $profile \
         | jq -c '
@@ -238,12 +249,32 @@ function console
     http POST -f https://eu-west-1.signin.aws.amazon.com/federation Action=getSigninToken SessionDuration=3599 Session=$session \
         | jq .SigninToken -r \
         | read -l signinToken
-    set -l destionationUrl (string escape --style=url https://eu-west-1.console.aws.amazon.com/console/home?region=eu-west-1)
+    set -l destinationUrl (string escape --style=url "https://eu-west-1.console.aws.amazon.com/$destination?region=eu-west-1")
 
-    set -l loginUrl "https://eu-west-1.signin.aws.amazon.com/federation?Action=login&Issuer=aws-console-wrapper&SigninToken=$signinToken&Destination=$destionationUrl"
+    set -l loginUrl "https://eu-west-1.signin.aws.amazon.com/federation?Action=login&Issuer=aws-console-wrapper&SigninToken=$signinToken&Destination=$destinationUrl"
     firefox-container --$color --name $profile $loginUrl
 end
-complete -c console -x -a "(aws configure list-profiles | grep cnops)"
+
+set -l awsProfiles cnops-build-admin cnops-dev-admin cnops-staging-admin cnops-prod-admin
+complete -c console -x -n "not __fish_seen_subcommand_from $awsProfiles" -a "$awsProfiles"
+complete -c console -x -n "__fish_seen_subcommand_from $awsProfiles" -a 'ecs/v2 cloudwatch codepipeline cloudformation events'
+
+function changeAwsProfileBackground -v AWS_PROFILE
+    if test -z $AWS_PROFILE
+        printf "\033]111\007"
+    else
+        # Define colors for different AWS profiles
+        switch "$AWS_PROFILE"
+            case cnops-prod-admin
+                set bg_color "#412B2F" # **Ultra-dark desaturated red** (Aged Wine)
+            case default '*'
+                set bg_color "#1E1E2E" # Default Mocha background
+        end
+
+        # Emit ANSI escape sequence to set the background color
+        printf "\033]11;%s\007" $bg_color
+    end
+end
 
 function gcal --wraps=gcalcli
     set -x GCALCLI_CONFIG $XDG_CONFIG_HOME/gcalcli/config.toml

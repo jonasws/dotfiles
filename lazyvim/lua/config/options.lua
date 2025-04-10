@@ -3,3 +3,5 @@
 -- Add any additional options here
 ---- in this case.
 vim.g.lazyvim_blink_main = false
+vim.g.ai_cmp = false
+vim.opt.clipboard = ""

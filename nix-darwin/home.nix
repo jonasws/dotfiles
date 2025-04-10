@@ -75,6 +75,8 @@
     # tig
     lazygit
 
+    sc-im
+
     awslogs
     awscli2
     ssm-session-manager-plugin

@@ -8,12 +8,14 @@ catppuccin.apply_to_config(config, {
   flavor = 'mocha',
 })
 
+-- config.set_environment_variables = {
+--   TERMINFO_DIRS = '/opt/homebrew/opt/ncurses/share/terminfo',
+-- }
 config.term = 'wezterm'
 
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 config.line_height = 1.1
-config.front_end = 'WebGpu'
 
 config.enable_kitty_keyboard = true
 config.audible_bell = 'Disabled'
