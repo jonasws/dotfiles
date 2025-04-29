@@ -72,7 +72,7 @@
     gh
     glab
     delta
-    # tig
+    tig
     lazygit
 
     sc-im
