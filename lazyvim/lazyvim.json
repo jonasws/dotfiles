@@ -2,13 +2,17 @@
   "extras": [
     "lazyvim.plugins.extras.coding.mini-surround",
     "lazyvim.plugins.extras.coding.yanky",
+    "lazyvim.plugins.extras.editor.aerial",
+    "lazyvim.plugins.extras.editor.dial",
     "lazyvim.plugins.extras.editor.harpoon2",
     "lazyvim.plugins.extras.editor.illuminate",
+    "lazyvim.plugins.extras.editor.navic",
     "lazyvim.plugins.extras.formatting.prettier",
     "lazyvim.plugins.extras.lang.docker",
     "lazyvim.plugins.extras.lang.git",
+    "lazyvim.plugins.extras.lang.java",
     "lazyvim.plugins.extras.lang.json",
-    "lazyvim.plugins.extras.lang.markdown",
+    "lazyvim.plugins.extras.lang.kotlin",
     "lazyvim.plugins.extras.lang.nix",
     "lazyvim.plugins.extras.lang.nushell",
     "lazyvim.plugins.extras.lang.sql",
@@ -16,7 +20,8 @@
     "lazyvim.plugins.extras.lang.toml",
     "lazyvim.plugins.extras.lang.typescript",
     "lazyvim.plugins.extras.lang.yaml",
-    "lazyvim.plugins.extras.linting.eslint"
+    "lazyvim.plugins.extras.linting.eslint",
+    "lazyvim.plugins.extras.util.dot"
   ],
   "install_version": 8,
   "news": {
