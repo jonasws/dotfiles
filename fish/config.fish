@@ -257,7 +257,7 @@ end
 
 set -l awsProfiles cnops-build-admin cnops-dev-admin cnops-staging-admin cnops-prod-admin
 complete -c console -x -n "not __fish_seen_subcommand_from $awsProfiles" -a "$awsProfiles"
-complete -c console -x -n "__fish_seen_subcommand_from $awsProfiles" -a 'ecs/v2 cloudwatch codepipeline cloudformation events'
+complete -c console -x -n "__fish_seen_subcommand_from $awsProfiles" -a 'ecs/v2 cloudwatch codepipeline cloudformation events secretsmanager ec2 vpc s3'
 
 function changeAwsProfileBackground -v AWS_PROFILE
     if test -z $AWS_PROFILE
