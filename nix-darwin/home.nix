@@ -35,7 +35,7 @@
     tree-sitter
 
     # pre-commit
-    carapace
+    # carapace
     # open-policy-agent
     # regal
 
@@ -44,17 +44,19 @@
 
     neovim
     git
-    coreutils
     openssl
+    tabiew
 
     # bat
     # bat-extras.batman
     # httpie
+    nushell
     xh
     hurl
     zoxide
     zellij
-    # starship
+    starship
+    carapace
     # go
     curl
     fd

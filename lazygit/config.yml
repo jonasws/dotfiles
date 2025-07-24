@@ -6,6 +6,9 @@ gui:
   showRandomTip: false
   shortTimeFormat: "15:04"
   nerdFontsVersion: "3"
+  tabWidth: 2
+  mainPanelSplitMode: flexible
+  enlargedSideViewLocation: top
   theme:
     activeBorderColor:
       - "#f5c2e7"
@@ -47,3 +50,9 @@ git:
 
 update:
   method: never
+
+customCommands:
+  - key: "R"
+    command: 'git log --oneline --author="^(?!.*renovate).*" --perl-regexp'
+    context: "files"
+    description: "Show commits not authored by renovate"

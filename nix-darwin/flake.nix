@@ -15,15 +15,17 @@
   };
 
   outputs =
-    inputs@{
+    {
       self,
       nix-darwin,
       nixpkgs,
       home-manager,
     }:
     let
-      system = "aarch64-darwin";
-      pkgs = import nixpkgs { inherit system; };
+      platform = "aarch64-darwin";
+      systemName = "Jonass-MacBook-Pro";
+      username = "jonasws";
+
       configuration =
         { pkgs, ... }:
         {
@@ -40,15 +42,26 @@
             nixfmt-rfc-style
           ];
 
+          system.primaryUser = username;
+
           homebrew = {
             enable = true;
+            global = {
+              autoUpdate = false;
+            };
             onActivation = {
+              autoUpdate = false;
               upgrade = true;
+              cleanup = "uninstall";
             };
             casks = [
               "nordvpn"
               "slack"
               "rectangle"
+              "firefox@nightly"
+              "wezterm@nightly"
+              "spotify"
+              "1password"
               "raycast"
               "karabiner-elements"
             ];
@@ -57,13 +70,20 @@
               "docker"
               "docker-compose"
               "docker-buildx"
-              "nushell"
+              "gcalcli"
+              "icu4c"
+              # "nushell"
               "starship"
-              # "lnav"
+              "lnav"
               "mise"
               "fnm"
               "ymtdzzz/tap/otel-tui"
               "pkg-config"
+              "zlib"
+              "gcc"
+              "readline"
+              "ossp-uuid"
+              "libpq"
               "cairo"
               "pango"
               "libpng"
@@ -79,6 +99,7 @@
 
           nix.package = pkgs.nix;
           nix.channel.enable = false;
+          nix.settings.download-buffer-size = 524288000;
 
           # Necessary for using flakes on this system.
           nix.settings.experimental-features = "nix-command flakes";
@@ -98,7 +119,7 @@
           system.stateVersion = 6;
 
           # The platform the configuration will be used on.
-          nixpkgs.hostPlatform = "aarch64-darwin";
+          nixpkgs.hostPlatform = platform;
         };
     in
     {
@@ -106,7 +127,7 @@
 
       # Build darwin flake using:
       # $ darwin-rebuild build --flake .#Jonass-MacBook-Pro
-      darwinConfigurations."Jonass-MacBook-Pro" = nix-darwin.lib.darwinSystem {
+      darwinConfigurations."${systemName}" = nix-darwin.lib.darwinSystem {
         modules = [
           configuration
           home-manager.darwinModules.home-manager
@@ -121,6 +142,6 @@
       };
 
       # Expose the package set, including overlays, for convenience.
-      darwinPackages = self.darwinConfigurations."Jonass-MacBook-Pro".pkgs;
+      darwinPackages = self.darwinConfigurations."${systemName}".pkgs;
     };
 }

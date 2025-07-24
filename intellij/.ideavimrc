@@ -143,3 +143,6 @@ nmap g<A-n> <Plug>AllWholeOccurrences
 xmap g<A-n> <Plug>AllWholeOccurrences
 omap g<A-n> <Plug>AllWholeOccurrences
 
+
+nmap <leader>cr    :action CopyReference<CR>
+

@@ -58,12 +58,15 @@ set -x LS_COLORS (vivid generate catppuccin-mocha)
 
 alias grt "cd (git rev-parse --show-toplevel)"
 alias top btop
+alias tw "tw --theme catppuccin"
 
 fzf_configure_bindings --directory=\cf --git_status=\eg --git_log=\el
 
 function fish_user_key_bindings
     bind -M insert ctrl-alt-l clear-screen
     bind -M visual ctrl-alt-l clear-screen
+    bind --erase --preset -M insert ctrl-l
+    bind --erase --preset ctrl-l
 end
 # set fish_key_bindings fish_hybrid_key_bindings
 set fish_key_bindings fish_vi_key_bindings
@@ -84,7 +87,8 @@ alias vim nvim
 alias c clear
 alias http xh
 alias n nvim
-abbr -a p pnpm
+alias dadbod "nvim -c DBUI"
+alias sg ast-grep
 
 abbr -a mcv "mvn clean spotless:apply verify"
 
@@ -109,10 +113,7 @@ alias la "eza --long --all --icons"
 
 alias tree "eza --tree --long"
 
-abbr -a dc "docker compose"
-
-# Calendar
-alias month="gcal --starting-day=1"
+abbr -a dc docker-compose
 
 # Git alises
 abbr -a gsm "git switch master"
@@ -122,6 +123,8 @@ abbr -a tf terraform
 # alias lazygit "TERM=xterm-256color command lazygit"
 alias lzd lazydocker
 alias lg lazygit
+alias lgl "lazygit log"
+alias lgs "lazygit status"
 
 abbr -a gp!! "git push --force"
 
@@ -255,9 +258,9 @@ function console -a profile destination
     firefox-container --$color --name $profile $loginUrl
 end
 
-set -l awsProfiles cnops-build-admin cnops-dev-admin cnops-staging-admin cnops-prod-admin
+set -l awsProfiles cnops-build-admin cnops-dev-admin cnops-staging-admin cnops-prod-admin trafficinfo-dev trafficinfo-test trafficinfo-stage trafficinfo-prod trafficinfo-prod--admin
 complete -c console -x -n "not __fish_seen_subcommand_from $awsProfiles" -a "$awsProfiles"
-complete -c console -x -n "__fish_seen_subcommand_from $awsProfiles" -a 'ecs/v2 cloudwatch codepipeline cloudformation events secretsmanager ec2 vpc s3'
+complete -c console -x -n "__fish_seen_subcommand_from $awsProfiles" -a 'ecs/v2 cloudwatch codepipeline cloudformation events secretsmanager ec2 vpc s3 states'
 
 function changeAwsProfileBackground -v AWS_PROFILE
     if test -z $AWS_PROFILE
@@ -266,6 +269,12 @@ function changeAwsProfileBackground -v AWS_PROFILE
         # Define colors for different AWS profiles
         switch "$AWS_PROFILE"
             case cnops-prod-admin
+                set bg_color "#412B2F" # **Ultra-dark desaturated red** (Aged Wine)
+            case cnops-prod-developer
+                set bg_color "#412B2F" # **Ultra-dark desaturated red** (Aged Wine)
+            case trafficinfo-prod--admin
+                set bg_color "#412B2F" # **Ultra-dark desaturated red** (Aged Wine)
+            case cnops-prod-developer
                 set bg_color "#412B2F" # **Ultra-dark desaturated red** (Aged Wine)
             case default '*'
                 set bg_color "#1E1E2E" # Default Mocha background
@@ -284,23 +293,68 @@ function gcal --wraps=gcalcli
 end
 
 function view-ci
+    set -l projectName (basename (pwd))
     set -l rev (git rev-parse HEAD)
     set -l runId (gh run list --commit $rev --json databaseId -q .[0].databaseId)
-    gh run watch $runId
+    gh run watch $runId; and notify "CI finished" "CI finished for $projectName"
 end
 
-function y
-    set tmp (mktemp -t "yazi-cwd.XXXXXX")
-    yazi $argv --cwd-file="$tmp"
-    if set cwd (command cat -- "$tmp"); and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
-        builtin cd -- "$cwd"
+function mvn --wraps=mvn
+    # Check if -f (file) or --file is passed to mvn
+    if not contains -- -f $argv; and not contains -- --file $argv
+        # Look for the Git root directory
+        set -l git_root (command git rev-parse --show-toplevel 2>/dev/null)
+
+        if test -n "$git_root"
+            # If Git root is found, construct the path to pom.xml
+            set -l pom_path "$git_root/pom.xml"
+
+            # Check if pom.xml exists at the Git root
+            if test -f "$pom_path"
+                echo "Using pom.xml from Git root: $pom_path"
+                command mvn -f "$pom_path" $argv
+                return $status
+            else
+                echo "Warning: pom.xml not found in Git root ($git_root). Aborting"
+            end
+        else
+            echo "Warning: Not in a Git repository. Running mvn without -f."
+        end
     end
-    rm -f -- "$tmp"
+
+    # If -f was passed, or if no Git root/pom.xml was found, run mvn directly
+    command mvn $argv
+end
+
+function mvnu --wraps=mvn
+    mvn -Dspotless.check.skip -DskipTests $argv
+end
+
+function notify -a title body
+    printf "\e]777;notify;%s;%s\e\\" $title $body
+end
+
+alias y yazi
+
+function grc.wrap -a executable
+    set executable $argv[1]
+
+    if test (count $argv) -gt 1
+        set arguments $argv[2..(count $argv)]
+    else
+        set arguments
+    end
+
+    set optionsvariable "grcplugin_"$executable
+    set options $$optionsvariable
+
+    command grc --pty -es --colour=auto $executable $options $arguments
 end
 
 #eval (zellij setup --generate-auto-start fish | string collect)
 batman --export-env | source
 starship init fish | source
+# atuin init fish | source
 
 zoxide init fish | source
 /opt/homebrew/bin/mise activate fish | source

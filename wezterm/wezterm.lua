@@ -14,7 +14,7 @@ config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 config.line_height = 1.1
 
-config.enable_kitty_keyboard = true
+config.enable_kitty_keyboard = false
 config.audible_bell = 'Disabled'
 config.front_end = 'WebGpu'
 
