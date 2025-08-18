@@ -2,11 +2,8 @@ local wezterm = require 'wezterm'
 -- local mux = wezterm.mux
 local act = wezterm.action
 
-local catppuccin = wezterm.plugin.require 'https://github.com/catppuccin/wezterm'
 local config = wezterm.config_builder()
-catppuccin.apply_to_config(config, {
-  flavor = 'mocha',
-})
+config.color_scheme = 'Catppuccin Mocha'
 
 config.term = 'wezterm'
 
@@ -149,7 +146,7 @@ config.ssh_domains = {
     name = 'pi',
     -- The hostname or address to connect to. Will be used to match settings
     -- from your ssh config file
-    remote_address = 'raspberrypi.lan',
+    remote_address = 'raspberrypi.local',
     -- The username to use on the remote host
     username = 'pi',
   },
