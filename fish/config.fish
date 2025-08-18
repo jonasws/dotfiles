@@ -1,7 +1,7 @@
 set -x LC_ALL en_US.UTF-8
-set -x PATH /Users/jonasws/.local/bin /etc/profiles/per-user/jonasws/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin /opt/whalebrew/bin /opt/homebrew/bin /opt/homebrew/opt/sphinx-doc/bin /Users/jonasws/.emacs.d/bin /opt/homebrew/opt/libiconv/bin /opt/homebrew/sbin /opt/homebrew/opt/sqlite/bin /opt/homebrew/opt/make/libexec/gnubin /Applications/WezTerm.app/Contents/MacOS /opt/homebrew/opt/jpeg/bin /opt/homebrew/opt/fzf/bin /usr/local/bin /System/Cryptexes/App/usr/bin /usr/bin /bin /usr/sbin /sbin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin $PATH
+set -x PATH /Users/jonasws/.local/bin /etc/profiles/per-user/jonasws/bin /run/current-system/sw/bin /nix/var/nix/profiles/default/bin /Applications/WezTerm.app/Contents/MacOS /usr/local/bin /System/Cryptexes/App/usr/bin /usr/bin /bin /usr/sbin /sbin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/local/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/bin /var/run/com.apple.security.cryptexd/codex.system/bootstrap/usr/appleinternal/bin $PATH
 
-/opt/homebrew/bin/brew shellenv | source
+/opt/homebrew/bin/brew shellenv fish | source
 
 set -x XDG_CONFIG_HOME "$HOME/.config"
 
@@ -186,7 +186,7 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
         set -f startTime (/bin/date -Iminutes)
     end
 
-    set -l variables (jq -n --arg numberOfDepartures $numberOfDepartures --arg startTime $startTime '
+    set -l variables (jq -r -n --arg numberOfDepartures $numberOfDepartures --arg startTime $startTime '
     {
         stopPlace: "NSR:StopPlace:59872",
         lines: ["VYG:Line:RE30", "VYG:Line:R31"],
@@ -195,7 +195,7 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
     } | @json')
 
     http --ignore-stdin POST https://api.entur.io/journey-planner/v3/graphql variables:=$variables query=$query "ET-Client-Name: jonas-laptop-cli" \
-        | jq -r '
+        | jq -c -r '
             .data.stopPlace.estimatedCalls[]
             | select(.serviceJourney.journeyPattern.quays[] | select(.name == "Nittedal stasjon"))
             | [.expectedDepartureTime, .destinationDisplay.frontText, .quay.publicCode, .serviceJourney.line.publicCode, ([.quay.stopPlace.name, .quay.stopPlace.description] | join(" - ")), .situations[0].summary[0].value]
@@ -215,50 +215,27 @@ set fzf_diff_highlighter delta --paging=never --width=20
 
 set -x GLAMOUR_STYLE "$HOME/catppuccin/glamour/themes/catppuccin-mocha.json"
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
-set -x AWS_PAGER "bat --plain --language json"
 # set -x AWS_DEFAULT_REGION eu-west-1
-set -x AWS_DEFAULT_OUTPUT json
 #set -x AWS_CLI_AUTO_PROMPT on-partial
 #set -x AWS_VAULT_FILE_PASSPHRASE "op://Employee/aws-vault password/password"
 #set -x AWS_VAULT_OTP "op://Employee/AWS - Capra Auth/one-time password"
 #set -x AWS_VAULT_BACKEND file
 #
 #
-
-function log-viewer -a logFile
-    nu -c "
-  open $logFile --raw |
-  from json --objects |
-  select @timestamp level logger_name message |
-  update @timestamp { date humanize } |
-  update logger_name { split row '.' | slice (-2).. | str join '.' } |
-  explore --tail
-  "
-end
-
+#
+#
+#
 function console -a profile destination
     set -l color (aws configure get color --profile $profile)
-    aws configure export-credentials --format process --profile $profile \
-        | jq -c '
-        {
-          sessionId: .AccessKeyId,
-          sessionKey: .SecretAccessKey,
-          sessionToken: .SessionToken
-        }' \
-        | read -l session
-    if test $status -ne 0
-        return
+    set -l service $destination
+    if test -z $service
+        set service ecs/v2
     end
-    http POST -f https://eu-west-1.signin.aws.amazon.com/federation Action=getSigninToken SessionDuration=3599 Session=$session \
-        | jq .SigninToken -r \
-        | read -l signinToken
-    set -l destinationUrl (string escape --style=url "https://eu-west-1.console.aws.amazon.com/$destination?region=eu-west-1")
-
-    set -l loginUrl "https://eu-west-1.signin.aws.amazon.com/federation?Action=login&Issuer=aws-console-wrapper&SigninToken=$signinToken&Destination=$destinationUrl"
+    set -l loginUrl (rain console --profile $profile --service $service --url)
     firefox-container --$color --name $profile $loginUrl
 end
 
-set -l awsProfiles cnops-build-admin cnops-dev-admin cnops-staging-admin cnops-prod-admin trafficinfo-dev trafficinfo-test trafficinfo-stage trafficinfo-prod trafficinfo-prod--admin
+set -l awsProfiles cnops-build-admin cnops-dev-admin cnops-staging-admin cnops-prod-admin trafficinfo-service trafficinfo-dev trafficinfo-test trafficinfo-stage trafficinfo-prod trafficinfo-prod--admin
 complete -c console -x -n "not __fish_seen_subcommand_from $awsProfiles" -a "$awsProfiles"
 complete -c console -x -n "__fish_seen_subcommand_from $awsProfiles" -a 'ecs/v2 cloudwatch codepipeline cloudformation events secretsmanager ec2 vpc s3 states'
 
@@ -334,22 +311,29 @@ function notify -a title body
     printf "\e]777;notify;%s;%s\e\\" $title $body
 end
 
-alias y yazi
-
-function grc.wrap -a executable
-    set executable $argv[1]
-
-    if test (count $argv) -gt 1
-        set arguments $argv[2..(count $argv)]
-    else
-        set arguments
+function y
+    set tmp (mktemp -t "yazi-cwd.XXXXXX")
+    yazi $argv --cwd-file="$tmp"
+    if read -z cwd <"$tmp"; and [ -n "$cwd" ]; and [ "$cwd" != "$PWD" ]
+        cd "$cwd"
     end
-
-    set optionsvariable "grcplugin_"$executable
-    set options $$optionsvariable
-
-    command grc --pty -es --colour=auto $executable $options $arguments
+    rm -f -- "$tmp"
 end
+
+# function grc.wrap --argument-names executable
+#     set executable $argv[1]
+#
+#     if test (count $argv) -gt 1
+#         set arguments $argv[2..(count $argv)]
+#     else
+#         set arguments
+#     end
+#
+#     set optionsvariable "grcplugin_"$executable
+#     set options $$optionsvariable
+#
+#     command grc -es --colour=auto --pty $executable $options $arguments
+# end
 
 #eval (zellij setup --generate-auto-start fish | string collect)
 batman --export-env | source
@@ -357,5 +341,41 @@ starship init fish | source
 # atuin init fish | source
 
 zoxide init fish | source
-/opt/homebrew/bin/mise activate fish | source
+mise activate fish | source
 source ~/.config/op/plugins.sh
+
+function aws --wraps=aws
+    # Store original arguments before argparse modifies them
+    set -l original_argv $argv
+    
+    # Parse known AWS CLI arguments we care about
+    argparse --ignore-unknown 'output=' -- $argv
+    or return
+    
+    set -l output_format json
+    set -l use_pager true
+    set -l bat_lang json
+    
+    # Check if --output was specified
+    if set -q _flag_output
+        set output_format $_flag_output
+    end
+
+    # Determine pager usage and bat language based on output format
+    switch $output_format
+        case table
+            set use_pager false
+        case yaml yaml-stream
+            set bat_lang yaml
+        case text
+            set bat_lang txt
+        case json
+            set bat_lang json
+    end
+
+    if test $use_pager = true; and isatty stdout
+        command aws $original_argv | bat --language=$bat_lang --style=plain
+    else
+        command aws $original_argv
+    end
+end
