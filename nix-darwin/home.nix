@@ -21,6 +21,7 @@
     # # Adds the 'hello' command to your environment. It prints a friendly
     # Docker stuff
     lazydocker
+    amazon-ecr-credential-helper
 
     # fastfetch
 
@@ -28,11 +29,16 @@
     grc
     doggo
     btop
+    hwatch
     yazi
+    xmlstarlet
+    sqlfluff
+    television
+    sd
+    nmap
     # spotify-player
 
     wget
-    tree-sitter
 
     # pre-commit
     # carapace
@@ -46,6 +52,8 @@
     git
     openssl
     tabiew
+
+    circleci-cli
 
     # bat
     # bat-extras.batman

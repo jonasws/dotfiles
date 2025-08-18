@@ -64,8 +64,10 @@
               "1password"
               "raycast"
               "karabiner-elements"
+              "obsidian"
             ];
             brews = [
+              "gping"
               "pngpaste"
               "docker"
               "docker-compose"
@@ -84,6 +86,7 @@
               "readline"
               "ossp-uuid"
               "libpq"
+              "colima"
               "cairo"
               "pango"
               "libpng"
