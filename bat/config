@@ -1,2 +1,3 @@
 --theme="Catppuccin Mocha"
+--map-syntax='*.hurl:TOML'
 
