@@ -1,7 +1,14 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:piper"
-rev = "1ab21d4"
+rev = "e95c7b3"
 hash = "2143a53182dbbe935a1abd1623424aa5"
 
-[flavor]
-deps = []
+[[plugin.deps]]
+use = "yazi-rs/plugins:mime-ext"
+rev = "e95c7b3"
+hash = "4c49c446328c4553a4ccab7facc10b21"
+
+[[flavor.deps]]
+use = "yazi-rs/flavors:catppuccin-mocha"
+rev = "9cd2ac4"
+hash = "f54b45bdd33f607ddde47f0afad96142"

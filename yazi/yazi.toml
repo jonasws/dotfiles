@@ -121,6 +121,7 @@ fetchers = [
   { id = "mime", name = "*", run = "mime", prio = "high" },
 ]
 prepend_previewers = [
+  { name = "*.hurl", run = 'piper -- bat --plain --color always --language=toml  "$1"' },
   { name = "*.xml", run = 'piper -- xmlstarlet fo "$1" | bat --plain --color always --language=xml' },
   { name = "*.md", run = 'piper -- CLICOLOR_FORCE=1 glow -w=$w -s /Users/jonasws/catppuccin/glamour/themes/catppuccin-mocha.json "$1"' },
 ]
