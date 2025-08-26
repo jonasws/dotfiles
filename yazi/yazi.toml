@@ -56,6 +56,9 @@ play = [
   { run = 'mpv --force-window %*', orphan = true, for = "windows" },
   { run = '''mediainfo "$1"; echo "Press enter to exit"; read _''', block = true, desc = "Show media info", for = "unix" },
 ]
+fx = [
+  { run = 'fx "$@"', block = true, orphan = false, desc = "Open with fx JSON viewer", for = "unix" },
+]
 
 [open]
 rules = [
@@ -85,10 +88,15 @@ rules = [
     "extract",
     "reveal",
   ] },
+  # jsonlines
+  { name = "*.jsonl", use = [
+    "fx",
+  ] },
+  # }
   # JSON
   { mime = "application/{json,ndjson}", use = [
-    "edit",
     "reveal",
+    "fx",
   ] },
   { mime = "*/javascript", use = [
     "edit",

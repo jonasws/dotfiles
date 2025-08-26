@@ -67,6 +67,12 @@ config.keys = {
     mods = 'ALT',
     action = wezterm.action.DisableDefaultAssignment,
   },
+  -- Claude Code integration: Enable Shift+Enter for multiline input
+  {
+    key = 'Enter',
+    mods = 'SHIFT',
+    action = act.SendString('\n'),
+  },
   {
     key = 'd',
     mods = 'SUPER',

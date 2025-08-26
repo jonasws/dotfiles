@@ -146,3 +146,7 @@ omap g<A-n> <Plug>AllWholeOccurrences
 
 nmap <leader>cr    :action CopyReference<CR>
 
+" Claude Code integration
+let g:WhichKeyDesc_Leader_ClaudeCode = "<leader>cc claude-code"
+nnoremap <leader>cc    :action com.anthropic.code.plugin.actions.OpenClaudeInTerminalAction<CR>
+vnoremap <leader>cc    :action com.anthropic.code.plugin.actions.OpenClaudeInTerminalAction<CR>

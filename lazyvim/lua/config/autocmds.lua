@@ -46,3 +46,11 @@ vim.api.nvim_create_autocmd("FileType", {
     end
   end,
 })
+
+-- Fix git commit cursor positioning
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = "gitcommit",
+  callback = function()
+    vim.cmd("normal! gg")
+  end,
+})

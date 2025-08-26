@@ -60,7 +60,7 @@
     # httpie
     nushell
     xh
-    hurl
+    # hurl
     zoxide
     zellij
     starship
