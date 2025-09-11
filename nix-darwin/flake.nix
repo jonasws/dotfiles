@@ -67,6 +67,7 @@
               "obsidian"
             ];
             brews = [
+              "duti"
               "hurl"
               "gping"
               "pngpaste"

@@ -242,6 +242,45 @@ if status is-interactive
 
     set -g _one_off_aws_command false
 
+    function deployments -a envName
+        nu -l -c "deployments $envName"
+    end
+
+    function build-screen --description "Watch CNOPS build screen for specified
+  environment" -a env_name -a interval
+
+        # Validate required environment argument
+        if test -z "$env_name"
+            echo "Error: Environment is required. Usage: build-screen <env>
+  [interval]"
+            echo "Available environments: dev, staging, prod"
+            return 1
+        end
+
+        # Set default interval
+        if test -z "$interval"
+            set interval 15
+        end
+
+        # Validate environment
+        if not contains $env_name dev staging prod
+            echo "Error: Environment must be one of: dev, staging, prod"
+            return 1
+        end
+
+        # Validate interval is a number
+        if not string match -qr '^\d+$' $interval
+            echo "Error: Interval must be a positive integer"
+            return 1
+        end
+
+        echo "🚀 Starting build screen for $env_name environment (refresh every
+$interval seconds)"
+        echo "Press Ctrl+C to stop"
+
+        hwatch -n $interval --no-title --no-summary --mouse --color "FORCE_COLOR=1 nu ~/overlays/build-screen.nu $env_name"
+    end
+
     function changeAwsProfileBackground -v AWS_PROFILE
         # Skip background change if this is a one-off command
         if test $_one_off_aws_command = true
@@ -293,8 +332,8 @@ if status is-interactive
     function view-ci
         set -l projectName (basename (pwd))
         set -l rev (git rev-parse HEAD)
-        set -l runId (gh run list --commit $rev --json databaseId -q .[0].databaseId)
-        gh run watch $runId; and notify "CI finished" "CI finished for $projectName"
+        set -l runId (gh run list --commit $rev --json databaseId -q '.[0].databaseId')
+        gh run watch $runId
     end
 
     function notify -a title body
@@ -343,12 +382,17 @@ if status is-interactive
         set -l original_argv $argv
 
         # Parse known AWS CLI arguments we care about
-        argparse --ignore-unknown 'output=' -- $argv
+        argparse --ignore-unknown 'output=' no-cli-pager -- $argv
         or return
 
         set -l output_format json
         set -l use_pager true
         set -l bat_lang json
+
+        # Check if --no-cli-pager was specified (takes precedence)
+        if set -q _flag_no_cli_pager
+            set use_pager false
+        end
 
         # Check if --output was specified
         if set -q _flag_output
@@ -356,15 +400,18 @@ if status is-interactive
         end
 
         # Determine pager usage and bat language based on output format
-        switch $output_format
-            case table
-                set use_pager false
-            case yaml yaml-stream
-                set bat_lang yaml
-            case text
-                set bat_lang txt
-            case json
-                set bat_lang json
+        # (only if --no-cli-pager wasn't specified)
+        if test $use_pager = true
+            switch $output_format
+                case table
+                    set use_pager false
+                case yaml yaml-stream
+                    set bat_lang yaml
+                case text
+                    set bat_lang txt
+                case json
+                    set bat_lang json
+            end
         end
 
         if test $use_pager = true; and isatty stdout

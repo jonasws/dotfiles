@@ -5,7 +5,25 @@ local act = wezterm.action
 local config = wezterm.config_builder()
 config.color_scheme = 'Catppuccin Mocha'
 
+-- Override only Catppuccin's grey "black" with transparent for TUI compatibility
+-- Unfortunately we need to specify all ANSI colors when overriding any
+config.colors = {
+  ansi = {
+    'none',     -- black: transparent (was #45475a)
+    '#f38ba8',  -- red
+    '#a6e3a1',  -- green
+    '#f9e2af',  -- yellow
+    '#89b4fa',  -- blue
+    '#f5c2e7',  -- pink (magenta)
+    '#94e2d5',  -- teal (cyan)
+    '#bac2de',  -- white (subtext1)
+  },
+}
+
 config.term = 'wezterm'
+config.set_environment_variables = {
+  COLORTERM = 'truecolor',
+}
 
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
@@ -29,6 +47,14 @@ config.command_palette_rows = 14
 
 config.use_dead_keys = false
 config.scrollback_lines = 5000
+
+-- Add hyperlink rules for Firefox container URLs
+config.hyperlink_rules = wezterm.default_hyperlink_rules()
+table.insert(config.hyperlink_rules, {
+  -- Pattern matches ext+container: followed by parameters
+  regex = [[ext\+container:(?:name=[^&\s]+)(?:&[a-zA-Z]+=(?:[^&\s]+))*]],
+  format = '$0',
+})
 
 -- config.window_padding = {
 --   left = 2,
@@ -71,7 +97,7 @@ config.keys = {
   {
     key = 'Enter',
     mods = 'SHIFT',
-    action = act.SendString('\n'),
+    action = act.SendString '\n',
   },
   {
     key = 'd',
@@ -111,6 +137,7 @@ config.keys = {
       label = 'open url',
       patterns = {
         [[https?:\/\/[^\s"'<>,]+]], -- URL with http or https, excluding trailing commas
+        [[ext\+container:(?:name=[^&\s]+)(?:&[a-zA-Z]+=(?:[^&\s]+))*]], -- Firefox container URLs
       },
       action = wezterm.action_callback(function(window, pane)
         local url = window:get_selection_text_for_pane(pane)
