@@ -209,10 +209,13 @@
           {
             "description": "Change left_control+hjkl to arrow keys",
             "manipulators": [
-              {
+               {
                 "conditions": [
                   {
-                    "bundle_identifiers": ["^com\\.github\\.wez\\.wezterm$"],
+                    "bundle_identifiers": [
+                      "^com\\.github\\.wez\\.wezterm$",
+                      "^dev\\.zed\\.Zed-Preview$"
+                    ],
                     "type": "frontmost_application_unless"
                   }
                 ],
@@ -230,10 +233,13 @@
                 ],
                 "type": "basic"
               },
-              {
+               {
                 "conditions": [
                   {
-                    "bundle_identifiers": ["^com\\.github\\.wez\\.wezterm$"],
+                    "bundle_identifiers": [
+                      "^com\\.github\\.wez\\.wezterm$",
+                      "^dev\\.zed\\.Zed-Preview$"
+                    ],
                     "type": "frontmost_application_unless"
                   }
                 ],
@@ -251,10 +257,13 @@
                 ],
                 "type": "basic"
               },
-              {
+               {
                 "conditions": [
                   {
-                    "bundle_identifiers": ["^com\\.github\\.wez\\.wezterm$"],
+                    "bundle_identifiers": [
+                      "^com\\.github\\.wez\\.wezterm$",
+                      "^dev\\.zed\\.Zed-Preview$"
+                    ],
                     "type": "frontmost_application_unless"
                   }
                 ],
@@ -272,10 +281,13 @@
                 ],
                 "type": "basic"
               },
-              {
+               {
                 "conditions": [
                   {
-                    "bundle_identifiers": ["^com\\.github\\.wez\\.wezterm$"],
+                    "bundle_identifiers": [
+                      "^com\\.github\\.wez\\.wezterm$",
+                      "^dev\\.zed\\.Zed-Preview$"
+                    ],
                     "type": "frontmost_application_unless"
                   }
                 ],
