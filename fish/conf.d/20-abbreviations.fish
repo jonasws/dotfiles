@@ -14,3 +14,6 @@ abbr -a dc docker-compose
 
 # Tool abbreviations
 abbr -a tf terraform
+
+abbr -a ge "gonzo --format=ecs-logback"
+

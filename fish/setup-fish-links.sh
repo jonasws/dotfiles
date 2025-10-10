@@ -30,6 +30,16 @@ for func_file in "$DOTFILES_FISH_DIR/functions"/*.fish; do
     fi
 done
 
+# Link individual completions
+echo "Linking custom completions..."
+for comp_file in "$DOTFILES_FISH_DIR/completions"/*.fish; do
+    if [ -f "$comp_file" ]; then
+        comp_name=$(basename "$comp_file")
+        echo "  Linking $comp_name..."
+        ln -sf "$comp_file" "$FISH_CONFIG_DIR/completions/$comp_name"
+    fi
+done
+
 # Copy conf.d files (don't link to avoid conflicts with fisher)
 echo "Copying conf.d files..."
 for conf_file in "$DOTFILES_FISH_DIR/conf.d"/*.fish; do
@@ -42,4 +52,4 @@ done
 
 echo "Fish configuration setup complete!"
 echo "You can now edit files in $DOTFILES_FISH_DIR and they will be immediately available."
-echo "Functions are symlinked, conf.d files are copied."
+echo "Functions and completions are symlinked, conf.d files are copied."
