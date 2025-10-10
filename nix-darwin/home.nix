@@ -29,8 +29,8 @@
     grc
     doggo
     btop
-    hwatch
     yazi
+    hwatch
     xmlstarlet
     sqlfluff
     television
@@ -93,7 +93,8 @@
 
     gradle
     _1password-cli
-    lnav
+    # lnav
+    toolong
     # ranger
 
     ookla-speedtest

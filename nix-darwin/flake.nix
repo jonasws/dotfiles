@@ -2,7 +2,10 @@
   description = "jonasws Darwin system flake";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
+    # Pinned to Oct 4, 2025 to avoid awscli2-2.30.6 test failures
+    # See: https://github.com/NixOS/nixpkgs/issues/449266
+    # Remove this pin once the issue is resolved
+    nixpkgs.url = "github:NixOS/nixpkgs/0ad7a9f5a5629b51e19d96ff5c4663b66caa4d55";
     nix-darwin = {
       url = "github:LnL7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -50,7 +53,7 @@
               autoUpdate = false;
             };
             onActivation = {
-              autoUpdate = false;
+              autoUpdate = true;
               upgrade = true;
               cleanup = "uninstall";
             };
@@ -59,7 +62,10 @@
               "slack"
               "rectangle"
               "firefox@nightly"
-              "wezterm@nightly"
+              {
+                name = "wezterm@nightly";
+                greedy = true;
+              }
               "spotify"
               "1password"
               "raycast"
@@ -67,6 +73,8 @@
               "obsidian"
             ];
             brews = [
+              "flyway"
+              "automake"
               "duti"
               "hurl"
               "gping"
@@ -78,9 +86,7 @@
               "icu4c"
               # "nushell"
               "starship"
-              "lnav"
               "mise"
-              "fnm"
               "ymtdzzz/tap/otel-tui"
               "pkg-config"
               "zlib"
@@ -93,7 +99,6 @@
               "pango"
               "libpng"
               "jpeg"
-              "lnav"
               "tailspin"
               "giflib"
               "bat"
