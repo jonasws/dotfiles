@@ -3,27 +3,23 @@ local wezterm = require 'wezterm'
 local act = wezterm.action
 
 local config = wezterm.config_builder()
+-- Configuration uses Catppuccin color scheme with custom transparency
 config.color_scheme = 'Catppuccin Mocha'
 
--- Override only Catppuccin's grey "black" with transparent for TUI compatibility
--- Unfortunately we need to specify all ANSI colors when overriding any
 config.colors = {
   ansi = {
-    'none',     -- black: transparent (was #45475a)
-    '#f38ba8',  -- red
-    '#a6e3a1',  -- green
-    '#f9e2af',  -- yellow
-    '#89b4fa',  -- blue
-    '#f5c2e7',  -- pink (magenta)
-    '#94e2d5',  -- teal (cyan)
-    '#bac2de',  -- white (subtext1)
+    'none', -- black: transparent (was #45475a)
+    '#f38ba8', -- red
+    '#a6e3a1', -- green
+    '#f9e2af', -- yellow
+    '#89b4fa', -- blue
+    '#f5c2e7', -- pink (magenta)
+    '#94e2d5', -- teal (cyan)
+    '#bac2de', -- white (subtext1)
   },
 }
 
 config.term = 'wezterm'
-config.set_environment_variables = {
-  COLORTERM = 'truecolor',
-}
 
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
