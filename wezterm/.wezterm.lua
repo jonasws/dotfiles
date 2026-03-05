@@ -19,7 +19,7 @@ config.colors = {
   },
 }
 
-config.term = 'wezterm'
+config.term = 'xterm-256color'
 
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
