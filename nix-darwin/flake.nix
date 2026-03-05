@@ -2,10 +2,7 @@
   description = "jonasws Darwin system flake";
 
   inputs = {
-    # Pinned to Oct 4, 2025 to avoid awscli2-2.30.6 test failures
-    # See: https://github.com/NixOS/nixpkgs/issues/449266
-    # Remove this pin once the issue is resolved
-    nixpkgs.url = "github:NixOS/nixpkgs/0ad7a9f5a5629b51e19d96ff5c4663b66caa4d55";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
     nix-darwin = {
       url = "github:LnL7/nix-darwin/master";
       inputs.nixpkgs.follows = "nixpkgs";
