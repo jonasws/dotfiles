@@ -91,6 +91,8 @@ $env.config = {
   # ]
 }
 
+$env.config.color_config.bool = {|x| if $x { 'green' } else { 'light_red' } }
+
 alias e = explore -i
 alias n = nvim
 alias la = ls --all

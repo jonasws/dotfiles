@@ -8,8 +8,6 @@ alias as-tree "command tree --fromfile"
 alias zp zed-preview
 
 # Tool aliases
-alias tw "tw --theme catppuccin"
-alias http xh
 alias dadbod "nvim -c DBUI"
 alias sg ast-grep
 alias bg batgrep
