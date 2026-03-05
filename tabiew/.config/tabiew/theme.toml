@@ -1,0 +1,176 @@
+# Based on the built-in Catppuccin Mocha theme, with a custom row_highlight:
+# dark text on muted yellow
+
+[table_header]
+fg = "#cdd6f4"
+bg = "#3E3E4E"
+add_modifier = ""
+sub_modifier = ""
+
+[[table_headers]]
+fg = "#f37799"
+bg = "#3E3E4E"
+add_modifier = ""
+sub_modifier = ""
+
+[[table_headers]]
+fg = "#89d88b"
+bg = "#3E3E4E"
+add_modifier = ""
+sub_modifier = ""
+
+[[table_headers]]
+fg = "#ebd391"
+bg = "#3E3E4E"
+add_modifier = ""
+sub_modifier = ""
+
+[[table_headers]]
+fg = "#74a8fc"
+bg = "#3E3E4E"
+add_modifier = ""
+sub_modifier = ""
+
+[[table_headers]]
+fg = "#f2aede"
+bg = "#3E3E4E"
+add_modifier = ""
+sub_modifier = ""
+
+[[table_headers]]
+fg = "#6bd7ca"
+bg = "#3E3E4E"
+add_modifier = ""
+sub_modifier = ""
+
+[[rows]]
+fg = "#cdd6f4"
+bg = "#242434"
+add_modifier = ""
+sub_modifier = ""
+
+[[rows]]
+fg = "#cdd6f4"
+bg = "#2A2A3A"
+add_modifier = ""
+sub_modifier = ""
+
+[row_highlight]
+fg = "#1e1e2e"
+bg = "#c9a84c"
+add_modifier = ""
+sub_modifier = ""
+
+[[table_tags]]
+fg = "#1e1e2e"
+bg = "#f38ba8"
+add_modifier = ""
+sub_modifier = ""
+
+[[table_tags]]
+fg = "#1e1e2e"
+bg = "#a6e3a1"
+add_modifier = ""
+sub_modifier = ""
+
+[[table_tags]]
+fg = "#1e1e2e"
+bg = "#f9e2af"
+add_modifier = ""
+sub_modifier = ""
+
+[[table_tags]]
+fg = "#1e1e2e"
+bg = "#89b4fa"
+add_modifier = ""
+sub_modifier = ""
+
+[[table_tags]]
+fg = "#1e1e2e"
+bg = "#f5c2e7"
+add_modifier = ""
+sub_modifier = ""
+
+[[table_tags]]
+fg = "#1e1e2e"
+bg = "#94e2d5"
+add_modifier = ""
+sub_modifier = ""
+
+[block]
+fg = "#cdd6f4"
+bg = "#1e1e2e"
+add_modifier = ""
+sub_modifier = ""
+
+[block_tag]
+fg = "#cdd6f4"
+bg = "#45475a"
+add_modifier = ""
+sub_modifier = ""
+
+[text]
+fg = "#cdd6f4"
+bg = "#1e1e2e"
+add_modifier = ""
+sub_modifier = ""
+
+[text_highlighted]
+fg = "#cdd6f4"
+bg = "#1e1e2e"
+add_modifier = ""
+sub_modifier = ""
+
+[subtext]
+fg = "#45475a"
+bg = "#1e1e2e"
+add_modifier = ""
+sub_modifier = ""
+
+[error]
+fg = "#C9B27F"
+bg = "#1e1e2e"
+add_modifier = ""
+sub_modifier = ""
+
+[gutter]
+fg = "#45475a"
+bg = "#1e1e2e"
+add_modifier = ""
+sub_modifier = ""
+
+[[chart]]
+fg = "#f38ba8"
+bg = "#1e1e2e"
+add_modifier = ""
+sub_modifier = ""
+
+[[chart]]
+fg = "#a6e3a1"
+bg = "#1e1e2e"
+add_modifier = ""
+sub_modifier = ""
+
+[[chart]]
+fg = "#f9e2af"
+bg = "#1e1e2e"
+add_modifier = ""
+sub_modifier = ""
+
+[[chart]]
+fg = "#89b4fa"
+bg = "#1e1e2e"
+add_modifier = ""
+sub_modifier = ""
+
+[[chart]]
+fg = "#f5c2e7"
+bg = "#1e1e2e"
+add_modifier = ""
+sub_modifier = ""
+
+[[chart]]
+fg = "#94e2d5"
+bg = "#1e1e2e"
+add_modifier = ""
+sub_modifier = ""

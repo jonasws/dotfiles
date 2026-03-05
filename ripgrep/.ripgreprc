@@ -1,7 +1,6 @@
---colors=line:fg:yellow
+--colors=line:fg:249,226,175
 --colors=line:style:bold
---colors=path:fg:green
+--colors=path:fg:137,180,250
 --colors=path:style:bold
---colors=match:fg:black
---colors=match:bg:yellow
---colors=match:style:nobold
+--colors=match:fg:243,139,168
+--colors=match:style:bold

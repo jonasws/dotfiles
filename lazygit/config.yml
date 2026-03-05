@@ -29,28 +29,22 @@ gui:
       - "#cdd6f4"
     searchingActiveBorderColor:
       - "#f9e2af"
-
   authorColors:
     "*": "#b4befe"
-
 disableStartupPopups: true
-
 git:
   autoFetch: false
   log:
     order: default
-  paging:
-    colorArg: always
-    pager: delta --dark --paging=never
+  pagers:
+    - colorArg: always
+      pager: delta --dark --paging=never
   commit:
     signOff: false
-  parseEmoji:
-    true
-    # externalDiffCommand: difft --color=always
-
+  parseEmoji: true
+  # externalDiffCommand: difft --color=always
 update:
   method: never
-
 customCommands:
   - key: "R"
     command: 'git log --oneline --author="^(?!.*renovate).*" --perl-regexp'
