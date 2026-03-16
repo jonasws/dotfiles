@@ -100,6 +100,9 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
     $data | get $columnName | compact  --empty | is-empty
   })
 
-  $data | reject ...$empty_columns
+  $data |
+    reject ...$empty_columns |
+    table -i false
+
 
 }

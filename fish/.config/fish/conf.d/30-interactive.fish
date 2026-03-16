@@ -17,9 +17,11 @@ if status is-interactive
     complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
 
     # Console command completions
-    set -l awsProfiles cnops-build-admin cnops-dev-admin cnops-dev-developer cnops-staging-admin cnops-staging-developer cnops-prod-admin cnops-prod-developer trafficinfo-service trafficinfo-dev trafficinfo-test trafficinfo-stage trafficinfo-prod trafficinfo-prod--admin
+    set -l awsProfiles cnops-build-developer cnops-build-admin cnops-dev-admin cnops-dev-developer cnops-staging-admin cnops-staging-developer cnops-prod-admin cnops-prod-developer trafficinfo-service trafficinfo-dev trafficinfo-test trafficinfo-stage trafficinfo-prod trafficinfo-prod--admin
     complete -c console -x -n "not __fish_seen_subcommand_from $awsProfiles" -a "$awsProfiles"
     complete -c console -x -n "__fish_seen_subcommand_from $awsProfiles" -a 'ecs/v2 cloudwatch codepipeline cloudformation events secretsmanager ec2 vpc s3 states'
+
+    set -x OP_ACCOUNT capragroup.1password.eu
 
     # Initialize external tools
     if command -q batman
@@ -47,4 +49,3 @@ if status is-interactive
         source ~/.config/op/plugins.sh
     end
 end
-
