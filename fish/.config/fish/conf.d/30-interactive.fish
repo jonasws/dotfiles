@@ -17,9 +17,10 @@ if status is-interactive
     complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
 
     # Console command completions
-    set -l awsProfiles cnops-build-developer cnops-build-admin cnops-dev-admin cnops-dev-developer cnops-staging-admin cnops-staging-developer cnops-prod-admin cnops-prod-developer trafficinfo-service trafficinfo-dev trafficinfo-test trafficinfo-stage trafficinfo-prod trafficinfo-prod--admin
-    complete -c console -x -n "not __fish_seen_subcommand_from $awsProfiles" -a "$awsProfiles"
-    complete -c console -x -n "__fish_seen_subcommand_from $awsProfiles" -a 'ecs/v2 cloudwatch codepipeline cloudformation events secretsmanager ec2 vpc s3 states'
+    complete -c console -x -n "not __fish_seen_subcommand_from (aws configure list-profiles)" \
+        -a "(aws configure list-profiles | grep -E 'cnops|cargonet|trafficinfo')"
+    complete -c console -x -n "__fish_seen_subcommand_from (aws configure list-profiles)" \
+        -a 'ecs/v2 cloudwatch codepipeline cloudformation events secretsmanager ec2 vpc s3 states'
 
     set -x OP_ACCOUNT capragroup.1password.eu
 
@@ -38,6 +39,25 @@ if status is-interactive
 
     if command -q tv
         tv init fish | source
+
+        function tv_autocomplete_with_aws_profiles
+            set -l current_prompt (commandline --current-process)
+            if string match -qr '(^|\s)aws\s.*--profile\s*$' -- $current_prompt
+                printf "\n"
+                set -l result (tv aws-profiles --inline --no-status-bar)
+                if test -n "$result"
+                    commandline -t -- $result' '
+                end
+                printf "\033[A"
+                commandline -f repaint
+            else
+                tv_smart_autocomplete
+            end
+        end
+
+        for mode in default insert
+            bind --mode $mode ctrl-t tv_autocomplete_with_aws_profiles
+        end
     end
 
     if command -q mise
@@ -48,4 +68,7 @@ if status is-interactive
     if test -f ~/.config/op/plugins.sh
         source ~/.config/op/plugins.sh
     end
+
+    alias claude='CLAUDE_SESSION=1 GH_TOKEN=$(op read "op://Employee/Liflig Github PAT/token") command claude'
+
 end
