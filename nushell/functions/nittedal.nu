@@ -9,7 +9,9 @@ export def main [numberOfDepartures?: int, startTime?: string] {
         if ($parts | length) == 2 {
             let hour = ($parts | get 0)
             let minute = ($parts | get 1)
-            date now | format date $"(%Y-%m-%d)T($hour):($minute)%z"
+            let date_part = (date now | format date "%Y-%m-%d")
+            let tz_part = (date now | format date "%z")
+            $"($date_part)T($hour):($minute)($tz_part)"
         } else {
             date now | format date "%Y-%m-%dT%H:%M%z"
         }
@@ -93,7 +95,7 @@ query GetDepartures($stopPlace: String!, $lines: [ID!]!, $timeRange: Int = 86400
     }
     | update time {
       $in | into datetime | format date '%H:%M'
-    } |
+    }
     | sort-by time)
 
   let empty_columns = (["stop_desc", "situation"] | where { |columnName|
