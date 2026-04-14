@@ -1,19 +1,24 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:piper"
-rev = "1962818"
+rev = "babfd0f"
 hash = "384464b6df8cb807425c521f8cd790f3"
 
 [[plugin.deps]]
 use = "uhs-robert/sshfs"
-rev = "4070c8e"
-hash = "a4cd81fe60c350c3f0fde9957f4a4bb9"
+rev = "7ba17a8"
+hash = "f6927372436c780965035310821a40d9"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mime-ext"
-rev = "1962818"
-hash = "8b177921e50732b2c8e9d71aa5956270"
+rev = "babfd0f"
+hash = "31994c9caec5bdcafd994e9b00c632a4"
+
+[[plugin.deps]]
+use = "aresler/path-from-root"
+rev = "3daa62f"
+hash = "f3375d21ceb5f49d2d50ad199262006a"
 
 [[flavor.deps]]
 use = "yazi-rs/flavors:catppuccin-mocha"
-rev = "2d73b79"
-hash = "d4c41d713b325710a9dd5ae86c3f8a5f"
+rev = "0670801"
+hash = "7dfe41c9c3d9be76da8a844263d0bbed"

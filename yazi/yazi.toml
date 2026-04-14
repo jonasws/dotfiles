@@ -140,6 +140,7 @@ fetchers = [
 ]
 prepend_previewers = [
   { url = "*.md", run = 'piper -- CLICOLOR_FORCE=1 glow -p -w=$w -s /Users/jonasws/catppuccin/glamour/themes/catppuccin-mocha.json "$1"' },
+  { url = "*.hurl", run = 'piper -- tree-sitter highlight "$1"' },
 ]
 
 prepend_preloaders = []
