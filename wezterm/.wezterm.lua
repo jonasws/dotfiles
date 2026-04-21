@@ -2,6 +2,208 @@ local wezterm = require 'wezterm'
 -- local mux = wezterm.mux
 local act = wezterm.action
 
+-- AWS console URL interception: resolve profile from account ID embedded in
+-- URL, run `aws-vault login --stdout` to mint a federated sign-in URL,
+-- splice the original URL as Destination, and open in firefox-container
+-- with a color derived from `aws configure get color`. Map from account-ID
+-- -> profile is built at config load and lazily refreshed on cache miss.
+-- Unknown account prompts for profile via InputSelector.
+
+local AWS_CONSOLE_SCRIPT = wezterm.home_dir .. '/dotfiles/utils/aws-console'
+local AWS_HIDDEN_WORKSPACE = '__aws_console_auth'
+-- Reuse an existing container session instead of minting a fresh sign-in
+-- URL when the last sign-in for a given profile is younger than this.
+-- Federated sign-in invalidates prior tabs in the same container, so
+-- re-signing within this window ejects the user from tabs they still
+-- have open. Role chaining (capra-auth STS session + target AssumeRole
+-- via aws-vault) caps browser sessions at 1h; 55 minutes leaves a
+-- 5-minute safety margin below that ceiling.
+local AWS_SESSION_REUSE_SECONDS = 55 * 60
+local aws_last_signin = {} -- profile -> os.time() of last aws-vault login
+
+-- Env for children spawned into the hidden auth pane:
+--  - OP_*: force the Capra 1Password account + biometric unlock so op
+--    doesn't hang waiting for interactive account selection.
+--  - AWS_VAULT_BIOMETRICS: Touch ID unlock for aws-vault keychain.
+--  - HIST*: suppress shell history pollution in the hidden workspace.
+local OP_ENV = {
+  OP_ACCOUNT = 'capragroup.1password.eu',
+  OP_BIOMETRIC_UNLOCK_ENABLED = 'true',
+  AWS_VAULT_BIOMETRICS = 'true',
+  HISTFILE = '/dev/null',
+  HISTSIZE = '0',
+  HISTFILESIZE = '0',
+}
+
+local function build_aws_profile_map()
+  local account_to_profiles = {}
+  local all_profiles = {}
+  local home = wezterm.home_dir
+  local cfg = io.open(home .. '/.aws/config', 'r')
+  if not cfg then
+    return account_to_profiles, all_profiles
+  end
+  local current_profile = nil
+  for line in cfg:lines() do
+    local p = line:match '^%s*%[profile%s+([^%]]+)%]'
+    if p then
+      current_profile = p
+      table.insert(all_profiles, p)
+    elseif current_profile then
+      local account = line:match 'role_arn%s*=%s*arn:aws:iam::(%d%d%d%d%d%d%d%d%d%d%d%d):'
+      if account then
+        account_to_profiles[account] = account_to_profiles[account] or {}
+        table.insert(account_to_profiles[account], current_profile)
+      end
+    end
+  end
+  cfg:close()
+
+  -- Collapse to a single preferred profile per account: prefer *-developer
+  local account_to_profile = {}
+  for acct, profiles in pairs(account_to_profiles) do
+    local pick = profiles[1]
+    for _, name in ipairs(profiles) do
+      if name:match '%-developer$' then
+        pick = name
+        break
+      end
+    end
+    account_to_profile[acct] = pick
+  end
+  return account_to_profile, all_profiles
+end
+
+local aws_profile_map, aws_all_profiles = build_aws_profile_map()
+
+local function is_aws_console_url(uri)
+  return uri:match '^https?://[^/]*console%.aws%.amazon%.com' ~= nil or uri:match '^https?://[^/]*%.console%.aws%.amazon%.com' ~= nil
+end
+
+local function extract_aws_account(uri)
+  -- Try in order of specificity:
+  -- 1. ARN (plain or percent-encoded colons): arn:aws:svc:region:ACCOUNT:...
+  local acct = uri:match 'arn:aws:[%w%-]+:[%w%-]*:(%d%d%d%d%d%d%d%d%d%d%d%d):'
+  if acct then
+    return acct
+  end
+  acct = uri:match 'arn%%3Aaws%%3A[%w%-]+%%3A[%w%-]*%%3A(%d%d%d%d%d%d%d%d%d%d%d%d)%%3A'
+  if acct then
+    return acct
+  end
+  -- 2. account=NNN query param
+  acct = uri:match '[?&]account=(%d%d%d%d%d%d%d%d%d%d%d%d)'
+  if acct then
+    return acct
+  end
+  -- 3. account ID as subdomain: 123456789012.console.aws.amazon.com or .signin.
+  acct = uri:match '://(%d%d%d%d%d%d%d%d%d%d%d%d)%.[%w%-]*%.?console%.aws%.amazon%.com'
+  if acct then
+    return acct
+  end
+  acct = uri:match '://(%d%d%d%d%d%d%d%d%d%d%d%d)%.signin%.aws%.amazon%.com'
+  if acct then
+    return acct
+  end
+  -- 4. path segment /NNN/ (e.g. /console/account/123456789012/)
+  acct = uri:match '/(%d%d%d%d%d%d%d%d%d%d%d%d)[/?#]'
+  if acct then
+    return acct
+  end
+  return nil
+end
+
+local function shell_quote(s)
+  return "'" .. s:gsub("'", [['\'']]) .. "'"
+end
+
+-- Find an existing pane in the hidden workspace, or nil.
+local function find_auth_pane()
+  for _, win in ipairs(wezterm.mux.all_windows()) do
+    if win:get_workspace() == AWS_HIDDEN_WORKSPACE then
+      for _, tab in ipairs(win:tabs()) do
+        for _, p in ipairs(tab:panes()) do
+          return p
+        end
+      end
+    end
+  end
+  return nil
+end
+
+-- Spawn a long-lived shell into the hidden workspace and return its pane.
+-- First command sent to this pane will pay the op biometric cost; later
+-- commands reuse the warm op session within the same shell.
+local function ensure_auth_pane()
+  local pane = find_auth_pane()
+  if pane then
+    return pane
+  end
+  local _, new_pane, _ = wezterm.mux.spawn_window {
+    args = { '/bin/sh', '-l' },
+    workspace = AWS_HIDDEN_WORKSPACE,
+    set_environment_variables = OP_ENV,
+  }
+  return new_pane
+end
+
+local function open_authenticated_aws(profile, uri)
+  local pane = ensure_auth_pane()
+  if not pane then
+    return
+  end
+  local now = os.time()
+  local last = aws_last_signin[profile]
+  local reuse = last and (now - last) < AWS_SESSION_REUSE_SECONDS
+  local parts = { shell_quote(AWS_CONSOLE_SCRIPT) }
+  if reuse then
+    table.insert(parts, '--no-signin')
+  else
+    aws_last_signin[profile] = now
+  end
+  table.insert(parts, shell_quote(profile))
+  table.insert(parts, shell_quote(uri))
+  pane:send_text(table.concat(parts, ' ') .. '\n')
+end
+
+local function prompt_profile(window, pane, uri)
+  local choices = {}
+  for _, name in ipairs(aws_all_profiles) do
+    table.insert(choices, { id = name, label = name })
+  end
+  window:perform_action(
+    act.InputSelector {
+      title = 'AWS profile for: ' .. uri,
+      choices = choices,
+      fuzzy = true,
+      action = wezterm.action_callback(function(_, _, id, _)
+        if id then
+          open_authenticated_aws(id, uri)
+        end
+      end),
+    },
+    pane
+  )
+end
+
+wezterm.on('open-uri', function(window, pane, uri)
+  if not is_aws_console_url(uri) then
+    return -- default handling
+  end
+  local account = extract_aws_account(uri)
+  local profile = account and aws_profile_map[account]
+  if not profile and account then
+    aws_profile_map, aws_all_profiles = build_aws_profile_map()
+    profile = aws_profile_map[account]
+  end
+  if profile then
+    open_authenticated_aws(profile, uri)
+    return false
+  end
+  prompt_profile(window, pane, uri)
+  return false
+end)
+
 local config = wezterm.config_builder()
 -- Configuration uses Catppuccin color scheme with custom transparency
 config.color_scheme = 'Catppuccin Mocha'
@@ -19,7 +221,7 @@ config.colors = {
   },
 }
 
-config.term = 'xterm-256color'
+config.term = 'wezterm'
 
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
@@ -43,6 +245,7 @@ config.command_palette_rows = 14
 
 config.use_dead_keys = false
 config.scrollback_lines = 5000
+config.notification_handling = 'SuppressFromFocusedWindow'
 
 -- Add hyperlink rules for Firefox container URLs
 config.hyperlink_rules = wezterm.default_hyperlink_rules()
