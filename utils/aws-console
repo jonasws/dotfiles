@@ -1,0 +1,87 @@
+#!/usr/bin/env bash
+# Open an AWS console URL in firefox-container under the given profile,
+# using `aws-vault login` to mint a federated sign-in URL.
+#
+# Usage:
+#   aws-console [--no-signin] <profile> [<service>|<url>]
+#
+# --no-signin: skip aws-vault login and open the URL directly in the
+#   container. Use when you know the container already has a valid AWS
+#   session, to avoid signing out other tabs in the same container.
+#
+# If the second positional argument starts with http(s):// it is treated
+# as a destination URL (spliced into aws-vault's sign-in URL via
+# --path/--region in the normal flow, passed through unchanged with
+# --no-signin). Otherwise it's passed to `aws-vault login --path`.
+# Omit to open the plain console home.
+set -euo pipefail
+
+# wezterm spawns us with a minimal PATH; prepend locations for mise shims
+# (aws-vault, aws, python3) and user-local bins (firefox-container).
+export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+no_signin=0
+if [[ "${1:-}" == "--no-signin" ]]; then
+  no_signin=1
+  shift
+fi
+
+if [[ $# -lt 1 ]]; then
+  echo "Usage: $(basename "$0") [--no-signin] <profile> [<service>|<url>]" >&2
+  exit 1
+fi
+
+profile="$1"
+destination="${2:-}"
+
+color="$(aws configure get color --profile "$profile" 2>/dev/null || true)"
+
+# aws-vault login needs an mfa_serial + token to do MFA-gated AssumeRole
+# on the target role. We keep mfa_serial out of the target profile so
+# `aws --profile X ...` doesn't trigger its own MFA prompt. Instead we
+# inject the serial via env and fetch the OTP from 1Password on demand.
+export AWS_MFA_SERIAL="arn:aws:iam::259731000386:mfa/jstr"
+mfa_token() {
+  op item get oztoffvitqmpnfiwgue677fw5m --otp
+}
+
+if [[ $no_signin -eq 1 ]]; then
+  if [[ -z "$destination" ]]; then
+    login_url="https://console.aws.amazon.com/"
+  elif [[ "$destination" =~ ^https?:// ]]; then
+    login_url="$destination"
+  else
+    login_url="https://console.aws.amazon.com/${destination}/home"
+  fi
+elif [[ "$destination" =~ ^https?:// ]]; then
+  # aws-vault login doesn't accept a full URL as Destination; mint a
+  # generic sign-in URL then splice the original URL in via Python.
+  signin="$(aws-vault login --stdout --mfa-token "$(mfa_token)" "$profile")"
+  encoded="$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$destination")"
+  login_url="$(printf '%s' "$signin" | python3 -c '
+import re, sys
+signin = sys.stdin.read()
+encoded = sys.argv[1]
+sys.stdout.write(re.sub(r"Destination=[^&]+", "Destination=" + encoded, signin, count=1))
+' "$encoded")"
+elif [[ -n "$destination" ]]; then
+  # Service name, e.g. "cloudformation" or "ec2/v2". aws-vault's --path
+  # becomes the Destination path directly, so append /home if the caller
+  # didn't already include a sub-path, to match the canonical AWS
+  # console URL shape (otherwise the console shows a 404).
+  path="${destination#/}"
+  if [[ "$path" != */* ]]; then
+    path="${path}/home"
+  fi
+  login_url="$(aws-vault login --stdout --mfa-token "$(mfa_token)" --path "$path" "$profile")"
+else
+  login_url="$(aws-vault login --stdout --mfa-token "$(mfa_token)" "$profile")"
+fi
+
+args=(firefox-container)
+if [[ -n "$color" ]]; then
+  args+=("--${color}")
+fi
+args+=(--name "$profile" "$login_url")
+
+exec "${args[@]}"

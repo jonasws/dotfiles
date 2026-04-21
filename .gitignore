@@ -8,5 +8,6 @@ zed/.*
 zed/embeddings/
 zed/prompts/
 yazi/flavors/
+yazi/plugins/
 nix-darwin/result
 television/.config/television/cable/
