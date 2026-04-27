@@ -5,6 +5,10 @@ if status is-interactive
         /opt/homebrew/bin/brew shellenv fish | source
     end
 
+    if command -q mise
+        mise activate fish | source
+    end
+
     # Fish theme
     fish_config theme choose "Catppuccin Mocha"
 
@@ -58,10 +62,6 @@ if status is-interactive
         for mode in default insert
             bind --mode $mode ctrl-t tv_autocomplete_with_aws_profiles
         end
-    end
-
-    if command -q mise
-        mise activate fish | source
     end
 
     # 1Password plugins

@@ -29,3 +29,5 @@ set -g _one_off_aws_command false
 
 # Fish configuration
 set fish_key_bindings fish_vi_key_bindings
+
+set -x AWS_VAULT_KEYCHAIN_NAME login
