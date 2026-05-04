@@ -36,14 +36,11 @@ destination="${2:-}"
 
 color="$(aws configure get color --profile "$profile" 2>/dev/null || true)"
 
-# aws-vault login needs an mfa_serial + token to do MFA-gated AssumeRole
-# on the target role. We keep mfa_serial out of the target profile so
-# `aws --profile X ...` doesn't trigger its own MFA prompt. Instead we
-# inject the serial via env and fetch the OTP from 1Password on demand.
+# aws-vault login needs mfa_serial to do MFA-gated AssumeRole on the
+# target role. We keep mfa_serial out of the target profile so
+# `aws --profile X ...` doesn't trigger its own MFA prompt. MFA token is
+# cached by aws-vault session elsewhere, so no --mfa-token injection here.
 export AWS_MFA_SERIAL="arn:aws:iam::259731000386:mfa/jstr"
-mfa_token() {
-  op item get oztoffvitqmpnfiwgue677fw5m --otp
-}
 
 if [[ $no_signin -eq 1 ]]; then
   if [[ -z "$destination" ]]; then
@@ -56,7 +53,7 @@ if [[ $no_signin -eq 1 ]]; then
 elif [[ "$destination" =~ ^https?:// ]]; then
   # aws-vault login doesn't accept a full URL as Destination; mint a
   # generic sign-in URL then splice the original URL in via Python.
-  signin="$(aws-vault login --stdout --mfa-token "$(mfa_token)" "$profile")"
+  signin="$(aws-vault login --stdout "$profile")"
   encoded="$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$destination")"
   login_url="$(printf '%s' "$signin" | python3 -c '
 import re, sys
@@ -73,9 +70,9 @@ elif [[ -n "$destination" ]]; then
   if [[ "$path" != */* ]]; then
     path="${path}/home"
   fi
-  login_url="$(aws-vault login --stdout --mfa-token "$(mfa_token)" --path "$path" "$profile")"
+  login_url="$(aws-vault login --stdout --path "$path" "$profile")"
 else
-  login_url="$(aws-vault login --stdout --mfa-token "$(mfa_token)" "$profile")"
+  login_url="$(aws-vault login --stdout "$profile")"
 fi
 
 args=(firefox-container)

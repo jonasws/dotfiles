@@ -97,6 +97,4 @@ if status is-interactive
 
     # Completion subcommand
     complete -c taws -n "__fish_seen_subcommand_from completion" -xa "bash zsh fish powershell elvish"
-
-    alias lnav "TERM=xterm-256color command lnav"
 end

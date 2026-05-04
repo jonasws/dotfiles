@@ -1,4 +1,4 @@
 function claude --wraps claude
-    set -lx GITHUB_TOKEN "op://Employee/Liflig Github PAT/token"
-    op run --no-masking -- command claude $argv
+    set -x GITHUB_TOKEN $CLAUDE_GITHUB_TOKEN
+    command claude $argv
 end

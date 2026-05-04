@@ -1,5 +1,5 @@
 # Maven abbreviations
-abbr -a mcv "mvn clean spotless:apply verify"
+abbr -a mcv "mvn clean verify"
 
 # Navigation abbreviations
 abbr -a - "cd -"
@@ -16,4 +16,3 @@ abbr -a dc docker-compose
 abbr -a tf terraform
 
 abbr -a ge "gonzo --format=ecs-logback"
-
