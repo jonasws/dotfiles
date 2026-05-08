@@ -1,6 +1,3 @@
-function view-ci --description "Watch CI run for current commit"
-    set -l projectName (basename (pwd))
-    set -l rev (git rev-parse HEAD)
-    set -l runId (gh run list --commit $rev --json databaseId -q '.[0].databaseId')
-    gh run watch $runId
+function view-ci --wraps='gh run ls -b (__git.current_branch) --status in_progress --json databaseId --jq .[].databaseId | xargs -r op plugin run -- gh run watch' --description 'alias view-ci gh run ls -b (__git.current_branch) --status in_progress --json databaseId --jq .[].databaseId | xargs -r op plugin run -- gh run watch'
+    gh run ls -b (__git.current_branch) --status in_progress --json databaseId --jq .[].databaseId | xargs -r op plugin run -- gh run watch $argv
 end

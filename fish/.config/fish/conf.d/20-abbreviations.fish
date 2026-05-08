@@ -10,9 +10,12 @@ abbr -a gsm "git switch master"
 abbr -a gp!! "git push --force"
 
 # Docker abbreviations
-abbr -a dc docker-compose
+abbr -a dc "docker compose"
 
 # Tool abbreviations
 abbr -a tf terraform
 
-abbr -a ge "gonzo --format=ecs-logback"
+abbr -a ge "gonzo --format=ecs-logback --use-log-time"
+
+# Log filtering abbreviations
+abbr -a tlt trim-log-times

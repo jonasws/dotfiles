@@ -20,37 +20,18 @@ local set_autoformat = function(pattern, bool_val)
 end
 
 set_autoformat({ "xml" }, false)
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "jq" },
-  callback = function()
-    vim.keymap.set(
-      { "n", "v" },
-      "<Leader>S",
-      "<Plug>(DBUI_ExecuteQuery)",
-      { buffer = true, silent = true, desc = "Execute current buffer sql query" }
-    )
-    if LazyVim.has_extra("coding.nvim-cmp") then
-      local cmp = require("cmp")
-
-      -- global sources
-      ---@param source cmp.SourceConfig
-      local sources = vim.tbl_map(function(source)
-        return { name = source.name }
-      end, cmp.get_config().sources)
-
-      -- add vim-dadbod-completion source
-      table.insert(sources, { name = "vim-dadbod-completion" })
-
-      -- update sources for the current buffer
-      cmp.setup.buffer({ sources = sources })
-    end
-  end,
-})
 
 -- Fix git commit cursor positioning
 vim.api.nvim_create_autocmd("FileType", {
   pattern = "gitcommit",
   callback = function()
     vim.cmd("normal! gg")
+  end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "sql", "mysql", "plsql", "markdown" },
+  callback = function()
+    vim.diagnostic.enable(false, { bufnr = 0 })
   end,
 })

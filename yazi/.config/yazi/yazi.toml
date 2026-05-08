@@ -1,6 +1,6 @@
 # A TOML linter such as https://taplo.tamasfe.dev/ can use this schema to validate your config.
 # If you encounter any issues, please make an issue at https://github.com/yazi-rs/schemas.
-"$schema" = "https://yazi-rs.github.io/schemas/yazi.json"
+# "$schema" = "https://yazi-rs.github.io/schemas/yazi.json"
 
 [mgr]
 ratio = [0, 1, 2]
@@ -122,21 +122,21 @@ image_bound = [0, 0]
 suppress_preload = false
 
 [[plugin.prepend_fetchers]]
-id = "mime"
 url = "local://*"
 run = "mime-ext.local"
 prio = "high"
+group = "mime"
 
 [[plugin.prepend_fetchers]]
-id = "mime"
 url = "remote://*"
 run = "mime-ext.remote"
 prio = "high"
+group = "mime"
 
 [plugin]
 fetchers = [
   # Mimetype
-  { id = "mime", url = "*/", run = "mime.dir", prio = "high" },
+  { url = "*/", run = "mime.dir", prio = "high", group = "mime" },
 ]
 prepend_previewers = [
   { url = "*.md", run = 'piper -- CLICOLOR_FORCE=1 glow -p -w=$w -s /Users/jonasws/catppuccin/glamour/themes/catppuccin-mocha.json "$1"' },

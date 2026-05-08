@@ -1,0 +1,110 @@
+##############################################
+#                                            #
+#       Superfile yazi-aligned Hotkeys       #
+#                                            #
+##############################################
+
+# Mirrors yazi defaults where superfile has equivalent actions. Diverges only
+# where superfile lacks an action (no half-page scroll, no gg/G, no chords)
+# or where superfile has features yazi doesn't (multi-panel, sort menu).
+# Docs: https://superfile.dev/configure/custom-hotkeys/
+
+###############################################################################
+#                                Global hotkeys                               #
+###############################################################################
+
+# Note: These hotkeys should be unique.
+
+#-- Basic Actions
+# yazi: enter/l = open dir/file. l added in mode-specific (parent_directory).
+confirm = ['enter', 'l']
+# yazi: q = quit, Q = quit --no-cwd-file. spf has cd_quit (Q) which fits.
+quit = ['q', 'ctrl+c']
+cd_quit = ['Q', '']
+
+#-- Navigation
+list_up = ['k', '']
+list_down = ['j', '']
+page_up = ['pgup', 'ctrl+u']
+page_down = ['pgdown', 'ctrl+d']
+
+#-- File Panel Controls
+# yazi: H/L = back/forward in dir history; spf reuses for prev/next panel.
+create_new_file_panel = ['n', '']
+close_file_panel = ['w', '']
+next_file_panel = ['tab', 'L']
+previous_file_panel = ['shift+tab', 'H']
+split_file_panel = ['N', '']
+toggle_file_preview_panel = ['f', '']
+# yazi has no sort menu; comma-prefix chords not supported in spf, so 'o' kept.
+open_sort_options_menu = ['o', '']
+toggle_reverse_sort = ['R', '']
+
+#-- Focus Manipulation
+# yazi: w = tasks_show
+focus_on_process_bar = ['w', '']
+focus_on_sidebar = ['ctrl+s', '']
+focus_on_metadata = ['<tab>', 'ctrl+d']
+
+#-- File/Dir Creation/Renaming
+file_panel_item_create = ['a', '']
+file_panel_item_rename = ['r', '']
+
+#-- Main File Operations
+copy_items = ['y', '']
+cut_items = ['x', '']
+paste_items = ['p', '']
+delete_items = ['d', '']
+permanently_delete_items = ['D', '']
+
+#-- Archive Manipulation
+extract_file = ['ctrl+e', '']
+compress_file = ['ctrl+a', '']
+
+#-- Editor Actions
+open_file_with_editor = ['e', '']
+open_current_directory_with_editor = ['E', '']
+
+#-- Other Actions
+pinned_directory = ['P', '']
+toggle_dot_file = ['.', '']
+# yazi: v = visual_mode
+change_panel_mode = ['v', '']
+# yazi: ~/F1 = help; spf used '?' which yazi maps to find-previous (no spf equiv).
+open_help_menu = ['?', '~']
+open_spf_prompt = ['>', '']
+# yazi: ; = shell --interactive, : = shell --block. spf has only one cmdline.
+open_command_line = [':', ';']
+# yazi: z = fzf, Z = zoxide. You preferred zoxide on lowercase.
+open_zoxide = ['z', '']
+# yazi: cc chord = copy path. spf no chord; uppercase Y is closest.
+copy_path = ['Y', '']
+copy_present_working_directory = ['c', '']
+toggle_footer = ['ctrl+f', '']
+
+###############################################################################
+#                                Typing hotkeys                               #
+###############################################################################
+
+# Note: These hotkeys can override all hotkeys.
+
+confirm_typing = ['enter', '']
+cancel_typing = ['esc', '']
+
+###############################################################################
+#                            Mode-Specific Hotkeys                            #
+###############################################################################
+
+# Note: These hotkeys can conflict with other modes, but not with global
+# hotkeys.
+
+#-- Normal Mode Actions
+# yazi: h = leave (parent dir)
+parent_directory = ['h', 'backspace']
+search_bar = ['/', '']
+
+#-- Selection Mode Actions
+# yazi visual mode uses j/k to extend; spf uses J/K.
+file_panel_select_mode_items_select_down = ['J', 'shift+down']
+file_panel_select_mode_items_select_up = ['K', 'shift+up']
+file_panel_select_all_items = ['A', 'ctrl+a']

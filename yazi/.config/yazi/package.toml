@@ -1,16 +1,11 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:piper"
-rev = "ac82af3"
+rev = "4ffa48f"
 hash = "384464b6df8cb807425c521f8cd790f3"
 
 [[plugin.deps]]
-use = "uhs-robert/sshfs"
-rev = "7ba17a8"
-hash = "f6927372436c780965035310821a40d9"
-
-[[plugin.deps]]
 use = "yazi-rs/plugins:mime-ext"
-rev = "ac82af3"
+rev = "4ffa48f"
 hash = "2678c84a0b3a0b22504e918ccaf99011"
 
 [[plugin.deps]]
