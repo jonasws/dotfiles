@@ -1,0 +1,77 @@
+# tailspin theme — high contrast for Catppuccin Mocha at 90% window opacity.
+#
+# Two problems with the shipped default on a translucent dark bg:
+#   1. `faint = true` on URLs / JSON / kv keys dims them below readability.
+#   2. Base ANSI colors (red/green/blue/cyan) resolve to Mocha's muted
+#      pastels, which lose contrast once the desktop bleeds through.
+#
+# Fix: drop `faint`, and route the previously-dim groups to the *bright*
+# ANSI variants (bright_green = ESC[92m etc.), which map to Mocha's
+# brighter palette. tailspin only accepts the 16 named ANSI colors
+# (no hex); accepted names are black/red/green/yellow/blue/magenta/cyan/
+# white and their bright_* counterparts.
+
+[dates]
+date = { fg = "bright_magenta" }
+time = { fg = "bright_blue" }
+zone = { fg = "red" }
+separator = { fg = "white" }
+
+[[keywords]]
+words = ['null', 'true', 'false']
+style = { fg = "bright_red", italic = true }
+
+[[keywords]]
+words = ['GET']
+style = { fg = "black", bg = "green" }
+
+[urls]
+http = { fg = "bright_red" }
+https = { fg = "bright_green" }
+host = { fg = "bright_blue" }
+path = { fg = "bright_cyan" }
+query_params_key = { fg = "bright_magenta" }
+query_params_value = { fg = "bright_cyan" }
+symbols = { fg = "red" }
+
+[numbers]
+number = { fg = "bright_cyan" }
+
+[ip_addresses]
+number = { fg = "bright_blue", italic = true }
+letter = { fg = "bright_magenta", italic = true }
+separator = { fg = "red" }
+
+[quotes]
+style = { fg = "bright_yellow" }
+quote_token = '"'
+
+[paths]
+segment = { fg = "bright_green", italic = true }
+separator = { fg = "yellow" }
+
+[uuids]
+number = { fg = "bright_blue", italic = true }
+letter = { fg = "bright_magenta", italic = true }
+separator = { fg = "red" }
+
+[pointers]
+number = { fg = "bright_blue", italic = true }
+letter = { fg = "bright_magenta", italic = true }
+
+[key_value_pairs]
+key = { fg = "bright_blue" }
+separator = { fg = "white" }
+
+[processes]
+name = { fg = "bright_green" }
+bracket = { fg = "red" }
+id = { fg = "bright_yellow" }
+
+[json]
+key = { fg = "bright_yellow" }
+quote_token = { fg = "yellow" }
+curly_bracket = { fg = "white" }
+square_bracket = { fg = "white" }
+comma = { fg = "white" }
+colon = { fg = "white" }
