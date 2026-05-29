@@ -44,6 +44,7 @@ set visualbell
 set noerrorbells
 
 " source ~/.intellimacs/extra.vim
+source ~/.intellimacs/extra/leader.vim
 source ~/.intellimacs/major.vim
 
 let g:WhichKeyDesc_Major_Refactoring = "<leader>mr +refactor"
