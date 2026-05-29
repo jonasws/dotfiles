@@ -2,21 +2,20 @@ local wezterm = require 'wezterm'
 local act = wezterm.action
 
 local config = wezterm.config_builder()
--- Configuration uses Catppuccin color scheme with custom transparency
-config.color_scheme = 'Catppuccin Mocha'
 
-config.colors = {
-  ansi = {
-    'none', -- black: transparent (was #45475a)
-    '#f38ba8', -- red
-    '#a6e3a1', -- green
-    '#f9e2af', -- yellow
-    '#89b4fa', -- blue
-    '#f5c2e7', -- pink (magenta)
-    '#94e2d5', -- teal (cyan)
-    '#bac2de', -- white (subtext1)
-  },
+-- Catppuccin Mocha (modified). The scheme's ANSI blue (index 4) is Mocha
+-- "Blue" #89b4fa — a pastel at ~76% lightness. Fine as foreground text,
+-- but unreadable as a *background*: apps like mitmproxy paint light fg on
+-- ANSI-blue bg, giving light-on-light. Extend the built-in scheme and
+-- swap ANSI 4 for a darker navy. Bright blue (index 12) stays at spec, so
+-- blue *text* keeps its pastel look.
+local mocha = wezterm.color.get_builtin_schemes()['Catppuccin Mocha']
+-- mocha.ansi[5] = '#3b5a8a' -- ANSI 4 (Lua 1-based index): darker navy for bg use
+config.color_schemes = {
+  ['Catppuccin Mocha (dark ANSI blue)'] = mocha,
 }
+-- config.color_scheme = 'Catppuccin Mocha (dark ANSI blue)'
+config.color_scheme = 'Catppuccin Mocha'
 
 config.set_environment_variables = {
   TERMINFO_DIRS = os.getenv 'HOME' .. '/.terminfo',
@@ -35,7 +34,12 @@ config.front_end = 'WebGpu'
 config.adjust_window_size_when_changing_font_size = false
 config.hide_tab_bar_if_only_one_tab = true
 config.window_decorations = 'RESIZE'
-config.font_size = 16.0
+-- Use a single patched Nerd Font for both text and powerline/icon glyphs.
+-- Without this, WezTerm renders text in bundled JetBrains Mono and pulls
+-- icons from a fallback whose vertical metrics overshoot the cell, clipping
+-- glyph bottoms (e.g. starship pill contents).
+config.font = wezterm.font 'JetBrainsMono Nerd Font'
+config.font_size = 18.0
 config.native_macos_fullscreen_mode = true
 
 config.window_background_opacity = 0.90
@@ -47,7 +51,7 @@ config.command_palette_bg_color = '#181825' -- Mocha Mantle
 config.command_palette_fg_color = '#cdd6f4' -- Mocha Text
 
 config.use_dead_keys = false
-config.scrollback_lines = 5000
+config.scrollback_lines = 100000
 config.notification_handling = 'SuppressFromFocusedWindow'
 
 -- Add hyperlink rules for Firefox container URLs
