@@ -21,14 +21,6 @@ end
 
 set_autoformat({ "xml" }, false)
 
--- Fix git commit cursor positioning
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = "gitcommit",
-  callback = function()
-    vim.cmd("normal! gg")
-  end,
-})
-
 vim.api.nvim_create_autocmd("FileType", {
   pattern = { "sql", "mysql", "plsql", "markdown" },
   callback = function()

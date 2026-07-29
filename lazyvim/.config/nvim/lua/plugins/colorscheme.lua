@@ -6,6 +6,7 @@ return {
     opts = {
       auto_integrations = true,
       transparent_background = true,
+      term_colors = true,
       float = {
         transparent = true,
       },
