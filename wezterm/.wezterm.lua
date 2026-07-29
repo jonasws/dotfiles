@@ -9,11 +9,20 @@ local config = wezterm.config_builder()
 -- ANSI-blue bg, giving light-on-light. Extend the built-in scheme and
 -- swap ANSI 4 for a darker navy. Bright blue (index 12) stays at spec, so
 -- blue *text* keeps its pastel look.
-local mocha = wezterm.color.get_builtin_schemes()['Catppuccin Mocha']
+-- local mocha = wezterm.color.get_builtin_schemes()['Catppuccin Mocha']
 -- mocha.ansi[5] = '#3b5a8a' -- ANSI 4 (Lua 1-based index): darker navy for bg use
-config.color_schemes = {
-  ['Catppuccin Mocha (dark ANSI blue)'] = mocha,
-}
+-- -- Mocha sets ANSI 0 ("black") = #45475a (Surface1), a grey-purple so that
+-- -- black *text* stays visible. But TUIs built on tview/tcell (e.g. otel-tui)
+-- -- fill their panel *background* with tcell.ColorBlack = ANSI 0, so that
+-- -- grey-purple bleeds across the whole UI. Pin ANSI 0 to Mocha Base #1e1e2e
+-- -- (the terminal background) so those panel fills blend into the window and the
+-- -- background blur shows through, instead of harsh true black or grey-purple.
+-- -- Bright black (index 8) keeps Mocha's Surface for dimmed text.
+-- mocha.ansi[1] = '#1e1e2e' -- ANSI 0 (Lua 1-based index): match bg so TUI fills blend
+-- config.color_schemes = {
+--   ['Catppuccin Mocha (dark ANSI blue)'] = mocha,
+--   ['Catppuccin Mocha (ANSI 0 = base)'] = mocha,
+-- }
 -- config.color_scheme = 'Catppuccin Mocha (dark ANSI blue)'
 config.color_scheme = 'Catppuccin Mocha'
 
@@ -25,7 +34,6 @@ config.term = 'wezterm'
 
 config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
-config.line_height = 1.1
 
 config.enable_kitty_keyboard = false
 config.audible_bell = 'Disabled'
@@ -34,12 +42,29 @@ config.front_end = 'WebGpu'
 config.adjust_window_size_when_changing_font_size = false
 config.hide_tab_bar_if_only_one_tab = true
 config.window_decorations = 'RESIZE'
--- Use a single patched Nerd Font for both text and powerline/icon glyphs.
--- Without this, WezTerm renders text in bundled JetBrains Mono and pulls
--- icons from a fallback whose vertical metrics overshoot the cell, clipping
--- glyph bottoms (e.g. starship pill contents).
-config.font = wezterm.font 'JetBrainsMono Nerd Font'
+-- Use the "Mono" Nerd Font variant for both text and powerline/icon glyphs.
+-- The plain "JetBrainsMono Nerd Font" build patches in icon glyphs with
+-- inflated vertical metrics (and double-width cells) that overshoot the cell
+-- box, clipping glyph tops/bottoms as the screen scrolls. The "...Nerd Font
+-- Mono" build clamps every glyph to a single constrained cell, so ascenders
+-- and descenders stay inside the row and nothing is cropped on scroll.
+-- Text from plain "JetBrains Mono" (clean, spec-compliant vertical metrics);
+-- icon/powerline glyphs fall back to the "Nerd Font Mono" build, which clamps
+-- every glyph to a single constrained cell. The non-Mono Nerd Font builds patch
+-- in icons with inflated vertical metrics that overshoot the cell box and clip
+-- glyph tops/bottoms on scroll (wezterm #6785) — so they are deliberately NOT in
+-- the fallback chain.
+config.font = wezterm.font_with_fallback {
+  'JetBrains Mono',
+  'JetBrainsMono Nerd Font Mono',
+}
 config.font_size = 18.0
+-- Keep line_height integer (1.0). JetBrainsMono has tight vertical metrics, so
+-- any fractional line_height lands the cell off the pixel grid and clips glyph
+-- tops/bottoms on scroll (wezterm #6785). Pills are flatter as a result — that's
+-- the tradeoff for a clip-free render; a taller cell would need a bigger font.
+config.line_height = 1.0
+
 config.native_macos_fullscreen_mode = true
 
 config.window_background_opacity = 0.90
@@ -50,7 +75,14 @@ config.command_palette_rows = 14
 config.command_palette_bg_color = '#181825' -- Mocha Mantle
 config.command_palette_fg_color = '#cdd6f4' -- Mocha Text
 
-config.use_dead_keys = false
+-- Norwegian chars (æ ø å) on US layout via the Option/Alt key.
+-- use_dead_keys must be true so dead-key composition (e.g. Option+u then a)
+-- works at all. send_composed_key_when_left_alt_is_pressed lets the left
+-- Option key produce the OS-composed character instead of an ESC/Meta
+-- sequence. The right Option is left as Meta for terminal keybindings.
+config.use_dead_keys = true
+config.send_composed_key_when_left_alt_is_pressed = true
+config.send_composed_key_when_right_alt_is_pressed = false
 config.scrollback_lines = 100000
 config.notification_handling = 'SuppressFromFocusedWindow'
 
@@ -99,11 +131,24 @@ config.keys = {
     mods = 'ALT',
     action = wezterm.action.DisableDefaultAssignment,
   },
-  -- Claude Code integration: Enable Shift+Enter for multiline input
+  -- Escape hatch out of a nested multiplexer. herdr's nav_at_edge is only
+  -- 'wrap' or 'stop' — neither hands the chord back to the outer terminal — so
+  -- CTRL+hjkl can never cross from a herdr pane to a sibling WezTerm pane.
+  -- LEADER+hjkl always moves WezTerm panes, whatever runs inside them.
+  { key = 'h', mods = 'LEADER', action = act.ActivatePaneDirection 'Left' },
+  { key = 'j', mods = 'LEADER', action = act.ActivatePaneDirection 'Down' },
+  { key = 'k', mods = 'LEADER', action = act.ActivatePaneDirection 'Up' },
+  { key = 'l', mods = 'LEADER', action = act.ActivatePaneDirection 'Right' },
+  -- Claude Code integration: Enable Shift+Enter for multiline input.
+  -- Sends ESC+CR (alt+Enter), not a bare LF. A bare LF is byte 0x0A, which is
+  -- indistinguishable from ctrl+j without the kitty keyboard protocol (disabled
+  -- above), so herdr's direct ctrl+j binding (herdr-splits.nav-down) swallowed it
+  -- and the newline never reached the pane. Nothing binds alt+Enter in herdr, and
+  -- ALT+Enter's WezTerm default is disabled above, so ESC+CR passes through clean.
   {
     key = 'Enter',
     mods = 'SHIFT',
-    action = act.SendString '\n',
+    action = act.SendString '\x1b\r',
   },
   {
     key = 'd',
@@ -209,7 +254,61 @@ config.keys = {
 --   window:set_config_overrides(overrides)
 -- end)
 
-local smart_splits = wezterm.plugin.require 'https://github.com/mrjones2014/smart-splits.nvim'
-smart_splits.apply_to_config(config)
+-- Smart split navigation, hand-rolled rather than via
+-- smart-splits.nvim's apply_to_config. That helper's is_vim predicate only
+-- checks the IS_NVIM user var, which herdr neither sets nor proxies out from
+-- the Neovim running inside its panes — so under herdr WezTerm would decide
+-- "not vim", claim CTRL+hjkl for itself, and herdr-splits would never see a
+-- keypress. apply_to_config exposes no way to override that predicate
+-- (only default_amount / direction_keys / modifiers / log_level), so the
+-- bindings are built here instead.
+--
+-- Move is CTRL, resize is CTRL+SHIFT. Resize deliberately avoids the plugin's
+-- META default: Option is the us-altgr-intl compose layer (Option+l is ø) and
+-- must stay free for text input. Keep in sync with herdr's config.toml and
+-- lazyvim/.../config/keymaps.lua, which bind the same two chord families.
+
+---Panes that own these chords themselves, so WezTerm must forward rather than act:
+---  * Neovim directly in a WezTerm pane — smart-splits.nvim sets IS_NVIM, and
+---    handles crossing back out to WezTerm itself via `wezterm cli`.
+---  * herdr — its own ctrl+hjkl / ctrl+shift+hjkl bindings drive herdr-splits,
+---    which in turn reaches any Neovim nested inside a herdr pane.
+local function pane_owns_splits(pane)
+  if pane:get_user_vars().IS_NVIM == 'true' then
+    return true
+  end
+  -- nil for panes WezTerm can't introspect (ssh/mux domains); those fall
+  -- through to WezTerm-side movement, which is the right default there.
+  local proc = pane:get_foreground_process_name()
+  return proc ~= nil and proc:match '[/\\]herdr$' ~= nil
+end
+
+local function split_nav(kind, key, direction)
+  local mods = kind == 'resize' and 'CTRL|SHIFT' or 'CTRL'
+  return {
+    key = key,
+    mods = mods,
+    action = wezterm.action_callback(function(win, pane)
+      if pane_owns_splits(pane) then
+        win:perform_action(act.SendKey { key = key, mods = mods }, pane)
+      elseif kind == 'resize' then
+        win:perform_action(act.AdjustPaneSize { direction, 3 }, pane)
+      else
+        win:perform_action(act.ActivatePaneDirection(direction), pane)
+      end
+    end),
+  }
+end
+
+for _, nav in ipairs {
+  { 'h', 'Left' },
+  { 'j', 'Down' },
+  { 'k', 'Up' },
+  { 'l', 'Right' },
+} do
+  local key, direction = nav[1], nav[2]
+  table.insert(config.keys, split_nav('move', key, direction))
+  table.insert(config.keys, split_nav('resize', key, direction))
+end
 
 return config
