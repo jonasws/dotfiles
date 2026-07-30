@@ -1,0 +1,67 @@
+# Ghostty configuration
+#
+# Clean slate: font/cell rendering left at ghostty defaults. Only family + size
+# are set — no adjust-cell-*, no font-thicken, no adjust-icon. Add rendering
+# tweaks back deliberately, one at a time, if needed.
+
+# Appearance
+theme = Catppuccin Mocha
+# theme = catppuccin-mocha.conf
+font-family = "JetBrainsMono Nerd Font Mono"
+font-size = 18
+# Rendering left at ghostty defaults — no font-thicken, no colorspace/contrast
+# overrides. Default blending is pixel-identical to Terminal.app = sharp baseline.
+
+# Extra line height: global breathing room + vertical space for powerline prompt
+# pills. Percentage (not px) so the cell stays on whole pixels at any DPI —
+# avoids the fractional-cell blur that an absolute px value caused on 1×.
+adjust-cell-height = 15%
+
+# Window
+# Match wezterm: window_background_opacity 0.90 + macos_window_background_blur 10
+background-opacity = 0.9
+background-blur-radius = 10
+# window-decoration = true
+# Transparent titlebar: native bar but the terminal background shows through,
+# so it blends with the Catppuccin theme instead of the grey native bar. Keeps
+# the full top area draggable. Others: native, tabs, hidden.
+macos-titlebar-style = transparent
+
+# Terminal
+scrollback-limit = 100000
+# Match wezterm: selecting text copies it straight to the system clipboard.
+copy-on-select = clipboard
+
+# Shell integration
+shell-integration = fish
+
+# macOS: treat Option as Alt so Alt+hjkl reaches the running program (nvim
+# resize via smart-splits) instead of typing special characters.
+macos-option-as-alt = true
+
+# ── Keybindings ─────────────────────────────────────────────────────────────
+
+# Reload config (super+shift+, default is easy to mishit near the font-zoom keys)
+keybind = super+shift+r=reload_config
+
+# Disable ghostty's default alt+enter
+keybind = alt+enter=unbind
+
+# Shift+Enter sends a literal newline (Claude Code multiline input)
+keybind = shift+enter=text:\n
+
+# CMD+D / CMD+R: ghostty-native splits (wezterm muscle memory)
+keybind = super+d=new_split:down
+keybind = super+r=new_split:right
+
+# Seamless Ctrl+hjkl across ghostty splits AND neovim splits. `performable:`
+# only consumes the key if a ghostty split exists that way; otherwise it falls
+# through to neovim, whose own Ctrl+hjkl (smart-splits.nvim) moves between
+# windows. One keymap, both layers, no multiplexer.
+keybind = performable:ctrl+h=goto_split:left
+keybind = performable:ctrl+j=goto_split:bottom
+keybind = performable:ctrl+k=goto_split:top
+keybind = performable:ctrl+l=goto_split:right
+
+# Keep a zoomed split zoomed while navigating
+split-preserve-zoom = navigation

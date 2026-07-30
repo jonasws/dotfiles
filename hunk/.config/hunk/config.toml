@@ -1,0 +1,6 @@
+theme = "catppuccin-mocha"
+transparent_background = true
+line_numbers = true
+menu_bar = false
+mode = "auto"
+exclude_untracked = true
