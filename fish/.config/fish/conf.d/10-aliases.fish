@@ -17,7 +17,24 @@ alias lgl "lazygit log"
 alias lgs "lazygit status"
 
 # Eza (better ls) aliases
-alias ll "eza --long --icons"
-alias l "eza --long --icons"
-alias la "eza --long --all --icons"
+alias ll "eza --long --icons auto"
+alias l "eza --long --icons auto"
+alias la "eza --long --all --icons auto"
 alias tree "eza --tree --long"
+
+# rgrc aliases (for cool colors)
+alias curl='rgrc curl'
+alias dig='rgrc dig'
+alias docker='rgrc docker'
+alias du='rgrc du'
+alias env='rgrc env'
+alias fdisk='rgrc fdisk'
+alias ifconfig='rgrc ifconfig'
+alias lsof='rgrc lsof'
+alias netstat='rgrc netstat'
+alias ping='rgrc ping'
+alias ps='rgrc ps'
+alias pv='rgrc pv'
+alias tail='rgrc tail'
+alias tcpdump='rgrc tcpdump'
+alias traceroute='rgrc traceroute'

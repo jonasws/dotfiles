@@ -17,14 +17,13 @@ if status is-interactive
         fzf_configure_bindings --directory=\cf --git_status=\eg --git_log=\el
     end
 
+    # Ctrl-O: open current prompt in nvim
+    for mode in default insert
+        bind --mode $mode ctrl-o edit_command_buffer
+    end
+
     # AWS completions
     complete --command aws --no-files --arguments '(begin; set --local --export COMP_SHELL fish; set --local --export COMP_LINE (commandline); aws_completer | sed \'s/ $//\'; end)'
-
-    # Console command completions
-    complete -c console -x -n "not __fish_seen_subcommand_from (aws configure list-profiles)" \
-        -a "(aws configure list-profiles | grep -E 'cnops|cargonet|trafficinfo')"
-    complete -c console -x -n "__fish_seen_subcommand_from (aws configure list-profiles)" \
-        -a 'ecs/v2 cloudwatch codepipeline cloudformation events secretsmanager ec2 vpc s3 states'
 
     set -x OP_ACCOUNT capragroup.1password.eu
 
@@ -41,16 +40,59 @@ if status is-interactive
         zoxide init fish | source
     end
 
+    # fnox: auto-load secrets as env vars per directory (prompt + cwd hooks)
+    if command -q fnox
+        fnox activate fish | source
+    end
+
     if command -q tv
         tv init fish | source
 
+        # All AWS profiles whose name starts with `cn`, matching the
+        # aws-profiles television cable channel. Used to validate a --profile
+        # token parsed off the command line before querying AWS with it.
+        function __aws_cn_profiles
+            awk -F'[][]' '/^\[profile cn/ {sub(/^profile /, "", $2); print $2}' \
+                (test -n "$AWS_CONFIG_FILE"; and echo $AWS_CONFIG_FILE; or echo ~/.aws/config) 2>/dev/null
+        end
+
         function tv_autocomplete_with_aws_profiles
             set -l current_prompt (commandline --current-process)
-            if string match -qr '(^|\s)aws\s.*--profile\s*$' -- $current_prompt
+
+            # awslogs: if a valid --profile value is already on the line,
+            # complete against that profile's log groups; otherwise fall
+            # through to the profile picker below.
+            if string match -qr '(^|\s)awslogs\s' -- $current_prompt
+                set -l profile (string replace -rf '.*--profile[=\s]+(\S+).*' '$1' -- $current_prompt)
+                if test -n "$profile"; and not string match -qr -- '[-]-profile\s*$' $current_prompt; and contains -- $profile (__aws_cn_profiles)
+                    printf "\n"
+                    # Current token is the partial log-group name being typed
+                    # (empty after a trailing space). Prefill the picker with
+                    # it for fuzzy filtering; fetch all groups so mid-string
+                    # fragments still match (server-side -p is prefix-anchored).
+                    set -l prefix (commandline -t)
+                    set -l result (awslogs groups --profile $profile 2>/dev/null \
+                        | tv --inline --no-status-bar -i "$prefix" \
+                            --preview-command "$HOME/dotfiles/utils/aws-log-group-preview.sh $profile {}" \
+                            --preview-header "last activity ($profile)")
+                    if test -n "$result"
+                        commandline -t -- $result' '
+                    else
+                        commandline -t -- ''
+                    end
+                    printf "\033[A"
+                    commandline -f repaint
+                    return
+                end
+            end
+
+            if string match -qr '(^|\s)(aws|awslogs)\s.*--profile\s*$' -- $current_prompt; or string match -qr '(^|\s)console\s*$' -- $current_prompt
                 printf "\n"
                 set -l result (tv aws-profiles --inline --no-status-bar)
                 if test -n "$result"
                     commandline -t -- $result' '
+                else
+                    commandline -t -- ''
                 end
                 printf "\033[A"
                 commandline -f repaint
@@ -97,4 +139,6 @@ if status is-interactive
 
     # Completion subcommand
     complete -c taws -n "__fish_seen_subcommand_from completion" -xa "bash zsh fish powershell elvish"
+
+    herdr completion fish | source
 end
