@@ -1,0 +1,64 @@
+[metadata]
+name = "herdr-sessions"
+description = """
+Fuzzy find and jump to Herdr panes.
+
+Bound to prefix+f in herdr's config.toml.
+
+Panes are listed as an attention queue: blocked, done, idle, working,
+unclassified agents, then panes running some other command, then idle shells.
+Each row is the pane id, workspace label, what the pane is running, and its
+terminal title. The state column is coloured by that same queue position, and
+the label is coloured per workspace so panes of one workspace read as a block.
+"""
+requirements = ["herdr", "nu", "jq", "nc"]
+
+[source]
+command = "~/.config/television/scripts/herdr-sessions.nu"
+# `ansi` and `display` are mutually exclusive (a display template selects the
+# processor that never strips escape codes), so colouring the state column means
+# the pane id must be visible text. It leads the row, dimmed, which reads more
+# cleanly than trailing it after a ragged-length title.
+ansi = true
+output = "{strip_ansi|split: :0}"
+# Agent state changes while the picker is open, so keep the list live. A refresh
+# is a single `herdr api snapshot`, so this is cheap. Previews are unaffected:
+# they run per selected entry and are cached, not polled.
+watch = 2.0
+frecency = false
+
+# One `herdr pane read` per preview, nothing else: the previewer kills any job
+# that takes over 3s. `visible` is the only source that works for both shells
+# and agents painting on the alternate screen; ctrl-f cycles to the others.
+#
+# herdr only ever emits SGR sequences, which television parses into styled text
+# via ansi_to_tui, so `--format ansi` renders the pane in its real colors. The
+# plain-text variant is kept one ctrl-f away as a fallback.
+[preview]
+command = [
+  "herdr pane read '{strip_ansi|split: :0}' --source visible --lines 200 --format ansi",
+  "herdr pane read '{strip_ansi|split: :0}' --source visible --lines 200",
+  "herdr pane read '{strip_ansi|split: :0}' --source recent-unwrapped --lines 400 --format ansi",
+]
+
+[ui]
+layout = "landscape"
+input_header = "Herdr panes"
+
+[ui.preview_panel]
+size = 60
+header = "{strip_ansi|split: :0}"
+scrollbar = true
+
+[keybindings]
+shortcut = "f4"
+enter = "actions:focus"
+
+# Focus the exact pane over the socket API. `herdr tab focus` would only reach
+# the tab's active pane, which is the wrong one whenever a tab is split.
+# `execute` replaces tv with the command, so the picker is gone by the time
+# focus lands.
+[actions.focus]
+description = "Jump to the selected pane"
+command = "~/.config/television/scripts/herdr-focus.sh '{strip_ansi|split: :0}'"
+mode = "execute"

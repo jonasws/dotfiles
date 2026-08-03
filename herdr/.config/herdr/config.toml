@@ -145,6 +145,26 @@ navigate_pane_up = "up"
 # width = "80%"
 # height = "80%"
 
+# Fuzzy pane picker. prefix+a still steps through the attention queue one agent
+# at a time; this jumps straight to any pane. The channel lists panes
+# attention-first (blocked, done, idle, working, other commands, shells) and
+# Enter focuses the selected pane over the socket API.
+# Channel: television/.config/television/cable/herdr-sessions.toml
+[[keys.command]]
+key = "prefix+f"
+type = "popup"
+command = "tv herdr-sessions"
+width = "90%"
+height = "80%"
+
+# Lazygit in a session-modal popup, so it does not disturb the tab layout.
+[[keys.command]]
+key = "prefix+l"
+type = "popup"
+command = "lazygit"
+width = "80%"
+height = "80%"
+
 # --- herdr-splits.nvim -------------------------------------------------------
 # Unified pane/split navigation across herdr panes and Neovim windows.
 # Requires the herdr-side plugin:
