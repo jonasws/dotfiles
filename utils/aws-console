@@ -16,9 +16,17 @@
 # Omit to open the plain console home.
 set -euo pipefail
 
-# wezterm spawns us with a minimal PATH; prepend locations for mise shims
-# (aws-vault, aws, python3) and user-local bins (firefox-container).
+# Normally invoked via the `console` fish function, which inherits the
+# interactive shell's PATH. But the script may also run with a minimal
+# PATH (Alfred, cron, a raw `bash` shell), so prepend locations for mise
+# shims (aws-vault, aws, python3) and user-local bins (firefox-container).
 export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
+
+# Likewise, outside the interactive shell AWS_VAULT_KEYCHAIN_NAME is unset.
+# Without it aws-vault uses the default `aws-vault` keychain and can't see
+# the MFA'd capra-auth session cached in the `login` keychain, so it would
+# prompt for MFA every time. Pin the keychain to match the interactive shell.
+export AWS_VAULT_KEYCHAIN_NAME="login"
 
 no_signin=0
 if [[ "${1:-}" == "--no-signin" ]]; then

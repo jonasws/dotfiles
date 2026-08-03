@@ -1,10 +1,10 @@
 [metadata]
 name = "aws-profiles"
 description = "List and switch AWS CLI profiles"
-requirements = ["aws", "grep"]
+requirements = ["awk"]
 
 [source]
-command = "grep -E '^\\[profile (cnops|cargonet|trafficinfo)' ~/.aws/config 2>/dev/null | sed 's/\\[profile //' | sed 's/\\]//' || grep '\\[' ~/.aws/credentials 2>/dev/null | sed 's/\\[//' | sed 's/\\]//'"
+command = "awk -F'[][]' '/^\\[profile cn/ {sub(/^profile /, \"\", $2); print $2}' ~/.aws/config 2>/dev/null"
 
 [keybindings]
 ctrl-e = "actions:export"
