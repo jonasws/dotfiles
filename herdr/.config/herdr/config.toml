@@ -165,6 +165,19 @@ command = "lazygit"
 width = "80%"
 height = "80%"
 
+# Git repo picker in a session-modal popup. `-k` overrides just the `enter`
+# binding for this invocation, from git-repos.toml's default `actions:cd`
+# to its `actions:workspace` (open/focus a Herdr workspace for the repo) --
+# no separate cable channel needed for that. Overrides resize mode's
+# prefix+r on purpose.
+# Channel: television/.config/television/cable/git-repos.toml
+[[keys.command]]
+key = "prefix+r"
+type = "popup"
+command = "tv git-repos -k 'enter=\"actions:workspace\"'"
+width = "90%"
+height = "80%"
+
 # --- herdr-splits.nvim -------------------------------------------------------
 # Unified pane/split navigation across herdr panes and Neovim windows.
 # Requires the herdr-side plugin:
@@ -331,7 +344,7 @@ command = "herdr-splits.resize-right"
 
 # Background notification popup delivery
 show_agent_labels_on_pane_borders = true
-agent_panel_sort = "priority"
+agent_panel_sort = "spaces"
 [ui.toast]
 # off = disable pop-up notifications
 # herdr = show in-app toasts

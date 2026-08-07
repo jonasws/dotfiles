@@ -2,5 +2,7 @@ theme = "catppuccin-mocha"
 transparent_background = true
 line_numbers = true
 menu_bar = false
+agent_notes = true
 mode = "auto"
 exclude_untracked = true
+prompt_save_view_preferences = false

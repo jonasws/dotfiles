@@ -36,9 +36,9 @@ git:
   autoFetch: false
   log:
     order: default
-  pagers:
+  diffRenderers:
     - colorArg: always
-      pager: delta --dark --paging=never
+      command: delta --dark --paging=never
   commit:
     signOff: false
   parseEmoji: true

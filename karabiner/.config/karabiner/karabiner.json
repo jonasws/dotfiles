@@ -98,13 +98,17 @@
             ]
           },
           {
-            "description": "Right Option Key → Hyper Key (⌃⌥⇧⌘, built-in keyboard only)",
+            "description": "Right Option Key → Hyper Key (⌃⌥⇧⌘, built-in keyboard only, except WezTerm where right_option stays Meta for M- keybinds)",
             "manipulators": [
               {
                 "conditions": [
                   {
                     "identifiers": [{ "is_built_in_keyboard": true }],
                     "type": "device_if"
+                  },
+                  {
+                    "bundle_identifiers": ["^com\\.github\\.wez\\.wezterm$"],
+                    "type": "frontmost_application_unless"
                   }
                 ],
                 "from": {

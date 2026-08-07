@@ -25,6 +25,15 @@ starship init nu | save -f ~/.cache/starship/init.nu
 zoxide init nushell | save -f ~/.zoxide.nu
 
 
+# aws-vault stores the capra-auth master creds and the MFA'd STS session
+# cache in the macOS `login` keychain, not the default `aws-vault` one.
+# AWS profiles resolve via `credential_process = aws-vault export ...`, so
+# every SDK call needs this set to hit the keychain that holds the cached
+# session — otherwise aws-vault looks in a non-existent `aws-vault`
+# keychain, finds no session, and re-prompts for MFA. fish exports the same
+# value, but set it here too so nushell run as a non-fish-child still works.
+$env.AWS_VAULT_KEYCHAIN_NAME = 'login'
+
 $env.CARAPACE_BRIDGES = 'zsh,fish,bash,inshellisense' # optional
 mkdir ~/.cache/carapace
 carapace _carapace nushell | save --force ~/.cache/carapace/init.nu

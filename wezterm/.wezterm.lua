@@ -75,13 +75,14 @@ config.command_palette_rows = 14
 config.command_palette_bg_color = '#181825' -- Mocha Mantle
 config.command_palette_fg_color = '#cdd6f4' -- Mocha Text
 
--- Norwegian chars (æ ø å) on US layout via the Option/Alt key.
--- use_dead_keys must be true so dead-key composition (e.g. Option+u then a)
--- works at all. send_composed_key_when_left_alt_is_pressed lets the left
--- Option key produce the OS-composed character instead of an ESC/Meta
--- sequence. The right Option is left as Meta for terminal keybindings.
+-- Norwegian chars (æ ø å) compose via Option/Alt elsewhere in macOS (Safari,
+-- Slack, Notes, ...) through the OS input source, unaffected by this file.
+-- Inside WezTerm specifically, both Option keys send Meta/ESC instead of
+-- OS-composed characters, so <M-h>-style terminal keybindings (Neovim,
+-- snacks picker, etc.) register. use_dead_keys stays true so dead-key
+-- composition still works for the rare case send_composed_key is on.
 config.use_dead_keys = true
-config.send_composed_key_when_left_alt_is_pressed = true
+config.send_composed_key_when_left_alt_is_pressed = false
 config.send_composed_key_when_right_alt_is_pressed = false
 config.scrollback_lines = 100000
 config.notification_handling = 'SuppressFromFocusedWindow'
