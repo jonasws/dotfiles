@@ -157,6 +157,21 @@ command = "tv herdr-sessions"
 width = "90%"
 height = "80%"
 
+# Herdr F1: the agents in this session as a race in the browser. Clicking a car
+# focuses that agent's pane, and the fork below also brings the WezTerm tab
+# hosting herdr to the front -- upstream only focuses within herdr, which is
+# invisible from a browser on another Space.
+#     herdr plugin install jonasws/herdr-f1 --ref wezterm-reveal
+# prefix+shift+f rather than the upstream README's prefix+f, which the pane
+# picker above already owns. Reopening while the dashboard runs just points the
+# browser at it again; `herdr plugin action invoke dev.minung.herdr-f1.stop`
+# shuts it down.
+[[keys.command]]
+key = "prefix+shift+f"
+type = "plugin_action"
+command = "dev.minung.herdr-f1.open"
+description = "open F1 dashboard"
+
 # Lazygit in a session-modal popup, so it does not disturb the tab layout.
 [[keys.command]]
 key = "prefix+l"
