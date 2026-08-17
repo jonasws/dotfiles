@@ -72,13 +72,20 @@ prefix = "ctrl+b"
 # settings = "prefix+s"
 # detach = "prefix+q"
 # reload_config = "prefix+shift+r"
+# Moved off the default so prefix+shift+r stays free for the afogel.shepherdr
+# plugin's resume-last action (reopen the newest finished dispatch in a headed
+# pane). The plugin manifest claims that key; herdr's own reload lives here now.
+reload_config = "prefix+alt+shift+r"
 # open_notification_target = "prefix+o"
 # workspace_picker = "prefix+w"
 # goto = "prefix+g"
 # new_workspace = "prefix+shift+n"
 # new_worktree = "prefix+shift+g"
 # open_worktree = ""    # optional, unset by default
-# remove_worktree = ""  # optional, unset by default; opens confirmation
+# Paired with new_worktree (prefix+shift+g) on the same letter. Ctrl rather than
+# alt because Option is the us-altgr-intl compose layer. Opens a confirmation
+# prompt before the checkout is removed.
+remove_worktree = "prefix+ctrl+g"
 # rename_workspace = "prefix+shift+w"
 # close_workspace = "prefix+shift+d"
 # previous_workspace = "" # optional, unset by default
@@ -145,10 +152,13 @@ navigate_pane_up = "up"
 # width = "80%"
 # height = "80%"
 
-# Fuzzy pane picker. prefix+a still steps through the attention queue one agent
-# at a time; this jumps straight to any pane. The channel lists panes
-# attention-first (blocked, done, idle, working, other commands, shells) and
-# Enter focuses the selected pane over the socket API.
+# Fuzzy "go there" picker. prefix+a still steps through the attention queue one
+# agent at a time; this jumps straight to any pane. The channel lists panes
+# attention-first (blocked, done, idle, working, other commands, shells), then
+# every git repo no pane is open in, so the same keystroke reaches work already
+# running and work not started yet. Enter focuses the pane over the socket API,
+# or opens a workspace on the repo -- which is what prefix+r below does, for the
+# repos this list leaves out.
 # Channel: television/.config/television/cable/herdr-sessions.toml
 [[keys.command]]
 key = "prefix+f"
@@ -180,11 +190,12 @@ command = "lazygit"
 width = "80%"
 height = "80%"
 
-# Git repo picker in a session-modal popup. `-k` overrides just the `enter`
-# binding for this invocation, from git-repos.toml's default `actions:cd`
-# to its `actions:workspace` (open/focus a Herdr workspace for the repo) --
-# no separate cable channel needed for that. Overrides resize mode's
-# prefix+r on purpose.
+# Repo-only picker in a session-modal popup: every repo, including the ones
+# prefix+f hides because a pane is already open in them, and with ctrl-e /
+# ctrl-w still on the entries. `-k` overrides just the `enter` binding for this
+# invocation, from git-repos.toml's default `actions:cd` to its
+# `actions:workspace` (open/focus a Herdr workspace for the repo) -- no separate
+# cable channel needed for that. Overrides resize mode's prefix+r on purpose.
 # Channel: television/.config/television/cable/git-repos.toml
 [[keys.command]]
 key = "prefix+r"
@@ -360,6 +371,31 @@ command = "herdr-splits.resize-right"
 # Background notification popup delivery
 show_agent_labels_on_pane_borders = true
 agent_panel_sort = "spaces"
+
+# Claude Code rows carry an extra line with the live topic, which herdr reads
+# from the pane's OSC 0/2 terminal title and strips of one leading activity or
+# spinner glyph. Without it every Claude row in the sidebar reads
+# `workspace / tab / claude` and they are impossible to tell apart. Agents
+# other than Claude keep herdr's default rows.
+#
+# This value is owned by the herdr server and is ephemeral across a cold
+# restart, so a resumed session shows nothing here until the agent repaints
+# its title.
+[ui.sidebar.agents.rows_by_agent]
+claude = [
+  [
+    "state_icon",
+    "workspace",
+    "tab",
+  ],
+  [
+    "terminal_title_stripped",
+  ],
+  [
+    "agent",
+  ],
+]
+
 [ui.toast]
 # off = disable pop-up notifications
 # herdr = show in-app toasts
@@ -368,7 +404,15 @@ agent_panel_sort = "spaces"
 # delivery = "off"
 # delay_seconds = 1
 
+# "off" because the jonasws.agent-notify plugin owns desktop notification now.
+# Neither built-in delivery can focus the pane that fired: `terminal` emits OSC 9,
+# whose toasts carry no click action at all, and `system` hardcodes
+# `terminal-notifier -activate <terminal bundle id>`, which raises WezTerm but
+# lands on whatever pane herdr was already showing. The plugin passes the pane id
+# from the event into terminal-notifier's -execute instead.
+# Leaving this on any value other than "off" double-notifies.
 delivery = "terminal"
+delay_seconds = 5
 [ui.toast.herdr]
 # position = "bottom-right"
 
@@ -378,7 +422,7 @@ delivery = "terminal"
 
 # Play sounds when agents change state in background workspaces
 [ui.sound]
-# enabled = true
+enabled = false
 # Optional custom mp3 sound files. Relative paths are resolved from this config file's directory.
 # path = "sounds/notification.mp3"   # one mp3 file for all sound notifications
 # done_path = "sounds/done.mp3"      # overrides only finished notifications
@@ -386,10 +430,10 @@ delivery = "terminal"
 
 # Per-agent overrides: default | on | off
 # By default, droid is muted.
-# [ui.sound.agents]
+[ui.sound.agents]
 # droid = "off"
+claude = "on"
 
-enabled = false
 [session]
 # Resume supported AI-agent panes into their native conversation sessions after
 # a Herdr server restart. Requires official integrations that report session refs.
@@ -410,10 +454,11 @@ resume_agents_on_restore = true
 # Allow launching herdr from inside a herdr-managed pane.
 # allow_nested = false
 # Experimental local Kitty graphics rendering for attached clients.
-# Requires a Kitty graphics-compatible outer terminal.
-# kitty_graphics = false
+# Requires a Kitty graphics-compatible outer terminal. WezTerm qualifies:
+# herdr gates this on TERM_PROGRAM being wezterm/ghostty/kitty (src/client/mod.rs).
+kitty_graphics = true
 # Save recent pane screen history across full server restarts.
-pane_history = false
+pane_history = true
 # While prefix mode is active, temporarily switch the macOS host input
 # source to an ASCII-capable keyboard layout so prefix commands register
 # even when a CJK IME is active, then restore the previous input source

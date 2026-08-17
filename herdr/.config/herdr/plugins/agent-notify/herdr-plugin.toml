@@ -1,0 +1,34 @@
+id = "jonasws.agent-notify"
+name = "Agent Notify"
+version = "0.1.0"
+min_herdr_version = "0.8.0"
+description = "Clickable macOS notifications that focus the herdr pane that fired them"
+platforms = ["macos"]
+
+# herdr's own [ui.toast] delivery cannot do this, which is why this plugin
+# exists. `terminal` emits OSC 9, and an OSC 9 toast has no action field at all
+# -- WezTerm draws it and a click does nothing. `system` shells out to
+# `terminal-notifier -title T -message B -activate com.github.wez.wezterm`
+# (src/platform/macos.rs), so a click raises WezTerm but lands wherever herdr
+# happened to be focused. Neither passes a pane id, and neither is configurable.
+#
+# So [ui.toast] delivery is "off" in config.toml and this hook owns desktop
+# notification instead, via growlrrr's --execute carrying the pane id from the
+# event through to a click handler. Not terminal-notifier: it is built on
+# NSUserNotification, whose click actions no longer fire on macOS 26.
+#
+# pane.agent_status_changed is one of the event names manifest hooks may
+# reference (PLUGIN_HOOK_EVENT_KINDS in src/api/schema/events.rs; the list is
+# deliberately narrower than the full event set, excluding high-volume ones like
+# pane.output_changed). Its payload carries pane_id, workspace_id, agent_status,
+# agent, display_agent, title, and state_labels.
+[[events]]
+on = "pane.agent_status_changed"
+command = ["./notify.sh"]
+
+# Reaching a pane answers its notification, however you got there -- clicking the
+# toast, prefix+a, or the sidebar. Clear it rather than leaving it in Notification
+# Center. pane.focused is also in PLUGIN_HOOK_EVENT_KINDS.
+[[events]]
+on = "pane.focused"
+command = ["./dismiss.sh"]

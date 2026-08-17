@@ -1,49 +1,56 @@
 [metadata]
 name = "herdr-sessions"
 description = """
-Fuzzy find and jump to Herdr panes.
+Fuzzy find and jump to anywhere worth working: every Herdr pane, then every git
+repository that has no pane on it yet.
 
 Bound to prefix+f in herdr's config.toml.
 
-Panes are listed as an attention queue: blocked, done, idle, working,
+Panes come first, as an attention queue: blocked, done, idle, working,
 unclassified agents, then panes running some other command, then idle shells.
 Each row is the pane id, workspace label, what the pane is running, and its
 terminal title. The state column is coloured by that same queue position, and
 the label is coloured per workspace so panes of one workspace read as a block.
+
+Repos follow, zoxide-frecency first and then whatever `fd` found under ~ that
+zoxide has not scored yet. A repo that already has a workspace is left out --
+either because a pane sits in it or because a workspace carries its name -- so
+the list never offers a second way into somewhere the pane rows already reach.
+Enter opens a workspace on the repo, or focuses the existing one, exactly as
+`git-repos` does.
 """
-requirements = ["herdr", "nu", "jq", "nc"]
+requirements = ["herdr", "nu", "jq", "nc", "fd", "git", "zoxide", "eza"]
 
 [source]
 command = "~/.config/television/scripts/herdr-sessions.nu"
 # `ansi` and `display` are mutually exclusive (a display template selects the
 # processor that never strips escape codes), so colouring the state column means
-# the pane id must be visible text. It leads the row, dimmed, which reads more
-# cleanly than trailing it after a ragged-length title.
+# each row's key must be visible text. It leads the row -- the pane id for a
+# pane, the path for a repo -- which reads more cleanly than trailing it after a
+# ragged-length title, and lets the scripts below tell the two kinds apart.
 ansi = true
 output = "{strip_ansi|split: :0}"
 # Agent state changes while the picker is open, so keep the list live. A refresh
-# is a single `herdr api snapshot`, so this is cheap. Previews are unaffected:
-# they run per selected entry and are cached, not polled.
+# is a single `herdr api snapshot` plus a cached repo list, so this is cheap --
+# the `fd` scan behind that cache is refreshed in the background, never on the
+# tick. Previews are unaffected: they run per selected entry and are cached, not
+# polled.
 watch = 2.0
 frecency = false
 
-# One `herdr pane read` per preview, nothing else: the previewer kills any job
-# that takes over 3s. `visible` is the only source that works for both shells
-# and agents painting on the alternate screen; ctrl-f cycles to the others.
-#
-# herdr only ever emits SGR sequences, which television parses into styled text
-# via ansi_to_tui, so `--format ansi` renders the pane in its real colors. The
-# plain-text variant is kept one ctrl-f away as a fallback.
+# One command per preview, nothing else: the previewer kills any job that takes
+# over 3s. The script picks what to run from the kind of entry -- a pane read for
+# a pane, a git log for a repo -- and ctrl-f cycles the three variants.
 [preview]
 command = [
-  "herdr pane read '{strip_ansi|split: :0}' --source visible --lines 200 --format ansi",
-  "herdr pane read '{strip_ansi|split: :0}' --source visible --lines 200",
-  "herdr pane read '{strip_ansi|split: :0}' --source recent-unwrapped --lines 400 --format ansi",
+  "~/.config/television/scripts/herdr-preview.sh '{strip_ansi|split: :0}' visible",
+  "~/.config/television/scripts/herdr-preview.sh '{strip_ansi|split: :0}' plain",
+  "~/.config/television/scripts/herdr-preview.sh '{strip_ansi|split: :0}' history",
 ]
 
 [ui]
 layout = "landscape"
-input_header = "Herdr panes"
+input_header = "Herdr panes & repos"
 
 [ui.preview_panel]
 size = 60
@@ -52,13 +59,14 @@ scrollbar = true
 
 [keybindings]
 shortcut = "f4"
-enter = "actions:focus"
+enter = "actions:jump"
 
-# Focus the exact pane over the socket API. `herdr tab focus` would only reach
+# For a pane: focus it over the socket API. `herdr tab focus` would only reach
 # the tab's active pane, which is the wrong one whenever a tab is split.
+# For a repo: open a workspace on it, or focus the one that already exists.
 # `execute` replaces tv with the command, so the picker is gone by the time
 # focus lands.
-[actions.focus]
-description = "Jump to the selected pane"
-command = "~/.config/television/scripts/herdr-focus.sh '{strip_ansi|split: :0}'"
+[actions.jump]
+description = "Focus the selected pane, or open the selected repo as a workspace"
+command = "~/.config/television/scripts/herdr-jump.sh '{strip_ansi|split: :0}'"
 mode = "execute"
