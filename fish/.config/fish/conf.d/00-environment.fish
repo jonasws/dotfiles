@@ -17,8 +17,9 @@ set fzf_history_opts --with-nth="4.." --preview-window="down,30%,border-top,wrap
 set fzf_diff_highlighter delta --paging=never --width=20
 
 # Bat and paging configurations
-set -x FX_THEME 1
+set -x FX_THEME 3
 set -x FX_SHOW_SIZE true
+set -x FX_INDENT 2
 set -x BATDIFF_USE_DELTA true
 set -x BAT_THEME "Catppuccin Mocha"
 set -x GLAMOUR_STYLE "$HOME/catppuccin/glamour/themes/catppuccin-mocha.json"

@@ -370,7 +370,7 @@ command = "herdr-splits.resize-right"
 
 # Background notification popup delivery
 show_agent_labels_on_pane_borders = true
-agent_panel_sort = "spaces"
+agent_panel_sort = "priority"
 
 # Claude Code rows carry an extra line with the live topic, which herdr reads
 # from the pane's OSC 0/2 terminal title and strips of one leading activity or

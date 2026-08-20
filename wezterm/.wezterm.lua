@@ -85,7 +85,7 @@ config.use_dead_keys = true
 config.send_composed_key_when_left_alt_is_pressed = false
 config.send_composed_key_when_right_alt_is_pressed = false
 config.scrollback_lines = 100000
-config.notification_handling = 'SuppressFromFocusedWindow'
+config.notification_handling = 'SuppressFromFocusedTab'
 
 -- Add hyperlink rules for Firefox container URLs
 config.hyperlink_rules = wezterm.default_hyperlink_rules()
