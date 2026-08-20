@@ -1,0 +1,12 @@
+# Stow package: git
+#
+# Kept here rather than in ~/.gitconfig so it stays version-controlled. Git
+# reads this file in addition to ~/.gitconfig; ~/.gitconfig wins on conflicts,
+# so nothing here overrides settings already there.
+#
+# core.hooksPath replaces .git/hooks for every repo that does not set its own
+# value. hooks/post-checkout chains to the repo-local hook so husky, lefthook,
+# pre-commit and mise keep working. A repo that sets its own core.hooksPath
+# (husky v9 uses .husky) overrides this and will not run these hooks at all.
+[core]
+	hooksPath = ~/.config/git/hooks

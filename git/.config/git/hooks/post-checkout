@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+#
+# Global post-checkout hook: link .mise.local.toml into new git worktrees.
+#
+# .mise.local.toml is gitignored, so a freshly created worktree does not get
+# one and mise silently loses the local env, tools and tasks. This links the
+# main checkout's file in, so every worktree shares one file instead of a copy
+# that drifts as tokens rotate and hosts change.
+#
+# Nothing to configure. Repos without a .mise.local.toml are untouched.
+#
+# mise trust is shared across linked worktrees, so a config trusted in the main
+# checkout is already trusted here -- no prompt, no broken env for agents.
+
+set -uo pipefail
+
+git_dir=$(git rev-parse --git-dir 2>/dev/null) || exit 0
+common_dir=$(git rev-parse --git-common-dir 2>/dev/null) || exit 0
+
+# $3 == 1 is a branch checkout; `git worktree add` always passes 1.
+# git-dir != common-dir means this is a linked worktree rather than the main
+# checkout. Without that second test the hook would fire on every ordinary
+# `git checkout` and trample the real file in the main working tree.
+if [[ ${3:-} == 1 && $git_dir != "$common_dir" ]]; then
+	top=$(git rev-parse --show-toplevel 2>/dev/null) || top=""
+
+	# The main worktree is always listed first.
+	main_wt=$(git worktree list --porcelain 2>/dev/null |
+		awk '/^worktree /{print substr($0, 10); exit}')
+
+	src="$main_wt/.mise.local.toml"
+	dest="$top/.mise.local.toml"
+
+	if [[ -n $top && -n $main_wt && -f $src ]]; then
+		# Only ever replace a symlink or nothing, never real content.
+		if [[ -e $dest && ! -L $dest ]]; then
+			printf 'post-checkout: leaving existing .mise.local.toml alone\n' >&2
+		else
+			ln -sfn "$src" "$dest"
+		fi
+	fi
+fi
+
+# core.hooksPath replaces .git/hooks for every repo that does not set its own
+# value, so a repo-local post-checkout (husky, lefthook, pre-commit, mise)
+# would silently stop running. Chain to it. Do not delete this.
+local_hook="$common_dir/hooks/post-checkout"
+if [[ -x $local_hook ]]; then
+	exec "$local_hook" "$@"
+fi
+
+exit 0
