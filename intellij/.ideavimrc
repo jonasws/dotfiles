@@ -30,9 +30,9 @@ source ~/.intellimacs/extra/files.vim
 let g:WhichKeyDesc_Buffers = "<leader>b    +buffers"
 source ~/.intellimacs/spacemacs/buffers.vim
 
-let g:WhichKeyDesc_GitVcs = "<leader>g    +git/version-control"
-source ~/.intellimacs/spacemacs/git-vcs.vim
-source ~/.intellimacs/extra/git-vcs.vim
+" let g:WhichKeyDesc_GitVcs = "<leader>g    +git/version-control"
+" source ~/.intellimacs/spacemacs/git-vcs.vim
+" source ~/.intellimacs/extra/git-vcs.vim
 
 nmap ]g :action VcsShowNextChangeMarker<CR><ESC>
 nmap [g :action VcsShowPrevChangeMarker<CR><ESC>
@@ -86,6 +86,22 @@ vnoremap ]e    <Esc>:action GotoNextError<CR>
 let g:WhichKeyDesc_Errors_PreviousError = "[e previous-error"
 nnoremap [e    :action GotoPreviousError<CR>
 vnoremap [e    <Esc>:action GotoPreviousError<CR>
+
+" Go to next method
+let g:WhichKeyDesc_Methods_NextMethod = "]m next-method"
+nnoremap ]m    :action MethodDown<CR>
+vnoremap ]m    <Esc>:action MethodDown<CR>
+
+" Go to previous method
+let g:WhichKeyDesc_Methods_PreviousMethod = "[m previous-method"
+nnoremap [m    :action MethodUp<CR>
+vnoremap [m    <Esc>:action MethodUp<CR>
+
+
+" Go to implementation
+let g:WhichKeyDesc_Major_Goto_Implementation = "<leader>gi implementation"
+nnoremap gi    :action GotoImplementation<CR>
+vnoremap gi    <Esc>:action GotoImplementation<CR>
 
 
 nnoremap L     :action NextTab<CR>
