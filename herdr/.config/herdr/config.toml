@@ -152,13 +152,10 @@ navigate_pane_up = "up"
 # width = "80%"
 # height = "80%"
 
-# Fuzzy "go there" picker. prefix+a still steps through the attention queue one
-# agent at a time; this jumps straight to any pane. The channel lists panes
-# attention-first (blocked, done, idle, working, other commands, shells), then
-# every git repo no pane is open in, so the same keystroke reaches work already
-# running and work not started yet. Enter focuses the pane over the socket API,
-# or opens a workspace on the repo -- which is what prefix+r below does, for the
-# repos this list leaves out.
+# Fuzzy pane picker. prefix+a still steps through the attention queue one agent
+# at a time; this jumps straight to any pane. The channel lists panes
+# attention-first (blocked, done, idle, working, other commands, shells) and
+# Enter focuses the selected pane over the socket API.
 # Channel: television/.config/television/cable/herdr-sessions.toml
 [[keys.command]]
 key = "prefix+f"
@@ -190,12 +187,11 @@ command = "lazygit"
 width = "80%"
 height = "80%"
 
-# Repo-only picker in a session-modal popup: every repo, including the ones
-# prefix+f hides because a pane is already open in them, and with ctrl-e /
-# ctrl-w still on the entries. `-k` overrides just the `enter` binding for this
-# invocation, from git-repos.toml's default `actions:cd` to its
-# `actions:workspace` (open/focus a Herdr workspace for the repo) -- no separate
-# cable channel needed for that. Overrides resize mode's prefix+r on purpose.
+# Git repo picker in a session-modal popup. `-k` overrides just the `enter`
+# binding for this invocation, from git-repos.toml's default `actions:cd`
+# to its `actions:workspace` (open/focus a Herdr workspace for the repo) --
+# no separate cable channel needed for that. Overrides resize mode's
+# prefix+r on purpose.
 # Channel: television/.config/television/cable/git-repos.toml
 [[keys.command]]
 key = "prefix+r"

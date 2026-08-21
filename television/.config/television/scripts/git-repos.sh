@@ -5,12 +5,11 @@
 # then a full `fd` scan of ~ for anything zoxide has never scored -- freshly
 # cloned repos, mostly. Duplicates are dropped, keeping the zoxide position.
 #
-# The fd scan takes seconds on a large home directory, which is fine for a
-# one-shot picker but not for `herdr-sessions`, whose source re-runs every two
-# seconds while the picker is open. So the scan result is cached and refreshed
-# in the background: every call returns immediately from zoxide plus whatever
-# the cache holds, and a stale cache only means a newly cloned repo shows up a
-# few seconds late.
+# The fd scan takes seconds on a large home directory, which would make every
+# picker launch feel sluggish. So the scan result is cached and refreshed in
+# the background: every call returns immediately from zoxide plus whatever the
+# cache holds, and a stale cache only means a newly cloned repo shows up a few
+# seconds late.
 set -euo pipefail
 
 cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/television"

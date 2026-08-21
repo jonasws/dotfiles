@@ -1,38 +1,27 @@
 #!/usr/bin/env nu
 
-# Emit the entries of the `herdr-sessions` television channel: every Herdr pane
-# first, then every git repository that has no pane open on it.
+# Emit one line per Herdr pane for the `herdr-sessions` television channel.
 #
-# Panes come ordered as an attention queue: blocked first, then done (finished
-# but unseen), then idle, working, unclassified agents, then panes running some
-# other command, and finally idle shells. Repos follow, zoxide-frecency first.
-# Television preserves this order until you start typing.
-#
-# The two halves answer the same question -- "take me to the thing I want to work
-# in" -- and differ only in whether that thing is already running. So a repo the
-# panes above already cover is dropped: its workspace exists, and the pane rows
-# are the richer way to reach it.
+# Ordered as an attention queue: blocked first, then done (finished but unseen),
+# then idle, working, unclassified agents, then panes running some other command,
+# and finally idle shells. Television preserves this order until you start typing.
 #
 # Colour requires `ansi = true`, which the channel spec lists as incompatible with
-# a `display` template, so the whole line renders and the key of the row has to
-# survive as visible text: the pane id for a pane, the path for a repo. It leads
-# the row and is recovered with `{strip_ansi|split: :0}`, which is also what tells
-# the two kinds apart downstream -- a key starting with `~` is a repo. Deriving
-# the key from the rest of the row instead is not an option -- two shells split
-# inside one workspace render an identical label/state/title row.
+# a `display` template, so the whole line renders and the pane id has to survive
+# as visible text. It leads the row, dimmed, and is recovered with
+# `{strip_ansi|split: :0}`. Deriving the pane from the rest of the row instead is
+# not an option -- two shells split inside one workspace render an identical
+# label/state/title row.
 #
 # The pane the picker was launched from is omitted, since focusing it is a no-op.
 # Popup commands get HERDR_ACTIVE_PANE_ID (the tiled pane underneath the popup);
 # a picker run directly in a pane gets HERDR_PANE_ID instead.
 #
-# Output is one ANSI-coloured line per entry, starting with that entry's key.
+# Output is one ANSI-coloured line per pane, starting with the pane id.
 
 const LABEL_MIN = 18
 const LABEL_MAX = 24
 const STATE_MIN = 14
-const REPO_MAX = 60
-
-const REPO_SOURCE = "~/.config/television/scripts/git-repos.sh"
 
 # Workspaces cycle through these so rows belonging together read as a block, and
 # so two workspaces sharing a label (herdr defaults it to the directory name) stay
@@ -79,47 +68,6 @@ def paint [color: string]: string -> string {
     $"(ansi $color)($in)(ansi reset)"
 }
 
-# `~` rather than the absolute path: the key column is the widest thing in the
-# repo block, and every path in it starts with the same 15 characters otherwise.
-def tildify []: string -> string {
-    let path = $in
-    let home = ($nu.home-dir | str trim --right --char "/")
-    if ($path | str starts-with $"($home)/") {
-        $"~($path | str substring ($home | str length)..)"
-    } else {
-        $path
-    }
-}
-
-# Repos that have no workspace on them yet.
-#
-# "Has a workspace" is asked two ways, because herdr tracks no cwd per workspace
-# -- only per pane, and a pane's cwd is wherever it was last `cd`ed to. So a pane
-# sitting in the repo (root or below) counts, and so does a workspace *labelled*
-# after the repo, which is how herdr-workspace.sh names the ones it opens. The
-# label test alone would be too eager: two repos can share a basename, and only
-# one of them is the one that is open, so it is skipped for those.
-#
-# A path containing a space is skipped entirely: the channel recovers the key as
-# the row's first space-separated field, so such a path would come back truncated
-# and the jump would land nowhere.
-def repos [open_cwds: list<string>, open_labels: list<string>]: nothing -> list<string> {
-    let candidates = (
-        ^($REPO_SOURCE | path expand)
-        | lines
-        | where {|repo| $repo != "" and not ($repo | str contains " ") }
-    )
-    let ambiguous = ($candidates | each {|repo| $repo | path basename} | uniq --repeated)
-
-    $candidates | where {|repo|
-        let base = ($repo | path basename)
-        not (
-            ($open_cwds | any {|cwd| $cwd == $repo or ($cwd | str starts-with $"($repo)/") }) or
-            ($base in $open_labels and $base not-in $ambiguous)
-        )
-    }
-}
-
 def main [] {
     let snapshot = (herdr api snapshot | from json | get result.snapshot)
 
@@ -163,35 +111,7 @@ def main [] {
         | sort-by rank wsnum pane_id
     )
 
-    # A pane counts as covering its repo whether it sits in the repo root or in a
-    # subdirectory of it, and whether that is the shell's cwd or the cwd of what
-    # the shell is running.
-    let open_cwds = (
-        $snapshot.panes
-        | each {|pane| [($pane.cwd? | default "") ($pane.foreground_cwd? | default "")] }
-        | flatten
-        | where {|cwd| $cwd != "" }
-        | uniq
-    )
-    let open_labels = ($snapshot.workspaces | get label | uniq)
-    let repo_paths = (repos ($open_cwds | each {|cwd| $cwd | path expand}) $open_labels)
-    let repo_width = ([
-        ($repo_paths | each {|repo| $repo | tildify | str length} | append 0 | math max)
-        $REPO_MAX
-    ] | math min)
-
-    # `fill`, not `clip`: an over-long path may push its tag out of line, but it
-    # must never be truncated -- it is the key the jump action is handed.
-    let repo_lines = (
-        $repo_paths | each {|repo|
-            [
-                ($repo | tildify | fill --alignment left --width $repo_width)
-                ("repo" | paint "light_gray")
-            ] | str join "  "
-        }
-    )
-
-    if ($rows | is-empty) { return ($repo_lines | to text) }
+    if ($rows | is-empty) { return }
 
     # Group labels so every pane of a workspace carries the same colour, keyed on
     # the workspace number rather than the label, which is not unique.
@@ -215,18 +135,12 @@ def main [] {
     # Upstream channels separate fields with two or three spaces rather than a
     # single one (see opencode-sessions, tmux-windows, gh-prs); the same gap reads
     # much better here than the tight single space.
-    let pane_lines = (
-        $rows | each {|row|
-            [
-                ($row.pane_id | clip $id_width | paint "light_gray")
-                ($row.label | clip $label_width | paint ($group_color | get $"($row.wsnum)"))
-                ($row.state | clip $state_width | paint $row.color)
-                $row.title
-            ] | str join "  "
-        }
-    )
-
-    # Two blocks, each aligned to its own widths. Sharing one key column would
-    # mean padding every pane id out to the width of the longest repo path.
-    $pane_lines | append $repo_lines | to text
+    $rows | each {|row|
+        [
+            ($row.pane_id | clip $id_width | paint "light_gray")
+            ($row.label | clip $label_width | paint ($group_color | get $"($row.wsnum)"))
+            ($row.state | clip $state_width | paint $row.color)
+            $row.title
+        ] | str join "  "
+    } | to text
 }
