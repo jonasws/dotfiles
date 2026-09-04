@@ -10,8 +10,8 @@ stow git
 
 ## What it does
 
-`hooks/post-checkout` links the main checkout's `.mise.local.toml` into every
-new git worktree.
+`template/hooks/post-checkout` links the main checkout's `.mise.local.toml`
+into every new git worktree.
 
 `.mise.local.toml` is gitignored, so a fresh worktree does not get one and mise
 silently loses the local env, tools and tasks it defines. The hook links rather
@@ -24,16 +24,44 @@ Works for every way a worktree gets created — `git worktree add`, `herdr
 worktree create`, and Claude Code's `EnterWorktree` — because all of them shell
 out to real git, which runs `post-checkout` inside the new worktree.
 
+## Existing repos need one backfill
+
+`init.templateDir` seeds `.git/hooks` at clone and init time, so repos cloned
+before this package have no hook. Re-running `git init` in a repo copies in any
+template hook it is missing, and does not touch hooks that already exist:
+
+```fish
+for d in ~/CNOPS/* ~/CX/*
+    test -d $d/.git; and git -C $d init -q
+end
+```
+
+Worktrees read hooks from the common git dir, so backfilling the main checkout
+covers every worktree of that repo.
+
+## Why not core.hooksPath
+
+`core.hooksPath` looks like the obvious way to install a hook globally. It is a
+trap here:
+
+- It **shadows `.git/hooks` for every repo**, so nothing a repo installs itself
+  runs unless the global hook explicitly chains to it.
+- **pre-commit refuses to install while it is set**: `[ERROR] Cowardly refusing
+  to install hooks with core.hooksPath set.`
+- Setting it to the empty string per repo to dodge that error is worse:
+  it disables hooks entirely, so `pre-commit install` reports success and the
+  hook then never runs on commit.
+
+`init.templateDir` has none of those problems. It seeds real files into
+`.git/hooks`, leaves `core.hooksPath` unset, and coexists with pre-commit,
+husky and lefthook.
+
 ## Things worth knowing
 
-**`core.hooksPath` shadows `.git/hooks` everywhere.** Setting it globally means
-no repo's own hooks run unless something chains to them. `post-checkout` ends by
-exec'ing the repo-local hook so husky, lefthook, pre-commit and mise keep
-working. Any hook added here must do the same.
-
-**Repos that set their own `core.hooksPath` opt out entirely.** husky v9 points
-it at `.husky`, and a repo-level value overrides the global one, so these hooks
-do not run there at all.
+**The hook must not chain.** It *is* `.git/hooks/post-checkout`, so exec'ing the
+repo-local hook would exec itself and loop forever. Nothing is shadowed, so
+there is nothing to chain to. A tool that later claims this hook renames this
+file (pre-commit uses `post-checkout.legacy`) and calls it.
 
 **The main working tree is never modified.** `post-checkout` also fires on
 ordinary `git checkout`, so the hook only acts when git-dir differs from

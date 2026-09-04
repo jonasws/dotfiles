@@ -11,6 +11,10 @@
 #
 # mise trust is shared across linked worktrees, so a config trusted in the main
 # checkout is already trusted here -- no prompt, no broken env for agents.
+#
+# Installed by init.templateDir, which copies this into .git/hooks at clone or
+# init time. Deliberately NOT core.hooksPath: that shadows .git/hooks for every
+# repo, and pre-commit refuses to install while it is set.
 
 set -uo pipefail
 
@@ -41,12 +45,8 @@ if [[ ${3:-} == 1 && $git_dir != "$common_dir" ]]; then
 	fi
 fi
 
-# core.hooksPath replaces .git/hooks for every repo that does not set its own
-# value, so a repo-local post-checkout (husky, lefthook, pre-commit, mise)
-# would silently stop running. Chain to it. Do not delete this.
-local_hook="$common_dir/hooks/post-checkout"
-if [[ -x $local_hook ]]; then
-	exec "$local_hook" "$@"
-fi
-
+# No chaining here. This file IS .git/hooks/post-checkout, so exec'ing the
+# repo-local hook would exec this script again and loop forever. Nothing is
+# being shadowed, so there is nothing to chain to. If a tool later claims this
+# hook it renames this file (pre-commit uses post-checkout.legacy) and calls it.
 exit 0
