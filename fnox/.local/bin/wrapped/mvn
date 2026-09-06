@@ -1,0 +1,21 @@
+#!/bin/sh
+# Maven, run under fnox so it gets the credentials ~/.m2/settings.xml expects.
+#
+# LIFLIG_GITHUB_PAT and NEXUS_PASSWORD are env = "exec" in fnox: absent from the
+# shell, so they reach Maven only through this wrapper and no other process
+# inherits them. Claude Code's Bash tool runs sh, not fish, so this has to be a
+# script on PATH rather than a shell function.
+#
+# On PATH via `_.path` in ~/.config/mise/config.toml, which mise orders ahead of
+# the maven tool directory. `mise which` resolves tools, not PATH, so asking it
+# for mvn returns the real binary and not this script.
+
+set -e
+
+real="$(mise which mvn 2>/dev/null || true)"
+if [ -z "$real" ]; then
+  echo "mvn: mise provisions no maven for $PWD" >&2
+  exit 127
+fi
+
+exec fnox exec -- "$real" "$@"

@@ -1,0 +1,35 @@
+#:schema https://fnox.jdx.dev/schema.json
+
+# Machine-wide fnox configuration.
+#
+# Secrets are referenced here, never stored here: the values live in 1Password
+# and are resolved on demand. This file is safe to commit.
+#
+# Not stowed, and must stay out of git: ~/.config/fnox/age.txt (age identity).
+
+# Keep secrets out of the interactive shell. They are injected only into
+# `fnox exec` subprocesses, so an agent launched from this shell inherits
+# nothing. Individual secrets can opt back in with `env = true`.
+env = "exec"
+
+# Fail loudly rather than running a build with a silently missing credential.
+if_missing = "error"
+
+[daemon]
+enabled = true
+idle_timeout = "8h"
+
+[providers]
+onepass = { type = "1password", account = "https://capragroup.1password.eu/" }
+
+[secrets]
+# Read by ~/.m2/settings.xml as ${env.LIFLIG_GITHUB_PAT} and
+# ${env.NEXUS_PASSWORD} for the `github` and `vy-nexus` server entries.
+LIFLIG_GITHUB_PAT = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
+NEXUS_PASSWORD = { provider = "onepass", value = "op://Employee/Vy - Nexus/password" }
+
+# Read by the github MCP server, which Claude Code starts as
+# `fnox exec -- github-mcp-server stdio`. GitHub's remote MCP endpoint has no
+# dynamic client registration, so OAuth cannot be set up from here; running the
+# server locally under fnox keeps the token out of every other process.
+GITHUB_PERSONAL_ACCESS_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
