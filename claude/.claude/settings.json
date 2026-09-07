@@ -114,24 +114,10 @@
     "failIfUnavailable": true,
     "allowUnsandboxedCommands": false,
     "network": {
-      "allowedDomains": [
-        "repo1.maven.org",
-        "repo.maven.apache.org",
-        "maven.pkg.github.com",
-        "nexus.common-services.vydev.io",
-        "github.com",
-        "api.github.com",
-        "codeload.github.com",
-        "*.githubusercontent.com",
-        "registry.npmjs.org",
-        "*.amazonaws.com",
-        "mise.jdx.dev",
-        "*.1password.eu",
-        "*.1password.com"
-      ],
       "allowUnixSockets": [
         "/var/folders/y7/klt58gf55_7_c3tb47j9lnym0000gn/T/fnox-501/fnox",
-        "/Users/jonasws/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+        "/Users/jonasws/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock",
+        "~/.config/herdr/herdr.sock"
       ],
       "allowLocalBinding": true
     },

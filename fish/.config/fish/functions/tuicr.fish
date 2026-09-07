@@ -1,5 +1,6 @@
 function tuicr --wraps tuicr
-    set -x GH_TOKEN $(op read "op://Employee/ng6rejbxwjz66bjj4vs4mhbkfq/password" 2>/dev/null); or return 1
+    set -lx GH_TOKEN (op-read-or-fail "op://Employee/ng6rejbxwjz66bjj4vs4mhbkfq/password")
+    or return 1
 
     command tuicr $argv
 end

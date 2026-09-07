@@ -72,10 +72,6 @@ prefix = "ctrl+b"
 # settings = "prefix+s"
 # detach = "prefix+q"
 # reload_config = "prefix+shift+r"
-# Moved off the default so prefix+shift+r stays free for the afogel.shepherdr
-# plugin's resume-last action (reopen the newest finished dispatch in a headed
-# pane). The plugin manifest claims that key; herdr's own reload lives here now.
-reload_config = "prefix+alt+shift+r"
 # open_notification_target = "prefix+o"
 # workspace_picker = "prefix+w"
 # goto = "prefix+g"
@@ -117,7 +113,7 @@ next_agent = "prefix+a"
 # close_pane = "prefix+x"
 # zoom = "prefix+z"       # legacy alias: fullscreen
 # resize_mode = "prefix+r"
-# toggle_sidebar = "prefix+b"
+toggle_sidebar = "prefix+b"
 
 # Navigate-mode movement. These local shortcuts win while navigate mode is open.
 # They are independent from focus_pane_*. Do not include prefix+, esc, enter, tab, or 1..9 here.
@@ -165,10 +161,11 @@ width = "90%"
 height = "80%"
 
 # Herdr F1: the agents in this session as a race in the browser. Clicking a car
-# focuses that agent's pane, and the fork below also brings the WezTerm tab
-# hosting herdr to the front -- upstream only focuses within herdr, which is
-# invisible from a browser on another Space.
-#     herdr plugin install jonasws/herdr-f1 --ref wezterm-reveal
+# focuses that agent's pane. Installed from a fork, whose main carries five
+# commits upstream does not have: herdr protocol 20 support, --bind for the
+# dashboard and for a multiplayer host, earned pace for the local classic car,
+# and a Firefox fix for the circuit picker.
+#     herdr plugin install jonasws/herdr-f1
 # prefix+shift+f rather than the upstream README's prefix+f, which the pane
 # picker above already owns. Reopening while the dashboard runs just points the
 # browser at it again; `herdr plugin action invoke dev.minung.herdr-f1.stop`
@@ -178,6 +175,12 @@ key = "prefix+shift+f"
 type = "plugin_action"
 command = "dev.minung.herdr-f1.open"
 description = "open F1 dashboard"
+
+[[keys.command]]
+key = ["prefix+k", "ctrl+alt+k"]
+type = "plugin_action"
+command = "herdr-bar.open"
+description = "command bar"
 
 # Lazygit in a session-modal popup, so it does not disturb the tab layout.
 [[keys.command]]
@@ -198,6 +201,18 @@ key = "prefix+r"
 type = "popup"
 command = "tv git-repos -k 'enter=\"actions:workspace\"'"
 width = "90%"
+height = "80%"
+
+# AWS profile picker in a session-modal popup, so it does not disturb the tab
+# layout. No -k override needed -- the channel's own `enter` binding is
+# already actions:open-browser. ctrl-e (actions:export) still works too,
+# since there is no way to unbind a channel keybinding per-invocation.
+# Channel: television/.config/television/cable/aws-profiles.toml
+[[keys.command]]
+key = "prefix+shift+o"
+type = "popup"
+command = "tv aws-profiles"
+width = "80%"
 height = "80%"
 
 # --- herdr-splits.nvim -------------------------------------------------------
@@ -368,29 +383,27 @@ command = "herdr-splits.resize-right"
 show_agent_labels_on_pane_borders = true
 agent_panel_sort = "priority"
 
-# Claude Code rows carry an extra line with the live topic, which herdr reads
-# from the pane's OSC 0/2 terminal title and strips of one leading activity or
-# spinner glyph. Without it every Claude row in the sidebar reads
-# `workspace / tab / claude` and they are impossible to tell apart. Agents
-# other than Claude keep herdr's default rows.
-#
-# This value is owned by the herdr server and is ephemeral across a cold
-# restart, so a resumed session shows nothing here until the agent repaints
-# its title.
-[ui.sidebar.agents.rows_by_agent]
-claude = [
-  [
-    "state_icon",
-    "workspace",
-    "tab",
-  ],
-  [
-    "terminal_title_stripped",
-  ],
-  [
-    "agent",
-  ],
-]
+# The tab row carries real information now -- herdr-automatic-rename labels each
+# tab with its foreground program, or the agent's topic when one is running --
+# so it stays visible even for a lone tab.
+hide_tab_bar_when_single_tab = false
+
+# Tabs are named by dan.pane-topic-sync from the pane's live topic, so there is
+# nothing left to type at creation time. Turning this off is what hands tab
+# labels over to the plugin; leaving it on means the plugin refuses to touch a
+# tab you named by hand.
+prompt_new_tab_name = false
+
+# The default is "{hostname}: {workspace}", which tells you nothing you cannot
+# already see. {terminal_title} is the focused pane's topic, so the WezTerm
+# window title -- the only part of herdr visible from cmd-tab and Mission
+# Control -- names the task rather than the machine.
+window_title = "{workspace}: {terminal_title}"
+
+# No [ui.sidebar.agents] override. The topic used to be carried here on a
+# `terminal_title_stripped` row, because the `tab` token only ever said "1".
+# herdr-automatic-rename puts the topic in the tab label itself, which the
+# default rows already render -- a second row would print the same string twice.
 
 [ui.toast]
 # off = disable pop-up notifications
@@ -479,3 +492,23 @@ pane_history = true
 # Maximum scrollback buffer size in bytes retained per pane terminal.
 # Matches Ghostty's default scrollback-limit behavior.
 # scrollback_limit_bytes = 10000000
+
+# BEGIN jhochenbaum.hunkdiff — managed by `setup-keys`; edit via the plugin, not by hand
+[[keys.command]]
+key = "prefix+shift+h"
+type = "plugin_action"
+command = "jhochenbaum.hunkdiff.review"
+description = "hunk: review changes"
+
+[[keys.command]]
+key = "prefix+shift+s"
+type = "plugin_action"
+command = "jhochenbaum.hunkdiff.send-review"
+description = "hunk: send review to agent"
+
+[[keys.command]]
+key = "prefix+shift+c"
+type = "plugin_action"
+command = "jhochenbaum.hunkdiff.review:commit"
+description = "hunk: review the last commit"
+# END jhochenbaum.hunkdiff
