@@ -132,9 +132,13 @@
       "allowUnixSockets": [
         "/var/folders/y7/klt58gf55_7_c3tb47j9lnym0000gn/T/fnox-501/fnox",
         "/Users/jonasws/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-      ]
+      ],
+      "allowLocalBinding": true
     },
     "filesystem": {
+      "allowWrite": [
+        "~/Library/Caches/mise"
+      ],
       "denyRead": [
         "~/.ssh/id_rsa",
         "~/.aws/credentials",
