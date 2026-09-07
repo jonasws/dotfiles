@@ -137,7 +137,8 @@
     },
     "filesystem": {
       "allowWrite": [
-        "~/Library/Caches/mise"
+        "~/Library/Caches/mise",
+        "~/.m2/repository"
       ],
       "denyRead": [
         "~/.ssh/id_rsa",
