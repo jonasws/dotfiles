@@ -1,0 +1,185 @@
+{
+  "env": {
+    "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
+    "ENABLE_TOOL_SEARCH": "auto"
+  },
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Bash(ctx7 library *)",
+      "Bash(ctx7 docs *)",
+      "Bash(ctx7 login)",
+      "Bash(npx ctx7@latest *)"
+    ],
+    "deny": [
+      "Read(//**/*.env)",
+      "Read(//**/.env)",
+      "Read(//**/.env.*)",
+      "Read(//**/*.env.*)",
+      "Read(//**/*-env)",
+      "Read(~/.ssh/**)",
+      "Read(~/.aws/credentials)",
+      "Read(~/.config/fnox/age.txt)"
+    ],
+    "ask": [
+      "Bash(git push --force*)",
+      "Bash(git push -f *)",
+      "Bash(git push --delete*)",
+      "Bash(git reset --hard*)",
+      "Bash(git clean -f*)",
+      "Bash(git rebase*)"
+    ],
+    "defaultMode": "auto"
+  },
+  "model": "opus",
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/jonasws/.claude/hooks/herdr-agent-state.sh' session",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "worktree": {
+    "baseRef": "fresh"
+  },
+  "enableWorkflows": false,
+  "workflowKeywordTriggerEnabled": false,
+  "statusLine": {
+    "type": "command",
+    "command": "bash /Users/jonasws/.claude/statusline-command.sh"
+  },
+  "enabledPlugins": {
+    "grafana-lgtm@grafana-skills": true,
+    "http4k@http4k-marketplace": true,
+    "playwright-skill@playwright-skill": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": true,
+    "voltagent-core-dev@voltagent-subagents": true,
+    "voltagent-dev-exp@voltagent-subagents": true,
+    "voltagent-infra@voltagent-subagents": true,
+    "voltagent-lang@voltagent-subagents": true,
+    "voltagent-meta@voltagent-subagents": true,
+    "superpowers@claude-plugins-official": true,
+    "obsidian@obsidian-skills": true,
+    "caveman@caveman": true
+  },
+  "extraKnownMarketplaces": {
+    "grafana-skills": {
+      "source": {
+        "source": "github",
+        "repo": "grafana/skills"
+      }
+    },
+    "http4k-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "http4k/agent-skills"
+      }
+    },
+    "playwright-skill": {
+      "source": {
+        "source": "github",
+        "repo": "lackeyjb/playwright-skill"
+      },
+      "autoUpdate": true
+    },
+    "voltagent-subagents": {
+      "source": {
+        "source": "github",
+        "repo": "VoltAgent/awesome-claude-code-subagents"
+      }
+    },
+    "obsidian-skills": {
+      "source": {
+        "source": "github",
+        "repo": "kepano/obsidian-skills"
+      }
+    },
+    "caveman": {
+      "source": {
+        "source": "github",
+        "repo": "JuliusBrussee/caveman"
+      }
+    }
+  },
+  "sandbox": {
+    "enabled": true,
+    "failIfUnavailable": true,
+    "allowUnsandboxedCommands": false,
+    "network": {
+      "allowedDomains": [
+        "repo1.maven.org",
+        "repo.maven.apache.org",
+        "maven.pkg.github.com",
+        "nexus.common-services.vydev.io",
+        "github.com",
+        "api.github.com",
+        "codeload.github.com",
+        "*.githubusercontent.com",
+        "registry.npmjs.org",
+        "*.amazonaws.com",
+        "mise.jdx.dev",
+        "*.1password.eu",
+        "*.1password.com"
+      ],
+      "allowUnixSockets": [
+        "/var/folders/y7/klt58gf55_7_c3tb47j9lnym0000gn/T/fnox-501/fnox",
+        "/Users/jonasws/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+      ]
+    },
+    "filesystem": {
+      "denyRead": [
+        "~/.ssh/id_rsa",
+        "~/.aws/credentials",
+        "~/.config/fnox/age.txt"
+      ]
+    }
+  },
+  "spinnerTipsEnabled": false,
+  "effortLevel": "high",
+  "awaySummaryEnabled": false,
+  "tui": "default",
+  "skipDangerousModePermissionPrompt": true,
+  "theme": "dark-ansi",
+  "editorMode": "vim",
+  "remoteControlAtStartup": false,
+  "skipAutoPermissionPrompt": true,
+  "autoMode": {
+    "environment": [
+      "### Org-wide",
+      "**Organization**: nsbno (GitHub org \u2014 from origin remote github.com/nsbno/cn-cx-booking-service)",
+      "**Cloud provider(s)**: AWS (aws CLI in shell history; aws secretsmanager marker in config scan; Cognito auth via AWS)",
+      "**Repository visibility**: not queryable here \u2014 assume private per shipped default (gh visibility check failed)",
+      "**Internal sharing / snippet hosting**: None configured \u2014 treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: AWS Secrets Manager (aws secretsmanager marker found in config scan)",
+      "**Default / protected branches**: master (default branch); protection status not queryable here (gh check failed) \u2014 treat master as protected by default caution",
+      "**CI/CD deploy targets**: None configured",
+      "**Network posture**: None configured",
+      "**Source control**: The trusted repo (nsbno/cn-cx-booking-service) and its origin remote only \u2014 no additional org repos configured (org repo split not gathered)",
+      "**Trusted internal domains**: services.cnops.vydev.io (Cognito scope resource-server prefix referenced in CLAUDE.md); maven.pkg.github.com and raw.githubusercontent.com (contacted hosts in this project's transcripts)",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: None configured",
+      "**Internal package registry**: GitHub Packages (no.liflig:*) and vy-nexus (no.cargonet.libs:*), per CLAUDE.md build instructions",
+      "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment (hyphen/underscore/dot-delimited \u2014 e.g. matches `prod-db`, not `producer`)",
+      "**Protected deployment namespaces / environments**: None configured \u2014 fall back to the Sensitive remote targets heuristic",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development (Kotlin/http4k booking API work in cn-cx-booking-service)",
+      "**Trusted repo**: /Users/jonasws/CX/cn-cx-booking-service and its origin remote (github.com/nsbno/cn-cx-booking-service) \u2014 visibility not confirmed, treat as private by default so confidential material is OK to commit there but not assumed publishable",
+      "**Org-specific CLIs**: mise (required wrapper for mvn \u2014 plain mvn 401s per CLAUDE.md), herdr, hunk, caveman, fnox, otree, rain, doggo, awslogs, console, fx, tv (frequent in shell history, likely internal/org tooling)",
+      "routine mise/mvn/fd/sd/rg/ast-grep usage under this project's working directory is expected per ~/.claude/CLAUDE.md tool preferences"
+    ]
+  },
+  "permissionRules": [],
+  "agentPushNotifEnabled": true,
+  "inputNeededNotifEnabled": true
+}
