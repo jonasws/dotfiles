@@ -115,7 +115,6 @@
     "allowUnsandboxedCommands": false,
     "network": {
       "allowUnixSockets": [
-        "/var/folders/y7/klt58gf55_7_c3tb47j9lnym0000gn/T/fnox-501/fnox",
         "/Users/jonasws/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock",
         "~/.config/herdr/herdr.sock"
       ],
@@ -124,7 +123,8 @@
     "filesystem": {
       "allowWrite": [
         "~/Library/Caches/mise",
-        "~/.m2/repository"
+        "~/.m2/repository",
+        "~/Library/Application Support/kotlin"
       ],
       "denyRead": [
         "~/.ssh/id_rsa",
