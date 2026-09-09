@@ -33,7 +33,3 @@ NEXUS_PASSWORD = { provider = "onepass", value = "op://Employee/Vy - Nexus/passw
 # dynamic client registration, so OAuth cannot be set up from here; running the
 # server locally under fnox keeps the token out of every other process.
 GITHUB_PERSONAL_ACCESS_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
-
-# Read by the gh CLI through ~/.local/bin/wrapped/gh. gh prefers GH_TOKEN over
-# its keyring entry, so the wrapper is the only place a token exists.
-GH_TOKEN = { provider = "onepass", value = "op://Employee/Vy - Nexus/password" }

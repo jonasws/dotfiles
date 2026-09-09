@@ -63,6 +63,26 @@ is ever removed: `Configuration error: fnox daemon did not become ready`, and
 Maven never runs at all — so never filter a build's output down to `ERROR` lines
 that would hide it.
 
+## Sandbox and secrets
+
+Inside Claude Code's sandbox the 1Password desktop app is unreachable, so `fnox`
+resolves nothing. `op` binds its daemon socket under `~/.config/op`, which is not
+writable there, and the app's per-client socket in the 1Password group container
+has a random per-client name with no stable path to allowlist. Anything needing a
+credential must therefore run outside the sandbox — as an MCP server Claude Code
+starts itself — or not need one at all.
+
+`$TMPDIR` is the tell: the sandbox points it at `/tmp/claude-<uid>`, while an
+unsandboxed shell leaves it at `/var/folders/.../T/`.
+
+## GitHub
+
+Use the `github` MCP tools. Never the `gh` CLI — it is denied in
+`permissions.deny`, and it has no credentials in any case: `~/.config/gh/hosts.yml`
+is empty and the fnox wrapper that fed it `GH_TOKEN` has been removed. The token
+now exists only inside `github-mcp-server`, which Claude Code starts outside the
+sandbox as `fnox exec -- github-mcp-server stdio`.
+
 ## Commit messages
 
 Indent the body with 2 spaces (from line 2 and below).
