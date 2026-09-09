@@ -18,15 +18,16 @@ if [ -z "$real" ]; then
   exit 127
 fi
 
-# fnox derives its daemon socket path from $TMPDIR, and Claude Code's sandbox
-# rewrites $TMPDIR to a per-session directory. The host daemon is therefore
-# invisible there, and the daemon fnox tries to start in its place cannot bind a
-# socket under Seatbelt, so `fnox exec` dies with "fnox daemon did not become
-# ready". Resolving secrets in-process is ~4.5s slower but always works.
-# `fnox daemon status` only probes; it never starts a daemon.
-no_daemon=
-if fnox daemon status 2>&1 | grep -q "not running"; then
-  no_daemon=--no-daemon
-fi
+# Claude Code's sandbox cannot reach the 1Password desktop app, so fnox resolves
+# nothing there and `fnox exec` fails outright. Offline Maven never authenticates
+# against maven.pkg.github.com or vy-nexus, so it needs no credentials at all and
+# the wrapper gets out of the way. The sandbox is identifiable by $TMPDIR, which
+# it points at /tmp/claude-<uid>.
+case "$TMPDIR" in
+  /tmp/claude-* | /private/tmp/claude-*)
+    echo "mvn: sandboxed, running --offline against ~/.m2/repository" >&2
+    exec "$real" --offline "$@"
+    ;;
+esac
 
-exec fnox exec $no_daemon -- "$real" "$@"
+exec fnox exec -- "$real" "$@"

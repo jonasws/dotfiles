@@ -55,13 +55,17 @@ around one shell.
 `kotlin.compiler.daemon` is the Maven property. `kotlin.compiler.execution.strategy`
 is the Gradle equivalent and is silently ignored by `kotlin-maven-plugin`.
 
-`mvn` on PATH is `~/.local/bin/wrapped/mvn`, which runs the real binary under
-`fnox exec` for the credentials `~/.m2/settings.xml` reads. fnox locates its daemon
-socket under `$TMPDIR`, and the sandbox rewrites `$TMPDIR` per session, so the
-wrapper falls back to `--no-daemon` when no daemon answers. Symptom if that probe
-is ever removed: `Configuration error: fnox daemon did not become ready`, and
-Maven never runs at all — so never filter a build's output down to `ERROR` lines
-that would hide it.
+`mvn` on PATH is `~/.local/bin/wrapped/mvn`. Outside the sandbox it runs the real
+binary under `fnox exec`, for the credentials `~/.m2/settings.xml` reads. Inside
+the sandbox it recognises `$TMPDIR` and runs `--offline` with no wrapper at all,
+since fnox cannot reach 1Password from there.
+
+A sandboxed build therefore resolves only what `~/.m2/repository` already holds.
+A new dependency or a first-time plugin fails with `Cannot access ... in offline
+mode`; warm the cache from an unsandboxed shell with `mvn dependency:go-offline`
+rather than editing the wrapper. Never filter a build's output down to `ERROR`
+lines — that hides exactly this class of failure, and a build that never ran
+looks identical to one that passed.
 
 ## Sandbox and secrets
 
