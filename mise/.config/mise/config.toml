@@ -27,7 +27,7 @@ github-cli = "latest"
 "github:walles/moor" = "latest"
 go = "latest"
 "go:github.com/isaacphi/mcp-language-server" = "latest"
-java = "zulu-25.36.205.0"
+java = "zulu-25"
 maven = "3"
 node = "24"
 "npm:@mermaid-js/mermaid-cli" = "latest"
@@ -76,8 +76,8 @@ glow = "latest"
 "cargo:mdcat" = "latest"
 herdr = "latest"
 "github:agavra/tuicr" = "latest"
-"github:modem-dev/hunk" = "v0.21.1"
-bun = "1.4.2"
+"github:modem-dev/hunk" = "latest"
+bun = "latest"
 "pipx:darrenburns/posting" = "latest"
 "github:huseyinbabal/taws" = "latest"
 "github:fioncat/otree" = "latest"
@@ -85,9 +85,10 @@ actionlint = "latest"
 "npm:herdr-f1" = "latest"
 "github:dmtrKovalenko/fff" = { version = "latest", matching = "fff-mcp", exe = "fff-mcp" }
 pre-commit = "latest"
-"aqua:github/github-mcp-server" = "1.12.1"
+"aqua:github/github-mcp-server" = "latest"
 
 [settings]
+lockfile = true
 experimental = true
 idiomatic_version_file_enable_tools = []
 env_cache = true
