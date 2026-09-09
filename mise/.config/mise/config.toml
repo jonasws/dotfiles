@@ -1,0 +1,103 @@
+[tools]
+1password = "latest"
+age = "latest"
+"aqua:aws/session-manager-plugin" = "latest"
+ast-grep = "latest"
+aws-cli = { version = "latest", symlink_bins = "true" }
+carapace = "latest"
+"cargo:abtop" = "latest"
+"cargo:anglosaxon" = "latest"
+"cargo:ast-grep" = "latest"
+"cargo:https://github.com/nushell/nufmt" = "latest"
+"cargo:jaq" = "latest"
+"cargo:jwt-cli" = "latest"
+fnox = "latest"
+fzf = "latest"
+github-cli = "latest"
+"github:ByteNess/aws-vault" = "latest"
+"github:alexpasmantier/television" = "latest"
+"github:aws-cloudformation/rain" = "latest"
+"github:charmbracelet/gum" = "latest"
+"github:control-theory/gonzo" = "latest"
+"github:docker/compose" = "latest"
+"github:hedhyw/json-log-viewer" = "latest"
+"github:nushell/nushell" = "latest"
+"github:pb33f/openapi-changes" = "latest"
+"github:starship/starship" = "latest"
+"github:walles/moor" = "latest"
+go = "latest"
+"go:github.com/isaacphi/mcp-language-server" = "latest"
+java = "zulu-25.36.205.0"
+maven = "3"
+node = "24"
+"npm:@mermaid-js/mermaid-cli" = "latest"
+"npm:@pb33f/openapi-changes" = "latest"
+"npm:typescript-language-server" = "latest"
+"pipx:awslogs" = "latest"
+"pipx:posting" = "latest"
+# postgres-mcp 0.3.0 declares mcp[cli]>=1.5.0; mcp 2.0 removed mcp.server.fastmcp,
+# so the dependency must stay on the 1.x line.
+"pipx:postgres-mcp" = { version = "latest", uvx_args = "--with mcp[cli]<2" }
+"pipx:sqlit-tui" = "latest"
+"pipx:xmlformatter" = "latest"
+python = "latest"
+rust = "latest"
+sops = "latest"
+viddy = "latest"
+docker-cli = "latest"
+gitu = "latest"
+lazydocker = "latest"
+lazygit = "latest"
+neovim = "latest"
+"github:docker/buildx" = "latest"
+superfile = "latest"
+uv = "latest"
+"pipx:mcp2cli" = "latest"
+"npm:@earendil-works/pi-coding-agent" = "latest"
+mitmproxy = "latest"
+"github:mfontanini/presenterm" = "latest"
+"github:riii111/sabiql" = "latest"
+"github:bensadeh/tailspin" = "latest"
+"npm:dotenv-cli" = "latest"
+"github:always-further/nono" = "latest"
+"github:BurntSushi/bttf" = "latest"
+"github:achristmascarl/rainfrog" = "latest"
+caddy = "latest"
+"github:caddyserver/caddy" = "latest"
+zellij = "latest"
+"github:pb33f/wiretap" = "latest"
+watchexec = "latest"
+"cargo:rgrc" = { version = "latest", features = "embed-configs" }
+"github:ouch-org/ouch" = "latest"
+"github:pb33f/printing-press" = "latest"
+sqlite = "latest"
+"github:pamburus/hl" = "latest"
+glow = "latest"
+"cargo:mdcat" = "latest"
+herdr = "latest"
+"github:agavra/tuicr" = "latest"
+"github:modem-dev/hunk" = "v0.21.1"
+bun = "1.4.0"
+"pipx:darrenburns/posting" = "latest"
+"github:huseyinbabal/taws" = "latest"
+"github:fioncat/otree" = "latest"
+actionlint = "latest"
+"npm:herdr-f1" = "latest"
+"github:dmtrKovalenko/fff" = { version = "latest", matching = "fff-mcp", exe = "fff-mcp" }
+pre-commit = "latest"
+"aqua:github/github-mcp-server" = "1.12.0"
+
+[settings]
+experimental = true
+idiomatic_version_file_enable_tools = []
+env_cache = true
+use_versions_host = true
+
+[settings.github]
+credential_command = "fnox get MISE_GITHUB_TOKEN"
+
+[env]
+# Commands that must run under `fnox exec` to receive their credentials. mise
+# orders these ahead of tool directories, so the wrapper here wins over the
+# maven that mise itself provisions.
+_.path = ["~/.local/bin/wrapped"]
