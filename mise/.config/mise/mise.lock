@@ -336,7 +336,10 @@ url = "https://s3.amazonaws.com/session-manager-downloads/plugin/1.2.835.0/mac/s
 [[tools."aqua:github/github-mcp-server"]]
 version = "1.12.1"
 backend = "aqua:github/github-mcp-server"
-specifiers = ["1.12.1"]
+specifiers = [
+    "1.12.1",
+    "latest",
+]
 
 [tools."aqua:github/github-mcp-server"."platforms.linux-arm64"]
 checksum = "sha256:0f613c61fa524b30278a249ae199220465ff051e79177e58866e5e677191fda9"
@@ -436,7 +439,10 @@ url = "https://awscli.amazonaws.com/AWSCLIV2-2.36.41.pkg"
 [[tools.bun]]
 version = "1.4.2"
 backend = "core:bun"
-specifiers = ["1.4.2"]
+specifiers = [
+    "1.4.2",
+    "latest",
+]
 
 [tools.bun."platforms.linux-arm64"]
 checksum = "sha256:54328bbc2d9c8e0c9f892c544d66c57a83b84139e34909e5ee81758f1ac8fda7"
@@ -1490,7 +1496,10 @@ url_api = "https://api.github.com/repos/mfontanini/presenterm/releases/assets/35
 [[tools."github:modem-dev/hunk"]]
 version = "0.21.1"
 backend = "github:modem-dev/hunk"
-specifiers = ["v0.21.1"]
+specifiers = [
+    "latest",
+    "v0.21.1",
+]
 
 [tools."github:modem-dev/hunk"."platforms.linux-arm64"]
 checksum = "sha256:1d31dfc382b9a4df9c045eb239ec248f61c4161dd32ec7caaab8593d55a9eca6"
@@ -2069,7 +2078,10 @@ url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/549270164
 [[tools.java]]
 version = "zulu-25.36.205.0"
 backend = "core:java"
-specifiers = ["zulu-25.36.205.0"]
+specifiers = [
+    "zulu-25",
+    "zulu-25.36.205.0",
+]
 
 [tools.java."platforms.linux-arm64"]
 checksum = "sha256:794526507a8f4792bd3dbe010fedb71e8540103b8e6773bf09d1f5e9360d38f8"
