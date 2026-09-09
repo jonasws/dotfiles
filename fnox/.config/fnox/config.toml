@@ -33,3 +33,11 @@ NEXUS_PASSWORD = { provider = "onepass", value = "op://Employee/Vy - Nexus/passw
 # dynamic client registration, so OAuth cannot be set up from here; running the
 # server locally under fnox keeps the token out of every other process.
 GITHUB_PERSONAL_ACCESS_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
+
+# Read only by mise, whose `[settings.github] credential_command` runs
+# `fnox get MISE_GITHUB_TOKEN`. Fine-grained, public-repo read and nothing else:
+# mise calls the GitHub API only to list releases and fetch assets, so the token
+# exists purely to lift the 60/hr anonymous rate limit. `env = false` keeps it
+# out of every `fnox exec` subprocess, so maven and the github MCP server never
+# receive it.
+MISE_GITHUB_TOKEN = { provider = "onepass", value = "op://Employee/mise github token/password", env = false }
