@@ -1,0 +1,52 @@
+# Maintenance tasks for this repo. Deliberately not in the global mise config:
+# keeping them here means `update` can never collide with a task of the same
+# name in another project, and it only resolves when mise is pointed at this
+# directory — `mise run update` from inside the repo, `mise -C ~/dotfiles run
+# update` from anywhere else.
+#
+# No [tools] section on purpose. The tools are declared in the global config
+# that this repo stows to ~/.config/mise/config.toml; this file exists only to
+# give the tasks a config root of their own.
+
+[tasks."update:brew"]
+description = "Upgrade homebrew formulae and casks"
+run = [
+  "brew update",
+  "brew upgrade",
+  "brew upgrade --cask --greedy",
+  "brew cleanup --prune=all",
+]
+
+[tasks."update:mise"]
+description = "Upgrade mise tools and refresh mise.lock"
+# $HOME, so the global config is the active config root. Left in this repo the
+# config root would be this file, which declares no tools at all.
+dir = "{{env.HOME}}"
+run = [
+  "mise upgrade",
+  # `mise upgrade` only records the platform it ran on. `mise lock --global`
+  # refills the other platform families already present in mise.lock.
+  "mise lock --global",
+  "mise prune --yes",
+]
+
+[tasks."update:yazi"]
+description = "Upgrade yazi plugins and flavors"
+run = "ya pkg upgrade"
+
+[tasks."update:nvim"]
+description = "Sync lazy.nvim plugins"
+run = "nvim --headless '+Lazy! sync' +qa"
+
+[tasks."update:manifests"]
+description = "Rewrite the homebrew manifests this repo tracks"
+depends = ["update:brew"]
+run = [
+  "brew bundle dump --global --force --formula --cask --tap",
+  "brew list --versions | sort > homebrew/.config/homebrew/Brewfile.versions",
+]
+
+[tasks.update]
+description = "Upgrade everything, then show what changed"
+depends = ["update:manifests", "update:mise", "update:yazi", "update:nvim"]
+run = "git status --short"

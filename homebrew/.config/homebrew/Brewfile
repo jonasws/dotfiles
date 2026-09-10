@@ -1,0 +1,176 @@
+tap "jetbrains/utils", "https://github.com/JetBrains/homebrew-utils"
+tap "teamookla/speedtest", trusted: true
+tap "vjeantet/tap"
+tap "wezterm/wezterm", trusted: { casks: ["wezterm@nightly"] }
+# Tool for generating GNU Standards-compliant Makefiles
+brew "automake"
+# Cryptography and SSL/TLS Toolkit
+brew "openssl@3"
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
+# Bash scripts that integrate bat with various command-line tools
+brew "bat-extras"
+# Resource monitor. C++ version and continuation of bashtop and bpytop
+brew "btop"
+# Library for manipulating PNG images
+brew "libpng"
+# C string library for manipulating Unicode strings
+brew "libunistring"
+# Perl compatible regular expressions library with a new API
+brew "pcre2"
+# Vector graphics library with cross-device output support
+brew "cairo"
+# Official command-line tool for CircleCI
+brew "circleci"
+# Cross-platform make
+brew "cmake"
+# Container runtimes on MacOS (and Linux) with minimal setup
+brew "colima"
+# Command-line csv viewer
+brew "csvlens"
+# Library and utilities for processing GIFs
+brew "giflib"
+# General-purpose data compression with high compression ratio
+brew "xz"
+# Library for command-line editing
+brew "readline"
+# Docker CLI plugin for extended build capabilities with BuildKit
+brew "docker-buildx"
+# Isolated development environments using Docker
+brew "docker-compose"
+# Docker Credential Helper for Amazon ECR
+brew "docker-credential-helper-ecr"
+# Command-line DNS Client for Humans
+brew "doggo"
+# Select default apps for documents and URL schemes on macOS
+brew "duti"
+# Modern, maintained replacement for ls
+brew "eza"
+# Simple, fast and user-friendly alternative to find
+brew "fd"
+# Play, record, convert, and stream select audio and video codecs
+brew "ffmpeg"
+# User-friendly command-line shell for UNIX-like operating systems
+brew "fish"
+# Terminal JSON viewer
+brew "fx"
+# Command-line fuzzy finder written in Go
+brew "fzf"
+# Easily access your Google Calendar(s) from a command-line
+brew "gcalcli"
+# GNU compiler collection
+brew "gcc"
+# Distributed revision control system
+brew "git"
+# Syntax-highlighting pager for git and diff output
+brew "git-delta"
+# GNU Privacy Guard (OpenPGP)
+brew "gnupg"
+# C/C++ and Java libraries for Unicode and globalization
+brew "icu4c@78"
+# User-friendly cURL replacement (command-line HTTP client)
+brew "httpie"
+# Run and Test HTTP Requests with plain text and curl
+brew "hurl"
+# Modern alternative to the watch command
+brew "hwatch"
+# Image manipulation library
+brew "jpeg"
+# Lightweight and flexible command-line JSON processor
+brew "jq"
+# Sophisticated file transfer program
+brew "lftp"
+# Postgres C API library
+brew "libpq"
+# Framework for layout and rendering of i18n text
+brew "pango"
+# Library to render SVG files using Cairo
+brew "librsvg"
+# Curses-based tool for viewing and analyzing log files
+brew "lnav"
+# Polyglot runtime manager (asdf rust clone)
+brew "mise"
+# Collection of tools that nobody wrote when UNIX was young
+brew "moreutils"
+# Media player based on MPlayer and mplayer2
+brew "mpv"
+# Port scanning utility for large networks
+brew "nmap"
+# Tiny, lightning fast, feature-packed file manager
+brew "nnn"
+# Open-source implementation of JPEG2000 Part-15 (or JPH or HTJ2K)
+brew "openjph"
+# High dynamic-range image file format
+brew "openexr"
+# ISO-C API and CLI for generating UUIDs
+brew "ossp-uuid"
+# Package compiler and linker metadata toolkit
+brew "pkgconf"
+# Paste PNG into files
+brew "pngpaste"
+# PDF rendering library (based on the xpdf-3.0 code base)
+brew "poppler"
+# Object-relational database system
+brew "postgresql@17"
+# Object-relational database system
+brew "postgresql@18", link: true
+# Monitor data's progress through a pipe
+brew "pv"
+# Search tool like grep and The Silver Searcher
+brew "ripgrep"
+# Command-line deletion tool focused on safety, ergonomics, and performance
+brew "rm-improved"
+# Intuitive find & replace CLI
+brew "sd"
+# Organize software neatly under a single directory tree (e.g. /usr/local)
+brew "stow"
+# TUI to view and query tabular files (CSV,TSV, Parquet, etc.)
+brew "tabiew"
+# User interface to the TELNET protocol
+brew "telnet"
+# Text interface for Git repositories
+brew "tig"
+# Parser generator tool
+brew "tree-sitter-cli"
+# Generator for LS_COLORS with support for multiple color themes
+brew "vivid"
+# XML command-line utilities
+brew "xmlstarlet"
+# Blazing fast terminal file manager written in Rust, based on async I/O
+brew "yazi"
+# Process YAML, JSON, XML, CSV and properties documents from the CLI
+brew "yq"
+# General-purpose lossless data-compression library
+brew "zlib"
+# Shell extension to navigate your filesystem faster
+brew "zoxide"
+# Ookla Speedtest
+brew "teamookla/speedtest/speedtest"
+# macOS notification CLI — send native notifications and capture user interactions
+brew "vjeantet/tap/alerter", trusted: true
+# Password manager that keeps all passwords secure behind one password
+cask "1password"
+# Web browser
+cask "firefox"
+cask "font-cascadia-code"
+cask "font-jetbrains-mono"
+# Web browser
+cask "google-chrome"
+# Keyboard customiser
+cask "karabiner-elements"
+# VPN client for secure internet access and private browsing
+cask "nordvpn"
+# Knowledge base that works on top of a local folder of plain text Markdown files
+cask "obsidian"
+# Control your tools with a few keystrokes
+cask "raycast"
+# Move and resize windows using keyboard shortcuts or snap areas
+cask "rectangle"
+# Team communication and collaboration software
+cask "slack"
+# Music streaming service
+cask "spotify"
+# GPU-accelerated cross-platform terminal emulator and multiplexer
+cask "wezterm@nightly"
+# Multiplayer code editor
+cask "zed"
