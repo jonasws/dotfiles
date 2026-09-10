@@ -30,6 +30,14 @@ run = [
   "mise prune --yes",
 ]
 
+[tasks."update:skills"]
+description = "Upgrade global agent skills"
+# The lockfile this rewrites is stowed from skills/.agents/.skill-lock.json, so
+# an upgraded skill shows up in the `update` task's closing git status. The CLI
+# writes the lock in place rather than by rename, which is what keeps the stow
+# symlink intact across runs.
+run = "npx -y skills@latest update --global --yes"
+
 [tasks."update:yazi"]
 description = "Upgrade yazi plugins and flavors"
 run = "ya pkg upgrade"
@@ -48,5 +56,5 @@ run = [
 
 [tasks.update]
 description = "Upgrade everything, then show what changed"
-depends = ["update:manifests", "update:mise", "update:yazi", "update:nvim"]
+depends = ["update:manifests", "update:mise", "update:skills", "update:yazi", "update:nvim"]
 run = "git status --short"
