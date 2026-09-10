@@ -1,0 +1,37 @@
+#!/bin/sh
+# GitHub CLI, run under fnox so it gets a token without one living in the shell.
+#
+# GH_TOKEN is env = "exec" in fnox and sits in the `gh` profile, so
+# `--no-defaults` hands gh that token and nothing else: no Nexus password, no
+# maven PAT. ~/.config/gh/hosts.yml stays empty on purpose, so a gh started
+# outside this wrapper is unauthenticated rather than holding a long-lived token.
+#
+# gh offers no credential-helper hook for its own auth — it reads GH_TOKEN,
+# GITHUB_TOKEN, or hosts.yml — so environment injection is the only way in.
+# A script rather than a fish function, so gh-dash, lazygit, git's credential
+# helper and anything else spawning gh through PATH are covered too.
+#
+# On PATH via `_.path` in ~/.config/mise/config.toml, which mise orders ahead of
+# the github-cli tool directory. `mise which` resolves tools, not PATH, so asking
+# it for gh returns the real binary and not this script.
+
+set -e
+
+real="$(mise which gh 2>/dev/null || true)"
+if [ -z "$real" ]; then
+  echo "gh: mise provisions no github-cli for $PWD" >&2
+  exit 127
+fi
+
+# Claude Code's sandbox cannot reach the 1Password desktop app, so fnox resolves
+# nothing there and `fnox exec` fails outright. The sandbox is identifiable by
+# $TMPDIR, which it points at /tmp/claude-<uid>. Agents use the github MCP
+# server instead, which Claude Code starts outside the sandbox under fnox.
+case "$TMPDIR" in
+  /tmp/claude-* | /private/tmp/claude-*)
+    echo "gh: sandboxed, no credential reachable — use the github MCP tools" >&2
+    exit 127
+    ;;
+esac
+
+exec fnox exec -P gh --no-defaults -- "$real" "$@"

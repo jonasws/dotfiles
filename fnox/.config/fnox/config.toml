@@ -41,3 +41,11 @@ GITHUB_PERSONAL_ACCESS_TOKEN = { provider = "onepass", value = "op://Employee/Li
 # out of every `fnox exec` subprocess, so maven and the github MCP server never
 # receive it.
 MISE_GITHUB_TOKEN = { provider = "onepass", value = "op://Employee/mise github token/password", env = false }
+
+# Read by the `gh` fish function, which runs
+# `fnox exec -P gh --no-defaults -- gh ...`. The profile exists to scope the
+# injection: `--no-defaults` drops the top-level secrets, so gh receives this
+# token and nothing else — no Nexus password, no maven PAT. `~/.config/gh/hosts.yml`
+# stays empty, so gh has no credential of its own outside this wrapper.
+[profiles.gh.secrets]
+GH_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }

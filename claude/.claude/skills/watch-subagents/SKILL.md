@@ -5,7 +5,8 @@ description: Open a Herdr pane per running subagent showing that agent's live ac
 
 # Watch subagents
 
-Give each running subagent its own terminal pane showing what it is doing, live.
+Give each running subagent its own pane, in a tab named `subagents`, showing
+what it is doing, live.
 
 A subagent's transcript is a JSONL file far too large to read into the
 orchestrating context. Streaming a projection of it into a pane puts the
@@ -57,23 +58,45 @@ also be on `PATH`.
    ls -t "$(dirname "$TMPDIR")"/*/*/tasks/*.output 2>/dev/null | head -5
    ```
 
-2. **Check the caller's geometry**, so the split does not produce a sliver:
+2. **Create or reuse the `subagents` tab.** Viewers never split the caller's
+   pane. They live in a tab of their own, so the user's working pane keeps its
+   full width however many agents run, and the tab bar names where they went.
 
    ```bash
-   herdr pane layout --pane "$HERDR_PANE_ID"
+   herdr tab list --workspace "$HERDR_WORKSPACE_ID"
    ```
 
-   Split a wide pane `right`, a narrow or tall one `down`. For N agents, split
-   once off the caller, then stack the rest `down` off that new pane.
-
-3. **Create one pane per agent**, keeping the user's focus where it is:
+   Reuse a tab whose `label` ends in `subagents` if one is already listed.
+   `tab list` renders labels with a `[N] ` index prefix — the tab created below
+   comes back as `[2] subagents` — so match the suffix, never the whole string.
+   Otherwise create it:
 
    ```bash
-   herdr pane split --current --direction right --cwd "$PWD" --no-focus
+   herdr tab create --workspace "$HERDR_WORKSPACE_ID" --cwd "$PWD" \
+     --label subagents --no-focus
    ```
 
-   Read the id from `.result.pane.pane_id`. For the next agent, split `down`
-   off that id rather than off the caller again.
+   Read `.result.tab.tab_id` and `.result.root_pane.pane_id`. That root pane is
+   a live shell already in `$PWD`, and it holds the first viewer.
+
+3. **Create the remaining panes inside that tab.** The first agent takes the
+   root pane, so split only from the second agent on — each split off the pane
+   made last, alternating direction so the panes tile rather than collapse into
+   slivers:
+
+   ```bash
+   herdr pane split --pane <previous-pane-id> --direction right --cwd "$PWD" --no-focus
+   ```
+
+   Read the new id from `.result.pane.pane_id`, and alternate `right`, `down`,
+   `right`, and so on.
+
+   When reusing a `subagents` tab that already holds viewers, split off one of
+   its existing panes instead of the root:
+
+   ```bash
+   herdr pane list --workspace "$HERDR_WORKSPACE_ID"
+   ```
 
 4. **Start one viewer per pane**, each in its own colour:
 
@@ -92,8 +115,8 @@ also be on `PATH`.
    herdr pane read <pane-id> --source recent-unwrapped --lines 3
    ```
 
-6. **Tell the user which pane holds which agent**, and that Ctrl-C in a pane
-   stops only that viewer.
+6. **Tell the user the tab is named `subagents`**, which pane in it holds which
+   agent, and that Ctrl-C in a pane stops only that viewer.
 
 ## Rules
 
@@ -101,7 +124,9 @@ also be on `PATH`.
   verify rendering are fine; dumping the pane is not.
 - Always pass `--no-focus`. The user keeps their pane.
 - Always pass `--cwd "$PWD"` so the viewer starts where the user is.
-- Do not close panes you did not create. When the agents finish, leave the panes
-  and their output; say they can be closed rather than closing them.
+- Do not close panes you did not create. When the agents finish, leave the
+  `subagents` tab and its output; say it can be closed with
+  `herdr tab close <tab_id>` rather than closing it. A left-open tab is what the
+  next run reuses.
 - Report the agents' findings from the completion notifications you receive, not
   from what you saw in a pane.

@@ -215,6 +215,57 @@ command = "tv aws-profiles"
 width = "80%"
 height = "80%"
 
+# --- pane scrollback ---------------------------------------------------------
+# Herdr 0.9.0 ships no [keys] action for scrolling a pane, and no modal scroll
+# mode for custom commands: the wheel and the scrollbar are the only built-in
+# ways to move the viewport. The socket API does expose an absolute pane.scroll,
+# so utils/herdr-scroll reads the focused pane's current offset and writes a new
+# one. Custom commands receive HERDR_ACTIVE_PANE_ID and HERDR_SOCKET_PATH, which
+# is everything it needs.
+#
+# w/s/x because Rectangle's alternate defaults own ctrl+alt with j k u i c d e f
+# t g r, the arrows, return, equal, minus and delete, and this config's own
+# ctrl+alt+n and ctrl+alt+b are Rectangle's todo actions. w/s keeps the vertical
+# axis; x leaves the scrollback.
+#
+# The shifted pair is the one to hold: macOS wheel repeat is too slow to scroll a
+# pane by hand, and a Defy layer can repeat these at firmware speed.
+#
+#   ctrl+alt+w / ctrl+alt+s               half screen up / down
+#   ctrl+alt+shift+w / ctrl+alt+shift+s   3 lines up / down (hold to repeat)
+#   ctrl+alt+x                            back to the live tail
+
+[[keys.command]]
+key = "ctrl+alt+w"
+type = "shell"
+command = "$HOME/dotfiles/utils/herdr-scroll up half"
+description = "scroll pane up half a screen"
+
+[[keys.command]]
+key = "ctrl+alt+s"
+type = "shell"
+command = "$HOME/dotfiles/utils/herdr-scroll down half"
+description = "scroll pane down half a screen"
+
+[[keys.command]]
+key = "ctrl+alt+shift+w"
+type = "shell"
+command = "$HOME/dotfiles/utils/herdr-scroll up 3"
+description = "scroll pane up 3 lines"
+
+[[keys.command]]
+key = "ctrl+alt+shift+s"
+type = "shell"
+command = "$HOME/dotfiles/utils/herdr-scroll down 3"
+description = "scroll pane down 3 lines"
+
+[[keys.command]]
+key = "ctrl+alt+x"
+type = "shell"
+command = "$HOME/dotfiles/utils/herdr-scroll bottom"
+description = "scroll pane to bottom"
+# -----------------------------------------------------------------------------
+
 # --- herdr-splits.nvim -------------------------------------------------------
 # Unified pane/split navigation across herdr panes and Neovim windows.
 # Requires the herdr-side plugin:

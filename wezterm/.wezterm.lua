@@ -108,7 +108,6 @@ config.key_tables = {
   scrolling = {
     { key = 'j', mods = 'NONE', action = act.ScrollByLine(scroll_interval) },
     { key = 'k', mods = 'NONE', action = act.ScrollByLine(-scroll_interval) },
-
     { key = 'u', mods = 'CTRL', action = act.ScrollByPage(-0.5) },
     { key = 'd', mods = 'CTRL', action = act.ScrollByPage(0.5) },
 
@@ -132,6 +131,8 @@ config.keys = {
     mods = 'ALT',
     action = wezterm.action.DisableDefaultAssignment,
   },
+
+  { key = 'k', mods = 'CMD', action = wezterm.action.SendString '\x1b[107;7u' },
   -- Escape hatch out of a nested multiplexer. herdr's nav_at_edge is only
   -- 'wrap' or 'stop' — neither hands the chord back to the outer terminal — so
   -- CTRL+hjkl can never cross from a herdr pane to a sibling WezTerm pane.
