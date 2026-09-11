@@ -7,12 +7,26 @@
 # No [tools] section on purpose. The tools are declared in the global config
 # that this repo stows to ~/.config/mise/config.toml; this file exists only to
 # give the tasks a config root of their own.
+#
+# Two cadences. `update` is the daily one: cheap, low blast radius, safe to run
+# unattended. `update:weekly` adds the work that is bandwidth-heavy, deletes
+# things, or rewrites tracked files — none of which pays for itself daily.
 
 [tasks."update:brew"]
-description = "Upgrade homebrew formulae and casks"
+description = "Upgrade homebrew formulae"
 run = [
   "brew update",
   "brew upgrade",
+]
+
+[tasks."update:brew-weekly"]
+description = "Refresh casks and reclaim homebrew disk space"
+# --greedy bypasses the "already latest" short-circuit for casks that carry
+# their own updater — most of the ones here (browsers, Slack, Spotify,
+# 1Password) self-update, so a daily greedy pass re-downloads full installers
+# to arrive where they already were. --prune=all drops homebrew's 120-day
+# cache grace, so it belongs on the same slower cadence.
+run = [
   "brew upgrade --cask --greedy",
   "brew cleanup --prune=all",
 ]
@@ -22,13 +36,28 @@ description = "Upgrade mise tools and refresh mise.lock"
 # $HOME, so the global config is the active config root. Left in this repo the
 # config root would be this file, which declares no tools at all.
 dir = "{{env.HOME}}"
+# No --minimum-release-age override: mise's 24h default is the point. Nearly
+# every tool in the global config is "latest", so a same-day release would go
+# straight onto ~100 tools unattended. Waiting a day lets a yanked or broken
+# release be caught first, and costs nothing at this cadence — the next run
+# picks it up.
 run = [
   "mise upgrade",
-  # `mise upgrade` only records the platform it ran on. `mise lock --global`
-  # refills the other platform families already present in mise.lock.
-  "mise lock --global",
-  "mise prune --yes",
+  # `mise upgrade` only records the platform it ran on; `mise lock --global`
+  # refreshes checksums and URLs for everything else in mise.lock. Without
+  # --platform it locks every platform family the lockfile already mentions,
+  # so a lockfile that once saw linux or windows keeps carrying them. This
+  # machine set is macOS on Apple silicon only.
+  "mise lock --global --platform macos-arm64",
 ]
+
+[tasks."update:mise-prune"]
+description = "Reclaim mise disk space"
+dir = "{{env.HOME}}"
+# Kept out of update:mise on purpose: pruning immediately after an upgrade
+# deletes the last known-good version of every tool that just moved, so a bad
+# "latest" leaves nothing to fall back to.
+run = "mise prune --yes"
 
 [tasks."update:skills"]
 description = "Upgrade global agent skills"
@@ -48,13 +77,24 @@ run = "nvim --headless '+Lazy! sync' +qa"
 
 [tasks."update:manifests"]
 description = "Rewrite the homebrew manifests this repo tracks"
-depends = ["update:brew"]
+# Weekly, not daily: these two files are rewritten on every run, and most of
+# the resulting diff is transitive dependency version bumps rather than a
+# package this repo chose to track. Daily it is a permanently dirty worktree
+# for almost no signal.
+depends = ["update:brew", "update:brew-weekly"]
 run = [
   "brew bundle dump --global --force --formula --cask --tap",
   "brew list --versions | sort > homebrew/.config/homebrew/Brewfile.versions",
 ]
 
 [tasks.update]
-description = "Upgrade everything, then show what changed"
-depends = ["update:manifests", "update:mise", "update:skills", "update:yazi", "update:nvim"]
+description = "Daily upgrade, then show what changed"
+depends = ["update:brew", "update:mise", "update:skills", "update:yazi", "update:nvim"]
+run = "git status --short"
+
+[tasks."update:weekly"]
+description = "Everything in `update`, plus casks, pruning and manifests"
+depends = ["update", "update:brew-weekly", "update:mise-prune", "update:manifests"]
+# `update` prints its own status before the manifests are rewritten; this is
+# the one that reflects the finished run.
 run = "git status --short"
