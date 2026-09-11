@@ -7,27 +7,26 @@ aws-cli = { version = "latest", symlink_bins = "true" }
 carapace = "latest"
 "cargo:abtop" = "latest"
 "cargo:anglosaxon" = "latest"
-"cargo:ast-grep" = "latest"
 "cargo:https://github.com/nushell/nufmt" = "latest"
-"cargo:jaq" = "latest"
-"cargo:jwt-cli" = "latest"
 fnox = "latest"
 fzf = "latest"
 github-cli = "latest"
-"github:ByteNess/aws-vault" = "latest"
-"github:alexpasmantier/television" = "latest"
+aws-vault = "latest"
+television = "latest"
 "github:aws-cloudformation/rain" = "latest"
-"github:charmbracelet/gum" = "latest"
+gum = "latest"
 "github:control-theory/gonzo" = "latest"
 "github:docker/compose" = "latest"
 "github:hedhyw/json-log-viewer" = "latest"
-"github:nushell/nushell" = "latest"
+nu = "latest"
 "github:pb33f/openapi-changes" = "latest"
-"github:starship/starship" = "latest"
+starship = "latest"
 "github:walles/moor" = "latest"
 go = "latest"
 "go:github.com/isaacphi/mcp-language-server" = "latest"
+jaq = "latest"
 java = "zulu-25"
+jwt = "latest"
 maven = "3"
 node = "24"
 "npm:@mermaid-js/mermaid-cli" = "latest"
@@ -63,7 +62,6 @@ mitmproxy = "latest"
 "github:BurntSushi/bttf" = "latest"
 "github:achristmascarl/rainfrog" = "latest"
 caddy = "latest"
-"github:caddyserver/caddy" = "latest"
 zellij = "latest"
 "github:pb33f/wiretap" = "latest"
 watchexec = "latest"
@@ -76,23 +74,56 @@ glow = "latest"
 "cargo:mdcat" = "latest"
 herdr = "latest"
 "github:agavra/tuicr" = "latest"
-"github:modem-dev/hunk" = "latest"
+hunk = "latest"
 bun = "latest"
-"pipx:darrenburns/posting" = "latest"
 "github:huseyinbabal/taws" = "latest"
 "github:fioncat/otree" = "latest"
 actionlint = "latest"
-"npm:herdr-f1" = "latest"
 "github:dmtrKovalenko/fff" = { version = "latest", matching = "fff-mcp", exe = "fff-mcp" }
 pre-commit = "latest"
 "aqua:github/github-mcp-server" = "latest"
+hwatch = "latest"
 
 [settings]
-lockfile = true
+# No `lockfile = true`: that creates a mise.lock in every project mise touches,
+# and only this repo's tools are worth locking. Unset still *updates* lockfiles
+# that already exist, and the global one is written by `mise lock --global` in
+# the update:mise task either way — see mise.toml.
 experimental = true
 idiomatic_version_file_enable_tools = []
 env_cache = true
 use_versions_host = true
+
+# The 24h default (mise's own) is the supply-chain guard for the ~75 tools
+# above: a yanked or broken "latest" gets caught before it lands. These are the
+# exceptions — agent tooling and small single-author CLIs where a same-day fix
+# is the reason to upgrade at all, and where waiting a day is the cost rather
+# than the protection. Full backend IDs, because a shorthand only matches if
+# the tool is declared by shorthand.
+minimum_release_age_excludes = [
+  "herdr",
+  "hunk",
+  "github:agavra/tuicr",
+  "github:dmtrKovalenko/fff",
+  "github:always-further/nono",
+  "aqua:github/github-mcp-server",
+  "pipx:mcp2cli",
+  "go:github.com/isaacphi/mcp-language-server",
+  "npm:@earendil-works/pi-coding-agent",
+  "github:BurntSushi/bttf",
+  "github:huseyinbabal/taws",
+  "github:riii111/sabiql",
+  "github:fioncat/otree",
+  "github:achristmascarl/rainfrog",
+  "github:pb33f/printing-press",
+  "github:pb33f/wiretap",
+  "github:control-theory/gonzo",
+  "github:walles/moor",
+  "github:pamburus/hl",
+  "github:bensadeh/tailspin",
+  "github:mfontanini/presenterm",
+  "github:ouch-org/ouch",
+]
 
 [settings.github]
 credential_command = "fnox get MISE_GITHUB_TOKEN"
