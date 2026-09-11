@@ -36,6 +36,12 @@ Grep, `url` for WebFetch, `description` for a nested Agent — and clipped.
 Deliberately dropped: tool *result* bodies, which are the bulk of the transcript
 and unreadable at speed, and every non-assistant bookkeeping record.
 
+Prose spanning several lines is shown whole, indented under its timestamp. The
+transcript's records are heterogeneous — `.message.content` is an array on most
+and a bare string on others, a record tailed mid-write is not JSON yet — so the
+viewer coerces what it can and silently skips what it cannot. A record it does
+not understand costs one line, never the stream.
+
 ## Prerequisites
 
 ```bash
