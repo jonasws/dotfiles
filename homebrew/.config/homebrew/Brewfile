@@ -1,4 +1,4 @@
-tap "jetbrains/utils", "https://github.com/JetBrains/homebrew-utils"
+tap "jetbrains/utils", "https://github.com/JetBrains/homebrew-utils", trusted: true
 tap "teamookla/speedtest", trusted: true
 tap "vjeantet/tap"
 tap "wezterm/wezterm", trusted: { casks: ["wezterm@nightly"] }
@@ -72,8 +72,6 @@ brew "icu4c@78"
 brew "httpie"
 # Run and Test HTTP Requests with plain text and curl
 brew "hurl"
-# Modern alternative to the watch command
-brew "hwatch"
 # Image manipulation library
 brew "jpeg"
 # Lightweight and flexible command-line JSON processor
