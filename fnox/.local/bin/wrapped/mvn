@@ -23,6 +23,38 @@ fi
 # against maven.pkg.github.com or vy-nexus, so it needs no credentials at all and
 # the wrapper gets out of the way. The sandbox is identifiable by $TMPDIR, which
 # it points at /tmp/claude-<uid>.
+#
+# The Kotlin compile daemon is detached and survives between builds, which makes
+# it the wrong process to hold the project's files. Under Claude Code's sandbox
+# it cannot write target/ at all, because writes are granted relative to each
+# process's cwd and the daemon's differs, so compilation dies on "Permission
+# denied" or "Could not create directory". Compiling in-process instead, always,
+# keeps one behaviour everywhere. The flag lives here and not in a pom or
+# .mvn/maven.config so that CI keeps its warm daemon.
+set -- -Dkotlin.compiler.daemon=false "$@"
+
+# Transfer progress is worth watching live and is pure noise in a log file that
+# gets read afterwards, and Maven offers no way to switch it back on once -ntp
+# is passed. Key it off the terminal instead of deciding once for every build.
+[ -t 1 ] || set -- -ntp "$@"
+
+# Maven's own JVM. A full `clean verify` with the Kotlin compiler in-process
+# peaks at 918M of heap and never reaches a full GC, so 2g is better than double
+# the headroom it needs; the old 8g was reserving memory nothing ever touched.
+# This used to live in ~/.mavenrc, which only the mvn shell script reads and
+# which Maven 4 drops altogether. Here $TMPDIR expands when mvn runs rather than
+# when the shell starts, which matters because Claude Code's sandbox moves it.
+# Assigned only when unset, so a one-off MAVEN_OPTS on the command line wins.
+MAVEN_OPTS="${MAVEN_OPTS:-\
+-Xms512m -Xmx2g \
+-XX:+ExitOnOutOfMemoryError \
+--enable-native-access=ALL-UNNAMED \
+-Djava.io.tmpdir=${TMPDIR:-/tmp} \
+-Daether.enhancedLocalRepository.trackingMode=local \
+-Dorg.slf4j.simpleLogger.showDateTime=true \
+-Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss}"
+export MAVEN_OPTS
+
 case "$TMPDIR" in
   /tmp/claude-* | /private/tmp/claude-*)
     echo "mvn: sandboxed, running --offline against ~/.m2/repository" >&2
