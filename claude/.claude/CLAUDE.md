@@ -38,6 +38,25 @@ Non-default tools; reach for them deliberately. Match tool to question shape, no
 - `sd` over `sed` for find & replace: global by default, no BSD `-i ''` quirk.
   Literal `$` is `$$`. Fall back to `sed`/`awk` only for line-addressed ops.
 
+## Shell for the Bash tool
+
+`CLAUDE_CODE_SHELL=/opt/homebrew/bin/bash` in `~/.claude/settings.json` pins Bash
+tool commands to Homebrew bash 5.3.
+
+Without it, Claude Code auto-detects: `$SHELL` when it names bash or zsh, otherwise
+the first working zsh, then bash, on PATH. Here `$SHELL=/bin/zsh`, so commands ran in
+zsh, where a bare `=word` is equals-expansion — `echo ===` fails with
+`(eval):1: == not found` and exits 1, easy to miss behind the real output of a
+compound command. Quote the separator (`echo '==='`) wherever zsh may still run it.
+
+Only bash and zsh are accepted; fish is not, and a path that is neither falls back to
+auto-detection without a warning. `defaultShell` in settings.json is a different
+setting — it chooses bash or PowerShell for `!`-prefix commands typed in the input box.
+
+Apple's `/bin/bash` is 3.2 and is the fallback on a machine without the Homebrew
+formula: no `${var^^}`, no associative arrays, no `mapfile`, no `globstar`. Prefer
+`python3` over bash 4+ syntax in anything that has to run there.
+
 ## Maven with Kotlin
 
 Run Maven plainly — `mvn test`. The Kotlin compile daemon works inside the sandbox

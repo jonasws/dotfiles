@@ -2,7 +2,8 @@
   "env": {
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
     "ENABLE_TOOL_SEARCH": "auto",
-    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet"
+    "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
+    "CLAUDE_CODE_SHELL": "/opt/homebrew/bin/bash"
   },
   "includeCoAuthoredBy": false,
   "permissions": {
