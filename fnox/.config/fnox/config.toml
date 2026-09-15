@@ -31,11 +31,19 @@ recipients = [
 ]
 key_file = "~/.config/fnox/age-se.txt"
 
+# Two mechanisms decide who sees a secret, and they answer different questions.
+# `env = false` means never injected into any environment: the consumer fetches the
+# value itself with `fnox get`, as mise's credential_command and the gcal function
+# do. A profile means injected as an environment variable, but only into the one
+# process started under it — which no per-secret flag can express, since a flag has
+# only "every `fnox exec` subprocess" and "none". Secrets below are top-level, so
+# every `fnox exec` receives them; that is what the profiles' `--no-defaults` sheds.
+
 [secrets]
 # Read by ~/.m2/settings.xml as ${env.LIFLIG_GITHUB_PAT} and
 # ${env.NEXUS_PASSWORD} for the `github` and `vy-nexus` server entries.
-LIFLIG_GITHUB_PAT = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
-NEXUS_PASSWORD = { provider = "onepass", value = "op://Employee/Vy - Nexus/password" }
+LIFLIG_GITHUB_PAT= { provider = "onepass", value = "op://Employee/Liflig Github PAT/token", env = "exec" }
+NEXUS_PASSWORD= { provider = "onepass", value = "op://Employee/Vy - Nexus/password", env = "exec" }
 
 # Read only by mise, whose `[settings.github] credential_command` runs
 # `fnox get MISE_GITHUB_TOKEN`. Fine-grained, public-repo read and nothing else:
@@ -43,7 +51,7 @@ NEXUS_PASSWORD = { provider = "onepass", value = "op://Employee/Vy - Nexus/passw
 # exists purely to lift the 60/hr anonymous rate limit. `env = false` keeps it
 # out of every `fnox exec` subprocess, so maven and the github MCP server never
 # receive it.
-MISE_GITHUB_TOKEN = { provider = "onepass", value = "op://Employee/mise github token/password", env = false }
+MISE_GITHUB_TOKEN= { provider = "onepass", value = "op://Employee/mise github token/password", env = false }
 
 # Read by the `gh` fish function, which runs
 # `fnox exec -P gh --no-defaults -- gh ...`. The profile exists to scope the
@@ -62,7 +70,7 @@ GH_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/toke
 # top-level secret, so opening a Claude Code session asked for biometrics three
 # times and handed the MCP server a Nexus password it has no use for.
 [profiles.github-mcp.secrets]
-GITHUB_PERSONAL_ACCESS_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
+GITHUB_PERSONAL_ACCESS_TOKEN= { provider = "onepass", value = "op://Employee/Liflig Github PAT/token", env = "exec" }
 
 # Read by the `gcal` fish function, which resolves each value with
 # `fnox get -P gcalcli --no-defaults`. gcalcli takes the OAuth client only as
@@ -71,3 +79,13 @@ GITHUB_PERSONAL_ACCESS_TOKEN = { provider = "onepass", value = "op://Employee/Li
 [profiles.gcalcli.secrets]
 GCALCLI_CLIENT_ID = { provider = "onepass", value = "op://Employee/gcalcli/username" }
 GCALCLI_CLIENT_SECRET = { provider = "onepass", value = "op://Employee/gcalcli/credential" }
+
+# Read by the Exa MCP server, which Claude Code starts as
+# `fnox exec -P exa-mcp --no-defaults -- npx -y exa-mcp-server`. The stdio server
+# reads its credential only from this variable and calls api.exa.ai directly, so
+# without a key every request 401s — the free anonymous tier belongs to the hosted
+# endpoint at mcp.exa.ai, not to the package. `agent_run` needs a user-provided key
+# even where the hosted server would grant it over OAuth.
+# PLACEHOLDER reference — replace with the real item path.
+[profiles.exa-mcp.secrets]
+EXA_API_KEY= { provider = "onepass", value = "op://Employee/Exa API Key/password", env = "exec" }
