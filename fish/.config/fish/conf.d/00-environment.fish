@@ -26,7 +26,6 @@ set -x GLAMOUR_STYLE "$HOME/catppuccin/glamour/themes/catppuccin-mocha.json"
 set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 
 # Global variables
-set -g _one_off_aws_command false
 
 # Fish configuration
 set fish_key_bindings fish_vi_key_bindings
