@@ -19,7 +19,7 @@ set -euo pipefail
 # Normally invoked via the `console` fish function, which inherits the
 # interactive shell's PATH. But the script may also run with a minimal
 # PATH (Alfred, cron, a raw `bash` shell), so prepend locations for mise
-# shims (aws-vault, aws, python3) and user-local bins (firefox-container).
+# shims (aws-vault, aws, python3, gum) and user-local bins (firefox-container).
 export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:$PATH"
 
 # Likewise, outside the interactive shell AWS_VAULT_KEYCHAIN_NAME is unset.
@@ -27,6 +27,22 @@ export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:/opt/homebrew/bin:/u
 # the MFA'd capra-auth session cached in the `login` keychain, so it would
 # prompt for MFA every time. Pin the keychain to match the interactive shell.
 export AWS_VAULT_KEYCHAIN_NAME="login"
+
+# Run "$@", showing a gum spinner for its duration, and print what it wrote
+# to stdout. `gum spin` swallows the wrapped command's stdout itself (that's
+# how it keeps the spinner clean), so the command is redirected to a temp
+# file instead and that file is what we emit — keeps `$(spin ... )` usable
+# as a normal command-substitution from the call site.
+spin() {
+  local title="$1"
+  shift
+  local out
+  out="$(mktemp)"
+  gum spin --spinner dot --title "$title" \
+    -- env AWS_CONSOLE_SPIN_OUT="$out" bash -c '"$@" > "$AWS_CONSOLE_SPIN_OUT"' _ "$@"
+  cat "$out"
+  rm -f "$out"
+}
 
 no_signin=0
 if [[ "${1:-}" == "--no-signin" ]]; then
@@ -42,7 +58,13 @@ fi
 profile="$1"
 destination="${2:-}"
 
-color="$(aws configure get color --profile "$profile" 2>/dev/null || true)"
+# Read directly off the config file instead of shelling out to `aws
+# configure get` — it's a single local INI key, no need to pay for a full
+# AWS CLI process start just to read it.
+color="$(awk -v want="[profile $profile]" -F'=' '
+  /^\[/ { insec = ($0 == want); next }
+  insec && $1 ~ /^[ \t]*color[ \t]*$/ { v=$2; gsub(/^[ \t]+|[ \t]+$/, "", v); print v; exit }
+' "${AWS_CONFIG_FILE:-$HOME/.aws/config}")"
 
 # aws-vault login needs mfa_serial to do MFA-gated AssumeRole on the
 # target role. We keep mfa_serial out of the target profile so
@@ -61,7 +83,7 @@ if [[ $no_signin -eq 1 ]]; then
 elif [[ "$destination" =~ ^https?:// ]]; then
   # aws-vault login doesn't accept a full URL as Destination; mint a
   # generic sign-in URL then splice the original URL in via Python.
-  signin="$(aws-vault login --stdout "$profile")"
+  signin="$(spin "Signing in to '$profile'…" aws-vault login --stdout "$profile")"
   encoded="$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$destination")"
   login_url="$(printf '%s' "$signin" | python3 -c '
 import re, sys
@@ -78,9 +100,9 @@ elif [[ -n "$destination" ]]; then
   if [[ "$path" != */* ]]; then
     path="${path}/home"
   fi
-  login_url="$(aws-vault login --stdout --path "$path" "$profile")"
+  login_url="$(spin "Signing in to '$profile'…" aws-vault login --stdout --path "$path" "$profile")"
 else
-  login_url="$(aws-vault login --stdout "$profile")"
+  login_url="$(spin "Signing in to '$profile'…" aws-vault login --stdout "$profile")"
 fi
 
 args=(firefox-container)
@@ -89,4 +111,5 @@ if [[ -n "$color" ]]; then
 fi
 args+=(--name "$profile" "$login_url")
 
+gum style --foreground 212 "Opening browser for '$profile'…" >&2
 exec "${args[@]}"
