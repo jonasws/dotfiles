@@ -13,3 +13,4 @@ nix-darwin/result
 television/.config/television/cable/
 /.tmp
 /superfile/.config/superfile/theme
+/fnox/.config/fnox/age-se.txt

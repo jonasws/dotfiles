@@ -19,20 +19,23 @@ if_missing = "error"
 enabled = true
 idle_timeout = "8h"
 
-[providers]
-onepass = { type = "1password", account = "https://capragroup.1password.eu/" }
+[providers.onepass]
+type = "1password"
+account = "https://capragroup.1password.eu/"
+
+
+[providers.sync-age]
+type = "age"
+recipients = [
+  "age1se1qft9hckpthwvn56y8hf68cs79wfsrrlq9ccws6z9hktgsgxjrhtj5rax3vz",
+]
+key_file = "~/.config/fnox/age-se.txt"
 
 [secrets]
 # Read by ~/.m2/settings.xml as ${env.LIFLIG_GITHUB_PAT} and
 # ${env.NEXUS_PASSWORD} for the `github` and `vy-nexus` server entries.
 LIFLIG_GITHUB_PAT = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
 NEXUS_PASSWORD = { provider = "onepass", value = "op://Employee/Vy - Nexus/password" }
-
-# Read by the github MCP server, which Claude Code starts as
-# `fnox exec -- github-mcp-server stdio`. GitHub's remote MCP endpoint has no
-# dynamic client registration, so OAuth cannot be set up from here; running the
-# server locally under fnox keeps the token out of every other process.
-GITHUB_PERSONAL_ACCESS_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
 
 # Read only by mise, whose `[settings.github] credential_command` runs
 # `fnox get MISE_GITHUB_TOKEN`. Fine-grained, public-repo read and nothing else:
@@ -49,3 +52,22 @@ MISE_GITHUB_TOKEN = { provider = "onepass", value = "op://Employee/mise github t
 # stays empty, so gh has no credential of its own outside this wrapper.
 [profiles.gh.secrets]
 GH_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
+
+# Read by the github MCP server, which Claude Code starts as
+# `fnox exec -P github-mcp --no-defaults -- github-mcp-server stdio`. GitHub's
+# remote MCP endpoint has no dynamic client registration, so OAuth cannot be set
+# up from here; running the server locally under fnox keeps the token out of
+# every other process. The profile is what keeps the startup to one 1Password
+# authorization: without `-P github-mcp --no-defaults` the exec resolves every
+# top-level secret, so opening a Claude Code session asked for biometrics three
+# times and handed the MCP server a Nexus password it has no use for.
+[profiles.github-mcp.secrets]
+GITHUB_PERSONAL_ACCESS_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
+
+# Read by the `gcal` fish function, which resolves each value with
+# `fnox get -P gcalcli --no-defaults`. gcalcli takes the OAuth client only as
+# `--client-id` / `--client-secret` flags, so the values are read into the
+# function rather than injected as environment variables.
+[profiles.gcalcli.secrets]
+GCALCLI_CLIENT_ID = { provider = "onepass", value = "op://Employee/gcalcli/username" }
+GCALCLI_CLIENT_SECRET = { provider = "onepass", value = "op://Employee/gcalcli/credential" }
