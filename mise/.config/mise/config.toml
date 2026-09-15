@@ -31,6 +31,8 @@ maven = "3"
 node = "24"
 "npm:@mermaid-js/mermaid-cli" = "latest"
 "npm:@pb33f/openapi-changes" = "latest"
+"npm:exa-mcp-server" = "latest"
+"npm:defuddle" = "latest"
 "npm:typescript-language-server" = "latest"
 "pipx:awslogs" = "latest"
 "pipx:posting" = "latest"
@@ -122,6 +124,7 @@ minimum_release_age_excludes = [
   "pipx:mcp2cli",
   "go:github.com/isaacphi/mcp-language-server",
   "npm:@earendil-works/pi-coding-agent",
+  "npm:exa-mcp-server",
   "github:BurntSushi/bttf",
   "github:huseyinbabal/taws",
   "github:riii111/sabiql",
