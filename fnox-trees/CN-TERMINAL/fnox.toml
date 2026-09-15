@@ -1,0 +1,83 @@
+#:schema https://fnox.jdx.dev/schema.json
+
+# AWS credentials for the cn-terminal tree. One profile per (environment, role): the
+# unsuffixed name is LifligDeveloper, `--admin` is LifligAdministrator.
+#
+#   fnox -P staging exec -- aws s3 ls
+#   fnox -P prod--admin exec -- aws cloudformation deploy ...
+#
+# Each lease is a single-hop AssumeRole on top of `capra-auth`, the MFA'd
+# GetSessionToken session that ~/.aws/config exposes via credential_process.
+# duration is 1h because role chaining is capped at 1h by AWS regardless of what
+# is requested here. The ledger at ~/.local/state/fnox/leases/ reuses a live
+# lease until it is within 5 minutes of expiry, so repeated execs within the
+# hour cost one AssumeRole, not one each.
+#
+# The lease key is the STS RoleSessionName: fnox names the session
+# fnox-exec-<lease key>, so the -jstr suffix is what puts the user back into
+# CloudTrail, the way role_session_name=jstr-* did under aws-vault.
+
+[profiles.gh.secrets]
+GH_TOKEN = { provider = "onepass", value = "op://Employee/Vy - Nexus/password" }
+
+[secrets]
+# The aws-sts backend exports the three credential variables and nothing else --
+# no region. Declared at top level so it merges into every profile in this tree.
+AWS_REGION = { default = "eu-west-1" }
+AWS_DEFAULT_REGION = { default = "eu-west-1" }
+
+[profiles.build.leases.cn-terminal-build-jstr]
+type = "aws-sts"
+region = "eu-west-1"
+role_arn = "arn:aws:iam::706362170376:role/LifligDeveloper"
+profile = "capra-auth"
+duration = "1h"
+
+[profiles.build--admin.leases.cn-terminal-build-admin-jstr]
+type = "aws-sts"
+region = "eu-west-1"
+role_arn = "arn:aws:iam::706362170376:role/LifligAdministrator"
+profile = "capra-auth"
+duration = "1h"
+
+[profiles.dev.leases.cn-terminal-dev-jstr]
+type = "aws-sts"
+region = "eu-west-1"
+role_arn = "arn:aws:iam::048495016612:role/LifligDeveloper"
+profile = "capra-auth"
+duration = "1h"
+
+[profiles.dev--admin.leases.cn-terminal-dev-admin-jstr]
+type = "aws-sts"
+region = "eu-west-1"
+role_arn = "arn:aws:iam::048495016612:role/LifligAdministrator"
+profile = "capra-auth"
+duration = "1h"
+
+[profiles.staging.leases.cn-terminal-staging-jstr]
+type = "aws-sts"
+region = "eu-west-1"
+role_arn = "arn:aws:iam::416963226792:role/LifligDeveloper"
+profile = "capra-auth"
+duration = "1h"
+
+[profiles.staging--admin.leases.cn-terminal-staging-admin-jstr]
+type = "aws-sts"
+region = "eu-west-1"
+role_arn = "arn:aws:iam::416963226792:role/LifligAdministrator"
+profile = "capra-auth"
+duration = "1h"
+
+[profiles.prod.leases.cn-terminal-prod-jstr]
+type = "aws-sts"
+region = "eu-west-1"
+role_arn = "arn:aws:iam::075006647135:role/LifligDeveloper"
+profile = "capra-auth"
+duration = "1h"
+
+[profiles.prod--admin.leases.cn-terminal-prod-admin-jstr]
+type = "aws-sts"
+region = "eu-west-1"
+role_arn = "arn:aws:iam::075006647135:role/LifligAdministrator"
+profile = "capra-auth"
+duration = "1h"
