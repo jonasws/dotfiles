@@ -9,28 +9,17 @@ Non-default tools; reach for them deliberately. Match tool to question shape, no
 | Question shape | Tool |
 |---|---|
 | Structure on a resolved symbol: who calls X, blast radius, what implements it | `LSP` tool: `findReferences`, `incomingCalls`/`outgoingCalls`, `goToImplementation` |
-| Structure ranked across a repo: what to read first, does an impl already exist | `ripwire` (CLI on PATH; the `ripwire-*` skills) — **not Kotlin** |
 | "where is X", "how does Y work" — semantic, no exact identifier in hand | `semble` (MCP) |
 | Match depends on syntax shape, or a rewrite | `ast-grep -p '<pat>' -l <lang>` (`-U` applies) |
 | Literal/regex text, path lookup, repeated in one repo | fff MCP: `grep`, `find_files`, `multi_grep` |
 | One-off search outside a git repo | `rg` / `fd` (never `find`, never `grep` CLI) |
 
-- LSP answers from the compiler's own resolution, so prefer it over ripwire on any
-  language a server is enabled for (Kotlin, Rust, TypeScript). ripwire infers edges
-  from tree-sitter; LSP knows them. LSP needs a file and a position, so it answers
+- LSP answers from the compiler's own resolution, so prefer it wherever a server is
+  enabled (Kotlin, Rust, TypeScript). LSP needs a file and a position, so it answers
   "who calls THIS", never "what matters in this repo".
-- **ripwire does not parse Kotlin.** `.kt` and `pom.xml` are both `unsupported-ext`,
-  so a Kotlin tree indexes zero symbols and every graph verb returns an honest
-  nothing. On Kotlin the structure lane is LSP; semble, fff and ast-grep are
-  unaffected. Supported: C/C++, Python, TS/JS, Java, Ruby, PHP, Lua, Elixir, Bash,
-  Go, Rust, Swift, C#, JSON/TOML/YAML, Markdown.
-- ripwire and semble overlap only on the cold "where do I start" question, and
-  answer it differently: ripwire ranks the symbol graph and gives callers,
-  callees and impact; semble matches meaning when no identifier is known yet.
-  Prefer ripwire once a symbol name exists; semble when only the behavior does.
-- ripwire does not compete with fff or ast-grep. It indexes symbols and edges,
-  never raw text or syntax patterns, so a literal search still goes to fff and a
-  shape-dependent match or rewrite still goes to ast-grep.
+- semble is the cold-start lane: it matches meaning when no identifier is known yet.
+  Once a symbol name is in hand, LSP is the precise answer; fff for literal text and
+  ast-grep for shape-dependent matches or rewrites.
 - semble chunks are function-scoped with no caller or import context. Read the
   full file (or ±80 lines) before reasoning about a change. Locators, not context.
 - fff holds a warm index per repo — pays off from the second search.

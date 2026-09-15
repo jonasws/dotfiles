@@ -66,46 +66,20 @@
     "command": "bash /Users/jonasws/.claude/statusline-command.sh"
   },
   "enabledPlugins": {
-    "http4k@http4k-marketplace": true,
-    "kotlin-lsp@claude-plugins-official": false,
     "playwright-skill@playwright-skill": true,
-    "rust-analyzer-lsp@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
-    "voltagent-core-dev@voltagent-subagents": true,
-    "voltagent-dev-exp@voltagent-subagents": true,
-    "voltagent-infra@voltagent-subagents": true,
-    "voltagent-lang@voltagent-subagents": true,
-    "voltagent-meta@voltagent-subagents": true,
     "superpowers@claude-plugins-official": true,
     "obsidian@obsidian-skills": true,
     "caveman@caveman": true,
     "i-have-adhd@i-have-adhd": true
   },
   "extraKnownMarketplaces": {
-    "grafana-skills": {
-      "source": {
-        "source": "github",
-        "repo": "grafana/skills"
-      }
-    },
-    "http4k-marketplace": {
-      "source": {
-        "source": "github",
-        "repo": "http4k/agent-skills"
-      }
-    },
     "playwright-skill": {
       "source": {
         "source": "github",
         "repo": "lackeyjb/playwright-skill"
       },
       "autoUpdate": true
-    },
-    "voltagent-subagents": {
-      "source": {
-        "source": "github",
-        "repo": "VoltAgent/awesome-claude-code-subagents"
-      }
     },
     "obsidian-skills": {
       "source": {
