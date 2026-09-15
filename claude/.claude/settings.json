@@ -75,7 +75,9 @@
     "caveman@caveman": true,
     "i-have-adhd@i-have-adhd": true,
     "feature-dev@claude-plugins-official": true,
-    "skill-creator@claude-plugins-official": true
+    "skill-creator@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "claude-code-setup@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "playwright-skill": {
