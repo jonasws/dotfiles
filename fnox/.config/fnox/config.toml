@@ -31,11 +31,19 @@ recipients = [
 ]
 key_file = "~/.config/fnox/age-se.txt"
 
+# Two mechanisms decide who sees a secret, and they answer different questions.
+# `env = false` means never injected into any environment: the consumer fetches the
+# value itself with `fnox get`, as mise's credential_command and the gcal function
+# do. A profile means injected as an environment variable, but only into the one
+# process started under it — which no per-secret flag can express, since a flag has
+# only "every `fnox exec` subprocess" and "none". Secrets below are top-level, so
+# every `fnox exec` receives them; that is what the profiles' `--no-defaults` sheds.
+
 [secrets]
 # Read by ~/.m2/settings.xml as ${env.LIFLIG_GITHUB_PAT} and
 # ${env.NEXUS_PASSWORD} for the `github` and `vy-nexus` server entries.
-LIFLIG_GITHUB_PAT = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
-NEXUS_PASSWORD = { provider = "onepass", value = "op://Employee/Vy - Nexus/password" }
+LIFLIG_GITHUB_PAT= { provider = "onepass", value = "op://Employee/Liflig Github PAT/token", env = "exec", sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBaUVHTWVoS0w0RlJsQXdPd2YxcnRPNEhINHJ5TmtoMzJPd3FUcStSZCtjbQpNRWlwRDU4M0FyM05HaU9idDNKeUcrRkcwSW5lTFd4aFhXcm92MkxKblNNCi0+IHZdNzUmNi1ncmVhc2UgQUsgMwp3ejJXTVNqalZhSE9wREV1RWVST01yNDZnSUZlR09OSk1vVzJLRnVGcTZnbVo3VDczREhTSVZaY3VtU0ZCNk5vCi93OTRMOVdrcGNWSWNzeFJaK29pdnpOWmRIV2QzeCtQNEZOcE43OXFTaUpxVXZaM3ZBCi0tLSBYNng5UWFxcTFDL2ZkeDJjdFlRVWt5MjVEeDQ2Y0txTGRVMlp0WFVZSnR3CuB5X5iAndyYkmqXqi6zNOyEclLTH0BoseYZoBo8YhLvImani2m+iIqU0JeIDoOF1zYFPtGrOf+59fJZRy98QtZ01t2fdmXa1K2A8kU=:1PuCXGSNIFZU1bBSHupYKioy8fzxMi1qtNGM+jyuPKnBZnbCBK0ubLy7Ef3mXTr+Klh5xBqy4kXmU97P+DY8sCynfcRzzy17w0xuDIru2stbbsO8SPIfoeXR9BRl86fIhiJddemCS6DbawgJOr1ZLc3FNguDQOb/rA==" } }
+NEXUS_PASSWORD= { provider = "onepass", value = "op://Employee/Vy - Nexus/password", env = "exec", sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBaUVHTWVoS0w0RlJsQXdPd2YxcnRPNEhINHJ5TmtoMzJPd3FUcStSZCtjbQpNRWlwRDU4M0FyM05HaU9idDNKeUcrRkcwSW5lTFd4aFhXcm92MkxKblNNCi0+IHZdNzUmNi1ncmVhc2UgQUsgMwp3ejJXTVNqalZhSE9wREV1RWVST01yNDZnSUZlR09OSk1vVzJLRnVGcTZnbVo3VDczREhTSVZaY3VtU0ZCNk5vCi93OTRMOVdrcGNWSWNzeFJaK29pdnpOWmRIV2QzeCtQNEZOcE43OXFTaUpxVXZaM3ZBCi0tLSBYNng5UWFxcTFDL2ZkeDJjdFlRVWt5MjVEeDQ2Y0txTGRVMlp0WFVZSnR3CuB5X5iAndyYkmqXqi6zNOyEclLTH0BoseYZoBo8YhLvImani2m+iIqU0JeIDoOF1zYFPtGrOf+59fJZRy98QtZ01t2fdmXa1K2A8kU=:wt0kBzJqp9FqNJSg/1fu0pR2JnWGnXwG+9owU6LNWeK9UYQOxZuu3Db7VC7J3KI8y+nZ8c6KVKuDm6MrHl14WXExeL0=" } }
 
 # Read only by mise, whose `[settings.github] credential_command` runs
 # `fnox get MISE_GITHUB_TOKEN`. Fine-grained, public-repo read and nothing else:
@@ -43,7 +51,7 @@ NEXUS_PASSWORD = { provider = "onepass", value = "op://Employee/Vy - Nexus/passw
 # exists purely to lift the 60/hr anonymous rate limit. `env = false` keeps it
 # out of every `fnox exec` subprocess, so maven and the github MCP server never
 # receive it.
-MISE_GITHUB_TOKEN = { provider = "onepass", value = "op://Employee/mise github token/password", env = false }
+MISE_GITHUB_TOKEN= { provider = "onepass", value = "op://Employee/mise github token/password", env = false, sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBaUVHTWVoS0w0RlJsQXdPd2YxcnRPNEhINHJ5TmtoMzJPd3FUcStSZCtjbQpNRWlwRDU4M0FyM05HaU9idDNKeUcrRkcwSW5lTFd4aFhXcm92MkxKblNNCi0+IHZdNzUmNi1ncmVhc2UgQUsgMwp3ejJXTVNqalZhSE9wREV1RWVST01yNDZnSUZlR09OSk1vVzJLRnVGcTZnbVo3VDczREhTSVZaY3VtU0ZCNk5vCi93OTRMOVdrcGNWSWNzeFJaK29pdnpOWmRIV2QzeCtQNEZOcE43OXFTaUpxVXZaM3ZBCi0tLSBYNng5UWFxcTFDL2ZkeDJjdFlRVWt5MjVEeDQ2Y0txTGRVMlp0WFVZSnR3CuB5X5iAndyYkmqXqi6zNOyEclLTH0BoseYZoBo8YhLvImani2m+iIqU0JeIDoOF1zYFPtGrOf+59fJZRy98QtZ01t2fdmXa1K2A8kU=:YIWkBVPZ8/RZNmxU5egY1sqwNfHOYW4LTe1ntJRIMpGaIKNexycFNQhtQsgrLHh9xazAo0ZjhlOykLI2gMTKVv/QE2sMe86CWLkHz+Xnjz7iq3P9CpttmslojhHKVya13RgXFpnyjBwcFpcnU0zVBVnuo9r93U8WAw==" } }
 
 # Read by the `gh` fish function, which runs
 # `fnox exec -P gh --no-defaults -- gh ...`. The profile exists to scope the
@@ -62,7 +70,7 @@ GH_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/toke
 # top-level secret, so opening a Claude Code session asked for biometrics three
 # times and handed the MCP server a Nexus password it has no use for.
 [profiles.github-mcp.secrets]
-GITHUB_PERSONAL_ACCESS_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
+GITHUB_PERSONAL_ACCESS_TOKEN= { provider = "onepass", value = "op://Employee/Liflig Github PAT/token", env = "exec", sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBKzk0dmN2VDFDYUt6WWFvVVFNemJvMEhKWDAzNldDbnZYRDNCRHlwdVdvVQpSYjNBdHZ6dmlrK3ZFellrWXluczkyaExkejRsRHNnVG1ReTV0blJ3WmxBCi0+IDt8aGdqUFEtZ3JlYXNlIDU6dnhvKHw6CmtKRzZkczdYZFVudGpxVnhKcVJITGwrZ1pnQk9vd29NeXM1K2xiWVpwL0grWDFnYnVWSHg0Yi9jTnpDUEprR28KWW5QRGh6Q1ZXb1lMa1RZTVRWOEFWL0xZOWJhSUs2UTZZdXRMVWpEaFpramwvY1lICi0tLSBEVEtJVzJVdjZQVXQzT21aZHovOFllWGZoVmFvSmMxTkx3ZEl1ZTE0Z3dFCgA5//kQKs8HwPoqJ3h6ut/zCE5h3Vrk9LojXXl8HdyMeQNTutVmGKzvsPU5ahBGcTndllzuHrRkn2JlwIoTJwYhNMDymRK10X3cSJw=:dmohsaKo/jvGeEEIxkcN8LAtI9cQ2hhl/uCo3B1S7axBIEF+9BehQeJ1CsGARrg4BocKUMdfQMYEpwkSLQecrl90T1k+Fu0aLex2ea1U6RGFhe1gh+AZ6x6xjnS/JJUcJc8QPelNpoZFrLj6GSxydjDDoflzj95f+A==" } }
 
 # Read by the `gcal` fish function, which resolves each value with
 # `fnox get -P gcalcli --no-defaults`. gcalcli takes the OAuth client only as
@@ -71,3 +79,13 @@ GITHUB_PERSONAL_ACCESS_TOKEN = { provider = "onepass", value = "op://Employee/Li
 [profiles.gcalcli.secrets]
 GCALCLI_CLIENT_ID = { provider = "onepass", value = "op://Employee/gcalcli/username" }
 GCALCLI_CLIENT_SECRET = { provider = "onepass", value = "op://Employee/gcalcli/credential" }
+
+# Read by the Exa MCP server, which Claude Code starts as
+# `fnox exec -P exa-mcp --no-defaults -- npx -y exa-mcp-server`. The stdio server
+# reads its credential only from this variable and calls api.exa.ai directly, so
+# without a key every request 401s — the free anonymous tier belongs to the hosted
+# endpoint at mcp.exa.ai, not to the package. `agent_run` needs a user-provided key
+# even where the hosted server would grant it over OAuth.
+# PLACEHOLDER reference — replace with the real item path.
+[profiles.exa-mcp.secrets]
+EXA_API_KEY= { provider = "onepass", value = "op://Employee/Exa API Key/password", env = "exec", sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBNkltbW1rV1pmU0dKRTg1alRBTUpJb1o3a1BZQ3I4ci9kOEh4NEsvOXdJNApMRW5IdHNleUlsUjBwT0k5R1pUUXkyNlF0angwSktXNCt3MEN6WUhXZDRVCi0+IERCKTsyJ3ktZ3JlYXNlIE8nflhJby1nIG5qcFhhfmAvIGVNWz5nNUAKZmFMa3EyNWlxcjhjOTJ6Z2VXano0MnI4VmloVnpNSzg3OFVBMEFQbXZEVEs5dnhXWmNaWHVLWTRObUtlVXdwbgpXeXdma0ZMWGcxcEZQQ05SWFFNQ1luZ1pFU3o2T3V2WW00M3Q4anp1T1QyeWJlQTltK2lxOGcKLS0tIEF5cWdZUlVzdWdqZkM0dS8yYTF3SFdvVUpOazUyNWtRb1U1TlhxRDZrRHMKEFSTiZI3DqemchAsPOVveOqSklX/cXauRZe7hYpHHGsvp+QVTZr19XlwjAkOdNNj4CDWxWTowTyje4hsV3r2ULwLHRTK4A3H8nrwGQ==:pf27yMNNqbUxvSElv/BNc2mNSdGLMegbI6cIE2CVTTCLHF5zAWNfqMuVhVbdASJS5yThW1nWtB6Bnqq2TYuX1Q==" } }
