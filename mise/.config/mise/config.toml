@@ -93,6 +93,7 @@ pre-commit = "latest"
 "aqua:anthropics/claude-code" = "latest"
 hwatch = "latest"
 "ubi:thiagokokada/gh-gfm-preview" = "latest"
+usage = "6.9.0"
 
 [settings]
 # No `lockfile = true`: that creates a mise.lock in every project mise touches,

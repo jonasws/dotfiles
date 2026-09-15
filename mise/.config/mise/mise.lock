@@ -753,6 +753,19 @@ specifiers = ["latest"]
 [tools."ubi:thiagokokada/gh-gfm-preview"."platforms.macos-arm64-gh-gfm-preview"]
 checksum = "blake3:cff7eaee472f37978ce8ca95a95d42a4c11fdfc45dc8a18cac3a86dd67cb9818"
 
+[[tools.usage]]
+version = "6.9.0"
+backend = "packslip:github.com/jdx/usage"
+specifiers = [
+    "6.9.0",
+    "latest",
+]
+
+[tools.usage."platforms.macos-arm64"]
+checksum = "sha256:9e5315149d5a08d7d1b863b4e94729aa36240353f2847529d06ac21fac7c6c01"
+url = "https://github.com/jdx/usage/releases/download/v6.9.0/usage-universal-apple-darwin.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
+
 [[tools.uv]]
 version = "0.12.14"
 backend = "asdf:uv"
