@@ -15,6 +15,7 @@
       "Bash(npx ctx7@latest *)"
     ],
     "deny": [
+      "WebSearch",
       "Read(//**/*.env)",
       "Read(//**/.env)",
       "Read(//**/.env.*)",
@@ -71,7 +72,6 @@
     "typescript-lsp@claude-plugins-official": true,
     "superpowers@claude-plugins-official": true,
     "obsidian@obsidian-skills": true,
-    "caveman@caveman": true,
     "i-have-adhd@i-have-adhd": true,
     "feature-dev@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
@@ -90,12 +90,6 @@
       "source": {
         "source": "github",
         "repo": "kepano/obsidian-skills"
-      }
-    },
-    "caveman": {
-      "source": {
-        "source": "github",
-        "repo": "JuliusBrussee/caveman"
       }
     },
     "i-have-adhd": {
@@ -166,7 +160,7 @@
       "### User-specific",
       "**Primary use of Claude Code**: software development (Kotlin/http4k booking API work in cn-cx-booking-service)",
       "**Trusted repo**: /Users/jonasws/CX/cn-cx-booking-service and its origin remote (github.com/nsbno/cn-cx-booking-service) — visibility not confirmed, treat as private by default so confidential material is OK to commit there but not assumed publishable",
-      "**Org-specific CLIs**: mise (required wrapper for mvn — plain mvn 401s per CLAUDE.md), herdr, hunk, caveman, fnox, otree, rain, doggo, awslogs, console, fx, tv (frequent in shell history, likely internal/org tooling)",
+      "**Org-specific CLIs**: mise (required wrapper for mvn — plain mvn 401s per CLAUDE.md), herdr, hunk, fnox, otree, rain, doggo, awslogs, console, fx, tv (frequent in shell history, likely internal/org tooling)",
       "routine mise/mvn/fd/sd/rg/ast-grep usage under this project's working directory is expected per ~/.claude/CLAUDE.md tool preferences"
     ]
   },
