@@ -62,4 +62,14 @@ case "$TMPDIR" in
     ;;
 esac
 
+# Already inside a fnox exec: the outer invocation merged the top-level secrets
+# (that is what --no-defaults turns off), so the two credentials
+# ~/.m2/settings.xml reads are present and a second fnox would only re-resolve
+# what is already here. Under `fnox -P staging exec -- mvn ...` that is the
+# common case, and skipping the inner exec keeps the process tree flat and the
+# outer profile's lease credentials untouched.
+if [ -n "${LIFLIG_GITHUB_PAT:-}" ] && [ -n "${NEXUS_PASSWORD:-}" ]; then
+  exec "$real" "$@"
+fi
+
 exec fnox exec -- "$real" "$@"
