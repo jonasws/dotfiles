@@ -147,3 +147,23 @@ credential_command = "fnox get MISE_GITHUB_TOKEN"
 # orders these ahead of tool directories, so the wrapper here wins over the
 # maven that mise itself provisions.
 _.path = ["~/.local/bin/wrapped"]
+
+# Re-encrypt every secret into the local age provider, so resolution stops
+# reaching 1Password: MCP servers start without a biometric prompt, and `mvn`
+# works offline. Sync writes a `sync` entry beside each secret and leaves the
+# `op://` reference in place, so this is a cache, not a migration — a rotated
+# 1Password value keeps serving stale until the task runs again.
+[tasks.sync-secrets]
+description = "Cache all fnox secrets into the local age provider"
+run = '''
+set -euo pipefail
+fnox sync -g -p sync-age -f
+# Profile secrets are separate from the top-level ones, and `--no-defaults`
+# keeps each pass from re-syncing the defaults it inherits. `gh` and `gcalcli`
+# stay out: both are used interactively, where a 1Password prompt costs nothing,
+# and leaving them as pure references keeps revocation immediate rather than
+# waiting for the next sync.
+fnox --no-color profiles | awk 'NR > 1 && $1 !~ /^(default|gh|gcalcli)$/ { print $1 }' | while read -r profile; do
+  fnox sync -g -p sync-age -P "$profile" --no-defaults -f
+done
+'''
