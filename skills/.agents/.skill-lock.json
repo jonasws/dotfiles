@@ -43,18 +43,18 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/JuliusBrussee/caveman.git",
       "skillPath": "skills/caveman-compress/SKILL.md",
-      "skillFolderHash": "e95dd5911da8896a142d1bf28e3b573c37e5deed",
+      "skillFolderHash": "1f4d964edb53b0ba264638a028011246a3839013",
       "installedAt": "2026-08-19T10:41:28.199Z",
-      "updatedAt": "2026-09-08T05:35:17.773Z"
+      "updatedAt": "2026-09-15T05:43:15.344Z"
     },
     "caveman": {
       "source": "JuliusBrussee/caveman",
       "sourceType": "github",
       "sourceUrl": "https://github.com/JuliusBrussee/caveman.git",
       "skillPath": "skills/caveman/SKILL.md",
-      "skillFolderHash": "efae5ae14e1ace5f456e895abb9e5643925a754c",
+      "skillFolderHash": "02b646b008b9d1e5b67e5f65fab56fd7073d9212",
       "installedAt": "2026-08-19T10:41:28.200Z",
-      "updatedAt": "2026-09-04T06:45:03.271Z"
+      "updatedAt": "2026-09-15T05:43:19.578Z"
     },
     "caveman-review": {
       "source": "JuliusBrussee/caveman",
@@ -106,9 +106,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/JuliusBrussee/caveman.git",
       "skillPath": "skills/caveman-help/SKILL.md",
-      "skillFolderHash": "6c85e34cfd4166be893224b7f39c6379d38c8b0c",
+      "skillFolderHash": "7f39fe20663ec4d859cfed3883927a79a4ed2eff",
       "installedAt": "2026-08-26T11:25:18.430Z",
-      "updatedAt": "2026-08-31T05:31:45.524Z"
+      "updatedAt": "2026-09-15T05:43:25.810Z"
     },
     "caveman-learn": {
       "source": "JuliusBrussee/caveman",
@@ -151,9 +151,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/JuliusBrussee/caveman.git",
       "skillPath": "skills/caveman-stats/SKILL.md",
-      "skillFolderHash": "c0fb6ec46cd22173f570edfdd20463d0f7aea67c",
+      "skillFolderHash": "a2e477b9de0ebf214b86f11dffdd2a0122e1fc1f",
       "installedAt": "2026-08-26T11:25:18.432Z",
-      "updatedAt": "2026-08-31T05:32:03.586Z"
+      "updatedAt": "2026-09-15T05:43:30.384Z"
     },
     "investigate-first": {
       "source": "JuliusBrussee/caveman",

@@ -66,7 +66,15 @@ zellij = "latest"
 "github:pb33f/wiretap" = "latest"
 watchexec = "latest"
 "cargo:rgrc" = { version = "latest", features = "embed-configs" }
-"github:ouch-org/ouch" = "latest"
+# Pinned, and on github: rather than aqua:. The aqua registry entry carries
+# `rosetta2: true`, and mise's actual_arch() rewrites arm64 to amd64 whenever
+# that is set, without checking whether an arm64 asset exists — so aqua hands
+# this machine the x86_64 build even though ouch ships aarch64-apple-darwin.
+# 0.8.2 is the last version whose attestations mise's github: backend can
+# resolve; 0.8.3 is a hotfix cut from a branch and trips a false "no provenance
+# verification" error that fails `mise lock`. Its only change is a `--version`
+# fix for source builds, which does not apply to a downloaded binary.
+"github:ouch-org/ouch" = "0.8.2"
 "github:pb33f/printing-press" = "latest"
 sqlite = "latest"
 "github:pamburus/hl" = "latest"
@@ -82,7 +90,9 @@ actionlint = "latest"
 "github:dmtrKovalenko/fff" = { version = "latest", matching = "fff-mcp", exe = "fff-mcp" }
 pre-commit = "latest"
 "aqua:github/github-mcp-server" = "latest"
+"aqua:anthropics/claude-code" = "latest"
 hwatch = "latest"
+"ubi:thiagokokada/gh-gfm-preview" = "latest"
 
 [settings]
 # No `lockfile = true`: that creates a mise.lock in every project mise touches,
@@ -107,6 +117,7 @@ minimum_release_age_excludes = [
   "github:dmtrKovalenko/fff",
   "github:always-further/nono",
   "aqua:github/github-mcp-server",
+  "aqua:anthropics/claude-code",
   "pipx:mcp2cli",
   "go:github.com/isaacphi/mcp-language-server",
   "npm:@earendil-works/pi-coding-agent",
@@ -122,7 +133,6 @@ minimum_release_age_excludes = [
   "github:pamburus/hl",
   "github:bensadeh/tailspin",
   "github:mfontanini/presenterm",
-  "github:ouch-org/ouch",
 ]
 
 [settings.github]

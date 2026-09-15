@@ -52,6 +52,16 @@ url = "https://github.com/FiloSottile/age/releases/download/v1.3.2/age-v1.3.2-da
 url_api = "https://api.github.com/repos/FiloSottile/age/releases/assets/535541897"
 provenance = "github-attestations"
 
+[[tools."aqua:anthropics/claude-code"]]
+version = "2.1.272"
+backend = "aqua:anthropics/claude-code"
+specifiers = ["latest"]
+
+[tools."aqua:anthropics/claude-code"."platforms.macos-arm64"]
+checksum = "sha256:3254b8926b112e5af92dbb9c3840fb33187678c9638807e31f7f9b100bc8c6d5"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.272/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/564448719"
+
 [[tools."aqua:aws/session-manager-plugin"]]
 version = "1.2.835.0"
 backend = "aqua:aws/session-manager-plugin"
@@ -85,23 +95,23 @@ url = "https://github.com/ast-grep/ast-grep/releases/download/0.45.3/app-aarch64
 url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/537332514"
 
 [[tools.aws-cli]]
-version = "2.36.43"
+version = "2.36.45"
 backend = "aqua:aws/aws-cli"
 specifiers = ["latest"]
 
 [tools.aws-cli."platforms.macos-arm64"]
-checksum = "blake3:d53ac95b591ee6652ac0323a065aabce4dd90d8708b252460785a11e21a17b05"
-url = "https://awscli.amazonaws.com/AWSCLIV2-2.36.43.pkg"
+checksum = "blake3:a1a9c30f6479aaf14f6a39ab90e76de1b79261cdf2f83f3f40d170d65ad90c2f"
+url = "https://awscli.amazonaws.com/AWSCLIV2-2.36.45.pkg"
 
 [[tools.aws-vault]]
-version = "7.13.6"
+version = "7.14.0"
 backend = "aqua:ByteNess/aws-vault"
 specifiers = ["latest"]
 
 [tools.aws-vault."platforms.macos-arm64"]
-checksum = "sha256:f5246e89a13eb2eaeb6b25839184b68c82a1155f9c786edeab353e8b344b8531"
-url = "https://github.com/ByteNess/aws-vault/releases/download/v7.13.6/aws-vault-darwin-arm64"
-url_api = "https://api.github.com/repos/ByteNess/aws-vault/releases/assets/535731547"
+checksum = "sha256:22ec956e968736d8099860b14f8d6be901ccf93fa9daee28b59846525d7f8a15"
+url = "https://github.com/ByteNess/aws-vault/releases/download/v7.14.0/aws-vault-darwin-arm64"
+url_api = "https://api.github.com/repos/ByteNess/aws-vault/releases/assets/557765308"
 
 [[tools.bun]]
 version = "1.4.2"
@@ -136,7 +146,7 @@ url = "https://github.com/carapace-sh/carapace-bin/releases/download/v1.7.3/cara
 url_api = "https://api.github.com/repos/carapace-sh/carapace-bin/releases/assets/462542252"
 
 [[tools."cargo:abtop"]]
-version = "0.5.3"
+version = "0.5.5"
 backend = "cargo:abtop"
 specifiers = ["latest"]
 
@@ -156,7 +166,7 @@ backend = "cargo:mdcat"
 specifiers = ["latest"]
 
 [[tools."cargo:rgrc"]]
-version = "0.6.30"
+version = "0.6.34"
 backend = "cargo:rgrc"
 specifiers = ["latest"]
 
@@ -172,24 +182,24 @@ specifiers = ["latest"]
 url = "https://download.docker.com/mac/static/stable/aarch64/docker-29.8.0.tgz"
 
 [[tools.fnox]]
-version = "1.35.1"
+version = "1.35.2"
 backend = "packslip:github.com/jdx/fnox"
 specifiers = ["latest"]
 
 [tools.fnox."platforms.macos-arm64"]
-checksum = "sha256:9b733a2b9e3e893e73131cc3c7d64c8596de4c7210b47f3695ed4011d798a1e6"
-url = "https://github.com/jdx/fnox/releases/download/v1.35.1/fnox-aarch64-apple-darwin.tar.gz"
+checksum = "sha256:3f6e9b4f7a59a5712abe48cf6c97b2a0600392b5cb54059a80b53497adeab354"
+url = "https://github.com/jdx/fnox/releases/download/v1.35.2/fnox-aarch64-apple-darwin.tar.gz"
 signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [[tools.fzf]]
-version = "0.74.3"
+version = "0.74.4"
 backend = "aqua:junegunn/fzf"
 specifiers = ["latest"]
 
 [tools.fzf."platforms.macos-arm64"]
-checksum = "sha256:1f8501cea4f9c0c2d6110d0ff75d0ec9451cd9d7524d9a26244a154ea89f3bd5"
-url = "https://github.com/junegunn/fzf/releases/download/v0.74.3/fzf-0.74.3-darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/517537091"
+checksum = "sha256:4f6a113bfc0c7959e0005c78d566a51afc4fcefc956f43735c62a9deb19e92ae"
+url = "https://github.com/junegunn/fzf/releases/download/v0.74.4/fzf-0.74.4-darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/558287774"
 
 [[tools.github-cli]]
 version = "2.100.0"
@@ -233,16 +243,15 @@ url = "https://github.com/agavra/tuicr/releases/download/v0.25.0/tuicr-0.25.0-aa
 url_api = "https://api.github.com/repos/agavra/tuicr/releases/assets/541533878"
 
 [[tools."github:always-further/nono"]]
-version = "0.76.0"
+version = "0.77.0"
 backend = "github:always-further/nono"
 specifiers = ["latest"]
 
 [tools."github:always-further/nono"."platforms.macos-arm64"]
-checksum = "sha256:985547be0bb6949a13b92c11965e3d9940d4d3c2c0d9adaf4f9f10f521c6a9dc"
-url = "https://github.com/nolabs-ai/nono/releases/download/v0.76.0/nono-v0.76.0-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/552520884"
+checksum = "sha256:1b413e61758f5e212f1c683b95c3aadb3799a01dbd54685dd7eae33782de7f12"
+url = "https://github.com/nolabs-ai/nono/releases/download/v0.77.0/nono-v0.77.0-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/nolabs-ai/nono/releases/assets/557854618"
 provenance = "github-attestations"
-provenance_verified = true
 
 [[tools."github:aws-cloudformation/rain"]]
 version = "1.24.4"
@@ -288,14 +297,14 @@ url = "https://github.com/dmtrKovalenko/fff/releases/download/v0.10.6/fff-mcp-aa
 url_api = "https://api.github.com/repos/dmtrKovalenko/fff/releases/assets/536282163"
 
 [[tools."github:docker/buildx"]]
-version = "0.37.0"
+version = "0.37.1"
 backend = "github:docker/buildx"
 specifiers = ["latest"]
 
 [tools."github:docker/buildx"."platforms.macos-arm64"]
-checksum = "sha256:4cf78bb790f96f576522af0db716c7c25e8937a71c3303a165ff90d5105170ff"
-url = "https://github.com/docker/buildx/releases/download/v0.37.0/buildx-v0.37.0.darwin-arm64"
-url_api = "https://api.github.com/repos/docker/buildx/releases/assets/541517587"
+checksum = "sha256:c3cbbc820d578b0aa8158dd62ef1af25a0c8a75ef53331dbe4e219471e1dbe8c"
+url = "https://github.com/docker/buildx/releases/download/v0.37.1/buildx-v0.37.1.darwin-arm64"
+url_api = "https://api.github.com/repos/docker/buildx/releases/assets/557519683"
 
 [[tools."github:docker/compose"]]
 version = "5.5.1"
@@ -352,14 +361,13 @@ url_api = "https://api.github.com/repos/mfontanini/presenterm/releases/assets/35
 [[tools."github:ouch-org/ouch"]]
 version = "0.8.2"
 backend = "github:ouch-org/ouch"
-specifiers = ["latest"]
+specifiers = ["0.8.2"]
 
 [tools."github:ouch-org/ouch"."platforms.macos-arm64"]
 checksum = "sha256:36d912a6739ccec6889b6e67cfe24d503e889b61c6da556b840a5e4e7e39a2e0"
 url = "https://github.com/ouch-org/ouch/releases/download/0.8.2/ouch-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/ouch-org/ouch/releases/assets/537367166"
 provenance = "github-attestations"
-provenance_verified = true
 
 [[tools."github:pamburus/hl"]]
 version = "0.36.3"
@@ -414,14 +422,14 @@ url = "https://github.com/riii111/sabiql/releases/download/v3.0.1/sabiql-aarch64
 url_api = "https://api.github.com/repos/riii111/sabiql/releases/assets/545712684"
 
 [[tools."github:walles/moor"]]
-version = "2.19.0"
+version = "2.19.1"
 backend = "github:walles/moor"
 specifiers = ["latest"]
 
 [tools."github:walles/moor"."platforms.macos-arm64"]
-checksum = "sha256:efb3802011530c0a9cf7202db976bf468e0bdb18897ac7db42f0917af22ee1c6"
-url = "https://github.com/walles/moor/releases/download/v2.19.0/moor-v2.19.0-darwin-arm64"
-url_api = "https://api.github.com/repos/walles/moor/releases/assets/549152896"
+checksum = "sha256:0dffcff7733b5d3f2d5b0cfff383ee4cd00448e15d1f039a142d83c8714aca9d"
+url = "https://github.com/walles/moor/releases/download/v2.19.1/moor-v2.19.1-darwin-arm64"
+url_api = "https://api.github.com/repos/walles/moor/releases/assets/562732221"
 
 [[tools.gitu]]
 version = "0.43.0"
@@ -459,14 +467,14 @@ backend = "go:github.com/isaacphi/mcp-language-server"
 specifiers = ["latest"]
 
 [[tools.gum]]
-version = "2.0.0"
+version = "2.0.1"
 backend = "aqua:charmbracelet/gum"
 specifiers = ["latest"]
 
 [tools.gum."platforms.macos-arm64"]
-checksum = "sha256:20224bcddeda5b9146373862ca77be7b1592c46c271435e00a2d3ab3f7750bb0"
-url = "https://github.com/charmbracelet/gum/releases/download/v2.0.0/gum_2.0.0_Darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/charmbracelet/gum/releases/assets/521957955"
+checksum = "sha256:994662daab6fcfe9dcfc57d87ca42bcae2948d86fa864f9010a3848fa9bb7d6e"
+url = "https://github.com/charmbracelet/gum/releases/download/v2.0.1/gum_2.0.1_Darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/charmbracelet/gum/releases/assets/556563007"
 provenance = "cosign"
 
 [[tools.herdr]]
@@ -542,14 +550,14 @@ url = "https://github.com/jesseduffield/lazydocker/releases/download/v0.25.2/laz
 url_api = "https://api.github.com/repos/jesseduffield/lazydocker/releases/assets/399711580"
 
 [[tools.lazygit]]
-version = "0.65.0"
+version = "0.65.1"
 backend = "aqua:jesseduffield/lazygit"
 specifiers = ["latest"]
 
 [tools.lazygit."platforms.macos-arm64"]
-checksum = "sha256:d8ea1cade9e4279e45cbb58652e84edb07e98a9f8ec0604099c8b0a8f709e63a"
-url = "https://github.com/jesseduffield/lazygit/releases/download/v0.65.0/lazygit_0.65.0_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/jesseduffield/lazygit/releases/assets/545957198"
+checksum = "sha256:65a367c6ea9a88efebaaf7998a6835eedb987e04916cef677264ff9b31b1b13e"
+url = "https://github.com/jesseduffield/lazygit/releases/download/v0.65.1/lazygit_0.65.1_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/jesseduffield/lazygit/releases/assets/560658243"
 
 [[tools.maven]]
 version = "3.9.16"
@@ -737,8 +745,16 @@ checksum = "sha256:94ae7177d499f74e7544243ffe9c82371183ca11a6363f198a4b3d0e29f82
 url = "https://github.com/alexpasmantier/television/releases/download/0.15.9/tv-0.15.9-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/alexpasmantier/television/releases/assets/447568866"
 
+[[tools."ubi:thiagokokada/gh-gfm-preview"]]
+version = "1.3.1"
+backend = "ubi:thiagokokada/gh-gfm-preview"
+specifiers = ["latest"]
+
+[tools."ubi:thiagokokada/gh-gfm-preview"."platforms.macos-arm64-gh-gfm-preview"]
+checksum = "blake3:cff7eaee472f37978ce8ca95a95d42a4c11fdfc45dc8a18cac3a86dd67cb9818"
+
 [[tools.uv]]
-version = "0.12.13"
+version = "0.12.14"
 backend = "asdf:uv"
 specifiers = ["latest"]
 
