@@ -70,7 +70,6 @@
   "enabledPlugins": {
     "playwright-skill@playwright-skill": true,
     "typescript-lsp@claude-plugins-official": true,
-    "superpowers@claude-plugins-official": true,
     "obsidian@obsidian-skills": true,
     "i-have-adhd@i-have-adhd": true,
     "feature-dev@claude-plugins-official": true,
