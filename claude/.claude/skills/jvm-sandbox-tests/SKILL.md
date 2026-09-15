@@ -1,3 +1,8 @@
+---
+name: jvm-sandbox-tests
+description: Run or debug JVM tests in the Vy Kotlin/Maven repos under ~/CX, ~/CNOPS and ~/CN-TERMINAL. Use when a mocking test throws JvmMockKGateway or ByteBuddy attach errors, when Testcontainers cannot find a Docker environment under colima, or when a *FlowTest does not run under mvn test.
+---
+
 # JVM tests under the Claude Code sandbox
 
 Applies to the Vy Kotlin/Maven repos under `~/CX`, `~/CNOPS` and `~/CN-TERMINAL`, which

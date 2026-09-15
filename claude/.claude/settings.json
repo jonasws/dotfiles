@@ -3,7 +3,9 @@
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
     "ENABLE_TOOL_SEARCH": "auto",
     "CLAUDE_CODE_SUBAGENT_MODEL": "sonnet",
-    "CLAUDE_CODE_SHELL": "/opt/homebrew/bin/bash"
+    "CLAUDE_CODE_SHELL": "/opt/homebrew/bin/bash",
+    "CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "3",
+    "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "2"
   },
   "includeCoAuthoredBy": false,
   "permissions": {
@@ -71,7 +73,9 @@
     "superpowers@claude-plugins-official": true,
     "obsidian@obsidian-skills": true,
     "caveman@caveman": true,
-    "i-have-adhd@i-have-adhd": true
+    "i-have-adhd@i-have-adhd": true,
+    "feature-dev@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "playwright-skill": {
