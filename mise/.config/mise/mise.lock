@@ -605,9 +605,19 @@ version = "0.2.11"
 backend = "npm:@pb33f/openapi-changes"
 specifiers = ["latest"]
 
+[[tools."npm:defuddle"]]
+version = "0.19.3"
+backend = "npm:defuddle"
+specifiers = ["latest"]
+
 [[tools."npm:dotenv-cli"]]
 version = "11.0.0"
 backend = "npm:dotenv-cli"
+specifiers = ["latest"]
+
+[[tools."npm:exa-mcp-server"]]
+version = "3.4.1"
+backend = "npm:exa-mcp-server"
 specifiers = ["latest"]
 
 [[tools."npm:typescript-language-server"]]
