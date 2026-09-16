@@ -1,6 +1,6 @@
 ---
 name: watch-subagents
-description: Open a Herdr pane per running subagent showing that agent's live activity - prose, tool calls with their arguments, and errors. Use when the user asks to watch, tail, follow or see what subagents are doing, or wants a live view of background agent progress. Requires HERDR_ENV=1.
+description: Open a Herdr pane per running subagent showing that agent's live activity - prose, thinking, tool calls with their arguments, and errors or denials. Use when the user asks to watch, tail, follow or see what subagents are doing, or wants a live view of background agent progress. Requires HERDR_ENV=1.
 ---
 
 # Watch subagents
@@ -21,17 +21,35 @@ Skip it for a single fast subagent: the pane costs more attention than the wait.
 
 ## What the stream carries
 
-Three event kinds, one line each, oldest first:
+Four event kinds, one line each, oldest first:
 
 | Marker | Event | Why it earns a line |
 | --- | --- | --- |
 | `▸` | the agent's prose | what it concluded — the reason you are watching |
+| `◇` | its thinking | the pause before a tool call reads as deliberation, not as a hang |
 | `·` | a tool call, with its salient argument | what it is doing right now: which file, which pattern, which command |
-| `✗` | a failed tool result | the signal that the agent is stuck |
+| `✗` | a failed or denied tool call | the signal that the agent is stuck, or waiting on the user |
 
 Each line is timestamped dim-grey. The salient argument is extracted per tool —
 `file_path` for Read/Edit/Write, `command` for Bash, `pattern` (+ `path`) for
-Grep, `url` for WebFetch, `description` for a nested Agent — and clipped.
+Grep, `url` for WebFetch, `description` for a nested Agent.
+
+A tool call is legible only while it stays on one line, so its argument is
+clipped to the pane's own width rather than to a fixed budget: each viewer holds
+a fraction of the window, and that fraction shrinks every time another agent's
+pane is split off beside it. The viewer re-measures as it runs, so a pane that
+narrows mid-flight keeps its lines short. The other three kinds soft-wrap
+instead — they are rare, and their tails carry the point.
+
+Thinking almost never survives to disk: the block is written, but its `.thinking`
+is empty and only the signature remains. The `◇` line is therefore usually the
+turn's `thinking_tokens` count — `thought 55 tokens` — and carries the prose only
+on the rare transcript that kept it. A turn spans several records that each
+repeat the same usage figures, so the count is collapsed to one line per turn.
+
+A denial is reported as `denied (user-rejected)` rather than as the paragraph of
+boilerplate its tool result carries. An agent stopped at a permission prompt
+otherwise looks exactly like an idle one.
 
 Deliberately dropped: tool *result* bodies, which are the bulk of the transcript
 and unreadable at speed, and every non-assistant bookkeeping record.
