@@ -114,6 +114,9 @@ next_agent = "prefix+a"
 # zoom = "prefix+z"       # legacy alias: fullscreen
 # resize_mode = "prefix+r"
 toggle_sidebar = "prefix+b"
+# Stands in for the ctrl+l that herdr-splits takes for navigation. Keeps the
+# current prompt line and leaves full-screen apps alone.
+clear_pane = "prefix+ctrl+l"
 
 # Navigate-mode movement. These local shortcuts win while navigate mode is open.
 # They are independent from focus_pane_*. Do not include prefix+, esc, enter, tab, or 1..9 here.
@@ -161,11 +164,7 @@ width = "90%"
 height = "80%"
 
 # Herdr F1: the agents in this session as a race in the browser. Clicking a car
-# focuses that agent's pane. Installed from a fork, whose main carries five
-# commits upstream does not have: herdr protocol 20 support, --bind for the
-# dashboard and for a multiplayer host, earned pace for the local classic car,
-# and a Firefox fix for the circuit picker.
-#     herdr plugin install jonasws/herdr-f1
+# focuses that agent's pane.
 # prefix+shift+f rather than the upstream README's prefix+f, which the pane
 # picker above already owns. Reopening while the dashboard runs just points the
 # browser at it again; `herdr plugin action invoke dev.minung.herdr-f1.stop`
@@ -224,8 +223,8 @@ height = "80%"
 # These are direct (non-prefix) bindings, so they take ctrl+h/j/k/l and
 # ctrl+shift+h/j/k/l away from whatever runs inside a pane. ctrl+l no longer
 # clears a shell and ctrl+j no longer sends a newline in readline — same
-# trade-off tmux users make with vim-tmux-navigator. Use prefix+h/j/k/l or
-# `ctrl+v ctrl+l` if you need the raw key back.
+# trade-off tmux users make with vim-tmux-navigator. prefix+ctrl+l clears the
+# pane instead (clear_pane above); `ctrl+v ctrl+l` sends the raw key.
 #
 # Resize is on ctrl+shift rather than alt because Option is the us-altgr-intl
 # compose layer (Option+l is ø) and must stay free for text input.
@@ -413,13 +412,8 @@ window_title = "{workspace}: {terminal_title}"
 # delivery = "off"
 # delay_seconds = 1
 
-# "off" because the jonasws.agent-notify plugin owns desktop notification now.
-# Neither built-in delivery can focus the pane that fired: `terminal` emits OSC 9,
-# whose toasts carry no click action at all, and `system` hardcodes
-# `terminal-notifier -activate <terminal bundle id>`, which raises WezTerm but
-# lands on whatever pane herdr was already showing. The plugin passes the pane id
-# from the event into terminal-notifier's -execute instead.
-# Leaving this on any value other than "off" double-notifies.
+# OSC 9 through WezTerm. Clicking the toast does nothing: OSC 9 carries no click
+# action, so it cannot take you to the pane that fired.
 delivery = "terminal"
 delay_seconds = 5
 [ui.toast.herdr]
