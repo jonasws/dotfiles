@@ -13,13 +13,6 @@ AUTO_INDEX_WORKSPACES=0
 # live here, so the digit on the label is the key that jumps to it.
 AUTO_INDEX_TABS=1
 
-# Named as it is invoked, not as it is installed. `claude` is a fish function
-# wrapping `caveman claude`, and mise shims put a versioned interpreter in the
-# foreground for others.
-PROGRAM_ALIASES=(
-  "lazygit=lg"
-)
-
 # Default is MAX_NAME_LEN + 8 = 28, which cuts a Claude topic mid-thought
 # ("Whoami endpoint with"). The tab bar spans the full terminal here and rarely
 # holds more than a handful of tabs, so it can afford the width.

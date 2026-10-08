@@ -399,10 +399,23 @@ prompt_new_tab_name = false
 # Control -- names the task rather than the machine.
 window_title = "{workspace}: {terminal_title}"
 
-# No [ui.sidebar.agents] override. The topic used to be carried here on a
-# `terminal_title_stripped` row, because the `tab` token only ever said "1".
-# herdr-automatic-rename puts the topic in the tab label itself, which the
-# default rows already render -- a second row would print the same string twice.
+# Claude rows give the session topic a line to itself, since that is the part
+# that tells agents apart. terminal_title_stripped rather than `tab`: the tab
+# label carries herdr-automatic-rename's "[n] " prefix, which is the
+# prefix+n key within one workspace and means nothing in this cross-workspace
+# list. The "claude" agent label is dropped: the pane border already shows it.
+#
+# $ctx is context window remaining (%), reported by
+# claude/statusline-command.sh on every status line refresh, with the status
+# line's thresholds and colours.
+[ui.sidebar.agents.rows_by_agent]
+claude = [
+  ["state_icon", "terminal_title_stripped"],
+  ["workspace", { token = "$ctx", fg = "#74c7ec", rules = [
+    { lt = 11, fg = "#f38ba8", bold = true },
+    { lt = 26, fg = "#f9e2af" },
+  ] }],
+]
 
 [ui.toast]
 # off = disable pop-up notifications
