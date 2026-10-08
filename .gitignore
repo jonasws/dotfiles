@@ -10,7 +10,7 @@ zed/prompts/
 yazi/flavors/
 yazi/plugins/
 nix-darwin/result
-television/.config/television/cable/
+television/cable/
 /.tmp
-/superfile/.config/superfile/theme
-/fnox/.config/fnox/age-se.txt
+/superfile/theme
+/fnox/age-se.txt

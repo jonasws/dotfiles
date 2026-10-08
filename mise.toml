@@ -4,9 +4,9 @@
 # directory — `mise run update` from inside the repo, `mise -C ~/dotfiles run
 # update` from anywhere else.
 #
-# No [tools] section on purpose. The tools are declared in the global config
-# that this repo stows to ~/.config/mise/config.toml; this file exists only to
-# give the tasks a config root of their own.
+# No [tools] section on purpose. The tools are declared in the global config,
+# which the `mise` dotfile group below links to ~/.config/mise/config.toml; this
+# file holds the maintenance tasks and the dotfile declarations.
 #
 # Two cadences. `update` is the daily one: cheap, low blast radius, safe to run
 # unattended. `update:weekly` adds the work that is bandwidth-heavy, deletes
@@ -61,9 +61,9 @@ run = "mise prune --yes"
 
 [tasks."update:skills"]
 description = "Upgrade global agent skills"
-# The lockfile this rewrites is stowed from skills/.agents/.skill-lock.json, so
-# an upgraded skill shows up in the `update` task's closing git status. The CLI
-# writes the lock in place rather than by rename, which is what keeps the stow
+# The lockfile this rewrites is linked from skills/dot-skill-lock.json, so an
+# upgraded skill shows up in the `update` task's closing git status. The CLI
+# writes the lock in place rather than by rename, which is what keeps the
 # symlink intact across runs.
 run = "npx -y skills@latest update --global --yes"
 
@@ -84,7 +84,7 @@ description = "Rewrite the homebrew manifests this repo tracks"
 depends = ["update:brew", "update:brew-weekly"]
 run = [
   "brew bundle dump --global --force --formula --cask --tap",
-  "brew list --versions | sort > homebrew/.config/homebrew/Brewfile.versions",
+  "brew list --versions | sort > homebrew/Brewfile.versions",
 ]
 
 [tasks.update]
@@ -98,3 +98,212 @@ depends = ["update", "update:brew-weekly", "update:mise-prune", "update:manifest
 # `update` prints its own status before the manifests are rewritten; this is
 # the one that reflects the finished run.
 run = "git status --short"
+
+# ── Dotfiles ────────────────────────────────────────────────────────────────
+# `mise -C ~/dotfiles dot apply` deploys this repo into $HOME. One group per
+# application: its directory holds that application's config as it appears on
+# disk, and `target` says where. Groups link each file (`symlink-each`) unless
+# they say `mode = "symlink"`, which links the directory itself — needed where
+# the application writes back into its own config directory (lazy-lock.json,
+# yazi's package.toml), so those writes land in the repo.
+#
+# Files that live directly in $HOME are named `dot-<name>` here and deploy as
+# `.<name>` (`dot_prefix`), so nothing in the repo is hidden from tv or yazi.
+
+[settings]
+dotfiles.root = "~/dotfiles"
+dotfiles.relative_symlinks = true
+
+[dotfile_groups.aws]
+root = "aws"
+target = "~/.aws"
+
+[dotfile_groups.bat]
+root = "bat"
+target = "~/.config/bat"
+
+[dotfile_groups.claude]
+root = "claude"
+target = "~/.claude"
+
+# ~/.claude/skills also holds skills installed from elsewhere, so each skill
+# kept here is linked on its own rather than the whole directory.
+[dotfile_groups.claude.entries]
+"~/.claude/themes" = { mode = "symlink" }
+"~/.claude/skills/brainstorming" = { mode = "symlink" }
+"~/.claude/skills/dispatching-parallel-agents" = { mode = "symlink" }
+"~/.claude/skills/find-docs" = { mode = "symlink" }
+"~/.claude/skills/jvm-sandbox-tests" = { mode = "symlink" }
+"~/.claude/skills/maven-kotlin-builds" = { mode = "symlink" }
+"~/.claude/skills/systematic-debugging" = { mode = "symlink" }
+"~/.claude/skills/test-driven-development" = { mode = "symlink" }
+"~/.claude/skills/watch-subagents" = { mode = "symlink" }
+
+[dotfile_groups.colima]
+root = "colima"
+target = "~/.config/colima"
+# colima rewrites default/colima.yaml on every start; only the template is ours.
+exclude = ["default"]
+
+[dotfile_groups.fish]
+root = "fish"
+target = "~/.config/fish"
+exclude = ["README.md"]
+
+[dotfile_groups.fnox]
+root = "fnox"
+target = "~/.config/fnox"
+exclude = ["README.md", "wrapped"]
+
+[dotfile_groups.fnox-trees]
+root = "fnox-trees"
+
+[dotfile_groups.gh-dash]
+root = "gh-dash"
+target = "~/.config/gh-dash"
+
+[dotfile_groups.ghostty]
+root = "ghostty"
+target = "~/.config/ghostty"
+mode = "symlink"
+
+[dotfile_groups.git]
+root = "git"
+target = "~/.config/git"
+exclude = ["README.md"]
+
+[dotfile_groups.git.entries]
+"~/.config/git/template" = { mode = "symlink" }
+
+[dotfile_groups.herdr]
+root = "herdr"
+target = "~/.config/herdr"
+exclude = ["automatic-rename"]
+
+[dotfile_groups.homebrew]
+root = "homebrew"
+target = "~/.config/homebrew"
+
+[dotfile_groups.hunk]
+root = "hunk"
+target = "~/.config/hunk"
+
+[dotfile_groups.intellij]
+root = "intellij"
+dot_prefix = true
+
+[dotfile_groups.lazygit]
+root = "lazygit"
+target = "~/.config/jesseduffield/lazygit"
+
+[dotfile_groups.lazyvim]
+root = "lazyvim"
+target = "~/.config/nvim"
+mode = "symlink"
+
+[dotfile_groups.lnav]
+root = "lnav"
+target = "~/.config/lnav"
+
+[dotfile_groups.mdcat]
+root = "mdcat"
+target = "~/.config/mdcat"
+mode = "symlink"
+
+[dotfile_groups.mise]
+# Not `mise/`: mise reads <project>/mise/config.toml as project config, which
+# would load the global config a second time whenever it runs in this repo.
+root = "mise-global"
+target = "~/.config/mise"
+
+[dotfile_groups.nono]
+root = "nono"
+target = "~/.config/nono"
+mode = "symlink"
+
+[dotfile_groups.nushell]
+root = "nushell"
+target = "~/.config/nushell"
+exclude = ["functions"]
+
+[dotfile_groups.otree]
+root = "otree"
+target = "~/.config"
+
+[dotfile_groups.posting]
+root = "posting"
+target = "~/.config/posting"
+
+[dotfile_groups.presenterm]
+root = "presenterm"
+target = "~/.config/presenterm"
+mode = "symlink"
+
+[dotfile_groups.ripgrep]
+root = "ripgrep"
+dot_prefix = true
+
+[dotfile_groups.skills]
+root = "skills"
+target = "~/.agents"
+dot_prefix = true
+
+[dotfile_groups.starship]
+root = "starship"
+target = "~/.config"
+
+[dotfile_groups.superfile]
+root = "superfile"
+target = "~/.config/superfile"
+mode = "symlink"
+
+[dotfile_groups.tabiew]
+root = "tabiew"
+target = "~/.config/tabiew"
+mode = "symlink"
+
+[dotfile_groups.television]
+root = "television"
+target = "~/.config/television"
+mode = "symlink"
+
+[dotfile_groups.tig]
+root = "tig"
+dot_prefix = true
+
+[dotfile_groups.tmux]
+root = "tmux"
+dot_prefix = true
+
+[dotfile_groups.tridactyl]
+root = "tridactyl"
+target = "~/.config/tridactyl"
+mode = "symlink"
+
+[dotfile_groups.tuicr]
+root = "tuicr"
+target = "~/.config/tuicr"
+mode = "symlink"
+
+[dotfile_groups.wezterm]
+root = "wezterm"
+dot_prefix = true
+
+[dotfile_groups.yazi]
+root = "yazi"
+target = "~/.config/yazi"
+mode = "symlink"
+
+[dotfile_groups.zed]
+root = "zed"
+target = "~/.config/zed"
+
+[dotfile_groups.zellij]
+root = "zellij"
+target = "~/.config/zellij"
+mode = "symlink"
+
+# Directories that sit beside a group's target rather than inside it.
+[dotfiles]
+"~/.local/bin/wrapped" = { source = "fnox/wrapped", mode = "symlink" }
+"~/.config/herdr-automatic-rename" = { source = "herdr/automatic-rename", mode = "symlink" }

@@ -1,4 +1,4 @@
-# Stow package: git
+# Dotfile group: git
 #
 # Kept here rather than in ~/.gitconfig so it stays version-controlled. Git
 # reads this file in addition to ~/.gitconfig; ~/.gitconfig wins on conflicts,

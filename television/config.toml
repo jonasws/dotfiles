@@ -226,6 +226,7 @@ fallback_channel = "files"
 "alias" = ["alias", "unalias"]
 "env" = ["export", "unset"]
 "dirs" = ["cd", "ls", "rmdir"]
+"zoxide" = ["z"]
 "files" = [
   "fx",
   "cat",

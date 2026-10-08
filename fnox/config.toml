@@ -5,7 +5,7 @@
 # Secrets are referenced here, never stored here: the values live in 1Password
 # and are resolved on demand. This file is safe to commit.
 #
-# Not stowed, and must stay out of git: ~/.config/fnox/age.txt (age identity).
+# Not in this repo, and must stay out of git: ~/.config/fnox/age.txt (age identity).
 
 # Keep secrets out of the interactive shell. They are injected only into
 # `fnox exec` subprocesses, so an agent launched from this shell inherits

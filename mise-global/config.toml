@@ -58,7 +58,6 @@ uv = "latest"
 mitmproxy = "latest"
 "github:mfontanini/presenterm" = "latest"
 "github:riii111/sabiql" = "latest"
-"github:bensadeh/tailspin" = "latest"
 "npm:dotenv-cli" = "latest"
 "github:always-further/nono" = "latest"
 "github:BurntSushi/bttf" = "latest"
@@ -135,7 +134,6 @@ minimum_release_age_excludes = [
   "github:control-theory/gonzo",
   "github:walles/moor",
   "github:pamburus/hl",
-  "github:bensadeh/tailspin",
   "github:mfontanini/presenterm",
 ]
 

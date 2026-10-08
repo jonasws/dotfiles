@@ -263,16 +263,6 @@ checksum = "sha256:d3bbd16f9d4957da3ddf79b29de019e8937d34e8d7efbc76d43368d1f165b
 url = "https://github.com/aws-cloudformation/rain/releases/download/v1.24.4/rain-v1.24.4_darwin-arm64.zip"
 url_api = "https://api.github.com/repos/aws-cloudformation/rain/releases/assets/403585995"
 
-[[tools."github:bensadeh/tailspin"]]
-version = "7.0.0"
-backend = "github:bensadeh/tailspin"
-specifiers = ["latest"]
-
-[tools."github:bensadeh/tailspin"."platforms.macos-arm64"]
-checksum = "sha256:8a815e7c2449c8ba3d25a475cdd92d9d9127b991d7b46e73623d2992e4bb9ce4"
-url = "https://github.com/bensadeh/tailspin/releases/download/7.0.0/tailspin-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/bensadeh/tailspin/releases/assets/476386804"
-
 [[tools."github:control-theory/gonzo"]]
 version = "0.4.3"
 backend = "github:control-theory/gonzo"
