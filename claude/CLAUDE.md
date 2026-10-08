@@ -58,6 +58,29 @@ starts itself — or not need one at all.
 `$TMPDIR` is the tell: the sandbox points it at `/tmp/claude-<uid>`, while an
 unsandboxed shell leaves it at `/var/folders/.../T/`.
 
+## Vy train data MCP servers
+
+`journey` and `ruteplan` overlap. For CargoNet freight — a cargo journey, a terminal
+departure board, a PLC, a top level train ID — prefer `journey`: it is the operational
+source CargoNet itself runs on, and it renders markdown rather than raw Elasticsearch
+documents. Reach for `ruteplan` for what `journey` does not cover: the SIRI/Entur
+pipeline (`trace_siri_pipeline`), train composition, per-stop event streams, raw
+BaneNOR/Trafikverket messages, and passenger traffic.
+
+They share vocabulary without sharing meaning, so do not carry ids or conclusions
+between them:
+
+- A `journey` "journey" is a CargoNet cargo run (UUID). Ruteplan's is a SIRI/Entur
+  `DatedServiceJourney`. Unrelated entities.
+- `journey` takes a PLC (`NO201`); ruteplan uses stopIds (`OSL`). Resolve a PLC with
+  `journey_find_terminal`, not `search_oppoint`.
+- `journey`'s `trainNumber` is the TOP LEVEL number. Ruteplan's "operational train
+  number" is the OTN, one level below it.
+- Both report delays, from different pipeline stages, and can legitimately disagree.
+  Say which one an answer came from.
+
+`nominalDate` does mean the same thing in both: the date the train departs its origin.
+
 ## GitHub
 
 Use the `github` MCP tools. Never the `gh` CLI — it is denied in
