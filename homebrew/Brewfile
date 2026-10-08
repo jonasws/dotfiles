@@ -2,8 +2,16 @@ tap "jetbrains/utils", "https://github.com/JetBrains/homebrew-utils", trusted: t
 tap "teamookla/speedtest", trusted: true
 tap "vjeantet/tap"
 tap "wezterm/wezterm", trusted: { casks: ["wezterm@nightly"] }
+# Age plugin for Apple Secure Enclave
+brew "age-plugin-se"
 # Tool for generating GNU Standards-compliant Makefiles
 brew "automake"
+# C string library for manipulating Unicode strings
+brew "libunistring"
+# Library for command-line editing
+brew "readline"
+# Bourne-Again SHell, a UNIX command interpreter
+brew "bash"
 # Cryptography and SSL/TLS Toolkit
 brew "openssl@3"
 # Clone of cat(1) with syntax highlighting and Git integration
@@ -14,8 +22,6 @@ brew "bat-extras"
 brew "btop"
 # Library for manipulating PNG images
 brew "libpng"
-# C string library for manipulating Unicode strings
-brew "libunistring"
 # Perl compatible regular expressions library with a new API
 brew "pcre2"
 # Vector graphics library with cross-device output support
@@ -32,8 +38,6 @@ brew "csvlens"
 brew "giflib"
 # General-purpose data compression with high compression ratio
 brew "xz"
-# Library for command-line editing
-brew "readline"
 # Docker CLI plugin for extended build capabilities with BuildKit
 brew "docker-buildx"
 # Isolated development environments using Docker
@@ -158,6 +162,8 @@ cask "karabiner-elements"
 cask "nordvpn"
 # Knowledge base that works on top of a local folder of plain text Markdown files
 cask "obsidian"
+# Cloud storage client
+cask "onedrive"
 # Control your tools with a few keystrokes
 cask "raycast"
 # Move and resize windows using keyboard shortcuts or snap areas
