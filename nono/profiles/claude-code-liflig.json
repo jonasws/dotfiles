@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nolabs-ai/nono/refs/heads/main/crates/nono-cli/data/nono-profile.schema.json",
+  "extends": ["claude-code"],
+  "meta": {
+    "name": "claude-code-liflig",
+    "description": null,
+    "author": null
+  },
+  "filesystem": {
+    "allow": ["~/CNOPS/", "~/CX/"],
+    "read": [
+      "~/.mavenrc",
+      "~/.config/gh",
+      "~/.docker",
+      "~/.local/state/claude/locks",
+      "~/.claude/themes",
+      "~/catppuccin/delta/catppuccin.gitconfig"
+    ],
+    "write": [],
+    "allow_file": [
+      "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock",
+      "~/.config/colima/default/docker.sock"
+    ],
+    "read_file": ["~/.gitignore", "~/.rgignore", "~/.config/gh/config.yml"],
+    "write_file": [],
+    "deny": [],
+    "bypass_protection": []
+  },
+  "network": {
+    "block": false
+  }
+}

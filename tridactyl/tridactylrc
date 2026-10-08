@@ -1,0 +1,25 @@
+" Tridactyl runtime config.
+" Reload after edits with `:source` or restart Firefox.
+
+" Full reset on every source (Tridactyl 1.25.0+). Storage otherwise
+" accumulates stale autocmds/subconfigs across `:source` runs forever --
+" `:source` alone only adds/overwrites, never prunes.
+sanitise tridactylconfig
+set configversion 2.0
+
+" --- Theme -------------------------------------------------------------
+
+" Reads themes/catppuccin-mocha.css relative to this file (native messenger
+" required). Local file, not --url, so it's version-controlled here and
+" doesn't depend on network/GitHub uptime at every `:source`.
+colourscheme catppuccin-mocha
+
+" --- Site-specific passthrough ------------------------------------------
+
+" Atlassian Cloud (Jira, Confluence): Tridactyl doesn't run here at all --
+" no content-script injection, no key interception, nothing to fight with
+" the site's own bindings (including `/` for its native search).
+seturl atlassian.net superignore true
+
+" Monkeytype needs raw keystrokes to type.
+autocmd DocStart monkeytype.com mode ignore
