@@ -7,6 +7,7 @@
     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "2"
   },
   "includeCoAuthoredBy": false,
+  "disableClaudeAiConnectors": true,
   "permissions": {
     "allow": [
       "Bash(ctx7 library *)",
@@ -53,6 +54,40 @@
             "type": "command",
             "command": "bash '/Users/jonasws/.claude/hooks/herdr-agent-state.sh' session",
             "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "^resume$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/jonasws/.claude/hooks/subagent-viewer.sh' resume",
+            "async": true,
+            "timeout": 60
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/jonasws/.claude/hooks/subagent-viewer.sh'",
+            "timeout": 30,
+            "async": true
+          }
+        ]
+      }
+    ],
+    "SessionEnd": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/jonasws/.claude/hooks/subagent-viewer.sh' end",
+            "timeout": 5
           }
         ]
       }
