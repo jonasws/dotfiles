@@ -153,7 +153,7 @@ printf '' | jq -R --argjson quiet "$quiet" "$filter" >/dev/null \
 
 tail -F -n +1 "$file" 2>/dev/null \
   | jq -R --unbuffered -r --argjson quiet "$quiet" "$filter" 2>/dev/null \
-  | awk -F'\t' -v c="$colour" -v cols="$cols" '
+  | awk -F'\t' -v c="$colour" -v cols="$cols" -v toolw="${WATCH_AGENT_TOOL_WIDTH:-10}" '
       BEGIN { sep = sprintf("%c", 1); width = cols + 0 }
       function dim(s)   { return "\033[2m"  s "\033[0m" }
       function tint(s)  { return "\033[" c "m" s "\033[0m" }
@@ -172,6 +172,15 @@ tail -F -n +1 "$file" 2>/dev/null \
         return width
       }
       function clip(s, n) { return length(s) > n ? substr(s, 1, n - 1) "\342\200\246" : s }
+      # tool names in one fixed-width column, so the arguments line up. The
+      # default width fits every built-in tool; MCP names lose their mcp__
+      # prefix (mcp__fff__grep -> fff:grep) and the final report reads as handback.
+      function short(s) {
+        if (s == "SubagentHandback") return "handback"
+        if (sub(/^mcp__/, "", s)) sub(/__/, ":", s)
+        return s
+      }
+      function fixed(s, n) { return length(s) > n ? clip(s, n) : s sprintf("%" (n - length(s)) "s", "") }
 
       $1 == "P" { gsub(sep, "\n           ", $3)
                   printf "%s %s %s\n\n", dim($2), tint("\342\226\270"), $3; fflush(); next }
@@ -180,9 +189,9 @@ tail -F -n +1 "$file" 2>/dev/null \
                   gsub(sep, "\n           ", $3)
                   printf "%s %s %s\n",    dim($2), tint("\342\227\207"), think($3); fflush(); next }
       # one tool call is one line: "HH:MM:SS " + marker + " " + name + " " is 12
-      # columns of prefix plus the name, and the argument gets what is left
-      $1 == "T" { budget = pane_width() - 12 - length($3)
+      # columns of prefix plus the name column, and the argument gets what is left
+      $1 == "T" { budget = pane_width() - 12 - toolw
                   if (budget < 24) budget = 24
-                  printf "%s %s %s %s\n",  dim($2), tint("\302\267"), tool($3), dim(clip($4, budget)); fflush(); next }
+                  printf "%s %s %s %s\n",  dim($2), tint("\302\267"), tool(fixed(short($3), toolw)), dim(clip($4, budget)); fflush(); next }
       $1 == "E" { printf "%s %s %s\n",     dim($2), bad("\342\234\227"), bad($3); fflush(); next }
     '

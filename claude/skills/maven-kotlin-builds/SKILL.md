@@ -1,21 +1,9 @@
 ---
 name: maven-kotlin-builds
-description: Run or fix Maven builds in the Vy Kotlin repos under ~/CX, ~/CNOPS and ~/CN-TERMINAL. Use when a build hits "Operation not permitted" on the Kotlin daemon directory, when a dependency or plugin fails with "Cannot access ... in offline mode", or when deciding whether to reach for -Dkotlin.compiler.daemon=false.
+description: Run or fix Maven builds in the Vy Kotlin repos under ~/CX, ~/CNOPS and ~/CN-TERMINAL. Use when a dependency or plugin fails with "Cannot access ... in offline mode", or when a build behaves differently inside and outside the sandbox.
 ---
 
 # Maven with Kotlin
-
-Run Maven plainly — `mvn test`. The Kotlin compile daemon works inside the sandbox
-because `~/Library/Application Support/kotlin` is in `sandbox.filesystem.allowWrite`
-and `allowLocalBinding` is on for the daemon's RMI port.
-
-If a build fails with
-`java.nio.file.FileSystemException: ~/Library/Application Support/kotlin/daemon/... Operation not permitted`,
-that allowWrite entry is missing. Restore it rather than reaching for
-`-Dkotlin.compiler.daemon=false`; the flag is a fallback for a shell whose sandbox
-you do not control, and it costs a cold compiler on every invocation. Never set it
-in a pom or `.mvn/maven.config` — that slows every build, CI's included, to work
-around one shell.
 
 `kotlin.compiler.daemon` is the Maven property. `kotlin.compiler.execution.strategy`
 is the Gradle equivalent and is silently ignored by `kotlin-maven-plugin`.
