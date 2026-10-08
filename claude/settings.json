@@ -7,7 +7,6 @@
     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "2"
   },
   "includeCoAuthoredBy": false,
-  "disableClaudeAiConnectors": true,
   "permissions": {
     "allow": [
       "Bash(ctx7 library *)",
@@ -44,11 +43,12 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "opus",
+  "model": "sonnet",
+  "disableClaudeAiConnectors": true,
   "hooks": {
     "SessionStart": [
       {
-        "matcher": "*",
+        "matcher": "^(startup|resume|clear|compact|fork)$",
         "hooks": [
           {
             "type": "command",
@@ -110,7 +110,8 @@
     "feature-dev@claude-plugins-official": true,
     "skill-creator@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": true,
-    "claude-code-setup@claude-plugins-official": true
+    "claude-code-setup@claude-plugins-official": true,
+    "aws-core@agent-toolkit-for-aws": true
   },
   "extraKnownMarketplaces": {
     "playwright-skill": {
@@ -130,6 +131,12 @@
       "source": {
         "source": "github",
         "repo": "ayghri/i-have-adhd"
+      }
+    },
+    "agent-toolkit-for-aws": {
+      "source": {
+        "source": "github",
+        "repo": "aws/agent-toolkit-for-aws"
       }
     }
   },
