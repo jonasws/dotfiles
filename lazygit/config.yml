@@ -29,8 +29,8 @@ gui:
       - "#cdd6f4"
     searchingActiveBorderColor:
       - "#f9e2af"
-  authorColors:
-    "*": "#b4befe"
+    authorColors:
+      "*": "#b4befe"
 disableStartupPopups: true
 git:
   autoFetch: false
@@ -38,7 +38,7 @@ git:
     order: default
   diffRenderers:
     - colorArg: always
-      command: delta --dark --paging=never
+      command: delta --{{colorScheme}} --paging=never --line-numbers --hyperlinks --hyperlinks-file-link-format="lazygit-edit://{path}:{line}"
   commit:
     signOff: false
   parseEmoji: true
