@@ -1,8 +1,8 @@
 # Dotfile group: git
 #
-# Kept here rather than in ~/.gitconfig so it stays version-controlled. Git
-# reads this file in addition to ~/.gitconfig; ~/.gitconfig wins on conflicts,
-# so nothing here overrides settings already there.
+# The global git config. There is no ~/.gitconfig: with it absent, git reads
+# this file as the global config and `git config --global` writes here, so
+# changes land in the repo.
 #
 # templateDir seeds .git/hooks at clone and init time. Existing repos need the
 # hook copied in once; see README.
@@ -12,3 +12,55 @@
 #   [ERROR] Cowardly refusing to install hooks with `core.hooksPath` set.
 [init]
 	templateDir = ~/.config/git/template
+
+[alias]
+	newest-tag = describe --abbrev=0
+	log = log --author=\"^(?!.*renovate\\[bot\\]).*$\" --perl-regexp
+[user]
+	name = Jonas Strømsodd
+	email = 2318955+jonasws@users.noreply.github.com
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKNfFNPjBlq1617HGs0m5taYVPg7s+PgbeJlnATJDAO4
+
+[core]
+	; pager = hunk pager
+	pager = delta
+	excludesFile = ~/.gitignore
+
+[diff]
+	colorMoved = default
+
+[interactive]
+	diffFilter = delta --color-only
+
+[include]
+	path = ~/catppuccin/delta/catppuccin.gitconfig
+
+[delta]
+	navigate = true  # use n and N to move between diff sections
+	dark = true      # or light = true, or omit for auto-detection
+	light = false
+	hyperlinks = true
+	true-color = always
+	side-by-side = true
+	line-numbers = true
+	features = catppuccin-mocha my-tweaks
+
+# Mocha's overlay0 gutter is 3.4:1 on base; overlay2 clears 4.5:1.
+[delta "my-tweaks"]
+	line-numbers-left-style = "#9399b2"
+	line-numbers-right-style = "#9399b2"
+	line-numbers-zero-style = "#9399b2"
+
+[gpg]
+	format = ssh
+
+[gpg "ssh"]
+	program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign"
+[commit]
+	gpgsign = true
+[grep]
+	patternType = perl
+[merge]
+	tool = nvimdiff
+[mergetool "nvimdiff"]
+	layout = "LOCAL,BASE,REMOTE / MERGED"

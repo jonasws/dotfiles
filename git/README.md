@@ -1,8 +1,9 @@
 # git
 
-Global git configuration, kept in `~/.config/git/` rather than `~/.gitconfig`
-so it stays version-controlled. Git reads both; `~/.gitconfig` wins on
-conflicts, so nothing here overrides what is already there.
+Global git configuration, kept in `~/.config/git/` so it stays
+version-controlled. There is no `~/.gitconfig`: git only falls back to
+`~/.config/git/config` for `git config --global` writes when that file is
+absent, and a stray one would win on conflicts.
 
 ```sh
 mise dot apply
