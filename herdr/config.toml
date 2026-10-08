@@ -155,7 +155,7 @@ navigate_pane_up = "up"
 # at a time; this jumps straight to any pane. The channel lists panes
 # attention-first (blocked, done, idle, working, other commands, shells) and
 # Enter focuses the selected pane over the socket API.
-# Channel: television/.config/television/cable/herdr-sessions.toml
+# Channel: television/cable/herdr-sessions.toml
 [[keys.command]]
 key = "prefix+f"
 type = "popup"
@@ -194,7 +194,7 @@ height = "80%"
 # to its `actions:workspace` (open/focus a Herdr workspace for the repo) --
 # no separate cable channel needed for that. Overrides resize mode's
 # prefix+r on purpose.
-# Channel: television/.config/television/cable/git-repos.toml
+# Channel: television/cable/git-repos.toml
 [[keys.command]]
 key = "prefix+r"
 type = "popup"
@@ -206,7 +206,7 @@ height = "80%"
 # layout. No -k override needed -- the channel's own `enter` binding is
 # already actions:open-browser. ctrl-e (actions:export) still works too,
 # since there is no way to unbind a channel keybinding per-invocation.
-# Channel: television/.config/television/cable/aws-profiles.toml
+# Channel: television/cable/aws-profiles.toml
 [[keys.command]]
 key = "prefix+shift+o"
 type = "popup"

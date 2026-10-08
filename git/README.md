@@ -5,7 +5,7 @@ so it stays version-controlled. Git reads both; `~/.gitconfig` wins on
 conflicts, so nothing here overrides what is already there.
 
 ```sh
-stow git
+mise dot apply
 ```
 
 ## What it does

@@ -1,17 +1,16 @@
 # fnox Configuration
 
-Machine-wide [fnox](https://fnox.jdx.dev) configuration, managed with GNU stow.
+Machine-wide [fnox](https://fnox.jdx.dev) configuration, deployed by the `fnox` dotfile group in `mise.toml`.
 
 ## Structure
 
 ```
-fnox/
-└── .config/
-    └── fnox/
-        └── config.toml    # providers, secrets, profiles — references only
+fnox/                  # deployed to ~/.config/fnox/
+├── config.toml        # providers, secrets, profiles — references only
+└── wrapped/           # deployed to ~/.local/bin/wrapped/
 ```
 
-`~/.config/fnox/age.txt` (the age identity) lives next to the stowed config but is
+`~/.config/fnox/age.txt` (the age identity) lives next to the linked config but is
 deliberately not in this repository.
 
 ## Setup
@@ -19,10 +18,10 @@ deliberately not in this repository.
 From the dotfiles root:
 
 ```sh
-stow fnox
+mise dot apply
 ```
 
-This symlinks `fnox/.config/fnox/config.toml` to `~/.config/fnox/config.toml`.
+This symlinks `fnox/config.toml` to `~/.config/fnox/config.toml`.
 
 ## Design rules
 
@@ -79,7 +78,7 @@ path with
 ```
 
 So if a sync is ever genuinely needed here, treat it as disposable: run it, use it,
-then throw the edits away with `git checkout fnox/.config/fnox/config.toml`. There
+then throw the edits away with `git checkout fnox/config.toml`. There
 is no unsync command — removing a `sync` sub-table is a manual edit.
 
 Project-level configs are the place where syncing is actually comfortable: a

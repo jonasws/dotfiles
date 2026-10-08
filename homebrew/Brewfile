@@ -120,8 +120,6 @@ brew "ripgrep"
 brew "rm-improved"
 # Intuitive find & replace CLI
 brew "sd"
-# Organize software neatly under a single directory tree (e.g. /usr/local)
-brew "stow"
 # TUI to view and query tabular files (CSV,TSV, Parquet, etc.)
 brew "tabiew"
 # User interface to the TELNET protocol

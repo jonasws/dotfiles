@@ -11,7 +11,7 @@
 ; console / assume-role sessions at 1h. That ceiling is AWS-enforced.
 ;
 ; Activate with:
-;   AWS_CONFIG_FILE=~/dotfiles/aws/.aws/config-vault
+;   AWS_CONFIG_FILE=~/dotfiles/aws/config-vault
 ; or symlink in place of ~/.aws/config.
 ;
 ; One-time seeding of master IAM user creds. Store them in the `login`
