@@ -43,7 +43,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "sonnet",
+  "model": "opus",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "SessionStart": [
@@ -63,8 +63,18 @@
           {
             "type": "command",
             "command": "bash '/Users/jonasws/.claude/hooks/subagent-viewer.sh' resume",
-            "async": true,
-            "timeout": 60
+            "timeout": 60,
+            "async": true
+          }
+        ]
+      },
+      {
+        "matcher": "^(startup|resume|clear|compact)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/jonasws/.claude/hooks/tasks-sidebar.sh' session",
+            "timeout": 10
           }
         ]
       }
@@ -88,6 +98,24 @@
             "type": "command",
             "command": "bash '/Users/jonasws/.claude/hooks/subagent-viewer.sh' end",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "bash '/Users/jonasws/.claude/hooks/tasks-sidebar.sh' end",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^(Write|Edit|MultiEdit)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash '/Users/jonasws/.claude/hooks/tasks-sidebar.sh'",
+            "timeout": 15,
+            "async": true
           }
         ]
       }

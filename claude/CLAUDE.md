@@ -89,6 +89,30 @@ is empty and the fnox wrapper that fed it `GH_TOKEN` has been removed. The token
 now exists only inside `github-mcp-server`, which Claude Code starts outside the
 sandbox as `fnox exec -- github-mcp-server stdio`.
 
+## Task lists
+
+Track progress on multi-step work in a task file, and tick items off as each one
+lands. A request to "track progress in TASKS.md" means this file too.
+
+- The file is `TASKS-<session-id>.md` at the repo root, one per session, so
+  parallel sessions and worktrees don't share one. A SessionStart hook gives the
+  exact path. `TASKS-*.md` is gitignored globally.
+- Put the title in frontmatter, `title: Tasks for Claude session <session-id>`,
+  not in a `#` heading: the file is shown in a narrow herdr taskbar, where a
+  rendered heading wastes rows.
+- Use GitHub task list items (`- [ ]` / `- [x]`), one line each, and `##`
+  headings only to group many items.
+- Work the list top to bottom and tick each item as soon as it lands, not in a
+  batch at the end. The first unchecked item counts as the task in progress: the
+  taskbar highlights it and herdr's sidebar shows it as `$task`, beside the
+  done/total count `$tasks`. Reorder the list rather than skip ahead.
+- Add items as new work appears, including requests that arrive mid-task.
+- Only the main agent writes the file. Subagents report back, and the main agent
+  ticks their items.
+- Writing the file opens the taskbar beside the Claude pane
+  (`claude/hooks/toggle-herdr-taskbar.sh`). `prefix+t` in herdr and `/taskbar`
+  toggle it.
+
 ## Commit messages
 
 Indent the body with 2 spaces (from line 2 and below).
