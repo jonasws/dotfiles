@@ -95,6 +95,11 @@ pre-commit = "latest"
 hwatch = "latest"
 "ubi:thiagokokada/gh-gfm-preview" = "latest"
 usage = "6.9.0"
+# The task board (claude/CLAUDE.md "Task board"). After an upgrade, refresh the
+# Claude skill: tsk's own `tsk update` only manages installer copies. The herdr
+# plugin needs nothing, since `tsk setup herdr` was run through the install
+# dir's `latest` symlink. `|| true` because an unchanged skill exits 1.
+"github:smarzban/tsk" = { version = "latest", postinstall = "\"$MISE_TOOL_INSTALL_PATH/tsk\" setup claude || true" }
 
 [settings]
 # No `lockfile = true`: that creates a mise.lock in every project mise touches,
@@ -141,6 +146,9 @@ minimum_release_age_excludes = [
 credential_command = "fnox get MISE_GITHUB_TOKEN"
 
 [env]
+# mise upgrades tsk; its board banner would otherwise advise `tsk update`.
+TSK_NO_UPDATE_CHECK = "1"
+
 # Commands that must run under `fnox exec` to receive their credentials. mise
 # orders these ahead of tool directories, so the wrapper here wins over the
 # maven that mise itself provisions.

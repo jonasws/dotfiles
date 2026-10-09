@@ -2,7 +2,3 @@
 **/.claude/.cc-writes/
 **/CLAUDE.local.md
 kls_database.db
-
-# Per-session Claude Code task lists, rendered by herdr's taskbar
-# (claude/hooks/toggle-herdr-taskbar.sh).
-TASKS-*.md

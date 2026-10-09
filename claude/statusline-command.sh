@@ -10,14 +10,12 @@ input=$(cat)
   IFS= read -r remaining
   IFS= read -r effort
   IFS= read -r five_pct
-  IFS= read -r session_id
 } < <(jq -r '
   (.workspace.current_dir // .cwd // ""),
   (.model.display_name // ""),
   (.context_window.remaining_percentage // ""),
   (.effort.level // ""),
-  (.rate_limits.five_hour.used_percentage // ""),
-  (.session_id // "")
+  (.rate_limits.five_hour.used_percentage // "")
 ' <<<"$input")
 
 # Catppuccin Mocha, matching starship/starship.toml and herdr's theme.
@@ -114,8 +112,6 @@ done
 # herdr/config.toml):
 #   $ctx                  context remaining, a bare number because herdr's
 #                         gt/lt colour rules only match values that parse as one
-#   $tasks                done/total in this session's TASKS-<session-id>.md
-#   $task                 its first unchecked item, the one being worked on
 #   $title_l1, $title_l2  the session topic word-wrapped over two rows, since
 #                         herdr truncates a row instead of wrapping it
 # No --seq: herdr keeps a source's highest seq for the pane's lifetime, so one
@@ -144,26 +140,12 @@ wrap_title() {
 }
 
 report_herdr_tokens() {
-  local args=() root file total done_count tasks="" task="" title
+  local args=() title
   [ -n "${remaining_int:-}" ] && args+=(--token "ctx=${remaining_int}")
-
-  if [ -n "$session_id" ] && [ -n "$cwd" ]; then
-    root=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null || echo "$cwd")
-    file="$root/TASKS-$session_id.md"
-    if [ -f "$file" ]; then
-      total=$(grep -cE '^[[:space:]]*[-*] \[[ xX]\]' "$file")
-      done_count=$(grep -cE '^[[:space:]]*[-*] \[[xX]\]' "$file")
-      [ "$total" -gt 0 ] && tasks="${done_count}/${total}"
-      # Markdown emphasis and code markers stripped: herdr shows tokens as text.
-      task=$(grep -m1 -E '^[[:space:]]*[-*] \[ \] ' "$file" | sed -E 's/^[[:space:]]*[-*] \[ \] //; s/[`*_]//g')
-    fi
-  fi
-  if [ -n "$tasks" ]; then args+=(--token "tasks=$tasks"); else args+=(--clear-token tasks); fi
-  if [ -n "$task" ]; then args+=(--token "task=$task"); else args+=(--clear-token task); fi
 
   title=$(herdr pane get "$HERDR_PANE_ID" 2>/dev/null | jq -r '.result.pane.terminal_title_stripped // empty')
   case "$title" in claude | "claude "*) title="" ;; esac
-  wrap_title "$title" $((TITLE_WIDTH - (${#tasks} > 0 ? ${#tasks} + 1 : 0)))
+  wrap_title "$title" "$TITLE_WIDTH"
   for t in title_l1 title_l2; do
     if [ -n "${!t}" ]; then args+=(--token "$t=${!t}"); else args+=(--clear-token "$t"); fi
   done

@@ -181,15 +181,6 @@ type = "plugin_action"
 command = "herdr-bar.open"
 description = "command bar"
 
-# Hide or show the taskbar: the focused Claude session's TASKS-<session-id>.md
-# in a 30% split on the right. Claude opens it when it writes that file, and
-# /taskbar in Claude Code toggles it too.
-[[keys.command]]
-key = "prefix+t"
-type = "shell"
-command = "bash ~/.claude/hooks/toggle-herdr-taskbar.sh toggle"
-description = "toggle taskbar"
-
 # Lazygit in a session-modal popup, so it does not disturb the tab layout.
 [[keys.command]]
 key = "prefix+l"
@@ -277,6 +268,22 @@ command = "herdr-splits.resize-up"
 key = "ctrl+shift+l"
 type = "plugin_action"
 command = "herdr-splits.resize-right"
+
+# tsk: the task board shared by me and my Claude sessions, across every repo.
+# Registered with `tsk setup herdr` (mise: github:smarzban/tsk), which
+# links the herdr-tsk plugin and adds these two bindings. Capture moved off
+# tsk's default prefix+a, which next_agent owns.
+[[keys.command]]
+key = "prefix+t"
+type = "plugin_action"
+command = "herdr-tsk.open-board"
+description = "tsk board"
+
+[[keys.command]]
+key = "prefix+ctrl+t"
+type = "plugin_action"
+command = "herdr-tsk.quick-capture"
+description = "tsk quick capture"
 # -----------------------------------------------------------------------------
 
 # Legacy indexed shortcut config is still parsed for compatibility.
@@ -415,15 +422,12 @@ window_title = "{workspace}: {terminal_title}"
 # topic fits on one line. The "claude" agent label is dropped: the pane border
 # already shows it.
 #
-# $tasks is done/total in the session's TASKS-<session-id>.md, $task its
-# first unchecked item (the one in progress), and $ctx is context window
-# remaining (%) with the status line's thresholds and colours. All come from
-# the same status line report.
+# $ctx is context window remaining (%) with the status line's thresholds and
+# colours, from the same status line report.
 [ui.sidebar.agents.rows_by_agent]
 claude = [
-  ["state_icon", { token = "$tasks", fg = "#a6e3a1" }, "$title_l1"],
+  ["state_icon", "$title_l1"],
   ["$title_l2"],
-  [{ token = "$task", dim = true }],
   ["workspace", { token = "$ctx", fg = "#74c7ec", rules = [
     { lt = 11, fg = "#f38ba8", bold = true },
     { lt = 26, fg = "#f9e2af" },

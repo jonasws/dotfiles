@@ -405,6 +405,16 @@ checksum = "sha256:124ab147c2f6a10cc6a68431e961d7bf15d4650791a102ffd5437c858e440
 url = "https://github.com/riii111/sabiql/releases/download/v3.0.1/sabiql-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/riii111/sabiql/releases/assets/545712684"
 
+[[tools."github:smarzban/tsk"]]
+version = "0.11.6"
+backend = "github:smarzban/tsk"
+specifiers = ["latest"]
+
+[tools."github:smarzban/tsk"."platforms.macos-arm64"]
+checksum = "sha256:af1bdca059d1bbb0fd95c1a821f4289d86f50207b0729a8a396c6ca79ffebadc"
+url = "https://github.com/smarzban/tsk/releases/download/v0.11.6/tsk-v0.11.6-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/smarzban/tsk/releases/assets/582195494"
+
 [[tools."github:walles/moor"]]
 version = "2.19.3"
 backend = "github:walles/moor"

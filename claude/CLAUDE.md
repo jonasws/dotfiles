@@ -89,29 +89,27 @@ is empty and the fnox wrapper that fed it `GH_TOKEN` has been removed. The token
 now exists only inside `github-mcp-server`, which Claude Code starts outside the
 sandbox as `fnox exec -- github-mcp-server stdio`.
 
-## Task lists
+## Task board
 
-Track progress on multi-step work in a task file, and tick items off as each one
-lands. A request to "track progress in TASKS.md" means this file too.
+Work that outlives one session goes on the tsk board (`tsk`, installed by mise
+as `github:smarzban/tsk`), shared by me and every Claude session across all repos.
+Inside a git repo the board scopes to that repo's project. The `tsk-cli` skill
+has the commands and the exit contract; a SessionStart hook lists the repo's
+live tasks.
 
-- The file is `TASKS-<session-id>.md` at the repo root, one per session, so
-  parallel sessions and worktrees don't share one. A SessionStart hook gives the
-  exact path. `TASKS-*.md` is gitignored globally.
-- Put the title in frontmatter, `title: Tasks for Claude session <session-id>`,
-  not in a `#` heading: the file is shown in a narrow herdr taskbar, where a
-  rendered heading wastes rows.
-- Use GitHub task list items (`- [ ]` / `- [x]`), one line each, and `##`
-  headings only to group many items.
-- Work the list top to bottom and tick each item as soon as it lands, not in a
-  batch at the end. The first unchecked item counts as the task in progress: the
-  taskbar highlights it and herdr's sidebar shows it as `$task`, beside the
-  done/total count `$tasks`. Reorder the list rather than skip ahead.
-- Add items as new work appears, including requests that arrive mid-task.
-- Only the main agent writes the file. Subagents report back, and the main agent
-  ticks their items.
-- Writing the file opens the taskbar beside the Claude pane
-  (`claude/hooks/toggle-herdr-taskbar.sh`). `prefix+t` in herdr and `/taskbar`
-  toggle it.
+- Add a task when work is deferred, split off, or found along the way, not for
+  steps you will finish this session. Use steps (`tsk steps`) only when I want
+  the order of work tracked on a task.
+- Picking up a task: `tsk status T<n> start`, tick its steps as they land, then
+  `review` with one line on what to look at. Only I set `done`.
+- Won't do: when we decide against something, record the decision instead of
+  dropping it. Archive the task (`tsk archive`) with notes starting
+  `Won't do: <reason>`, so a later session doesn't propose it again.
+- Only the main agent writes to the board. Subagents report back.
+- In a git worktree, pass `-p <main checkout path>` to `tsk add` and `tsk list`:
+  tsk otherwise treats each worktree as its own project. The SessionStart hook
+  names the path.
+- In herdr, `prefix+t` opens the board and `prefix+ctrl+t` quick capture.
 
 ## Commit messages
 
