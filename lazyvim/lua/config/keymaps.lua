@@ -7,6 +7,7 @@
 -- against wezterm. Both expose move_cursor_* and resize_*, so the bindings below
 -- are identical either way — only the backend differs.
 local in_herdr = vim.env.HERDR_ENV == "1"
+local mc = require("util.multicursor")
 local ok, splits = pcall(require, in_herdr and "herdr-splits" or "smart-splits")
 
 if not ok then
@@ -25,10 +26,18 @@ else
   vim.keymap.set("n", "<C-h>", splits.move_cursor_left)
   vim.keymap.set("n", "<C-j>", splits.move_cursor_down)
   vim.keymap.set("n", "<C-k>", splits.move_cursor_up)
-  vim.keymap.set("n", "<C-l>", splits.move_cursor_right)
+  -- <C-l> is also the built-in multicursor clear (nvim 0.13+), so it clears
+  -- cursors when the buffer has any and only navigates otherwise.
+  vim.keymap.set("n", "<C-l>", function()
+    if mc.active() then
+      mc.clear()
+    else
+      splits.move_cursor_right()
+    end
+  end, { desc = "Clear multicursors / go to right split" })
 
-  -- herdr-splits has no previous-pane equivalent, so this stays smart-splits-only.
-  if not in_herdr then
+  -- herdr-splits and smart-splits v3 have no previous-pane equivalent.
+  if splits.move_cursor_previous then
     vim.keymap.set("n", "<C-\\>", splits.move_cursor_previous)
   end
 end

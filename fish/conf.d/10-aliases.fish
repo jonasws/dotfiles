@@ -3,7 +3,6 @@ alias grt "cd (git rev-parse --show-toplevel)"
 alias top btop
 alias vim nvim
 alias c clear
-alias n nvim
 alias as-tree "command tree --fromfile"
 alias zp zed-preview
 

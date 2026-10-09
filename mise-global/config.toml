@@ -165,3 +165,7 @@ fnox --no-color profiles | awk 'NR > 1 && $1 !~ /^(default|gh|gcalcli)$/ { print
   fnox sync -g -p sync-age -P "$profile" --no-defaults -f
 done
 '''
+
+[shell_alias]
+nvn = "~/.local/share/mise/installs/neovim/nightly/bin/nvim"
+n = "nvim"
