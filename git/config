@@ -24,7 +24,7 @@
 [core]
 	; pager = hunk pager
 	pager = delta
-	excludesFile = ~/.gitignore
+	excludesFile = ~/.config/git/ignore
 
 [diff]
 	colorMoved = default
