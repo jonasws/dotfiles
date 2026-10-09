@@ -12,7 +12,16 @@
       "Bash(ctx7 library *)",
       "Bash(ctx7 docs *)",
       "Bash(ctx7 login)",
-      "Bash(npx ctx7@latest *)"
+      "Bash(npx ctx7@latest *)",
+      "Bash(tsk add *)",
+      "Bash(tsk list *)",
+      "Bash(tsk status *)",
+      "Bash(tsk steps *)",
+      "Bash(tsk edit *)",
+      "Bash(tsk archive *)",
+      "Bash(tsk help *)",
+      "Bash(tsk --help)",
+      "Bash(tsk --version)"
     ],
     "deny": [
       "WebSearch",
@@ -69,11 +78,11 @@
         ]
       },
       {
-        "matcher": "^(startup|resume|clear|compact)$",
+        "matcher": "^(startup|resume|clear)$",
         "hooks": [
           {
             "type": "command",
-            "command": "bash '/Users/jonasws/.claude/hooks/tasks-sidebar.sh' session",
+            "command": "bash '/Users/jonasws/.claude/hooks/tsk-context.sh'",
             "timeout": 10
           }
         ]
@@ -98,24 +107,6 @@
             "type": "command",
             "command": "bash '/Users/jonasws/.claude/hooks/subagent-viewer.sh' end",
             "timeout": 5
-          },
-          {
-            "type": "command",
-            "command": "bash '/Users/jonasws/.claude/hooks/tasks-sidebar.sh' end",
-            "timeout": 5
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "^(Write|Edit|MultiEdit)$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash '/Users/jonasws/.claude/hooks/tasks-sidebar.sh'",
-            "timeout": 15,
-            "async": true
           }
         ]
       }
@@ -184,7 +175,8 @@
       "allowWrite": [
         "~/Library/Caches/mise",
         "~/.m2/repository",
-        "~/Library/Application Support/kotlin"
+        "~/Library/Application Support/kotlin",
+        "~/.tsk"
       ],
       "denyRead": [
         "~/.ssh/id_rsa",
