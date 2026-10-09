@@ -181,6 +181,15 @@ type = "plugin_action"
 command = "herdr-bar.open"
 description = "command bar"
 
+# Hide or show the taskbar: the focused Claude session's TASKS-<session-id>.md
+# in a 30% split on the right. Claude opens it when it writes that file, and
+# /taskbar in Claude Code toggles it too.
+[[keys.command]]
+key = "prefix+t"
+type = "shell"
+command = "bash ~/.claude/hooks/toggle-herdr-taskbar.sh toggle"
+description = "toggle taskbar"
+
 # Lazygit in a session-modal popup, so it does not disturb the tab layout.
 [[keys.command]]
 key = "prefix+l"
@@ -399,18 +408,22 @@ prompt_new_tab_name = false
 # Control -- names the task rather than the machine.
 window_title = "{workspace}: {terminal_title}"
 
-# Claude rows give the session topic a line to itself, since that is the part
-# that tells agents apart. terminal_title_stripped rather than `tab`: the tab
-# label carries herdr-automatic-rename's "[n] " prefix, which is the
-# prefix+n key within one workspace and means nothing in this cross-workspace
-# list. The "claude" agent label is dropped: the pane border already shows it.
+# Claude rows give the session topic two lines of its own, since that is the
+# part that tells agents apart. herdr truncates rather than wraps, so
+# claude/statusline-command.sh word-wraps the topic into $title_l1 and
+# $title_l2 on every status line refresh; $title_l2 and its row vanish when the
+# topic fits on one line. The "claude" agent label is dropped: the pane border
+# already shows it.
 #
-# $ctx is context window remaining (%), reported by
-# claude/statusline-command.sh on every status line refresh, with the status
-# line's thresholds and colours.
+# $tasks is done/total in the session's TASKS-<session-id>.md, $task its
+# first unchecked item (the one in progress), and $ctx is context window
+# remaining (%) with the status line's thresholds and colours. All come from
+# the same status line report.
 [ui.sidebar.agents.rows_by_agent]
 claude = [
-  ["state_icon", "terminal_title_stripped"],
+  ["state_icon", { token = "$tasks", fg = "#a6e3a1" }, "$title_l1"],
+  ["$title_l2"],
+  [{ token = "$task", dim = true }],
   ["workspace", { token = "$ctx", fg = "#74c7ec", rules = [
     { lt = 11, fg = "#f38ba8", bold = true },
     { lt = 26, fg = "#f9e2af" },
