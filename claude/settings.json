@@ -52,7 +52,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "sonnet",
+  "model": "opus",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "SessionStart": [
@@ -130,7 +130,8 @@
     "skill-creator@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
-    "aws-core@agent-toolkit-for-aws": true
+    "aws-core@agent-toolkit-for-aws": true,
+    "kotlin-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "playwright-skill": {
