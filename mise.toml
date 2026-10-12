@@ -120,6 +120,10 @@ run = "git status --short"
 dotfiles.root = "~/dotfiles"
 dotfiles.relative_symlinks = true
 
+[dotfile_groups.atuin]
+root = "atuin"
+target = "~/.config/atuin"
+
 [dotfile_groups.aws]
 root = "aws"
 target = "~/.aws"

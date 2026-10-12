@@ -4,7 +4,7 @@
 complete -c tv -f
 
 # Complete channel names for the first argument
-complete -c tv -n __fish_is_first_token -a "dotfiles man-pages procs docker-images git-log git-diff git-branch dirs text fish-history aws-secrets git-repos files env nu-history"
+complete -c tv -n __fish_is_first_token -a "dotfiles man-pages procs docker-images git-log git-diff git-branch dirs text aws-secrets git-repos files env nu-history"
 
 # Complete commands
 complete -c tv -n __fish_is_first_token -a list-channels -d "Lists the available channels"

@@ -1,0 +1,31 @@
+# Atuin records history and owns ctrl-r (bound in
+# fish/functions/fish_user_key_bindings.fish). Fish keeps its own up-or-search
+# on up, ctrl-p and k, so ATUIN_NOBIND stops atuin binding anything itself.
+
+# mise upgrades atuin.
+update_check = false
+
+# No sync account.
+auto_sync = false
+
+# Enter puts the command on the prompt instead of running it.
+enter_accept = false
+
+# Search bar on top, like the tv pickers.
+invert = true
+
+# Start in vim insert or normal mode, matching fish's mode when ctrl-r is hit.
+keymap_mode = "auto"
+
+filter_mode = "global"
+
+# Enables the `workspace` filter (the current git repo).
+workspaces = true
+
+# Esc on an empty search closes it, like tv; with a query typed it enters
+# normal mode for j/k browsing. Esc in normal mode closes.
+[keymap.vim-insert]
+"esc" = [
+  { when = "input-empty", action = "exit" },
+  { action = "vim-enter-normal" },
+]
