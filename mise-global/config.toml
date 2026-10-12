@@ -36,9 +36,6 @@ node = "24"
 "npm:typescript-language-server" = "latest"
 "pipx:awslogs" = "latest"
 "pipx:posting" = "latest"
-# postgres-mcp 0.3.0 declares mcp[cli]>=1.5.0; mcp 2.0 removed mcp.server.fastmcp,
-# so the dependency must stay on the 1.x line.
-"pipx:postgres-mcp" = { version = "latest", uvx_args = "--with mcp[cli]<2" }
 "pipx:sqlit-tui" = "latest"
 "pipx:xmlformatter" = "latest"
 python = "latest"

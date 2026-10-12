@@ -158,6 +158,8 @@ cask "font-jetbrains-mono"
 cask "google-chrome"
 # Keyboard customiser
 cask "karabiner-elements"
+# Utility to extend trackpad functionality
+cask "middleclick"
 # VPN client for secure internet access and private browsing
 cask "nordvpn"
 # Knowledge base that works on top of a local folder of plain text Markdown files
