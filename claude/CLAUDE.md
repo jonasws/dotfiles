@@ -89,6 +89,17 @@ is empty, and the `~/.local/bin/wrapped/gh` wrapper that supplies `GH_TOKEN` via
 `fnox-secret` cannot reach 1Password from inside the sandbox. The github MCP
 server gets the same token through its own wrapper, outside the sandbox.
 
+## Subagents and models
+
+The main session runs Opus and does the deciding: design, debugging, and reviewing
+diffs. Hand the mechanical part to the Sonnet `implementer` once the approach is
+settled and the change spans more than a few edits: the edit-and-test loop then runs
+in its context instead of growing this one. Brief it with the files, the decisions
+taken, the acceptance criteria and the commands to run, then read its diff and rerun
+the tests before calling the work done.
+
+For a change to a CDK app (the `*-infra` repos), run `cdk-reviewer` before committing.
+
 ## Task board
 
 Work that outlives one session goes on the tsk board (`tsk`, installed by mise
