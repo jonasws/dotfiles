@@ -2,9 +2,9 @@
 
 lockfile_version = 1
 
-[conda-packages.macos-arm64."libsqlite-3.53.4-h34a968b_103"]
-url = "https://conda.anaconda.org/conda-forge/osx-arm64/libsqlite-3.53.4-h34a968b_103.conda"
-checksum = "sha256:b7c1d5a15d21948eec177a00e90801ad0d1c35e552404da9fbf0d657421aa0dd"
+[conda-packages.macos-arm64."libsqlite-3.54.0-h34a968b_101"]
+url = "https://conda.anaconda.org/conda-forge/osx-arm64/libsqlite-3.54.0-h34a968b_101.conda"
+checksum = "sha256:7f0f2e4ca2eb6e5059d9593ffe88088debe453b146e2794641d94242b901d85c"
 
 [conda-packages.macos-arm64."libzlib-1.3.2-h8088a28_3"]
 url = "https://conda.anaconda.org/conda-forge/osx-arm64/libzlib-1.3.2-h8088a28_3.conda"
@@ -49,22 +49,23 @@ url_api = "https://api.github.com/repos/FiloSottile/age/releases/assets/53554189
 provenance = "github-attestations"
 
 [[tools."aqua:anthropics/claude-code"]]
-version = "2.1.295"
+version = "2.1.296"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
 [tools."aqua:anthropics/claude-code"."platforms.macos-arm64"]
-checksum = "sha256:dfbbe96007c69d7bc8631c5f4d7596e960cb0962f8d13efea7d4239f4caa3917"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.295/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/622630668"
+checksum = "sha256:60f97cde7f7e078b424138e34ecf1ad620bd81ac3866984fb8996623a36a052e"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.296/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/625598716"
 
 [[tools."aqua:aws/session-manager-plugin"]]
-version = "1.2.835.0"
+version = "1.2.896.0"
 backend = "aqua:aws/session-manager-plugin"
 specifiers = ["latest"]
 
 [tools."aqua:aws/session-manager-plugin"."platforms.macos-arm64"]
-url = "https://s3.amazonaws.com/session-manager-downloads/plugin/1.2.835.0/mac_arm64/sessionmanager-bundle.zip"
+checksum = "blake3:1aeffba4bda1a0ced7266fc69697c858b240ae04c6467fd53f5dd792066358c7"
+url = "https://s3.amazonaws.com/session-manager-downloads/plugin/1.2.896.0/mac_arm64/sessionmanager-bundle.zip"
 
 [[tools."aqua:github/github-mcp-server"]]
 version = "2.0.2"
@@ -78,45 +79,42 @@ url_api = "https://api.github.com/repos/github/github-mcp-server/releases/assets
 provenance = "github-attestations"
 
 [[tools.ast-grep]]
-version = "0.45.3"
+version = "0.50.0"
 backend = "aqua:ast-grep/ast-grep"
 specifiers = ["latest"]
 
 [tools.ast-grep."platforms.macos-arm64"]
-checksum = "sha256:6d2279dea5bea2ad79c66ea93f5fe54ba926e398a8a26de76c56db68fe59eac6"
-url = "https://github.com/ast-grep/ast-grep/releases/download/0.45.3/app-aarch64-apple-darwin.zip"
-url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/537332514"
+checksum = "sha256:b7de40f9c4a29b1c6e26619b776d02b432902550de9a79e4a71a416e86cc41f5"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.50.0/app-aarch64-apple-darwin.zip"
+url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/625198087"
 
 [[tools.aws-cli]]
-version = "2.37.11"
+version = "2.37.12"
 backend = "aqua:aws/aws-cli"
 specifiers = ["latest"]
 
 [tools.aws-cli."platforms.macos-arm64"]
-checksum = "blake3:37712a81d8ff59f96b9df57dff23c690b4c6103e154d8fd8641c97ba28ab31d6"
-url = "https://awscli.amazonaws.com/AWSCLIV2-2.37.11.pkg"
+checksum = "blake3:2bb2d828c9e31a2d79f4db60fde7232af0b252b9e7d3a3b3c4c1e29998e14bf7"
+url = "https://awscli.amazonaws.com/AWSCLIV2-2.37.12.pkg"
 
 [[tools.aws-vault]]
-version = "7.15.4"
+version = "7.16.2"
 backend = "aqua:ByteNess/aws-vault"
 specifiers = ["latest"]
 
 [tools.aws-vault."platforms.macos-arm64"]
-checksum = "sha256:015a265923a548b7059f56434f5179447f89a748c992cdb1df325fb38d6de604"
-url = "https://github.com/ByteNess/aws-vault/releases/download/v7.15.4/aws-vault-darwin-arm64"
-url_api = "https://api.github.com/repos/ByteNess/aws-vault/releases/assets/619201895"
+checksum = "sha256:df51347cf15b6c2c3899f17c089199117c20f5cb5887e66df1f40ab74cb56d11"
+url = "https://github.com/ByteNess/aws-vault/releases/download/v7.16.2/aws-vault-darwin-arm64"
+url_api = "https://api.github.com/repos/ByteNess/aws-vault/releases/assets/622940644"
 
 [[tools.bun]]
-version = "1.4.2"
+version = "1.4.3"
 backend = "core:bun"
-specifiers = [
-    "1.4.2",
-    "latest",
-]
+specifiers = ["latest"]
 
 [tools.bun."platforms.macos-arm64"]
-checksum = "sha256:90987a3a16d7db556d886ac3d551e7b6d3edf0a1cf43acaed622e8676be1d12f"
-url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.2/bun-darwin-aarch64.zip"
+checksum = "sha256:80afd4c069b46a6fa8f3ec520bebc750a7843e4a8d5b9583d29ad436c00a3403"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.3/bun-darwin-aarch64.zip"
 
 [[tools.caddy]]
 version = "2.11.7"
@@ -167,13 +165,13 @@ specifiers = ["latest"]
 features = "embed-configs"
 
 [[tools.docker-cli]]
-version = "29.8.2"
+version = "29.9.0"
 backend = "aqua:docker/cli"
 specifiers = ["latest"]
 
 [tools.docker-cli."platforms.macos-arm64"]
-checksum = "blake3:0a6e98de62d113b046f264cbca213b562801fb87ca21e1cdf842e903665c9299"
-url = "https://download.docker.com/mac/static/stable/aarch64/docker-29.8.2.tgz"
+checksum = "blake3:063fb46804b8490ada8a22b55def213c8b3067983746dc0636e307d8e438fcf1"
+url = "https://download.docker.com/mac/static/stable/aarch64/docker-29.9.0.tgz"
 
 [[tools.fnox]]
 version = "1.39.0"
@@ -186,14 +184,14 @@ url = "https://github.com/jdx/fnox/releases/download/v1.39.0/fnox-aarch64-apple-
 signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [[tools.fzf]]
-version = "0.74.4"
+version = "0.74.5"
 backend = "aqua:junegunn/fzf"
 specifiers = ["latest"]
 
 [tools.fzf."platforms.macos-arm64"]
-checksum = "sha256:4f6a113bfc0c7959e0005c78d566a51afc4fcefc956f43735c62a9deb19e92ae"
-url = "https://github.com/junegunn/fzf/releases/download/v0.74.4/fzf-0.74.4-darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/558287774"
+checksum = "sha256:ada808c7401b9949ce8842274ac16a6b6193fd32dcada396884a6a9a89e5985a"
+url = "https://github.com/junegunn/fzf/releases/download/v0.74.5/fzf-0.74.5-darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/629581702"
 
 [[tools.github-cli]]
 version = "2.102.0"
@@ -366,14 +364,14 @@ provenance = "github-attestations"
 provenance_verified = true
 
 [[tools."github:pb33f/openapi-changes"]]
-version = "0.2.11"
+version = "0.2.12"
 backend = "github:pb33f/openapi-changes"
 specifiers = ["latest"]
 
 [tools."github:pb33f/openapi-changes"."platforms.macos-arm64"]
-checksum = "sha256:5af043778e449397e81e7f84dff7330a926f5472aeda70cbb5ab8dfaaff6b9c1"
-url = "https://github.com/pb33f/openapi-changes/releases/download/v0.2.11/openapi-changes_0.2.11_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/pb33f/openapi-changes/releases/assets/531088626"
+checksum = "sha256:7390161ec843b8bd7999e5e6c977898ca86a02587dc18028755c200c0df1a9cd"
+url = "https://github.com/pb33f/openapi-changes/releases/download/v0.2.12/openapi-changes_0.2.12_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/pb33f/openapi-changes/releases/assets/628713581"
 
 [[tools."github:pb33f/printing-press"]]
 version = "0.0.28"
@@ -416,14 +414,14 @@ url = "https://github.com/smarzban/tsk/releases/download/v0.11.6/tsk-v0.11.6-aar
 url_api = "https://api.github.com/repos/smarzban/tsk/releases/assets/582195494"
 
 [[tools."github:walles/moor"]]
-version = "2.19.3"
+version = "2.19.4"
 backend = "github:walles/moor"
 specifiers = ["latest"]
 
 [tools."github:walles/moor"."platforms.macos-arm64"]
-checksum = "sha256:9b75b70ddfbdd9b3db2f6879be059291630bfdb2fefab23f6060b66e7c497ed4"
-url = "https://github.com/walles/moor/releases/download/v2.19.3/moor-v2.19.3-darwin-arm64"
-url_api = "https://api.github.com/repos/walles/moor/releases/assets/623965393"
+checksum = "sha256:c4b5f2ea5c0edc96d9949850df207d299d021fc292cc0a9580840977cbe27c29"
+url = "https://github.com/walles/moor/releases/download/v2.19.4/moor-v2.19.4-darwin-arm64"
+url_api = "https://api.github.com/repos/walles/moor/releases/assets/628599552"
 
 [[tools.gitu]]
 version = "0.43.0"
@@ -447,13 +445,13 @@ url_api = "https://api.github.com/repos/charmbracelet/glow/releases/assets/51046
 provenance = "cosign"
 
 [[tools.go]]
-version = "1.27.1"
+version = "1.27.2"
 backend = "core:go"
 specifiers = ["latest"]
 
 [tools.go."platforms.macos-arm64"]
-checksum = "sha256:ee215d57e0ec269c60cc9ceca68e6bda321ba9ee5afe24f4b0988703c2d87d12"
-url = "https://dl.google.com/go/go1.27.1.darwin-arm64.tar.gz"
+checksum = "sha256:76812b213b1b2302c978d28fa52fa92d541704b9e7d9d5db8002c50e4018c4c5"
+url = "https://dl.google.com/go/go1.27.2.darwin-arm64.tar.gz"
 
 [[tools."go:github.com/isaacphi/mcp-language-server"]]
 version = "0.1.1"
@@ -568,12 +566,12 @@ backend = "pipx:mitmproxy"
 specifiers = ["latest"]
 
 [[tools.neovim]]
-version = "0.12.5"
+version = "0.12.6"
 backend = "vfox:mise-plugins/vfox-neovim"
 specifiers = ["latest"]
 
 [tools.neovim."platforms.macos-arm64"]
-url = "https://github.com/neovim/neovim/releases/download/v0.12.5/nvim-macos-arm64.tar.gz"
+url = "https://github.com/neovim/neovim/releases/download/v0.12.6/nvim-macos-arm64.tar.gz"
 
 [[tools.node]]
 version = "24.21.0"
@@ -595,12 +593,12 @@ backend = "npm:@mermaid-js/mermaid-cli"
 specifiers = ["latest"]
 
 [[tools."npm:@pb33f/openapi-changes"]]
-version = "0.2.11"
+version = "0.2.12"
 backend = "npm:@pb33f/openapi-changes"
 specifiers = ["latest"]
 
 [[tools."npm:defuddle"]]
-version = "0.19.4"
+version = "0.19.5"
 backend = "npm:defuddle"
 specifiers = ["latest"]
 
@@ -615,7 +613,7 @@ backend = "npm:exa-mcp-server"
 specifiers = ["latest"]
 
 [[tools."npm:typescript-language-server"]]
-version = "6.0.1"
+version = "6.0.2"
 backend = "npm:typescript-language-server"
 specifiers = ["latest"]
 
@@ -635,17 +633,9 @@ backend = "pipx:awslogs"
 specifiers = ["latest"]
 
 [[tools."pipx:mcp2cli"]]
-version = "3.7.0"
+version = "3.8.0"
 backend = "pipx:mcp2cli"
 specifiers = ["latest"]
-
-[[tools."pipx:postgres-mcp"]]
-version = "0.3.0"
-backend = "pipx:postgres-mcp"
-specifiers = ["latest"]
-
-[tools."pipx:postgres-mcp".options]
-uvx_args = "--with mcp[cli]<2"
 
 [[tools."pipx:posting"]]
 version = "2.11.1"
@@ -673,13 +663,13 @@ url = "https://github.com/pre-commit/pre-commit/releases/download/v4.6.2/pre-com
 url_api = "https://api.github.com/repos/pre-commit/pre-commit/releases/assets/509317714"
 
 [[tools.python]]
-version = "3.14.8"
+version = "3.15.0"
 backend = "core:python"
 specifiers = ["latest"]
 
 [tools.python."platforms.macos-arm64"]
-checksum = "sha256:ed14e9042f36c0aa18383f5d9729bcbf17847e842666a793b5a5a5d8505c0ca1"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261003/cpython-3.14.8+20261003-aarch64-apple-darwin-install_only_stripped.tar.gz"
+checksum = "sha256:473e6213a1c55da12e60642249a6201fe9dca841b4ad8c59149798846ed87c62"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261009/cpython-3.15.0+20261009-aarch64-apple-darwin-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [[tools.rust]]
@@ -701,7 +691,7 @@ url_api = "https://api.github.com/repos/getsops/sops/releases/assets/486808198"
 url = "https://github.com/getsops/sops/releases/download/v3.13.3/sops-v3.13.3.intoto.jsonl"
 
 [[tools.sqlite]]
-version = "3.53.4"
+version = "3.54.0"
 backend = "conda:sqlite"
 specifiers = ["latest"]
 
@@ -709,10 +699,10 @@ specifiers = ["latest"]
 channel = "conda-forge"
 
 [tools.sqlite."platforms.macos-arm64"]
-checksum = "sha256:978964e6425519d2929ec8eb23d59bdef9aa93d2d7284cece8929070bbd85792"
-url = "https://conda.anaconda.org/conda-forge/osx-arm64/sqlite-3.53.4-hdb6324b_103.conda"
+checksum = "sha256:55a8f232878ae035f44712718757efaf508b6cc5459b253162c71bb06d840e57"
+url = "https://conda.anaconda.org/conda-forge/osx-arm64/sqlite-3.54.0-hdb6324b_101.conda"
 conda_deps = [
-    "libsqlite-3.53.4-h34a968b_103",
+    "libsqlite-3.54.0-h34a968b_101",
     "libzlib-1.3.2-h8088a28_3",
     "ncurses-6.6-he64c551_1",
     "readline-8.3-h8b90a29_1",
@@ -770,7 +760,7 @@ url = "https://github.com/jdx/usage/releases/download/v6.9.0/usage-universal-app
 signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [[tools.uv]]
-version = "0.12.24"
+version = "0.13.0"
 backend = "asdf:uv"
 specifiers = ["latest"]
 
