@@ -21,6 +21,8 @@ run = [
 
 [tasks."update:brew-weekly"]
 description = "Refresh casks and reclaim homebrew disk space"
+# Homebrew allows one process at a time; without this it races update:brew.
+depends = ["update:brew"]
 # --greedy bypasses the "already latest" short-circuit for casks that carry
 # their own updater — most of the ones here (browsers, Slack, Spotify,
 # 1Password) self-update, so a daily greedy pass re-downloads full installers
@@ -54,6 +56,7 @@ run = [
 [tasks."update:mise-prune"]
 description = "Reclaim mise disk space"
 dir = "{{env.HOME}}"
+depends = ["update:mise"]
 # Kept out of update:mise on purpose: pruning immediately after an upgrade
 # deletes the last known-good version of every tool that just moved, so a bad
 # "latest" leaves nothing to fall back to.
@@ -72,8 +75,11 @@ description = "Upgrade yazi plugins and flavors"
 run = "ya pkg upgrade"
 
 [tasks."update:nvim"]
-description = "Sync lazy.nvim plugins"
-run = "nvim --headless '+Lazy! sync' +qa"
+description = "Sync lazy.nvim plugins, upgrade mason packages and treesitter parsers"
+run = [
+  "nvim --headless '+Lazy! sync' +qa",
+  "nvim --headless '+luafile {{config_root}}/lazyvim/headless-update.lua'",
+]
 
 [tasks."update:manifests"]
 description = "Rewrite the homebrew manifests this repo tracks"
