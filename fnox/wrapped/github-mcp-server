@@ -1,0 +1,17 @@
+#!/bin/sh
+# github-mcp-server with GITHUB_PERSONAL_ACCESS_TOKEN from fnox, as Claude Code starts it
+# (see ~/.claude.json). The token is exported to this one process only;
+# fnox-secret explains how all its callers share one Touch ID per cold start.
+
+set -e
+
+real="$(mise which github-mcp-server 2>/dev/null || true)"
+if [ -z "$real" ]; then
+  echo "github-mcp-server: mise provisions no github-mcp-server for $PWD" >&2
+  exit 127
+fi
+
+GITHUB_PERSONAL_ACCESS_TOKEN="$("$(dirname "$0")/fnox-secret" GITHUB_PERSONAL_ACCESS_TOKEN)"
+export GITHUB_PERSONAL_ACCESS_TOKEN
+
+exec "$real" "$@"

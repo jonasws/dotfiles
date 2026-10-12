@@ -1,0 +1,17 @@
+#!/bin/sh
+# exa-mcp-server with EXA_API_KEY from fnox, as Claude Code starts it
+# (see ~/.claude.json). The token is exported to this one process only;
+# fnox-secret explains how all its callers share one Touch ID per cold start.
+
+set -e
+
+real="$(mise which exa-mcp-server 2>/dev/null || true)"
+if [ -z "$real" ]; then
+  echo "exa-mcp-server: mise provisions no exa-mcp-server for $PWD" >&2
+  exit 127
+fi
+
+EXA_API_KEY="$("$(dirname "$0")/fnox-secret" EXA_API_KEY)"
+export EXA_API_KEY
+
+exec "$real" "$@"

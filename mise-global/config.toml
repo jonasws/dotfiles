@@ -140,7 +140,8 @@ minimum_release_age_excludes = [
 ]
 
 [settings.github]
-credential_command = "fnox get MISE_GITHUB_TOKEN"
+# mise runs this through sh with its shims stripped from PATH, hence the full path.
+credential_command = "~/.local/bin/wrapped/fnox-secret MISE_GITHUB_TOKEN"
 
 [env]
 # mise upgrades tsk; its board banner would otherwise advise `tsk update`.
@@ -152,7 +153,7 @@ TSK_NO_UPDATE_CHECK = "1"
 _.path = ["~/.local/bin/wrapped"]
 
 # Re-encrypt every secret into the local age provider, so resolution stops
-# reaching 1Password: MCP servers start without a biometric prompt, and `mvn`
+# reaching 1Password: MCP servers start without a 1Password prompt, and `mvn`
 # works offline. Sync writes a `sync` entry beside each secret and leaves the
 # `op://` reference in place, so this is a cache, not a migration — a rotated
 # 1Password value keeps serving stale until the task runs again.
@@ -160,15 +161,12 @@ _.path = ["~/.local/bin/wrapped"]
 description = "Cache all fnox secrets into the local age provider"
 run = '''
 set -euo pipefail
+# One run re-encrypts every top-level secret under one shared key, which is
+# what lets fnox-secret's single batch decrypt them all behind one Touch ID.
+# Profile secrets (`gh`, `gcalcli`) stay pure 1Password references: both are
+# used interactively, where a prompt costs nothing, and revocation stays
+# immediate rather than waiting for the next sync.
 fnox sync -g -p sync-age -f
-# Profile secrets are separate from the top-level ones, and `--no-defaults`
-# keeps each pass from re-syncing the defaults it inherits. `gh` and `gcalcli`
-# stay out: both are used interactively, where a 1Password prompt costs nothing,
-# and leaving them as pure references keeps revocation immediate rather than
-# waiting for the next sync.
-fnox --no-color profiles | awk 'NR > 1 && $1 !~ /^(default|gh|gcalcli)$/ { print $1 }' | while read -r profile; do
-  fnox sync -g -p sync-age -P "$profile" --no-defaults -f
-done
 '''
 
 [shell_alias]
