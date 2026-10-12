@@ -33,8 +33,8 @@ key_file = "~/.config/fnox/age-se.txt"
 
 # Two mechanisms decide who sees a secret, and they answer different questions.
 # `env = false` means never injected into any environment: the consumer fetches the
-# value itself with `fnox get`, as mise's credential_command and the gcal function
-# do. A profile means injected as an environment variable, but only into the one
+# value itself, as fnox-secret (mise's credential_command, the MCP wrappers) and the
+# gcal function do. A profile means injected as an environment variable, but only into the one
 # process started under it — which no per-secret flag can express, since a flag has
 # only "every `fnox exec` subprocess" and "none". Secrets below are top-level, so
 # every `fnox exec` receives them; that is what the profiles' `--no-defaults` sheds.
@@ -42,16 +42,31 @@ key_file = "~/.config/fnox/age-se.txt"
 [secrets]
 # Read by ~/.m2/settings.xml as ${env.LIFLIG_GITHUB_PAT} and
 # ${env.NEXUS_PASSWORD} for the `github` and `vy-nexus` server entries.
-LIFLIG_GITHUB_PAT= { provider = "onepass", value = "op://Employee/Liflig Github PAT/token", env = "exec", sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBdHVaTzFzMFBVbTQ5UGdQS1JxMDc3bVJ2a1hNeW13TEpvcUJYaUc1TWxOQQp5OGxkYXJTNVQ4NHdhVGJNQlM3UlVzVjhsbmJjSGtBT0htOWF0T09jMHRrCi0+IGFRRW0ibWc4LWdyZWFzZSBJVFpUczQgZ2IKQitpM1Y4MkMxMk5FVHd1YWRETUZDb2ZMVEptVzJRT3dzU1BJTjBleWhnK0IxTUJPRHNFcTN4ajJtSUp4bnc1OApUMjNzQ3JId0xtU2JFMlkwMDdkQkNBCi0tLSBrRnBBS3puaDdsaWxrZm92bDBIVC84Z1orbzBMY3JsclN0ZjZYVkUrZmVRCouBMaGeOv07aNAJLQFLSZpnKJEHKW6dOTgZ8MZ+4V/Dcy9evPmgI13NKqA00EbJtuJtVuCldPL5OfNgla4PpYmuabPB0e0lzOyJVEE=:oidl7EduL8tdcX5CGR522Ww/y9gF2v529tx2m//xoGc1F191aHJQ7YMhoDWkhB4a1TlOY4k30/EoWvl6scWcqM8VmnMhBTh/UEgi+wWRg1iJtT2wm1tH9Cu/w1lnGQDlpMphH7JS2EAy8DaQZOVYxyHTTX2ECyd2mA==" } }
-NEXUS_PASSWORD= { provider = "onepass", value = "op://Employee/Vy - Nexus/password", env = "exec", sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBdHVaTzFzMFBVbTQ5UGdQS1JxMDc3bVJ2a1hNeW13TEpvcUJYaUc1TWxOQQp5OGxkYXJTNVQ4NHdhVGJNQlM3UlVzVjhsbmJjSGtBT0htOWF0T09jMHRrCi0+IGFRRW0ibWc4LWdyZWFzZSBJVFpUczQgZ2IKQitpM1Y4MkMxMk5FVHd1YWRETUZDb2ZMVEptVzJRT3dzU1BJTjBleWhnK0IxTUJPRHNFcTN4ajJtSUp4bnc1OApUMjNzQ3JId0xtU2JFMlkwMDdkQkNBCi0tLSBrRnBBS3puaDdsaWxrZm92bDBIVC84Z1orbzBMY3JsclN0ZjZYVkUrZmVRCouBMaGeOv07aNAJLQFLSZpnKJEHKW6dOTgZ8MZ+4V/Dcy9evPmgI13NKqA00EbJtuJtVuCldPL5OfNgla4PpYmuabPB0e0lzOyJVEE=:+tuSKWiVWxMJzE/NIiBdsIgZZTv8gc2gf7NDI72DoGtZp+ej5nfKng+V/UNwYhTH8WzziXwxA++9hR+1H5lQqCjxdRY=" } }
+LIFLIG_GITHUB_PAT= { provider = "onepass", value = "op://Employee/Liflig Github PAT/token", env = "exec", sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBblJTL2JwZzN6VTYzMkVlbXA1NHNhOEpERkIrWm1lWHA5VmgySVkzVjZsSgpwNUJMeEhET0JyOGNRTHNaSjAweU4yK1NqL3o5bVk1N0FoTVJpWDAwWEVvCi0+ID1qUHgtZ3JlYXNlCnAxOWhBTlFMcXV0NUt2RkQvVXdBS1pkOEVIcWNMWXZsaVR6d2xIdnIraGRpUHIxZXNwKzFlMHk0b1FnNlA1NlMKMXJuSE0zdEx0c1M5Uzc0VlltZHhJTGNwd1EKLS0tIEpRTkZGU3lhTHI2V0F1YlNnZjNkN1ZTN1pIS0R6MGZ2NVRoL0dTOWJTN1UKdeBsJWU6ZKumNC8oHXjTkBtJuwC9VSuSwlvRmTuvbqMO5A7ugMTyNLH+qX4vwBGbm8+4mAlDK3j2mk2y7L3nbM/e79JHXwzQE0RHng==:c2hCAVLBYhMM99V27jiVVcurUZOm0vD4kyVHQ2mL8IrSibL7EB4hdifFCMZZ5V387elBymEe5Z/JPyRWtMcTlzz1kFEcyxZfI1t7ZnO5crSBDqYxanL4QN+lWlYi2IUmRr2d5VRabxk6BjjgOcz7psbJ4/9FKxtfdQ==" } }
+NEXUS_PASSWORD= { provider = "onepass", value = "op://Employee/Vy - Nexus/password", env = "exec", sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBblJTL2JwZzN6VTYzMkVlbXA1NHNhOEpERkIrWm1lWHA5VmgySVkzVjZsSgpwNUJMeEhET0JyOGNRTHNaSjAweU4yK1NqL3o5bVk1N0FoTVJpWDAwWEVvCi0+ID1qUHgtZ3JlYXNlCnAxOWhBTlFMcXV0NUt2RkQvVXdBS1pkOEVIcWNMWXZsaVR6d2xIdnIraGRpUHIxZXNwKzFlMHk0b1FnNlA1NlMKMXJuSE0zdEx0c1M5Uzc0VlltZHhJTGNwd1EKLS0tIEpRTkZGU3lhTHI2V0F1YlNnZjNkN1ZTN1pIS0R6MGZ2NVRoL0dTOWJTN1UKdeBsJWU6ZKumNC8oHXjTkBtJuwC9VSuSwlvRmTuvbqMO5A7ugMTyNLH+qX4vwBGbm8+4mAlDK3j2mk2y7L3nbM/e79JHXwzQE0RHng==:xyvA7GFVmjIlP0Uz1cT7N4CNDmTAXKP8e/RCImUAdS1tjWcNuUFnmExa9YLKWKWMb59WOa+rhk5WUsMVdxH9YWmy9aA=" } }
 
 # Read only by mise, whose `[settings.github] credential_command` runs
-# `fnox get MISE_GITHUB_TOKEN`. Fine-grained, public-repo read and nothing else:
+# `fnox-secret MISE_GITHUB_TOKEN`. Fine-grained, public-repo read and nothing else:
 # mise calls the GitHub API only to list releases and fetch assets, so the token
 # exists purely to lift the 60/hr anonymous rate limit. `env = false` keeps it
 # out of every `fnox exec` subprocess, so maven and the github MCP server never
 # receive it.
-MISE_GITHUB_TOKEN= { provider = "onepass", value = "op://Employee/mise github token/password", env = false, sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBdHVaTzFzMFBVbTQ5UGdQS1JxMDc3bVJ2a1hNeW13TEpvcUJYaUc1TWxOQQp5OGxkYXJTNVQ4NHdhVGJNQlM3UlVzVjhsbmJjSGtBT0htOWF0T09jMHRrCi0+IGFRRW0ibWc4LWdyZWFzZSBJVFpUczQgZ2IKQitpM1Y4MkMxMk5FVHd1YWRETUZDb2ZMVEptVzJRT3dzU1BJTjBleWhnK0IxTUJPRHNFcTN4ajJtSUp4bnc1OApUMjNzQ3JId0xtU2JFMlkwMDdkQkNBCi0tLSBrRnBBS3puaDdsaWxrZm92bDBIVC84Z1orbzBMY3JsclN0ZjZYVkUrZmVRCouBMaGeOv07aNAJLQFLSZpnKJEHKW6dOTgZ8MZ+4V/Dcy9evPmgI13NKqA00EbJtuJtVuCldPL5OfNgla4PpYmuabPB0e0lzOyJVEE=:H2J3SLpLPVmfKe9SHS3mwOFJvs+kEMjrjHBDaHmXLhT+XQQwMZALsFSBgUESNCoWubnsRQkN4BQ+gF95az8VoZYfZt8q4jSXXpemEbbvDJUZ9qInzR8iPBUylkQWgsD//kBsfwUVkqj2B4iiWnokf+XubDtRzTCL/Q==" } }
+MISE_GITHUB_TOKEN= { provider = "onepass", value = "op://Employee/mise github token/password", env = false, sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBblJTL2JwZzN6VTYzMkVlbXA1NHNhOEpERkIrWm1lWHA5VmgySVkzVjZsSgpwNUJMeEhET0JyOGNRTHNaSjAweU4yK1NqL3o5bVk1N0FoTVJpWDAwWEVvCi0+ID1qUHgtZ3JlYXNlCnAxOWhBTlFMcXV0NUt2RkQvVXdBS1pkOEVIcWNMWXZsaVR6d2xIdnIraGRpUHIxZXNwKzFlMHk0b1FnNlA1NlMKMXJuSE0zdEx0c1M5Uzc0VlltZHhJTGNwd1EKLS0tIEpRTkZGU3lhTHI2V0F1YlNnZjNkN1ZTN1pIS0R6MGZ2NVRoL0dTOWJTN1UKdeBsJWU6ZKumNC8oHXjTkBtJuwC9VSuSwlvRmTuvbqMO5A7ugMTyNLH+qX4vwBGbm8+4mAlDK3j2mk2y7L3nbM/e79JHXwzQE0RHng==:d7oseLjBSQV442vAXOdQESqePkwizWebItHau9xk4OM5F0NjETKl1E4FFkJFooTd68d2gu6pGJgPCOgoR575RhAdhFTLyjNSbLWmWOn10QP/BObyEAicJwIHF5YUiaeM3y6JvGwhGNbq0tO+cY0ef+pj9TkH2n/jfw==" } }
+
+# Read by the MCP servers Claude Code starts, through the wrappers of the same
+# name in ~/.local/bin/wrapped. Each wrapper fetches its own token with
+# fnox-secret and exports it to that one process, so `env = false` keeps both
+# out of every `fnox exec` subprocess -- maven never receives them.
+#
+# Top-level rather than in a profile each: every profile has its own daemon and
+# its own sync blob, so each one cost a Touch ID on a cold start. Here they share
+# the default daemon and one blob with every other top-level secret.
+#
+# EXA_API_KEY: the stdio server reads its credential only from this variable and
+# calls api.exa.ai directly, so without a key every request 401s -- the anonymous
+# tier belongs to the hosted endpoint at mcp.exa.ai, not to the package.
+GITHUB_PERSONAL_ACCESS_TOKEN= { provider = "onepass", value = "op://Employee/Liflig Github PAT/token", env = false, sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBblJTL2JwZzN6VTYzMkVlbXA1NHNhOEpERkIrWm1lWHA5VmgySVkzVjZsSgpwNUJMeEhET0JyOGNRTHNaSjAweU4yK1NqL3o5bVk1N0FoTVJpWDAwWEVvCi0+ID1qUHgtZ3JlYXNlCnAxOWhBTlFMcXV0NUt2RkQvVXdBS1pkOEVIcWNMWXZsaVR6d2xIdnIraGRpUHIxZXNwKzFlMHk0b1FnNlA1NlMKMXJuSE0zdEx0c1M5Uzc0VlltZHhJTGNwd1EKLS0tIEpRTkZGU3lhTHI2V0F1YlNnZjNkN1ZTN1pIS0R6MGZ2NVRoL0dTOWJTN1UKdeBsJWU6ZKumNC8oHXjTkBtJuwC9VSuSwlvRmTuvbqMO5A7ugMTyNLH+qX4vwBGbm8+4mAlDK3j2mk2y7L3nbM/e79JHXwzQE0RHng==:CjdJYvhM8shSY781Y3SIWd+/1PEIs034mC62NdH92L71LRsJ9waWC4OGFkABl5TBFKnnbBzKLLvGH5v6Fg5C8fHBsYuOggzj8iwMrQuf3VI7zunwWuD+AgYE9m/ex/CHzta4A8igMl9f+MwA8mW2A9qu+Rlvuqzcvg==" } }
+EXA_API_KEY= { provider = "onepass", value = "op://Employee/Exa API Key/password", env = false, sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBblJTL2JwZzN6VTYzMkVlbXA1NHNhOEpERkIrWm1lWHA5VmgySVkzVjZsSgpwNUJMeEhET0JyOGNRTHNaSjAweU4yK1NqL3o5bVk1N0FoTVJpWDAwWEVvCi0+ID1qUHgtZ3JlYXNlCnAxOWhBTlFMcXV0NUt2RkQvVXdBS1pkOEVIcWNMWXZsaVR6d2xIdnIraGRpUHIxZXNwKzFlMHk0b1FnNlA1NlMKMXJuSE0zdEx0c1M5Uzc0VlltZHhJTGNwd1EKLS0tIEpRTkZGU3lhTHI2V0F1YlNnZjNkN1ZTN1pIS0R6MGZ2NVRoL0dTOWJTN1UKdeBsJWU6ZKumNC8oHXjTkBtJuwC9VSuSwlvRmTuvbqMO5A7ugMTyNLH+qX4vwBGbm8+4mAlDK3j2mk2y7L3nbM/e79JHXwzQE0RHng==:3kvQKfBv1aeWvpRb9ZlWbQX7NyeOwCoQBFWSl1onQ18oqq3SkXhx0fL0shvX/mzzsG9xrE7JpvLnIutsDSWsWQ==" } }
 
 # Read by the `gh` fish function, which runs
 # `fnox exec -P gh --no-defaults -- gh ...`. The profile exists to scope the
@@ -61,17 +76,6 @@ MISE_GITHUB_TOKEN= { provider = "onepass", value = "op://Employee/mise github to
 [profiles.gh.secrets]
 GH_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
 
-# Read by the github MCP server, which Claude Code starts as
-# `fnox exec -P github-mcp --no-defaults -- github-mcp-server stdio`. GitHub's
-# remote MCP endpoint has no dynamic client registration, so OAuth cannot be set
-# up from here; running the server locally under fnox keeps the token out of
-# every other process. The profile is what keeps the startup to one 1Password
-# authorization: without `-P github-mcp --no-defaults` the exec resolves every
-# top-level secret, so opening a Claude Code session asked for biometrics three
-# times and handed the MCP server a Nexus password it has no use for.
-[profiles.github-mcp.secrets]
-GITHUB_PERSONAL_ACCESS_TOKEN= { provider = "onepass", value = "op://Employee/Liflig Github PAT/token", env = "exec", sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBczRreDB6UlFjSlh3N3JmZGVoRmtNdjEzVmRRazhTOGRJRjR5ZnVtSTRNeQp4SXo0T2trZWcvckR3NUxVUGZaY1VwVXVJYlNyK2JwSEdvSXFvZTdtRkE4Ci0+IG97OHg5TUc0LWdyZWFzZQoxOGd3V1M1aTBSNms1cVZRMC9nODVYek10RFEvQmFoc0FjOHZOQXFQdTRGcGNNOTVrd3FBbXpUdEo1dkZYN1FCCjZ5OWNoR2Q3bWV0aQotLS0gMDdEeHVSK2NjVHlSMjdQVkgrWHpxekFVZndONG9uWHUrNUJRTHRFeGo3YwqLoermKejp5VNhjKcYgrQrHVcSaFP0G0QqitK+7HQ9+08+iEwLpUy2FO4CnUhWW+rS8XieOKLCBugO5t+NK7qxioTPM21RvIpz8Dku:97eeygRoBkXCYEAyQ3OqWb9beDmauFZUb7moKC03ShwUDkJyqXIp/bm3wgE4uGJs0DXY4M4aUHoToaBrqUzl3gXY2RROpIMkEsVnfla+sknF9SrUyNKNt1sg5J3yP+2at5mf3pmqFl2BwnhiwduWuISxUrJXmL3bmA==" } }
-
 # Read by the `gcal` fish function, which resolves each value with
 # `fnox get -P gcalcli --no-defaults`. gcalcli takes the OAuth client only as
 # `--client-id` / `--client-secret` flags, so the values are read into the
@@ -79,13 +83,3 @@ GITHUB_PERSONAL_ACCESS_TOKEN= { provider = "onepass", value = "op://Employee/Lif
 [profiles.gcalcli.secrets]
 GCALCLI_CLIENT_ID = { provider = "onepass", value = "op://Employee/gcalcli/username" }
 GCALCLI_CLIENT_SECRET = { provider = "onepass", value = "op://Employee/gcalcli/credential" }
-
-# Read by the Exa MCP server, which Claude Code starts as
-# `fnox exec -P exa-mcp --no-defaults -- npx -y exa-mcp-server`. The stdio server
-# reads its credential only from this variable and calls api.exa.ai directly, so
-# without a key every request 401s — the free anonymous tier belongs to the hosted
-# endpoint at mcp.exa.ai, not to the package. `agent_run` needs a user-provided key
-# even where the hosted server would grant it over OAuth.
-# PLACEHOLDER reference — replace with the real item path.
-[profiles.exa-mcp.secrets]
-EXA_API_KEY= { provider = "onepass", value = "op://Employee/Exa API Key/password", env = "exec", sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBNnVKb0RZQkZrTzZ4b2lqUi9CdzJCYXYveDJDclNsQ3BXaFlNREJzR0hnawpUVHU2WktDMnd3aG1la1RRazJFaFJLRFFQUCsxVE5LdHJKTm1JUHoxMzFNCi0+IDotZ3JlYXNlIGQwRzplIEtpe015IHxJIEM4JSQKaE1YMXBuS2c4SjFWSjJVV3pOeVpzNEhNeTArcnoycjRaM09KODN5dDcxSVZnRXhqNjUxY2V3Z05jM05PaG5TQwp5YUpHUzZGVVdLM3p4MnBmd3J0NGVvSU5ZeDIwMHhTTwotLS0gZStqU2ZmUUZEMXR3QnBWa2RjeHNUTzBLYlFRUXRvNGZIZnBxU1ZIWXA1WQp11qByxJAWthi049m4lz2Gso+fcdtDBYYfvMSWvvD9p2a3cg6l8XXeghJvDsQ1CiKofdJcbiv7u58GVUFhq5+KINciZseLN3ncTM7r:jszrEwTGOU0KUzahi8Srpn9F7uav6GLV0BUe1AM9Ux4npzZg/FtUj+pPHNMWZwIdfiwnACZn357X/26gT/La6Q==" } }

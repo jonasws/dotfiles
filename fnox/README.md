@@ -96,10 +96,18 @@ fnox exec -P gh --no-defaults -- gh pr list       # GH_TOKEN only
 fnox get -P gcalcli --no-defaults GCALCLI_CLIENT_ID
 ```
 
-That scoping is also what keeps 1Password authorizations down. An unscoped
-`fnox exec` resolves every top-level secret at once, so the github MCP server —
-started by Claude Code as `fnox exec -P github-mcp --no-defaults -- \
-github-mcp-server stdio` — used to ask for biometrics three times per cold
-session and receive a Nexus password it has no use for. One profile, one prompt.
-
 `fnox profiles` lists them.
+
+## Touch ID: one per cold start
+
+Every profile has its own daemon and its own sync blob, so each profile read cold
+costs a Secure Enclave decrypt and a Touch ID. The secrets read at Claude Code
+startup — the github and Exa MCP tokens, and mise's GitHub token — are therefore
+top-level `env = false` secrets, fetched through `wrapped/fnox-secret`. Its header
+explains the three flags that make all of its callers share one decrypt: `-c`
+for a fingerprint that does not change per directory tree, `export --all` to
+resolve the whole blob at once, and `--non-interactive` to serialise parallel
+callers in the daemon.
+
+After adding or rotating a top-level secret, `mise run sync-secrets` re-encrypts
+them all into one blob.
