@@ -92,7 +92,6 @@ Profiles scope an injection to one consumer. Combined with `--no-defaults`, the
 command receives that profile's secrets and nothing else:
 
 ```sh
-fnox exec -P gh --no-defaults -- gh pr list       # GH_TOKEN only
 fnox get -P gcalcli --no-defaults GCALCLI_CLIENT_ID
 ```
 
@@ -102,7 +101,8 @@ fnox get -P gcalcli --no-defaults GCALCLI_CLIENT_ID
 
 Every profile has its own daemon and its own sync blob, so each profile read cold
 costs a Secure Enclave decrypt and a Touch ID. The secrets read at Claude Code
-startup — the github and Exa MCP tokens, and mise's GitHub token — are therefore
+startup — the github and Exa MCP tokens, gh's token (Claude Code runs gh on its
+own), and mise's GitHub token — are therefore
 top-level `env = false` secrets, fetched through `wrapped/fnox-secret`. Its header
 explains the three flags that make all of its callers share one decrypt: `-c`
 for a fingerprint that does not change per directory tree, `export --all` to

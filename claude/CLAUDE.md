@@ -85,10 +85,9 @@ between them:
 
 Use the `github` MCP tools. Never the `gh` CLI — it is denied in
 `permissions.deny`, and it has no credentials in any case: `~/.config/gh/hosts.yml`
-is empty and the fnox wrapper that fed it `GH_TOKEN` has been removed. The token
-now exists only inside `github-mcp-server`, which Claude Code starts outside the
-sandbox through the `~/.local/bin/wrapped/github-mcp-server` wrapper, which
-fetches the token with `fnox-secret`.
+is empty, and the `~/.local/bin/wrapped/gh` wrapper that supplies `GH_TOKEN` via
+`fnox-secret` cannot reach 1Password from inside the sandbox. The github MCP
+server gets the same token through its own wrapper, outside the sandbox.
 
 ## Task board
 

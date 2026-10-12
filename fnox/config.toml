@@ -54,7 +54,8 @@ NEXUS_PASSWORD= { provider = "onepass", value = "op://Employee/Vy - Nexus/passwo
 MISE_GITHUB_TOKEN= { provider = "onepass", value = "op://Employee/mise github token/password", env = false, sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBblJTL2JwZzN6VTYzMkVlbXA1NHNhOEpERkIrWm1lWHA5VmgySVkzVjZsSgpwNUJMeEhET0JyOGNRTHNaSjAweU4yK1NqL3o5bVk1N0FoTVJpWDAwWEVvCi0+ID1qUHgtZ3JlYXNlCnAxOWhBTlFMcXV0NUt2RkQvVXdBS1pkOEVIcWNMWXZsaVR6d2xIdnIraGRpUHIxZXNwKzFlMHk0b1FnNlA1NlMKMXJuSE0zdEx0c1M5Uzc0VlltZHhJTGNwd1EKLS0tIEpRTkZGU3lhTHI2V0F1YlNnZjNkN1ZTN1pIS0R6MGZ2NVRoL0dTOWJTN1UKdeBsJWU6ZKumNC8oHXjTkBtJuwC9VSuSwlvRmTuvbqMO5A7ugMTyNLH+qX4vwBGbm8+4mAlDK3j2mk2y7L3nbM/e79JHXwzQE0RHng==:d7oseLjBSQV442vAXOdQESqePkwizWebItHau9xk4OM5F0NjETKl1E4FFkJFooTd68d2gu6pGJgPCOgoR575RhAdhFTLyjNSbLWmWOn10QP/BObyEAicJwIHF5YUiaeM3y6JvGwhGNbq0tO+cY0ef+pj9TkH2n/jfw==" } }
 
 # Read by the MCP servers Claude Code starts, through the wrappers of the same
-# name in ~/.local/bin/wrapped. Each wrapper fetches its own token with
+# name in ~/.local/bin/wrapped. The gh wrapper exports GITHUB_PERSONAL_ACCESS_TOKEN
+# as GH_TOKEN, since both are the same 1Password item. Each wrapper fetches its own token with
 # fnox-secret and exports it to that one process, so `env = false` keeps both
 # out of every `fnox exec` subprocess -- maven never receives them.
 #
@@ -67,14 +68,6 @@ MISE_GITHUB_TOKEN= { provider = "onepass", value = "op://Employee/mise github to
 # tier belongs to the hosted endpoint at mcp.exa.ai, not to the package.
 GITHUB_PERSONAL_ACCESS_TOKEN= { provider = "onepass", value = "op://Employee/Liflig Github PAT/token", env = false, sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBblJTL2JwZzN6VTYzMkVlbXA1NHNhOEpERkIrWm1lWHA5VmgySVkzVjZsSgpwNUJMeEhET0JyOGNRTHNaSjAweU4yK1NqL3o5bVk1N0FoTVJpWDAwWEVvCi0+ID1qUHgtZ3JlYXNlCnAxOWhBTlFMcXV0NUt2RkQvVXdBS1pkOEVIcWNMWXZsaVR6d2xIdnIraGRpUHIxZXNwKzFlMHk0b1FnNlA1NlMKMXJuSE0zdEx0c1M5Uzc0VlltZHhJTGNwd1EKLS0tIEpRTkZGU3lhTHI2V0F1YlNnZjNkN1ZTN1pIS0R6MGZ2NVRoL0dTOWJTN1UKdeBsJWU6ZKumNC8oHXjTkBtJuwC9VSuSwlvRmTuvbqMO5A7ugMTyNLH+qX4vwBGbm8+4mAlDK3j2mk2y7L3nbM/e79JHXwzQE0RHng==:CjdJYvhM8shSY781Y3SIWd+/1PEIs034mC62NdH92L71LRsJ9waWC4OGFkABl5TBFKnnbBzKLLvGH5v6Fg5C8fHBsYuOggzj8iwMrQuf3VI7zunwWuD+AgYE9m/ex/CHzta4A8igMl9f+MwA8mW2A9qu+Rlvuqzcvg==" } }
 EXA_API_KEY= { provider = "onepass", value = "op://Employee/Exa API Key/password", env = false, sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBblJTL2JwZzN6VTYzMkVlbXA1NHNhOEpERkIrWm1lWHA5VmgySVkzVjZsSgpwNUJMeEhET0JyOGNRTHNaSjAweU4yK1NqL3o5bVk1N0FoTVJpWDAwWEVvCi0+ID1qUHgtZ3JlYXNlCnAxOWhBTlFMcXV0NUt2RkQvVXdBS1pkOEVIcWNMWXZsaVR6d2xIdnIraGRpUHIxZXNwKzFlMHk0b1FnNlA1NlMKMXJuSE0zdEx0c1M5Uzc0VlltZHhJTGNwd1EKLS0tIEpRTkZGU3lhTHI2V0F1YlNnZjNkN1ZTN1pIS0R6MGZ2NVRoL0dTOWJTN1UKdeBsJWU6ZKumNC8oHXjTkBtJuwC9VSuSwlvRmTuvbqMO5A7ugMTyNLH+qX4vwBGbm8+4mAlDK3j2mk2y7L3nbM/e79JHXwzQE0RHng==:3kvQKfBv1aeWvpRb9ZlWbQX7NyeOwCoQBFWSl1onQ18oqq3SkXhx0fL0shvX/mzzsG9xrE7JpvLnIutsDSWsWQ==" } }
-
-# Read by the `gh` fish function, which runs
-# `fnox exec -P gh --no-defaults -- gh ...`. The profile exists to scope the
-# injection: `--no-defaults` drops the top-level secrets, so gh receives this
-# token and nothing else — no Nexus password, no maven PAT. `~/.config/gh/hosts.yml`
-# stays empty, so gh has no credential of its own outside this wrapper.
-[profiles.gh.secrets]
-GH_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
 
 # Read by the `gcal` fish function, which resolves each value with
 # `fnox get -P gcalcli --no-defaults`. gcalcli takes the OAuth client only as

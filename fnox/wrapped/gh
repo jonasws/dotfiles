@@ -1,10 +1,12 @@
 #!/bin/sh
 # GitHub CLI, run under fnox so it gets a token without one living in the shell.
 #
-# GH_TOKEN is env = "exec" in fnox and sits in the `gh` profile, so
-# `--no-defaults` hands gh that token and nothing else: no Nexus password, no
-# maven PAT. ~/.config/gh/hosts.yml stays empty on purpose, so a gh started
-# outside this wrapper is unauthenticated rather than holding a long-lived token.
+# GH_TOKEN is the same 1Password item the github MCP server uses, read through
+# fnox-secret so it comes out of the shared, already-warm daemon cache: Claude
+# Code runs gh on its own at startup, and a profile of its own cost a Touch ID.
+# Only this token is exported, so gh sees no Nexus password and no maven PAT.
+# ~/.config/gh/hosts.yml stays empty on purpose, so a gh started outside this
+# wrapper is unauthenticated rather than holding a long-lived token.
 #
 # gh offers no credential-helper hook for its own auth — it reads GH_TOKEN,
 # GITHUB_TOKEN, or hosts.yml — so environment injection is the only way in.
@@ -34,4 +36,7 @@ case "$TMPDIR" in
     ;;
 esac
 
-exec fnox exec -P gh --no-defaults -- "$real" "$@"
+GH_TOKEN="$("$(dirname "$0")/fnox-secret" GITHUB_PERSONAL_ACCESS_TOKEN)"
+export GH_TOKEN
+
+exec "$real" "$@"
