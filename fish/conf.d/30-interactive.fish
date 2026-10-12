@@ -106,6 +106,13 @@ if status is-interactive
         end
     end
 
+    # atuin records history and binds nothing: up, ctrl-p and k stay fish's own
+    # up-or-search. fish_user_key_bindings binds ctrl-r to _atuin_search.
+    if command -q atuin
+        set -gx ATUIN_NOBIND true
+        atuin init fish --disable-ai | source
+    end
+
     # 1Password plugins
     if test -f ~/.config/op/plugins.sh
         source ~/.config/op/plugins.sh

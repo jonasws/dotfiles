@@ -88,6 +88,17 @@ checksum = "sha256:b7de40f9c4a29b1c6e26619b776d02b432902550de9a79e4a71a416e86cc4
 url = "https://github.com/ast-grep/ast-grep/releases/download/0.50.0/app-aarch64-apple-darwin.zip"
 url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/625198087"
 
+[[tools.atuin]]
+version = "18.23.0"
+backend = "aqua:atuinsh/atuin"
+specifiers = ["latest"]
+
+[tools.atuin."platforms.macos-arm64"]
+checksum = "sha256:c988be1cde19cd7295ce64bc8b955d42fb1855e5227cb640c87fc09c8408c3fc"
+url = "https://github.com/atuinsh/atuin/releases/download/v18.23.0/atuin-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/580134148"
+provenance = "github-attestations"
+
 [[tools.aws-cli]]
 version = "2.37.12"
 backend = "aqua:aws/aws-cli"
