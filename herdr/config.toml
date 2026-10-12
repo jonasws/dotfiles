@@ -286,6 +286,16 @@ key = "prefix+ctrl+t"
 type = "plugin_action"
 command = "herdr-tsk.quick-capture"
 description = "tsk quick capture"
+
+# Edit the notes of the task under the tsk board cursor in nvim; ctrl+e is
+# tsk's own edit key.
+[[keys.command]]
+key = "prefix+ctrl+e"
+type = "popup"
+command = "~/.config/herdr/scripts/tsk-notes.sh"
+description = "edit tsk notes in nvim"
+width = "80%"
+height = "80%"
 # -----------------------------------------------------------------------------
 
 # Legacy indexed shortcut config is still parsed for compatibility.
