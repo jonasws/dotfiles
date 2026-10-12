@@ -54,7 +54,8 @@ NEXUS_PASSWORD= { provider = "onepass", value = "op://Employee/Vy - Nexus/passwo
 MISE_GITHUB_TOKEN= { provider = "onepass", value = "op://Employee/mise github token/password", env = false }
 
 # Read by the MCP servers Claude Code starts, through the wrappers of the same
-# name in ~/.local/bin/wrapped. Each wrapper fetches its own token with
+# name in ~/.local/bin/wrapped. The gh wrapper exports GITHUB_PERSONAL_ACCESS_TOKEN
+# as GH_TOKEN, since both are the same 1Password item. Each wrapper fetches its own token with
 # fnox-secret and exports it to that one process, so `env = false` keeps both
 # out of every `fnox exec` subprocess -- maven never receives them.
 #
@@ -67,14 +68,6 @@ MISE_GITHUB_TOKEN= { provider = "onepass", value = "op://Employee/mise github to
 # tier belongs to the hosted endpoint at mcp.exa.ai, not to the package.
 GITHUB_PERSONAL_ACCESS_TOKEN= { provider = "onepass", value = "op://Employee/Liflig Github PAT/token", env = false }
 EXA_API_KEY= { provider = "onepass", value = "op://Employee/Exa API Key/password", env = false }
-
-# Read by the `gh` fish function, which runs
-# `fnox exec -P gh --no-defaults -- gh ...`. The profile exists to scope the
-# injection: `--no-defaults` drops the top-level secrets, so gh receives this
-# token and nothing else — no Nexus password, no maven PAT. `~/.config/gh/hosts.yml`
-# stays empty, so gh has no credential of its own outside this wrapper.
-[profiles.gh.secrets]
-GH_TOKEN = { provider = "onepass", value = "op://Employee/Liflig Github PAT/token" }
 
 # Read by the `gcal` fish function, which resolves each value with
 # `fnox get -P gcalcli --no-defaults`. gcalcli takes the OAuth client only as

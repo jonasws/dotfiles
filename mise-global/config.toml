@@ -163,7 +163,7 @@ run = '''
 set -euo pipefail
 # One run re-encrypts every top-level secret under one shared key, which is
 # what lets fnox-secret's single batch decrypt them all behind one Touch ID.
-# Profile secrets (`gh`, `gcalcli`) stay pure 1Password references: both are
+# Profile secrets (`gcalcli`) stay pure 1Password references: it is
 # used interactively, where a prompt costs nothing, and revocation stays
 # immediate rather than waiting for the next sync.
 fnox sync -g -p sync-age -f
