@@ -313,4 +313,24 @@ for _, nav in ipairs {
   table.insert(config.keys, split_nav('resize', key, direction))
 end
 
+-- herdr captures the mouse, so the default middle-click paste (which only fires
+-- when mouse reporting is off) never runs, and herdr drops the click for panes
+-- that don't request mouse input. Paste here instead; herdr forwards the
+-- bracketed paste to its focused pane. Also covers a three-finger tap, which
+-- MiddleClick.app posts as a real middle button.
+config.mouse_bindings = {
+  {
+    event = { Down = { streak = 1, button = 'Middle' } },
+    mods = 'NONE',
+    mouse_reporting = true,
+    action = act.PasteFrom 'Clipboard',
+  },
+  {
+    event = { Up = { streak = 1, button = 'Middle' } },
+    mods = 'NONE',
+    mouse_reporting = true,
+    action = act.Nop,
+  },
+}
+
 return config
