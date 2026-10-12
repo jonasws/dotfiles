@@ -110,6 +110,42 @@
           }
         ]
       }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.local/share/mise/shims/atuin hook claude-code",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.local/share/mise/shims/atuin hook claude-code",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.local/share/mise/shims/atuin hook claude-code",
+            "timeout": 5
+          }
+        ]
+      }
     ]
   },
   "worktree": {
