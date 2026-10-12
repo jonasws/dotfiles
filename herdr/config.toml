@@ -165,6 +165,8 @@ height = "80%"
 
 # Herdr F1: the agents in this session as a race in the browser. Clicking a car
 # focuses that agent's pane.
+# Requires the plugin, installed from upstream:
+#     herdr plugin install hmu332233/herdr-f1
 # prefix+shift+f rather than the upstream README's prefix+f, which the pane
 # picker above already owns. Reopening while the dashboard runs just points the
 # browser at it again; `herdr plugin action invoke dev.minung.herdr-f1.stop`

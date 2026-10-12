@@ -52,7 +52,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "opus",
+  "model": "sonnet",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "SessionStart": [
@@ -190,6 +190,7 @@
   "effortLevel": "high",
   "awaySummaryEnabled": false,
   "tui": "default",
+  "timeFormat": "24-hour",
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark-ansi",
   "editorMode": "vim",
