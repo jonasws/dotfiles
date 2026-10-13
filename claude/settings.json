@@ -76,16 +76,6 @@
             "async": true
           }
         ]
-      },
-      {
-        "matcher": "^(startup|resume|clear)$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash '/Users/jonasws/.claude/hooks/tsk-context.sh'",
-            "timeout": 10
-          }
-        ]
       }
     ],
     "SubagentStart": [

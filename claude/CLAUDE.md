@@ -131,8 +131,8 @@ For a change to a CDK app (the `*-infra` repos), run `cdk-reviewer` before commi
 Work that outlives one session goes on the tsk board (`tsk`, installed by mise
 as `github:smarzban/tsk`), shared by me and every Claude session across all repos.
 Inside a git repo the board scopes to that repo's project. The `tsk-cli` skill
-has the commands and the exit contract; a SessionStart hook lists the repo's
-live tasks.
+has the commands and the exit contract. Nothing lists the board at session
+start: look at it only when I ask for it or the work at hand involves it.
 
 - Add a task when work is deferred, split off, or found along the way, not for
   steps you will finish this session. Use steps (`tsk steps`) only when I want
@@ -143,9 +143,8 @@ live tasks.
   dropping it. Archive the task (`tsk archive`) with notes starting
   `Won't do: <reason>`, so a later session doesn't propose it again.
 - Only the main agent writes to the board. Subagents report back.
-- In a git worktree, pass `-p <main checkout path>` to `tsk add` and `tsk list`:
-  tsk otherwise treats each worktree as its own project. The SessionStart hook
-  names the path.
+- A git worktree is its own tsk project, the same as on the herdr board. Use
+  tsk's default scope there; do not pass `-p` to reach the main checkout.
 - In herdr, `prefix+t` opens the board and `prefix+ctrl+t` quick capture.
 
 ## Commit messages
