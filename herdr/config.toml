@@ -86,10 +86,8 @@ remove_worktree = "prefix+ctrl+g"
 # close_workspace = "prefix+shift+d"
 # previous_workspace = "" # optional, unset by default
 # next_workspace = ""     # optional, unset by default
-# With agent_panel_sort = "priority" the agent list is the attention queue, so
-# walking it lands on blocked agents first.
+# prefix+a is the attention jump in scripts/next-agent.sh (a keys.command below).
 previous_agent = "prefix+shift+a"
-next_agent = "prefix+a"
 # focus_agent = ""        # optional indexed binding, e.g. "prefix+alt+1..9"
 # remote_image_paste = "ctrl+v" # only active in herdr --remote; empty disables raw-key image paste
 # new_tab = "prefix+c"
@@ -108,6 +106,8 @@ next_agent = "prefix+a"
 # cycle_pane_next = "prefix+tab"
 # cycle_pane_previous = "prefix+shift+tab"
 # last_pane = ""          # optional, unset by default; bind e.g. "prefix+tab" for global back-and-forth
+# tmux's last-pane key. Pairs with prefix+a: jump to a blocked agent, then back.
+last_pane = "prefix+semicolon"
 # split_vertical = "prefix+v"
 # split_horizontal = "prefix+minus"
 # close_pane = "prefix+x"
@@ -287,6 +287,14 @@ type = "plugin_action"
 command = "herdr-tsk.quick-capture"
 description = "tsk quick capture"
 
+# Agents are sorted by space, so the built-in next_agent no longer lands on
+# blocked agents first. This visits blocked, then done, then any agent.
+[[keys.command]]
+key = "prefix+a"
+type = "shell"
+command = "~/.config/herdr/scripts/next-agent.sh"
+description = "next agent needing attention"
+
 # Edit the notes of the task under the tsk board cursor in nvim; ctrl+e is
 # tsk's own edit key.
 [[keys.command]]
@@ -407,6 +415,10 @@ height = "80%"
 # accent = "cyan"
 
 # Background notification popup delivery
+# Wide enough for most Claude topics on one row. Pinned by min_width too, since
+# herdr otherwise shrinks it to fit the workspace names.
+# sidebar_width = 34
+# sidebar_min_width = 34
 show_agent_labels_on_pane_borders = true
 # Agents follow the spaces list, where worktree spaces sit under their repo.
 agent_panel_sort = "spaces"
@@ -416,10 +428,6 @@ agent_panel_sort = "spaces"
 # so it stays visible even for a lone tab.
 hide_tab_bar_when_single_tab = false
 
-# Wide enough for most Claude topics on one row. Pinned by min_width too, since
-# herdr otherwise shrinks it to fit the workspace names.
-# sidebar_width = 34
-# sidebar_min_width = 34
 # Tabs are named by dan.pane-topic-sync from the pane's live topic, so there is
 # nothing left to type at creation time. Turning this off is what hands tab
 # labels over to the plugin; leaving it on means the plugin refuses to touch a
