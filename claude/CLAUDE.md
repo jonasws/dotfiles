@@ -86,14 +86,18 @@ between them:
 Use the `github` MCP tools. Never the `gh` CLI — it is denied in
 `permissions.deny`, and it has no credentials in any case: `~/.config/gh/hosts.yml`
 is empty, and the `~/.local/bin/wrapped/gh` wrapper that supplies `GH_TOKEN` via
-`fnox-secret` cannot reach 1Password from inside the sandbox. The github MCP
-server gets the same token through its own wrapper, outside the sandbox.
+`fnox-secret` cannot reach 1Password from inside the sandbox.
 
-Do not search the `nsbno` org with the github MCP (`search_code`, `search_issues`,
-`search_pull_requests`, `search_commits`, `org:nsbno` or `repo:nsbno/...`): its token
-lacks proper access there, so results come back empty or partial and read as "not
-found". Search the local clones under `~/CX`, `~/CNOPS` and `~/CN-TERMINAL` instead.
-If the repo is not cloned, say so rather than concluding from an empty search.
+The github MCP server is read-only and public-only: it runs with `--read-only` on
+a fine-grained token that can read public repositories and nothing else. It cannot
+see any private repo, issue or PR, and it cannot create, comment, push or merge.
+Use it for public open-source code and history.
+
+Do not use the github MCP for private repos — the `nsbno` and `capralifecycle`
+orgs included. A search there comes back empty and reads as "not found". Search
+the local clones under `~/CX`, `~/CNOPS` and `~/CN-TERMINAL` instead. If the repo
+is not cloned, say so rather than concluding from an empty search. Anything that
+needs write access or a private repo is mine to do with `gh`; tell me the command.
 
 A clone's working tree may sit on a feature branch, carry uncommitted edits, or lag
 behind the remote. To answer "what does nsbno/X do", search the default branch as

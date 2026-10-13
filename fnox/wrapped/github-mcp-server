@@ -1,7 +1,10 @@
 #!/bin/sh
-# github-mcp-server with GITHUB_PERSONAL_ACCESS_TOKEN from fnox, as Claude Code starts it
-# (see ~/.claude.json). The token is exported to this one process only;
-# fnox-secret explains how all its callers share one Touch ID per cold start.
+# github-mcp-server as Claude Code starts it (see ~/.claude.json), deliberately weak:
+# it gets MISE_GITHUB_TOKEN, a fine-grained token with public-repo read and nothing
+# else, and runs with --read-only so no write tool is even registered. Full access
+# stays with the gh wrapper, which agents cannot run. The token is exported to this
+# one process only; fnox-secret explains how all its callers share one Touch ID per
+# cold start.
 
 set -e
 
@@ -11,7 +14,7 @@ if [ -z "$real" ]; then
   exit 127
 fi
 
-GITHUB_PERSONAL_ACCESS_TOKEN="$("$(dirname "$0")/fnox-secret" GITHUB_PERSONAL_ACCESS_TOKEN)"
+GITHUB_PERSONAL_ACCESS_TOKEN="$("$(dirname "$0")/fnox-secret" MISE_GITHUB_TOKEN)"
 export GITHUB_PERSONAL_ACCESS_TOKEN
 
-exec "$real" "$@"
+exec "$real" "$@" --read-only
