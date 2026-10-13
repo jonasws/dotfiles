@@ -9,9 +9,10 @@
 # sidebar on a key that does not exist.
 AUTO_INDEX_WORKSPACES=0
 
-# Tabs keep their number: switch_tab = "prefix+1..9" is herdr's default and is
-# live here, so the digit on the label is the key that jumps to it.
-AUTO_INDEX_TABS=1
+# Tab labels are read by more than the tab bar -- herdr-bar, herdr-f1 and the
+# window title all show them -- and a "[2] " prefix means nothing there.
+# prefix+1..9 still counts tab position, which the tab bar already shows.
+AUTO_INDEX_TABS=0
 
 # Default is MAX_NAME_LEN + 8 = 28, which cuts a Claude topic mid-thought
 # ("Whoami endpoint with"). The tab bar spans the full terminal here and rarely
