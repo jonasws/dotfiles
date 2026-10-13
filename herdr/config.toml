@@ -408,13 +408,18 @@ height = "80%"
 
 # Background notification popup delivery
 show_agent_labels_on_pane_borders = true
-agent_panel_sort = "priority"
+# Agents follow the spaces list, where worktree spaces sit under their repo.
+agent_panel_sort = "spaces"
 
 # The tab row carries real information now -- herdr-automatic-rename labels each
 # tab with its foreground program, or the agent's topic when one is running --
 # so it stays visible even for a lone tab.
 hide_tab_bar_when_single_tab = false
 
+# Wide enough for most Claude topics on one row. Pinned by min_width too, since
+# herdr otherwise shrinks it to fit the workspace names.
+# sidebar_width = 34
+# sidebar_min_width = 34
 # Tabs are named by dan.pane-topic-sync from the pane's live topic, so there is
 # nothing left to type at creation time. Turning this off is what hands tab
 # labels over to the plugin; leaving it on means the plugin refuses to touch a
@@ -427,23 +432,24 @@ prompt_new_tab_name = false
 # Control -- names the task rather than the machine.
 window_title = "{workspace}: {terminal_title}"
 
-# Claude rows give the session topic two lines of its own, since that is the
-# part that tells agents apart. herdr truncates rather than wraps, so
-# claude/statusline-command.sh word-wraps the topic into $title_l1 and
-# $title_l2 on every status line refresh; $title_l2 and its row vanish when the
-# topic fits on one line. The "claude" agent label is dropped: the pane border
-# already shows it.
+# Claude rows drop the "claude" agent label: the pane border already shows it.
 #
 # $ctx is context window remaining (%) with the status line's thresholds and
-# colours, from the same status line report.
+# colours, reported by claude/statusline-command.sh. It leads its row because
+# herdr cannot right-align a token: first in the row, the numbers form a column.
 [ui.sidebar.agents.rows_by_agent]
 claude = [
-  ["state_icon", "$title_l1"],
-  ["$title_l2"],
-  ["workspace", { token = "$ctx", fg = "#74c7ec", rules = [
-    { lt = 11, fg = "#f38ba8", bold = true },
-    { lt = 26, fg = "#f9e2af" },
-  ] }],
+  [
+    "state_icon",
+    "terminal_title_stripped",
+  ],
+  [
+    { token = "$ctx", fg = "#74c7ec", rules = [
+      { lt = 11, fg = "#f38ba8", bold = true },
+      { lt = 26, fg = "#f9e2af" },
+    ] },
+    "workspace",
+  ],
 ]
 
 [ui.toast]
