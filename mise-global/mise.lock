@@ -100,13 +100,13 @@ url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/580134148"
 provenance = "github-attestations"
 
 [[tools.aws-cli]]
-version = "2.37.12"
+version = "2.37.13"
 backend = "aqua:aws/aws-cli"
 specifiers = ["latest"]
 
 [tools.aws-cli."platforms.macos-arm64"]
-checksum = "blake3:2bb2d828c9e31a2d79f4db60fde7232af0b252b9e7d3a3b3c4c1e29998e14bf7"
-url = "https://awscli.amazonaws.com/AWSCLIV2-2.37.12.pkg"
+checksum = "blake3:82ea0bf0e2be77a20b3623489be280786588eadc2c4ff9adf9cadfe469e1ceab"
+url = "https://awscli.amazonaws.com/AWSCLIV2-2.37.13.pkg"
 
 [[tools.aws-vault]]
 version = "7.16.2"
@@ -375,14 +375,14 @@ provenance = "github-attestations"
 provenance_verified = true
 
 [[tools."github:pb33f/openapi-changes"]]
-version = "0.2.12"
+version = "0.2.13"
 backend = "github:pb33f/openapi-changes"
 specifiers = ["latest"]
 
 [tools."github:pb33f/openapi-changes"."platforms.macos-arm64"]
-checksum = "sha256:7390161ec843b8bd7999e5e6c977898ca86a02587dc18028755c200c0df1a9cd"
-url = "https://github.com/pb33f/openapi-changes/releases/download/v0.2.12/openapi-changes_0.2.12_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/pb33f/openapi-changes/releases/assets/628713581"
+checksum = "sha256:dfdcb805e14c5445360153e6b4b28fc35b91d5743ae474d727dc05e891c6f5b8"
+url = "https://github.com/pb33f/openapi-changes/releases/download/v0.2.13/openapi-changes_0.2.13_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/pb33f/openapi-changes/releases/assets/630934656"
 
 [[tools."github:pb33f/printing-press"]]
 version = "0.0.28"
@@ -553,14 +553,14 @@ url = "https://github.com/jesseduffield/lazydocker/releases/download/v0.25.2/laz
 url_api = "https://api.github.com/repos/jesseduffield/lazydocker/releases/assets/399711580"
 
 [[tools.lazygit]]
-version = "0.66.0"
+version = "0.66.1"
 backend = "aqua:jesseduffield/lazygit"
 specifiers = ["latest"]
 
 [tools.lazygit."platforms.macos-arm64"]
-checksum = "sha256:e9fe2fe1f1bbc1b4c3214b33e8e0d57a4d6e3c2276aa9aa713f9bcbdc223e65c"
-url = "https://github.com/jesseduffield/lazygit/releases/download/v0.66.0/lazygit_0.66.0_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/jesseduffield/lazygit/releases/assets/613198499"
+checksum = "sha256:c66b15f666216142a2f39143f5540c6a572473f03fab014dae07c33cd76e719a"
+url = "https://github.com/jesseduffield/lazygit/releases/download/v0.66.1/lazygit_0.66.1_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/jesseduffield/lazygit/releases/assets/630328410"
 
 [[tools.maven]]
 version = "3.10.0"
@@ -594,7 +594,7 @@ checksum = "sha256:bed7eea5325e1108f32ce5228ddd6a5f0f08a499ee42aa7442aea583702f6
 url = "https://nodejs.org/dist/v24.21.0/node-v24.21.0-darwin-arm64.tar.gz"
 
 [[tools."npm:@earendil-works/pi-coding-agent"]]
-version = "1.1.0"
+version = "1.2.0"
 backend = "npm:@earendil-works/pi-coding-agent"
 specifiers = ["latest"]
 
@@ -604,7 +604,7 @@ backend = "npm:@mermaid-js/mermaid-cli"
 specifiers = ["latest"]
 
 [[tools."npm:@pb33f/openapi-changes"]]
-version = "0.2.12"
+version = "0.2.13"
 backend = "npm:@pb33f/openapi-changes"
 specifiers = ["latest"]
 
