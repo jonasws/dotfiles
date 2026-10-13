@@ -81,6 +81,12 @@ run = [
   "nvim --headless '+luafile {{config_root}}/lazyvim/headless-update.lua'",
 ]
 
+[tasks."update:nvim-nightly"]
+description = "Reinstall the neovim nightly build behind the nvn alias"
+# Not in `update`: nightly is opt-in. --force because "nightly" is a fixed
+# version name, so mise otherwise treats an existing install as current.
+run = "mise install --force neovim@nightly"
+
 [tasks."update:manifests"]
 description = "Rewrite the homebrew manifests this repo tracks"
 # Weekly, not daily: these two files are rewritten on every run, and most of
