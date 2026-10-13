@@ -45,17 +45,17 @@ key_file = "~/.config/fnox/age-se.txt"
 LIFLIG_GITHUB_PAT= { provider = "onepass", value = "op://Employee/Liflig Github PAT/token", env = "exec" }
 NEXUS_PASSWORD= { provider = "onepass", value = "op://Employee/Vy - Nexus/password", env = "exec" }
 
-# Read only by mise, whose `[settings.github] credential_command` runs
+# Read by mise, whose `[settings.github] credential_command` runs
 # `fnox-secret MISE_GITHUB_TOKEN`. Fine-grained, public-repo read and nothing else:
 # mise calls the GitHub API only to list releases and fetch assets, so the token
 # exists purely to lift the 60/hr anonymous rate limit. `env = false` keeps it
-# out of every `fnox exec` subprocess, so maven and the github MCP server never
-# receive it.
+# out of every `fnox exec` subprocess. The github MCP server wrapper reads it too,
+# so agents get public read access only.
 MISE_GITHUB_TOKEN= { provider = "onepass", value = "op://Employee/mise github token/password", env = false }
 
-# Read by the MCP servers Claude Code starts, through the wrappers of the same
-# name in ~/.local/bin/wrapped. The gh wrapper exports GITHUB_PERSONAL_ACCESS_TOKEN
-# as GH_TOKEN, since both are the same 1Password item. Each wrapper fetches its own token with
+# Read through the wrappers in ~/.local/bin/wrapped: the gh wrapper exports
+# GITHUB_PERSONAL_ACCESS_TOKEN as GH_TOKEN (full access, for gh only), and the exa
+# MCP server wrapper reads EXA_API_KEY. Each wrapper fetches its own token with
 # fnox-secret and exports it to that one process, so `env = false` keeps both
 # out of every `fnox exec` subprocess -- maven never receives them.
 #
