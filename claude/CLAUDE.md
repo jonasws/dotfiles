@@ -89,6 +89,32 @@ is empty, and the `~/.local/bin/wrapped/gh` wrapper that supplies `GH_TOKEN` via
 `fnox-secret` cannot reach 1Password from inside the sandbox. The github MCP
 server gets the same token through its own wrapper, outside the sandbox.
 
+Do not search the `nsbno` org with the github MCP (`search_code`, `search_issues`,
+`search_pull_requests`, `search_commits`, `org:nsbno` or `repo:nsbno/...`): its token
+lacks proper access there, so results come back empty or partial and read as "not
+found". Search the local clones under `~/CX`, `~/CNOPS` and `~/CN-TERMINAL` instead.
+If the repo is not cloned, say so rather than concluding from an empty search.
+
+A clone's working tree may sit on a feature branch, carry uncommitted edits, or lag
+behind the remote. To answer "what does nsbno/X do", search the default branch as
+pushed, independent of the checkout:
+
+```bash
+git -C ~/CX/<repo> fetch --quiet origin
+git -C ~/CX/<repo> grep -n '<pattern>' origin/HEAD -- '*.kt'
+git -C ~/CX/<repo> show origin/HEAD:path/to/File.kt
+git -C ~/CX/<repo> log -1 --format='%h %cr' origin/HEAD   # cite this
+```
+
+`origin/HEAD` resolves to the remote default branch (`master` or `main`) without a
+checkout. If it is unset, run `git remote set-head origin --auto` once. If the fetch
+fails, search anyway and say the result is as of that commit.
+
+semble, fff, ast-grep and LSP read the working tree, not a ref. Use them on a clone
+only when `git status -sb` shows the default branch, clean, and not behind
+`origin`; otherwise use `git grep` on `origin/HEAD`. When the question is about the
+checked-out branch itself, search the working tree and say which branch it was.
+
 ## Subagents and models
 
 The main session runs Opus and does the deciding: design, debugging, and reviewing

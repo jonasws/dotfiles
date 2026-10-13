@@ -30,7 +30,7 @@ From there the only question is which door. Picking wrong costs twice: a wasted 
 |---|---|---|
 | A named library, framework, SDK, or CLI tool — API, config, migration | Context7 | `npx ctx7@latest library` then `docs` |
 | AWS — service behavior, API/CLI params, CloudFormation/CDK, regional availability | aws-knowledge MCP | `aws___search_documentation` |
-| A specific repo or org — source, issues, PRs, releases, changelogs, "when did this change" | github MCP | `search_code`, `search_issues`, `list_releases` |
+| A specific repo or org (never `nsbno` — see below) — source, issues, PRs, releases, changelogs, "when did this change" | github MCP | `search_code`, `search_issues`, `list_releases` |
 | Everything else — news, comparisons, ecosystem questions, "does a tool exist for X" | exa MCP | `web_search_exa` |
 | Reading a URL you already have | `defuddle`, locally | `defuddle parse <url> --md -o page.md`, then grep — see [Reading a page](#reading-a-page) |
 
@@ -74,6 +74,8 @@ Use when the subject is a *project* rather than a topic: how an implementation a
 When none of those resolve it, say so and hand the question back with what you would check next. An unanswered question the user can close in one sentence beats a plausible guess.
 
 Never use the `gh` CLI here; it is denied and unauthenticated in this environment.
+
+Not for the `nsbno` org: the github MCP token lacks proper access there, so a search returns empty or partial results that look like a real "not found". Those repos are internal, not outside this machine — search the local clones under `~/CX`, `~/CNOPS` and `~/CN-TERMINAL`, and if the repo is not cloned, say so. Search the default branch rather than whatever is checked out: `git fetch origin`, then `git grep <pattern> origin/HEAD` and `git show origin/HEAD:<path>`. CLAUDE.md's GitHub section has the full recipe and when the working-tree tools are safe to use instead.
 
 ## exa MCP — the open web
 
