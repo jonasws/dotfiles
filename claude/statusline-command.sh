@@ -109,48 +109,14 @@ done
 
 # --- herdr sidebar tokens ---
 # Mirrors this agent into its row in herdr's sidebar (rows_by_agent.claude in
-# herdr/config.toml):
-#   $ctx                  context remaining, a bare number because herdr's
-#                         gt/lt colour rules only match values that parse as one
-#   $title_l1, $title_l2  the session topic word-wrapped over two rows, since
-#                         herdr truncates a row instead of wrapping it
+# herdr/config.toml): $ctx is context remaining, a bare number because herdr's
+# gt/lt colour rules only match values that parse as one.
 # No --seq: herdr keeps a source's highest seq for the pane's lifetime, so one
 # bad value would silence every later report. Backgrounded with every fd closed
 # so the status line never waits on herdr.
-
-# Columns a title row gets with herdr's default 26-column sidebar: the first
-# row loses one column plus the state icon, later rows lose three. herdr's API
-# cannot read the real width, so this assumes the divider was not dragged.
-TITLE_WIDTH=23
-
-# wrap_title <text> <first-row width>: sets title_l1 and title_l2
-wrap_title() {
-  local words word w1=$2 need
-  title_l1="" title_l2=""
-  read -ra words <<<"$1"
-  for word in "${words[@]}"; do
-    need=$((${#title_l1} + ${#word} + (${#title_l1} > 0)))
-    if [ -z "$title_l2" ] && [ "$need" -le "$w1" ]; then
-      title_l1="${title_l1:+$title_l1 }$word"
-    else
-      title_l2="${title_l2:+$title_l2 }$word"
-    fi
-  done
-  [ "${#title_l2}" -gt "$TITLE_WIDTH" ] && title_l2="${title_l2:0:TITLE_WIDTH-1}…"
-}
-
 report_herdr_tokens() {
-  local args=() title
-  [ -n "${remaining_int:-}" ] && args+=(--token "ctx=${remaining_int}")
-
-  title=$(herdr pane get "$HERDR_PANE_ID" 2>/dev/null | jq -r '.result.pane.terminal_title_stripped // empty')
-  case "$title" in claude | "claude "*) title="" ;; esac
-  wrap_title "$title" "$TITLE_WIDTH"
-  for t in title_l1 title_l2; do
-    if [ -n "${!t}" ]; then args+=(--token "$t=${!t}"); else args+=(--clear-token "$t"); fi
-  done
-
-  herdr pane report-metadata "$HERDR_PANE_ID" --source claude-statusline "${args[@]}"
+  [ -n "${remaining_int:-}" ] || return 0
+  herdr pane report-metadata "$HERDR_PANE_ID" --source claude-statusline --token "ctx=${remaining_int}"
 }
 
 if [ "${HERDR_ENV:-}" = 1 ] && [ -n "${HERDR_PANE_ID:-}" ] && command -v herdr >/dev/null; then
