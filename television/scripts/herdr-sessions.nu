@@ -13,9 +13,14 @@
 # not an option -- two shells split inside one workspace render an identical
 # label/state/title row.
 #
-# The pane the picker was launched from is omitted, since focusing it is a no-op.
-# Popup commands get HERDR_ACTIVE_PANE_ID (the tiled pane underneath the popup);
-# a picker run directly in a pane gets HERDR_PANE_ID instead.
+# The pane the picker was launched from sorts last: focusing it is a no-op, but
+# it stays findable. Popup commands get HERDR_ACTIVE_PANE_ID (the tiled pane
+# underneath the popup); a picker run directly in a pane gets HERDR_PANE_ID.
+#
+# The scope argument narrows the list the way herdr-bar's tab-cycled filters do;
+# the channel lists one source per scope so Tab steps through them. Widths and
+# workspace colours are computed over every pane before narrowing, so a row keeps
+# its colour and columns stay put while cycling.
 #
 # Output is one ANSI-coloured line per pane, starting with the pane id.
 
@@ -68,13 +73,25 @@ def paint [color: string]: string -> string {
     $"(ansi $color)($in)(ansi reset)"
 }
 
-def main [] {
+def in-scope [scope: string, rank: int]: nothing -> bool {
+    match $scope {
+        "agents" => ($rank <= 4)
+        "commands" => ($rank == 5)
+        "shells" => ($rank == 6)
+        "attention" => ($rank <= 1)
+        _ => true
+    }
+}
+
+# scope: all, agents, commands (panes running something else), shells, or
+# attention (blocked and done agents).
+def main [scope: string = "all"] {
     let snapshot = (herdr api snapshot | from json | get result.snapshot)
 
     # Outside a managed pane neither variable is set, so fall back to whatever the
     # server currently reports as focused.
     let from_env = [$env.HERDR_ACTIVE_PANE_ID? $env.HERDR_PANE_ID?] | compact
-    let exclude = if ($from_env | is-empty) { [$snapshot.focused_pane_id] } else { $from_env }
+    let current = if ($from_env | is-empty) { [$snapshot.focused_pane_id] } else { $from_env }
 
     let workspaces = (
         $snapshot.workspaces
@@ -84,7 +101,6 @@ def main [] {
 
     let rows = (
         $snapshot.panes
-        | where {|pane| $pane.pane_id not-in $exclude }
         | each {|pane|
             let title = ($pane.terminal_title_stripped? | default $pane.terminal_title? | default "" | str trim)
             let fg = ($title | foreground)
@@ -100,6 +116,7 @@ def main [] {
 
             {
                 pane_id: $pane.pane_id
+                current: ($pane.pane_id in $current)
                 rank: $att.rank
                 color: $att.color
                 wsnum: ($workspace.wsnum? | default 999)
@@ -108,7 +125,7 @@ def main [] {
                 title: $title
             }
         }
-        | sort-by rank wsnum pane_id
+        | sort-by current rank wsnum pane_id
     )
 
     if ($rows | is-empty) { return }
@@ -135,7 +152,7 @@ def main [] {
     # Upstream channels separate fields with two or three spaces rather than a
     # single one (see opencode-sessions, tmux-windows, gh-prs); the same gap reads
     # much better here than the tight single space.
-    $rows | each {|row|
+    $rows | where {|row| in-scope $scope $row.rank } | each {|row|
         [
             ($row.pane_id | clip $id_width | paint "light_gray")
             ($row.label | clip $label_width | paint ($group_color | get $"($row.wsnum)"))

@@ -10,11 +10,20 @@ unclassified agents, then panes running some other command, then idle shells.
 Each row is the pane id, workspace label, what the pane is running, and its
 terminal title. The state column is coloured by that same queue position, and
 the label is coloured per workspace so panes of one workspace read as a block.
+
+Tab cycles the scope, after herdr-bar: all, agents, panes running some
+other command, idle shells, and agents that need you (blocked or done).
 """
 requirements = ["herdr", "nu", "jq", "nc"]
 
 [source]
-command = "~/.config/television/scripts/herdr-sessions.nu"
+command = [
+  { name = "all", run = "~/.config/television/scripts/herdr-sessions.nu all" },
+  { name = "@ agents", run = "~/.config/television/scripts/herdr-sessions.nu agents" },
+  { name = "% panes", run = "~/.config/television/scripts/herdr-sessions.nu commands" },
+  { name = "$ shells", run = "~/.config/television/scripts/herdr-sessions.nu shells" },
+  { name = "! needs you", run = "~/.config/television/scripts/herdr-sessions.nu attention" },
+]
 # `ansi` and `display` are mutually exclusive (a display template selects the
 # processor that never strips escape codes), so colouring the state column means
 # the pane id must be visible text. It leads the row, dimmed, which reads more
@@ -34,11 +43,14 @@ frecency = false
 # herdr only ever emits SGR sequences, which television parses into styled text
 # via ansi_to_tui, so `--format ansi` renders the pane in its real colors. The
 # plain-text variant is kept one ctrl-f away as a fallback.
+#
+# The empty-scope guard lives in a script because tv runs previews through
+# $SHELL, which is fish here.
 [preview]
 command = [
-  "herdr pane read '{strip_ansi|split: :0}' --source visible --lines 200 --format ansi",
-  "herdr pane read '{strip_ansi|split: :0}' --source visible --lines 200",
-  "herdr pane read '{strip_ansi|split: :0}' --source recent-unwrapped --lines 400 --format ansi",
+  "~/.config/television/scripts/herdr-preview.sh '{strip_ansi|split: :0}' --source visible --lines 200 --format ansi",
+  "~/.config/television/scripts/herdr-preview.sh '{strip_ansi|split: :0}' --source visible --lines 200",
+  "~/.config/television/scripts/herdr-preview.sh '{strip_ansi|split: :0}' --source recent-unwrapped --lines 400 --format ansi",
 ]
 
 [ui]
@@ -53,6 +65,9 @@ scrollbar = true
 [keybindings]
 shortcut = "f4"
 enter = "actions:focus"
+# Enter focuses a single pane, so multi-select has no use here and Tab is free
+# to switch scope. tv has no reverse cycle, so shift-tab is left alone.
+tab = "cycle_sources"
 
 # Focus the exact pane over the socket API. `herdr tab focus` would only reach
 # the tab's active pane, which is the wrong one whenever a tab is split.
