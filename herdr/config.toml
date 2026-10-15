@@ -271,12 +271,13 @@ command = "herdr-splits.resize-right"
 # tsk: the task board shared by me and my Claude sessions, across every repo.
 # Registered with `tsk setup herdr` (mise: github:smarzban/tsk), which
 # links the herdr-tsk plugin and adds these two bindings. Capture moved off
-# tsk's default prefix+a, which next_agent owns.
+# tsk's default prefix+a, which next_agent owns. prefix+t toggles: it closes a
+# board in the tab in view, and otherwise opens or focuses one.
 [[keys.command]]
 key = "prefix+t"
-type = "plugin_action"
-command = "herdr-tsk.open-board"
-description = "tsk board"
+type = "shell"
+command = "~/.config/herdr/scripts/tsk-toggle.sh"
+description = "toggle tsk board"
 
 [[keys.command]]
 key = "prefix+ctrl+t"
