@@ -180,11 +180,23 @@ type = "plugin_action"
 command = "dev.minung.herdr-f1.open"
 description = "open F1 dashboard"
 
-# Lazygit in a session-modal popup, so it does not disturb the tab layout.
+# Lazygit in a session-modal popup, so it does not disturb the tab layout:
+# prefix+l opens on the files view, prefix+shift+l on the commit log. The
+# script starts lazygit in the repo of the pane the key was pressed in, and
+# layers lazygit/popup.yml on top so Esc at the top level closes the popup.
 [[keys.command]]
 key = "prefix+l"
 type = "popup"
-command = "lazygit"
+command = "~/.config/herdr/scripts/lazygit-popup.sh status"
+description = "lazygit: status"
+width = "80%"
+height = "80%"
+
+[[keys.command]]
+key = "prefix+shift+l"
+type = "popup"
+command = "~/.config/herdr/scripts/lazygit-popup.sh log"
+description = "lazygit: log"
 width = "80%"
 height = "80%"
 
