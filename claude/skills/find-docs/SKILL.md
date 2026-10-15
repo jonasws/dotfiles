@@ -75,7 +75,7 @@ When none of those resolve it, say so and hand the question back with what you w
 
 Never use the `gh` CLI here; it is denied and unauthenticated in this environment.
 
-Not for the `nsbno` org: the github MCP token lacks proper access there, so a search returns empty or partial results that look like a real "not found". Those repos are internal, not outside this machine — search the local clones under `~/CX`, `~/CNOPS` and `~/CN-TERMINAL`, and if the repo is not cloned, say so. Search the default branch rather than whatever is checked out: `git fetch origin`, then `git grep <pattern> origin/HEAD` and `git show origin/HEAD:<path>`. CLAUDE.md's GitHub section has the full recipe and when the working-tree tools are safe to use instead.
+Not for the `nsbno` org: the github MCP token lacks proper access there, so a search returns empty or partial results that look like a real "not found". Those repos are internal, not outside this machine. For another service's API (endpoints, DTOs), use the `sibling-api-docs` skill and read its rendered contract rather than its source. Otherwise search the local clones under `~/CX`, `~/CNOPS` and `~/CN-TERMINAL`, and if the repo is not cloned, say so. Search the default branch rather than whatever is checked out: `git fetch origin`, then `git grep <pattern> origin/HEAD` and `git show origin/HEAD:<path>`. CLAUDE.md's GitHub section has the full recipe and when the working-tree tools are safe to use instead.
 
 ## exa MCP — the open web
 
