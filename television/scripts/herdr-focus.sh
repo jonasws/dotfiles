@@ -11,6 +11,9 @@
 set -euo pipefail
 
 pane_id="${1:?usage: herdr-focus.sh <pane_id>}"
+
+# The channel's blank entry for an empty scope is not a pane; do nothing for it.
+[[ "$pane_id" =~ ^[^[:space:]:]+:p[^[:space:]]+$ ]] || exit 0
 socket="${HERDR_SOCKET_PATH:-$HOME/.config/herdr/herdr.sock}"
 
 # Newline-delimited JSON over a unix socket. The server answers one request per

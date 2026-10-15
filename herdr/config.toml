@@ -151,15 +151,18 @@ navigate_pane_up = "up"
 # width = "80%"
 # height = "80%"
 
-# Fuzzy pane picker. prefix+a still steps through the attention queue one agent
-# at a time; this jumps straight to any pane. The channel lists panes
-# attention-first (blocked, done, idle, working, other commands, shells) and
-# Enter focuses the selected pane over the socket API.
+# Fuzzy pane picker, and the Cmd+K bar: ctrl+alt+k is what the terminal sends
+# for Cmd+K. prefix+a still steps through the attention queue one agent at a
+# time; this jumps straight to any pane. The channel lists panes attention-first
+# (blocked, done, idle, working, other commands, shells), Tab cycles the scope,
+# and Enter focuses the selected pane over the socket API.
 # Channel: television/cable/herdr-sessions.toml
 [[keys.command]]
-key = "prefix+f"
+key = ["prefix+f", "prefix+k", "ctrl+alt+k"]
 type = "popup"
-command = "tv herdr-sessions"
+# The launcher sizes tv's preview to the popup's width; see the script. It
+# assumes the width and height below, so change its POPUP_*_PCT with them.
+command = "~/.config/television/scripts/herdr-picker.sh"
 width = "90%"
 height = "80%"
 
@@ -176,12 +179,6 @@ key = "prefix+shift+f"
 type = "plugin_action"
 command = "dev.minung.herdr-f1.open"
 description = "open F1 dashboard"
-
-[[keys.command]]
-key = ["prefix+k", "ctrl+alt+k"]
-type = "plugin_action"
-command = "herdr-bar.open"
-description = "command bar"
 
 # Lazygit in a session-modal popup, so it does not disturb the tab layout.
 [[keys.command]]
