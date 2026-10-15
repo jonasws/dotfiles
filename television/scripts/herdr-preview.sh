@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 # Preview a Herdr pane for the `herdr-sessions` channel.
 #
-# A scope with no panes still triggers a preview with an empty id, which herdr
-# answers with `pane_not_found`, so that case prints a note instead. Remaining
-# arguments go to `herdr pane read`.
+# An empty scope leaves only the channel's blank entry to preview, which is
+# not a pane id, so anything not shaped like one (wAE:p8)
+# prints a note instead of herdr's `pane_not_found`. Remaining arguments go to
+# `herdr pane read`.
 set -euo pipefail
 
 pane_id="${1-}"
 shift || true
 
-if [[ -z "$pane_id" ]]; then
+if [[ ! "$pane_id" =~ ^[^[:space:]:]+:p[^[:space:]]+$ ]]; then
   echo "No panes in this scope"
   exit 0
 fi

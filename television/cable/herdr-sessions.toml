@@ -3,16 +3,20 @@ name = "herdr-sessions"
 description = """
 Fuzzy find and jump to Herdr panes.
 
-Bound to prefix+f in herdr's config.toml.
-
 Panes are listed as an attention queue: blocked, done, idle, working,
 unclassified agents, then panes running some other command, then idle shells.
 Each row is the pane id, workspace label, what the pane is running, and its
 terminal title. The state column is coloured by that same queue position, and
 the label is coloured per workspace so panes of one workspace read as a block.
+Status glyphs and agent colours follow herdr-bar, which follows Herdr's sidebar.
 
 Tab cycles the scope, after herdr-bar: all, agents, panes running some
 other command, idle shells, and agents that need you (blocked or done).
+Typing a sigil first narrows the same way: @ agents, % panes, # shells,
+? needs you. ($ and ! are tv query syntax, so herdr-bar's sigils for the
+last two could not be kept.)
+
+Bound to prefix+f, prefix+k and ctrl+alt+k (Cmd+K) in herdr's config.toml.
 """
 requirements = ["herdr", "nu", "jq", "nc"]
 
@@ -21,8 +25,8 @@ command = [
   { name = "all", run = "~/.config/television/scripts/herdr-sessions.nu all" },
   { name = "@ agents", run = "~/.config/television/scripts/herdr-sessions.nu agents" },
   { name = "% panes", run = "~/.config/television/scripts/herdr-sessions.nu commands" },
-  { name = "$ shells", run = "~/.config/television/scripts/herdr-sessions.nu shells" },
-  { name = "! needs you", run = "~/.config/television/scripts/herdr-sessions.nu attention" },
+  { name = "# shells", run = "~/.config/television/scripts/herdr-sessions.nu shells" },
+  { name = "? needs you", run = "~/.config/television/scripts/herdr-sessions.nu attention" },
 ]
 # `ansi` and `display` are mutually exclusive (a display template selects the
 # processor that never strips escape codes), so colouring the state column means

@@ -30,18 +30,34 @@ const STATE_MIN = 14
 
 # Workspaces cycle through these so rows belonging together read as a block, and
 # so two workspaces sharing a label (herdr defaults it to the directory name) stay
-# tellable apart. Deliberately not the state colours' saturated variants.
-const GROUP_COLORS = [light_blue light_magenta light_cyan light_green light_yellow light_purple]
+# tellable apart. Kept clear of the status colours (cyan, green, red, amber) so a
+# label never reads as a state; the hex values are Catppuccin lavender, pink
+# and peach.
+const GROUP_COLORS = [light_blue light_magenta light_yellow "#b4befe" "#f5c2e7" "#fab387"]
 
-# rank drives sort order, colour marks the group boundaries.
+# rank drives sort order. Glyphs and colours are herdr-bar's, which in turn
+# mirror Herdr's own sidebar, so the picker reads the same as the sidebar --
+# except idle: tv renders anything above U+0700 outside the ranges it trusts
+# (U+2000-U+25FF, Nerd Font, emoji) as ␀, which takes Herdr's ✓ (U+2713), so
+# √ stands in for it.
 def attention [status: string]: nothing -> record {
     match $status {
-        "blocked" => {rank: 0, color: "light_red_bold"}
-        "done" => {rank: 1, color: "green"}
-        "idle" => {rank: 2, color: "yellow"}
-        "working" => {rank: 3, color: "cyan"}
-        _ => {rank: 4, color: "magenta"}
+        "blocked" => {rank: 0, glyph: "◉", color: "light_red_bold"}
+        "done" => {rank: 1, glyph: "●", color: "light_cyan"}
+        "idle" => {rank: 2, glyph: "√", color: "light_green"}
+        "working" => {rank: 3, glyph: "◐", color: "#c78a1f"}
+        _ => {rank: 4, glyph: "○", color: "dark_gray"}
     }
+}
+
+# Vendor colours from herdr-bar, so a mixed team of agents scans by colour.
+const AGENT_COLORS = {
+    claude: "#D97757"
+    codex: "#10A37F"
+    gemini: "#4285F4"
+    cursor: "#A78BFA"
+    opencode: "#38BDF8"
+    kimi: "#9B8AFB"
 }
 
 # A shell titles itself "<command line> <abbreviated cwd>" while something runs
@@ -69,6 +85,34 @@ def clip [width: int]: string -> string {
     }
 }
 
+# A row's name followed by dimmed context, with the context dropped when the
+# name already contains it. Agents lead with the tab name, since that is what
+# the work was named, and trail the agent's own summary. Other panes lead with
+# their terminal title and trail the tab name, so a shell split into an agent's
+# tab does not pass itself off as the agent.
+def heading [name: string, context: string]: nothing -> string {
+    if $name == "" {
+        $context
+    } else if $context == "" or ($name | str lowercase | str contains ($context | str lowercase)) {
+        $name
+    } else {
+        $"($name)  (ansi dark_gray)($context)(ansi reset)"
+    }
+}
+
+# Glyph and status in the attention colour, the agent in its vendor colour.
+# State text is never wider than the column, which sizes to the widest row, so
+# padding the plain text length is enough and nothing needs clipping.
+def state-cell [row: record, width: int]: nothing -> string {
+    let pad = ("" | fill --width ($width - ($row.state | str length)))
+    let agent = if $row.agent == "" {
+        ""
+    } else {
+        ($row.agent | paint ($AGENT_COLORS | get -o $row.agent | default "default")) + " "
+    }
+    $"($row.glyph | paint $row.color) ($agent)($row.status | paint $row.color)($pad)"
+}
+
 def paint [color: string]: string -> string {
     $"(ansi $color)($in)(ansi reset)"
 }
@@ -81,6 +125,14 @@ def in-scope [scope: string, rank: int]: nothing -> bool {
         "attention" => ($rank <= 1)
         _ => true
     }
+}
+
+# Typed sigils, after herdr-bar's: a row carries the sigil of every scope it
+# belongs to, so typing one first narrows the list by fuzzy match alone. tv's
+# query syntax reserves `!` and a trailing `$`, so herdr-bar's `$ shells` and
+# `! needs you` become `#` and `?` here.
+def sigils [rank: int]: nothing -> string {
+    if $rank <= 1 { "@?" } else if $rank <= 4 { "@" } else if $rank == 5 { "%" } else { "#" }
 }
 
 # scope: all, agents, commands (panes running something else), shells, or
@@ -99,18 +151,24 @@ def main [scope: string = "all"] {
         | rename workspace_id label wsnum
     )
 
+    let tab_labels = (
+        $snapshot.tabs
+        | reduce --fold {} {|tab, acc| $acc | insert $tab.tab_id ($tab.label? | default "" | str trim) }
+    )
+
     let rows = (
         $snapshot.panes
         | each {|pane|
             let title = ($pane.terminal_title_stripped? | default $pane.terminal_title? | default "" | str trim)
             let fg = ($title | foreground)
             let agent = ($pane.agent? | default "")
+            let status = ($pane.agent_status? | default "unknown")
             let att = if $agent != "" {
-                attention ($pane.agent_status? | default "unknown")
+                attention $status
             } else if $fg != null {
-                {rank: 5, color: "blue"}
+                {rank: 5, glyph: "▸", color: "blue"}
             } else {
-                {rank: 6, color: "light_gray"}
+                {rank: 6, glyph: "·", color: "light_gray"}
             }
             let workspace = ($workspaces | where workspace_id == $pane.workspace_id | first)
 
@@ -119,10 +177,18 @@ def main [scope: string = "all"] {
                 current: ($pane.pane_id in $current)
                 rank: $att.rank
                 color: $att.color
+                glyph: $att.glyph
+                agent: $agent
+                status: (if $agent != "" { $status } else { $fg | default "shell" })
                 wsnum: ($workspace.wsnum? | default 999)
                 label: ($workspace.label? | default $pane.workspace_id)
-                state: (if $agent != "" { $"($agent) ($pane.agent_status? | default 'unknown')" } else { $fg | default "shell" })
-                title: $title
+                state: ([$att.glyph $agent (if $agent != "" { $status } else { $fg | default "shell" })] | where {|it| $it != "" } | str join " ")
+                title: (if $agent != "" {
+                    heading ($tab_labels | get -o $pane.tab_id | default "") ($pane.label? | default $title | str trim)
+                } else {
+                    let cwd = ($pane.foreground_cwd? | default $pane.cwd? | default "" | str replace $env.HOME "~")
+                    heading (if $title != "" { $title } else { $cwd }) ($tab_labels | get -o $pane.tab_id | default "")
+                })
             }
         }
         | sort-by current rank wsnum pane_id
@@ -152,11 +218,22 @@ def main [scope: string = "all"] {
     # Upstream channels separate fields with two or three spaces rather than a
     # single one (see opencode-sessions, tmux-windows, gh-prs); the same gap reads
     # much better here than the tight single space.
-    $rows | where {|row| in-scope $scope $row.rank } | each {|row|
+    let shown = ($rows | where {|row| in-scope $scope $row.rank })
+
+    # An empty source makes tv list its own "Command produced no output" line
+    # and preview it as a pane called "Command". A single blank line counts as
+    # output, so the list stays visibly empty; the blank entry is not a pane id,
+    # which the preview and focus scripts both check before acting.
+    if ($shown | is-empty) {
+        return ""
+    }
+
+    $shown | each {|row|
         [
-            ($row.pane_id | clip $id_width | paint "light_gray")
+            ($row.pane_id | clip $id_width | paint "dark_gray")
+            (sigils $row.rank | clip 2 | paint "dark_gray")
             ($row.label | clip $label_width | paint ($group_color | get $"($row.wsnum)"))
-            ($row.state | clip $state_width | paint $row.color)
+            (state-cell $row $state_width)
             $row.title
         ] | str join "  "
     } | to text
