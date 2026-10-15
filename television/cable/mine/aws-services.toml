@@ -1,0 +1,70 @@
+[metadata]
+name = "aws-services"
+description = "Pick an AWS service, output its console URL path (used by aws-profiles' open-browser action)"
+
+[source]
+# "Display Name|console/url/path" pairs. Paths match console.aws.amazon.com/<path>/home
+# (see utils/aws-console, which appends /home when the path has no slash already).
+command = '''
+printf '%s\n' \
+  "ACM (Certificate Manager)|acm" \
+  "API Gateway|apigateway" \
+  "AppSync|appsync" \
+  "Athena|athena" \
+  "Backup|backup" \
+  "Bedrock|bedrock" \
+  "Billing|billing" \
+  "Cloud9|cloud9" \
+  "Cloud Map|cloudmap" \
+  "CloudFormation|cloudformation" \
+  "CloudFront|cloudfront" \
+  "CloudTrail|cloudtrail" \
+  "CloudWatch|cloudwatch" \
+  "CodeArtifact|codesuite/codeartifact" \
+  "CodeCommit|codesuite/codecommit" \
+  "CodeDeploy|codedeploy" \
+  "CodePipeline|codepipeline" \
+  "Cognito|cognito" \
+  "Config|config" \
+  "Control Tower|controltower" \
+  "Cost Management|cost-management" \
+  "Direct Connect|directconnect/v2" \
+  "DMS|dms/v2" \
+  "DynamoDB|dynamodbv2" \
+  "EC2|ec2/v2" \
+  "ECR|ecr" \
+  "ECS|ecs" \
+  "EKS|eks" \
+  "ElastiCache|elasticache" \
+  "Elastic Beanstalk|elasticbeanstalk" \
+  "EventBridge|events" \
+  "Global Accelerator|globalaccelerator" \
+  "GuardDuty|guardduty" \
+  "IAM|iamv2" \
+  "IAM Identity Center (SSO)|singlesignon" \
+  "KMS|kms" \
+  "Lambda|lambda" \
+  "Managed Grafana|grafana" \
+  "MWAA (Managed Airflow)|mwaa" \
+  "Organizations|organizations/v2" \
+  "RAM (Resource Access Manager)|ram" \
+  "RDS|rds" \
+  "Redshift|redshiftv2" \
+  "Route 53|route53/v2" \
+  "S3|s3" \
+  "SageMaker|sagemaker" \
+  "Secrets Manager|secretsmanager" \
+  "Security Hub|securityhub" \
+  "SES|ses" \
+  "SNS|sns" \
+  "SQS|sqs" \
+  "SSM Parameter Store|systems-manager/parameters" \
+  "Step Functions|states" \
+  "Systems Manager|systems-manager" \
+  "Trusted Advisor|trustedadvisor" \
+  "VPC|vpc" \
+  "WAF & Shield|wafv2/homev2"
+'''
+
+display = "{split:|:0}"
+output = "{split:|:1}"

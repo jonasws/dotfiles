@@ -1,0 +1,6 @@
+[metadata]
+name = "cnops-prod-log-groups"
+description = "CNOPS production AWS log groups"
+
+[source]
+command = "cat ~/.local/share/aws-logs/cnops-prod-log-groups.txt"

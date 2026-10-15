@@ -1,0 +1,42 @@
+[metadata]
+name = "git-repos"
+requirements = ["fd", "git", "zoxide"]
+description = """
+A channel to select from git repositories on your local machine.
+
+This channel uses `fd` to find directories that contain a `.git` subdirectory, and then allows you to preview the git log of the selected repository.
+
+Results are ranked by zoxide frecency first (most visited/recent repos on top), falling back to fd's raw discovery order for repos zoxide hasn't scored yet (e.g. freshly cloned ones).
+"""
+
+[source]
+# The fd half of the list is cached; see the script.
+command = "~/.config/television/scripts/git-repos.sh"
+display = "{split:/:-1}"
+no_sort = true
+frecency = false
+
+[preview]
+command = "git -C {} log -n 200 --pretty=medium --all --graph --color"
+
+[keybindings]
+enter = "actions:cd"
+ctrl-e = "actions:edit"
+ctrl-w = "actions:workspace"
+
+[actions.cd]
+description = "Open a new shell in the selected repository"
+command = "cd '{}' && $SHELL"
+mode = "execute"
+
+[actions.edit]
+description = "Open the repository in editor"
+command = "${EDITOR:-vim} '{}'"
+shell = "bash"
+mode = "execute"
+
+[actions.workspace]
+description = "Open as a Herdr workspace, or focus it if already open"
+command = "~/.config/television/scripts/herdr-workspace.sh '{}'"
+shell = "bash"
+mode = "execute"

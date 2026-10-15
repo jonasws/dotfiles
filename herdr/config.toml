@@ -156,7 +156,7 @@ navigate_pane_up = "up"
 # time; this jumps straight to any pane. The channel lists panes attention-first
 # (blocked, done, idle, working, other commands, shells), Tab cycles the scope,
 # and Enter focuses the selected pane over the socket API.
-# Channel: television/cable/herdr-sessions.toml
+# Channel: television/cable/mine/herdr-sessions.toml
 [[keys.command]]
 key = ["prefix+f", "prefix+k", "ctrl+alt+k"]
 type = "popup"
