@@ -10,7 +10,16 @@ zed/prompts/
 yazi/flavors/
 yazi/plugins/
 nix-darwin/result
-television/cable/
+# tv channels: upstream ones come from `tv update-channels` and stay untracked.
+# Our own live in cable/mine/. Forks of upstream channels keep the upstream file
+# name, which tv keys channels by, so update-channels skips them instead of a
+# second copy colliding with them.
+television/cable/*
+!television/cable/mine/
+!television/cable/aws-profiles.toml
+!television/cable/channels.toml
+!television/cable/git-repos.toml
+!television/cable/zoxide.toml
 /.tmp
 /superfile/theme
 /fnox/age-se.txt

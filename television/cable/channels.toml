@@ -1,0 +1,22 @@
+[metadata]
+name = "channels"
+description = "Select a television channel"
+requirements = ["tv", "bat"]
+
+[source]
+command = ["tv list-channels"]
+
+# Channels live at any depth under cable/ (our own sit in cable/mine/), so the
+# file is found rather than globbed. -I because cable/ is gitignored in the
+# dotfiles repo it is linked from, which fd would otherwise honour.
+[preview]
+command = "bat -pn --color always \"$(fd -I -1 -t f -g '{}.toml' \"${TELEVISION_CONFIG:-${XDG_CONFIG_HOME:-$HOME/.config}/television}/cable\")\""
+shell = "bash"
+
+[keybindings]
+enter = "actions:channel-enter"
+
+[actions.channel-enter]
+description = "Enter a television channel"
+command = "tv {}"
+mode = "execute"
