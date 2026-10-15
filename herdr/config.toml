@@ -302,6 +302,15 @@ command = "~/.config/herdr/scripts/tsk-notes.sh"
 description = "edit tsk notes in nvim"
 width = "80%"
 height = "80%"
+
+# Subagent viewers for the Claude session in this pane, opened on demand: the
+# Claude hooks only record subagents. Pressed in the viewer tab, it closes it.
+# Script: claude/hooks/subagent-viewer.sh
+[[keys.command]]
+key = "prefix+shift+s"
+type = "shell"
+command = "bash ~/.claude/hooks/subagent-viewer.sh toggle"
+description = "toggle subagent viewers"
 # -----------------------------------------------------------------------------
 
 # Legacy indexed shortcut config is still parsed for compatibility.
