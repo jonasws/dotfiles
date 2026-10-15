@@ -1,0 +1,3 @@
+# Layered over config.yml for lazygit in a Herdr popup: Esc at the top level
+# quits, which closes the popup.
+quitOnTopLevelReturn: true
