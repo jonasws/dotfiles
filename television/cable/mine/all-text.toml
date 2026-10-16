@@ -4,6 +4,8 @@ description = "A channel to find and select text from files, without ignoring"
 requirements = ["rg", "bat"]
 
 [source]
+# bash: tv runs commands through $SHELL (fish), which costs about 80ms a run.
+shell = "bash"
 command = [
   "rg . --no-ignore --no-heading --line-number --colors 'match:fg:white' --colors 'path:fg:blue' --color=always",
   "rg . --no-ignore --no-heading --line-number --hidden --colors 'match:fg:white' --colors 'path:fg:blue' --color=always",
@@ -12,6 +14,7 @@ ansi = true
 output = "{strip_ansi|split:\\::..2}"
 
 [preview]
+shell = "bash"
 command = "bat -n --color=always '{strip_ansi|split:\\::0}'"
 env = { BAT_THEME = "ansi" }
 offset = '{strip_ansi|split:\::1}'

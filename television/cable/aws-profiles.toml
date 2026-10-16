@@ -4,6 +4,8 @@ description = "Pick an AWS profile and open its console"
 requirements = ["awk"]
 
 [source]
+# bash: tv runs commands through $SHELL (fish), which costs about 80ms a run.
+shell = "bash"
 command = "awk -F'[][]' '/^\\[profile cn/ {sub(/^profile /, \"\", $2); print $2}' ~/.aws/config 2>/dev/null"
 
 [keybindings]

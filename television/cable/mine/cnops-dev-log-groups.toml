@@ -3,4 +3,6 @@ name = "cnops-dev-log-groups"
 description = "CNOPS dev AWS log groups"
 
 [source]
+# bash: tv runs commands through $SHELL (fish), which costs about 80ms a run.
+shell = "bash"
 command = "cat ~/.local/share/aws-logs/cnops-dev-log-groups.txt"

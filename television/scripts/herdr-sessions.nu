@@ -1,4 +1,4 @@
-#!/usr/bin/env nu
+#!/usr/bin/env -S nu -n --no-std-lib
 
 # Emit one line per Herdr pane for the `herdr-sessions` television channel.
 #
