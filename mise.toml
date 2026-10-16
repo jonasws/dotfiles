@@ -219,6 +219,10 @@ target = "~/.config/nvim"
 mode = "symlink"
 
 [dotfile_groups.lnav]
+[dotfile_groups.leaf]
+root = "leaf"
+target = "~/.config/leaf"
+
 root = "lnav"
 target = "~/.config/lnav"
 
