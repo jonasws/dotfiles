@@ -98,6 +98,7 @@ usage = "6.9.0"
 # dir's `latest` symlink. `|| true` because an unchanged skill exits 1.
 "github:smarzban/tsk" = { version = "latest", postinstall = "\"$MISE_TOOL_INSTALL_PATH/tsk\" setup claude || true" }
 atuin = "latest"
+"github:RivoLink/leaf" = "latest"
 
 [settings]
 # No `lockfile = true`: that creates a mise.lock in every project mise touches,
