@@ -170,9 +170,7 @@ navigate_pane_up = "up"
 [[keys.command]]
 key = ["prefix+f", "prefix+k", "ctrl+alt+k"]
 type = "popup"
-# The launcher sizes tv's preview to the popup's width; see the script. It
-# assumes the width and height below, so change its POPUP_*_PCT with them.
-command = "~/.config/television/scripts/herdr-picker.sh"
+command = "tv herdr-sessions"
 width = "90%"
 height = "80%"
 
