@@ -225,6 +225,16 @@ checksum = "sha256:4284325e09e3e2bd62eea76e803701d81750619f951956e5698d208c37c9b
 url = "https://github.com/BurntSushi/bttf/releases/download/0.1.4/bttf-0.1.4-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/BurntSushi/bttf/releases/assets/432196770"
 
+[[tools."github:RivoLink/leaf"]]
+version = "1.29.1"
+backend = "github:RivoLink/leaf"
+specifiers = ["latest"]
+
+[tools."github:RivoLink/leaf"."platforms.macos-arm64"]
+checksum = "sha256:c35a30d42600cc9574b44a39ed71fcf382f8513bf58ceb6cd11b9980b49f130c"
+url = "https://github.com/RivoLink/leaf/releases/download/1.29.1/leaf-macos-arm64"
+url_api = "https://api.github.com/repos/RivoLink/leaf/releases/assets/641708748"
+
 [[tools."github:achristmascarl/rainfrog"]]
 version = "0.4.6"
 backend = "github:achristmascarl/rainfrog"
