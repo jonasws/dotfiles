@@ -28,6 +28,16 @@ onboarding = false
 
 name = "catppuccin"
 auto_switch = false
+
+# Catppuccin Mocha
+[theme.custom]
+sidebar_bg = "#181825"
+active_row_bg = "#313244"
+selection_bg = "#45475a"
+accent = "#cba6f7"
+overlay0 = "#7f849c"
+overlay1 = "#9399b2"
+
 [terminal]
 # Executable used for new interactive panes.
 # Empty means $SHELL, then /bin/sh.
@@ -86,8 +96,9 @@ remove_worktree = "prefix+ctrl+g"
 # close_workspace = "prefix+shift+d"
 # previous_workspace = "" # optional, unset by default
 # next_workspace = ""     # optional, unset by default
-# prefix+a is the attention jump in scripts/next-agent.sh (a keys.command below).
-previous_agent = "prefix+shift+a"
+# The custom attention jump (scripts/next-agent.sh) is commented out below.
+next_agent = "prefix+a"
+previous_agent = "prefix+semicolon"
 # focus_agent = ""        # optional indexed binding, e.g. "prefix+alt+1..9"
 # remote_image_paste = "ctrl+v" # only active in herdr --remote; empty disables raw-key image paste
 # new_tab = "prefix+c"
@@ -106,8 +117,7 @@ previous_agent = "prefix+shift+a"
 # cycle_pane_next = "prefix+tab"
 # cycle_pane_previous = "prefix+shift+tab"
 # last_pane = ""          # optional, unset by default; bind e.g. "prefix+tab" for global back-and-forth
-# tmux's last-pane key. Pairs with prefix+a: jump to a blocked agent, then back.
-last_pane = "prefix+semicolon"
+# last_pane = "prefix+semicolon"  # disabled while testing multiple clients
 # split_vertical = "prefix+v"
 # split_horizontal = "prefix+minus"
 # close_pane = "prefix+x"
@@ -297,13 +307,15 @@ type = "plugin_action"
 command = "herdr-tsk.quick-capture"
 description = "tsk quick capture"
 
+# Disabled while checking it against multiple attached clients: the script
+# starts its ring from the server-wide focused agent, not the pressing client's.
 # Agents are sorted by space, so the built-in next_agent no longer lands on
 # blocked agents first. This visits blocked, then done, then any agent.
-[[keys.command]]
-key = "prefix+a"
-type = "shell"
-command = "~/.config/herdr/scripts/next-agent.sh"
-description = "next agent needing attention"
+# [[keys.command]]
+# key = "prefix+a"
+# type = "shell"
+# command = "~/.config/herdr/scripts/next-agent.sh"
+# description = "next agent needing attention"
 
 # Edit the notes of the task under the tsk board cursor in nvim; ctrl+e is
 # tsk's own edit key.
@@ -337,13 +349,13 @@ description = "toggle subagent viewers"
 
 [ui]
 # Sidebar width (auto-scaled based on workspace names, this sets the default)
-# sidebar_width = 26
+sidebar_width = 34
 
 # Minimum sidebar width when expanded (columns)
-# sidebar_min_width = 18
+sidebar_min_width = 26
 
 # Maximum sidebar width when expanded (columns)
-# sidebar_max_width = 36
+sidebar_max_width = 48
 
 # Start with the sidebar collapsed. Changes take effect on the next launch.
 # sidebar_start_collapsed = false
