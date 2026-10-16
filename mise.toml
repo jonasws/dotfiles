@@ -150,6 +150,7 @@ target = "~/.claude"
 "~/.claude/skills/dispatching-parallel-agents" = { mode = "symlink" }
 "~/.claude/skills/find-docs" = { mode = "symlink" }
 "~/.claude/skills/jvm-sandbox-tests" = { mode = "symlink" }
+"~/.claude/skills/markdown-preview" = { mode = "symlink" }
 "~/.claude/skills/maven-kotlin-builds" = { mode = "symlink" }
 "~/.claude/skills/systematic-debugging" = { mode = "symlink" }
 "~/.claude/skills/test-driven-development" = { mode = "symlink" }
