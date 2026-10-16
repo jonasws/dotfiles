@@ -4,6 +4,8 @@ description = "Select a television channel"
 requirements = ["tv", "bat"]
 
 [source]
+# bash: tv runs commands through $SHELL (fish), which costs about 80ms a run.
+shell = "bash"
 command = ["tv list-channels"]
 
 # Channels live at any depth under cable/ (our own sit in cable/mine/), so the
@@ -17,6 +19,7 @@ shell = "bash"
 enter = "actions:channel-enter"
 
 [actions.channel-enter]
+shell = "bash"
 description = "Enter a television channel"
 command = "tv {}"
 mode = "execute"

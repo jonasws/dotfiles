@@ -4,11 +4,14 @@ description = "Browse zoxide directory history"
 requirements = ["zoxide"]
 
 [source]
+# bash: tv runs commands through $SHELL (fish), which costs about 80ms a run.
+shell = "bash"
 command = "zoxide query -l | grep -vFx \"$(git rev-parse --show-toplevel 2>/dev/null)\""
 no_sort = true
 frecency = false
 
 [preview]
+shell = "bash"
 command = "ls -la --color=always '{}'"
 
 [keybindings]
@@ -16,11 +19,13 @@ enter = "actions:cd"
 ctrl-d = "actions:remove"
 
 [actions.cd]
+shell = "bash"
 description = "Change to the selected directory"
 command = "cd '{}' && $SHELL"
 mode = "execute"
 
 [actions.remove]
+shell = "bash"
 description = "Remove the selected directory from zoxide"
 command = "zoxide remove '{}'"
 mode = "fork"

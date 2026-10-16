@@ -28,6 +28,10 @@ command = [
   { name = "# shells", run = "~/.config/television/scripts/herdr-sessions.nu shells" },
   { name = "? needs you", run = "~/.config/television/scripts/herdr-sessions.nu attention" },
 ]
+# tv runs commands through $SHELL, which is fish here, and fish costs about 70ms
+# a run before the script starts. That is the visible gap between the frame and
+# the list, and it repeats on every watch refresh and every preview.
+shell = "bash"
 # `ansi` and `display` are mutually exclusive (a display template selects the
 # processor that never strips escape codes), so colouring the state column means
 # the pane id must be visible text. It leads the row, dimmed, which reads more
@@ -51,6 +55,7 @@ frecency = false
 # The empty-scope guard lives in a script because tv runs previews through
 # $SHELL, which is fish here.
 [preview]
+shell = "bash"
 command = [
   "~/.config/television/scripts/herdr-preview.sh '{strip_ansi|split: :0}' --source visible --lines 200 --format ansi",
   "~/.config/television/scripts/herdr-preview.sh '{strip_ansi|split: :0}' --source visible --lines 200",
@@ -58,16 +63,19 @@ command = [
 ]
 
 [ui]
-layout = "landscape"
+layout = "portrait"
 input_header = "Herdr panes"
 
 [ui.preview_panel]
-size = 60
+size = 62
 header = "{strip_ansi|split: :0}"
 scrollbar = true
 
 [keybindings]
 shortcut = "f4"
+# Cmd+K opens this picker from herdr, and a popup takes all input while it is
+# open, so the same chord reaches tv here and toggles it closed.
+ctrl-alt-k = "quit"
 enter = "actions:focus"
 # Enter focuses a single pane, so multi-select has no use here and Tab is free
 # to switch scope. tv has no reverse cycle, so shift-tab is left alone.
@@ -78,6 +86,8 @@ tab = "cycle_sources"
 # `execute` replaces tv with the command, so the picker is gone by the time
 # focus lands.
 [actions.focus]
+# bash: tv runs commands through $SHELL (fish), which costs about 80ms a run.
+shell = "bash"
 description = "Jump to the selected pane"
 command = "~/.config/television/scripts/herdr-focus.sh '{strip_ansi|split: :0}'"
 mode = "execute"

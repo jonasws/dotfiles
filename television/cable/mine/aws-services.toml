@@ -3,6 +3,8 @@ name = "aws-services"
 description = "Pick an AWS service, output its console URL path (used by aws-profiles' open-browser action)"
 
 [source]
+# bash: tv runs commands through $SHELL (fish), which costs about 80ms a run.
+shell = "bash"
 # "Display Name|console/url/path" pairs. Paths match console.aws.amazon.com/<path>/home
 # (see utils/aws-console, which appends /home when the path has no slash already).
 command = '''

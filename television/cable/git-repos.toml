@@ -10,6 +10,8 @@ Results are ranked by zoxide frecency first (most visited/recent repos on top), 
 """
 
 [source]
+# bash: tv runs commands through $SHELL (fish), which costs about 80ms a run.
+shell = "bash"
 # The fd half of the list is cached; see the script.
 command = "~/.config/television/scripts/git-repos.sh"
 display = "{split:/:-1}"
@@ -17,6 +19,7 @@ no_sort = true
 frecency = false
 
 [preview]
+shell = "bash"
 command = "git -C {} log -n 200 --pretty=medium --all --graph --color"
 
 [keybindings]
@@ -25,6 +28,7 @@ ctrl-e = "actions:edit"
 ctrl-w = "actions:workspace"
 
 [actions.cd]
+shell = "bash"
 description = "Open a new shell in the selected repository"
 command = "cd '{}' && $SHELL"
 mode = "execute"
