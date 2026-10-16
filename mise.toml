@@ -160,7 +160,7 @@ target = "~/.claude"
 root = "colima"
 target = "~/.config/colima"
 # colima rewrites default/colima.yaml on every start; only the template is ours.
-exclude = ["default"]
+exclude = ["default", "sh.brew.colima.plist"]
 
 [dotfile_groups.fish]
 root = "fish"

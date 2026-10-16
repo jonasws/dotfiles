@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Loaded with `brew services start colima --file=<this file>`. Homebrew's own plist
+     lacks mise's shims (the docker CLI) and XDG_CONFIG_HOME, so colima dies on
+     "docker not found" and then falls back to ~/.colima. -->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>sh.brew.colima</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/opt/homebrew/opt/colima/bin/colima</string>
+		<string>start</string>
+		<string>--foreground</string>
+	</array>
+	<key>EnvironmentVariables</key>
+	<dict>
+		<key>PATH</key>
+		<string>/Users/jonasws/.local/share/mise/shims:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+		<key>XDG_CONFIG_HOME</key>
+		<string>/Users/jonasws/.config</string>
+	</dict>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<dict>
+		<key>SuccessfulExit</key>
+		<false/>
+	</dict>
+	<key>ThrottleInterval</key>
+	<integer>30</integer>
+	<key>WorkingDirectory</key>
+	<string>/Users/jonasws</string>
+	<key>StandardOutPath</key>
+	<string>/opt/homebrew/var/log/colima.log</string>
+	<key>StandardErrorPath</key>
+	<string>/opt/homebrew/var/log/colima.log</string>
+</dict>
+</plist>
