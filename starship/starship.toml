@@ -6,43 +6,32 @@ format = """
 $directory\
 [](fg:peach bg:green)\
 $git_branch\
+$git_state\
 $git_status\
 [](fg:green bg:teal)\
 $rust\
 $golang\
 $nodejs\
 $java\
-$kotlin\
+${custom.kotlin}\
 $python\
-[](fg:teal bg:blue)\
-[](fg:blue bg:purple)\
+[](fg:teal bg:mauve)\
 $time\
-[ ](fg:purple)\
+[ ](fg:mauve)\
 $line_break$character"""
 
 right_format="""
-$aws
-"""
+$status\
+$cmd_duration\
+$aws"""
 
 palette = 'catppuccin_mocha'
-
-[palettes.gruvbox_dark]
-color_fg0 = '#fbf1c7'
-color_bg1 = '#3c3836'
-color_bg3 = '#665c54'
-color_blue = '#458588'
-color_aqua = '#689d6a'
-color_green = '#98971a'
-color_orange = '#d65d0e'
-color_purple = '#b16286'
-color_red = '#cc241d'
-color_yellow = '#d79921'
 
 [palettes.catppuccin_mocha]
 rosewater = "#f5e0dc"
 flamingo = "#f2cdcd"
 pink = "#f5c2e7"
-orange = "#cba6f7"
+mauve = "#cba6f7"
 red = "#f38ba8"
 maroon = "#eba0ac"
 peach = "#fab387"
@@ -66,37 +55,6 @@ base = "#1e1e2e"
 mantle = "#181825"
 crust = "#11111b"
 
-[os]
-disabled = false
-style = "bg:surface0 fg:text"
-
-[os.symbols]
-Windows = "󰍲"
-Ubuntu = "󰕈"
-SUSE = ""
-Raspbian = "󰐿"
-Mint = "󰣭"
-Macos = ""
-Manjaro = ""
-Linux = "󰌽"
-Gentoo = "󰣨"
-Fedora = "󰣛"
-Alpine = ""
-Amazon = ""
-Android = ""
-Arch = "󰣇"
-Artix = "󰣇"
-CentOS = ""
-Debian = "󰣚"
-Redhat = "󱄛"
-RedHatEnterprise = "󱄛"
-
-[username]
-show_always = true
-style_user = "bg:surface0 fg:text"
-style_root = "bg:surface0 fg:text"
-format = '[ $user ]($style)'
-
 [directory]
 style = "fg:mantle bg:peach"
 format = "[ $path ]($style)"
@@ -114,6 +72,11 @@ truncation_symbol = "…/"
 symbol = ""
 style = "bg:teal"
 format = '[[ $symbol $branch ](fg:base bg:green)]($style)'
+truncation_length = 32
+
+[git_state]
+style = "bg:green"
+format = '[[ $state( $progress_current/$progress_total) ](fg:base bg:green)]($style)'
 
 [git_status]
 style = "bg:teal"
@@ -149,10 +112,14 @@ symbol = " "
 style = "bg:teal"
 format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
 
-[kotlin]
+[custom.kotlin]
+description = "Kotlin language version from pom.xml; the kotlin binary is not installed"
+detect_files = ["pom.xml"]
+shell = ["/bin/sh"]
+command ="sed -n 's:.*<kotlin.compiler.languageVersion>\\(.*\\)</kotlin.compiler.languageVersion>.*:\\1:p' pom.xml | head -n 1"
 symbol = ""
 style = "bg:teal"
-format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
+format = '[[ $symbol( $output) ](fg:base bg:teal)]($style)'
 
 [haskell]
 symbol = ""
@@ -164,16 +131,22 @@ symbol = ""
 style = "bg:teal"
 format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
 
-[docker_context]
-symbol = ""
-style = "bg:mantle"
-format = '[[ $symbol( $context) ](fg:#83a598 bg:color_bg3)]($style)'
-
 [time]
 disabled = false
 time_format = "%R"
 style = "bg:peach"
-format = '[[  $time ](fg:mantle bg:purple)]($style)'
+format = '[[  $time ](fg:mantle bg:mauve)]($style)'
+
+[cmd_duration]
+min_time = 3000
+style = "fg:yellow"
+format = "[⏱ $duration]($style) "
+
+[status]
+disabled = false
+symbol = "✘ "
+style = "fg:red"
+format = "[$symbol$status]($style) "
 
 [line_break]
 disabled = false
@@ -182,7 +155,7 @@ disabled = false
 disabled = false
 success_symbol = '[](bold fg:green)'
 error_symbol = '[](bold fg:red)'
-vimcmd_symbol = '[](bold fg:creen)'
-vimcmd_replace_one_symbol = '[](bold fg:purple)'
-vimcmd_replace_symbol = '[](bold fg:purple)'
+vimcmd_symbol = '[](bold fg:green)'
+vimcmd_replace_one_symbol = '[](bold fg:mauve)'
+vimcmd_replace_symbol = '[](bold fg:mauve)'
 vimcmd_visual_symbol = '[](bold fg:lavender)'
