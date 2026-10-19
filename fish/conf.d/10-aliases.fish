@@ -14,6 +14,8 @@ alias lzd lazydocker
 alias lg lazygit
 alias lgl "lazygit log"
 alias lgs "lazygit status"
+alias resume "tv claude-sessions"
+alias r "tv claude-sessions"
 
 # Eza (better ls) aliases
 alias ll "eza --long --icons auto"
