@@ -9,9 +9,6 @@ if status is-interactive
         mise activate fish | source
     end
 
-    # Fish theme
-    fish_config theme choose "Catppuccin Mocha"
-
     # FZF key bindings
     if functions -q fzf_configure_bindings
         fzf_configure_bindings --directory=\cf --git_status=\eg --git_log=\el
@@ -33,7 +30,17 @@ if status is-interactive
     end
 
     if command -q starship
-        starship init fish | source
+        # starship bakes the absolute path of the binary that ran init into the
+        # prompt functions, and mise installs each version in its own directory,
+        # so a shell opened before an upgrade kept calling a removed path. Call
+        # it by name instead, so the prompt follows whatever PATH resolves.
+        starship init fish --print-full-init | string replace --regex --all '^(\s*)\S+/starship prompt' '$1starship prompt' | source
+
+        # Collapse each finished prompt to just the character in scrollback.
+        function starship_transient_prompt_func
+            starship module character $argv
+        end
+        enable_transience
     end
 
     if command -q zoxide
