@@ -8,14 +8,8 @@ $directory\
 $git_branch\
 $git_state\
 $git_status\
-[](fg:green bg:teal)\
-$rust\
-$golang\
-$nodejs\
-$java\
-${custom.kotlin}\
-$python\
-[](fg:teal bg:mauve)\
+([](fg:green bg:teal)$rust$golang$nodejs$java${custom.kotlin}$python[](fg:teal bg:mauve))\
+${custom.nolang}\
 $time\
 [ ](fg:mauve)\
 $line_break$character"""
@@ -84,6 +78,9 @@ format = '[[($all_status$ahead_behind )](fg:base bg:green)]($style)'
 
 [nodejs]
 symbol = ""
+detect_files = ["package.json", ".nvmrc", ".node-version"]
+detect_extensions = ["js", "mjs", "cjs", "ts"]
+detect_folders = []
 style = "bg:teal"
 format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
 
@@ -94,11 +91,17 @@ format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
 
 [rust]
 symbol = ""
+detect_files = ["Cargo.toml"]
+detect_extensions = ["rs"]
+detect_folders = []
 style = "bg:teal"
 format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
 
 [golang]
 symbol = ""
+detect_files = ["go.mod"]
+detect_extensions = ["go"]
+detect_folders = []
 style = "bg:teal"
 format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
 
@@ -109,6 +112,9 @@ format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
 
 [java]
 symbol = " "
+detect_files = ["pom.xml", "build.gradle", "build.gradle.kts"]
+detect_extensions = ["java"]
+detect_folders = []
 style = "bg:teal"
 format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
 
@@ -128,8 +134,20 @@ format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
 
 [python]
 symbol = ""
+detect_files = ["pyproject.toml", "requirements.txt", ".python-version"]
+detect_extensions = ["py"]
+detect_folders = []
 style = "bg:teal"
 format = '[[ $symbol( $version) ](fg:base bg:teal)]($style)'
+
+# Fills the slot's place when no language module has anything to show. Its marker
+# list must match the detect_* settings of the language modules above.
+[custom.nolang]
+description = "Green-to-mauve arrow when the language segment is empty"
+shell = ["/bin/sh"]
+when = 'for f in Cargo.toml go.mod package.json .nvmrc .node-version pom.xml build.gradle build.gradle.kts pyproject.toml requirements.txt .python-version *.rs *.go *.js *.mjs *.cjs *.ts *.java *.py; do [ -e "$f" ] && exit 1; done; exit 0'
+command = "printf x"
+format = '[](fg:green bg:mauve)'
 
 [time]
 disabled = false
