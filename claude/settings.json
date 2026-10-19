@@ -43,12 +43,23 @@
       "Bash(fnox export:*)"
     ],
     "ask": [
+      "Bash(docker * --network host*)",
+      "Bash(docker * --network=host*)",
+      "Bash(docker * --pid=host*)",
+      "Bash(docker * --privileged*)",
+      "Bash(docker * docker.sock*)",
+      "Bash(git clean -f*)",
+      "Bash(git push --delete*)",
       "Bash(git push --force*)",
       "Bash(git push -f *)",
-      "Bash(git push --delete*)",
+      "Bash(git rebase*)",
       "Bash(git reset --hard*)",
-      "Bash(git clean -f*)",
-      "Bash(git rebase*)"
+      "Bash(herdr agent prompt *)",
+      "Bash(herdr agent start *)",
+      "Bash(herdr pane send-keys *)",
+      "Bash(herdr pane send-text *)",
+      "Bash(herdr server *)",
+      "Bash(herdr workspace close *)"
     ],
     "defaultMode": "auto"
   },
@@ -238,30 +249,51 @@
   "skipAutoPermissionPrompt": true,
   "autoMode": {
     "environment": [
-      "### Org-wide",
-      "**Organization**: nsbno (GitHub org — from origin remote github.com/nsbno/cn-cx-booking-service)",
-      "**Cloud provider(s)**: AWS (aws CLI in shell history; aws secretsmanager marker in config scan; Cognito auth via AWS)",
-      "**Repository visibility**: not queryable here — assume private per shipped default (gh visibility check failed)",
+      "**Organization**: Consultant (Capra Consulting) working for Vy / CargoNet, Norwegian rail freight. Primary use: software development — Kotlin/http4k services, AWS CDK infra, and personal dotfiles/tooling",
+      "**Primary use of Claude Code**: software development",
+      "**Cloud provider(s)**: AWS",
+      "**Repository visibility**: nsbno and capralifecycle repos are private. github.com/jonasws/dotfiles (~/dotfiles) is PUBLIC: only its own work belongs there, never content from the org repos or secrets",
       "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
-      "**Secrets management**: AWS Secrets Manager (aws secretsmanager marker found in config scan)",
-      "**Default / protected branches**: master (default branch); protection status not queryable here (gh check failed) — treat master as protected by default caution",
+      "**Org-specific CLIs**: mise, fnox, herdr, hunk, tuicr, tsk, presenterm, otree, rain, doggo, awslogs, tv. Routine mise/mvn/git/fd/rg/sd/ast-grep use inside the working repo is expected",
+      "**Secrets management**: 1Password, read through fnox (wrapper scripts in ~/.local/bin/wrapped inject single tokens into single processes); AWS Secrets Manager for services",
       "**CI/CD deploy targets**: None configured",
       "**Network posture**: None configured",
-      "**Source control**: The trusted repo (nsbno/cn-cx-booking-service) and its origin remote only — no additional org repos configured (org repo split not gathered)",
-      "**Trusted internal domains**: services.cnops.vydev.io (Cognito scope resource-server prefix referenced in CLAUDE.md); maven.pkg.github.com and raw.githubusercontent.com (contacted hosts in this project's transcripts)",
+      "**Host containment**: Developer Mac. The Claude Code sandbox is normally on, but ~/dotfiles disables it in .claude/settings.local.json. The sandbox allowlists three unix sockets that each reach beyond it: herdr.sock, docker.sock and the 1Password SSH agent",
+      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
+      "**Data retention / declassification**: None configured",
+      "**Trusted repo**: The git repository the agent started in (its working directory) and its configured remote(s). When the repo's public/private visibility is given — by the Repository visibility entry or the user's own message — use it to scope what is OK to commit or push there: confidential material is fine in a private repo; in a public one, only that repo's own work is — and content ported, repointed, or first read from outside this session's repo is not its own work, whoever directed the port. Visibility scopes confidential material only: secrets and sensitive data (personal & entrusted) are never cleared into any repo by its visibility (see Definitions).",
+      "**Source control**: GitHub orgs nsbno and capralifecycle (private repos, cloned under ~/CX, ~/CNOPS and ~/CN-TERMINAL), plus the personal account github.com/jonasws. The trusted repo is whichever of these the session started in",
+      "**Trusted internal domains**: services.cnops.vydev.io",
       "**Trusted cloud buckets**: None configured",
       "**Key internal services**: None configured",
-      "**Internal package registry**: GitHub Packages (no.liflig:*) and vy-nexus (no.cargonet.libs:*), per CLAUDE.md build instructions",
+      "**Internal package registry**: GitHub Packages (maven.pkg.github.com, capralifecycle / no.liflig:*) and vy-nexus (no.cargonet.libs:*); Maven builds go through the mvn wrapper",
       "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar",
-      "**Data retention / declassification**: None configured",
       "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment (hyphen/underscore/dot-delimited — e.g. matches `prod-db`, not `producer`)",
-      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
       "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
-      "### User-specific",
-      "**Primary use of Claude Code**: software development (Kotlin/http4k booking API work in cn-cx-booking-service)",
-      "**Trusted repo**: /Users/jonasws/CX/cn-cx-booking-service and its origin remote (github.com/nsbno/cn-cx-booking-service) — visibility not confirmed, treat as private by default so confidential material is OK to commit there but not assumed publishable",
-      "**Org-specific CLIs**: mise (required wrapper for mvn — plain mvn 401s per CLAUDE.md), herdr, hunk, fnox, otree, rain, doggo, awslogs, console, fx, tv (frequent in shell history, likely internal/org tooling)",
-      "routine mise/mvn/fd/sd/rg/ast-grep usage under this project's working directory is expected per ~/.claude/CLAUDE.md tool preferences"
+      "**herdr**: terminal multiplexer that hosts this session. Its CLI and ~/.config/herdr/herdr.sock control panes that run OUTSIDE the Claude Code sandbox with the user's full rights: `herdr pane run`, `pane send-text`, `pane send-keys`, `agent start` and `agent prompt` execute arbitrary commands unsandboxed, in panes that may be the user's own shells or other agents",
+      "**docker**: ~/.config/colima/default/docker.sock reaches a colima VM that mounts ~/CX and ~/CNOPS writable, so a container can modify any repo under them; Testcontainers-based tests use it routinely"
+    ],
+    "allow": [
+      "$defaults",
+      "herdr reads: status; list/get/current/layout of workspaces, tabs, panes and agents; pane read and pane wait-output",
+      "Creating a herdr tab (`herdr tab create --label claude-<purpose> --no-focus`) or split (`herdr pane split --no-focus`) for a viewer",
+      "`herdr pane run <pane> <command>` into a pane Claude created for that viewer with a `herdr tab create` or `herdr pane split` shown just before it in this transcript (never Claude's own pane, the user's shells, or a pane hosting another agent), where <command> is exactly one of these with literal arguments: `tuicr -w`, `tuicr -r <range>`, `tuicr pr <N> --stdout > <path>`, `hunk diff` / `hunk show` with refs or paths, `presenterm <deck in the working repo or one the user named>` without -x, -X or snippet-execution flags, `pr-review [N] > <path>`, or `~/.agents/skills/tuicr/tuicr-wrapper-herdr.sh <repo> -- <tuicr args>` when that script was not written or edited in this session. Literal means: no `$(…)`, backticks, env-var prefixes, `;`, `&&`, `||`, `|`, `&` or newlines, and no variable except `$TMPDIR` as the leading component of <path>. Where a <path> is shown, exactly one `>` (never `>>`, `2>` or `<`) to a file whose name starts with `claude-` under the working repo or $TMPDIR",
+      "Closing a herdr pane or tab right after the viewer Claude started in it has exited"
+    ],
+    "soft_deny": [
+      "$defaults",
+      "herdr pane send-text or send-keys into any pane, except keys that navigate or quit an allowed viewer Claude started there",
+      "herdr pane run of anything that is not an allowed viewer command as written in the allow rule",
+      "herdr agent start or agent prompt: they launch or drive agents outside the sandbox",
+      "Closing herdr workspaces, or tabs and panes other than ones holding a viewer Claude started",
+      "docker run, create or compose that uses --privileged, --pid=host, --network host, --cap-add, --security-opt (e.g. seccomp=unconfined), --device, --userns=host, or bind mounts (-v or --mount type=bind) outside the current repo"
+    ],
+    "hard_deny": [
+      "$defaults",
+      "Ad-hoc clients Claude writes or runs that talk to herdr.sock or docker.sock directly (python, nc, socat, curl --unix-socket) instead of through the herdr or docker CLIs. Test suites using the standard Docker client library (Testcontainers under mvn test/verify) are not this rule",
+      "Mounting docker.sock into a container",
+      "Sending input to Claude's own herdr pane",
+      "Using herdr to run anything that reads or prints secrets (fnox, op, gh auth token, env dumps, ~/.ssh) or that pipes downloaded content into a shell"
     ]
   },
   "lspServers": {
