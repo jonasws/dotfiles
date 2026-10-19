@@ -203,7 +203,10 @@
         "~/Library/Caches/mise",
         "~/.m2/repository",
         "~/Library/Application Support/kotlin",
-        "~/.tsk"
+        "~/.tsk",
+        "~/CX/api-docs",
+        "~/CNOPS/api-docs",
+        "~/CN-TERMINAL/api-docs"
       ],
       "denyRead": [
         "~/.ssh/id_rsa",

@@ -29,6 +29,18 @@ workspace_root() {
   dirname "$1"
 }
 
+# When the spec itself last changed, which says more about freshness than the
+# ref: a service can see daily commits while its contract stands still.
+spec_changed() {
+  local repo_dir=$1 rev=$2 rel=$3 file=$4 commit
+  if [[ $rev == HEAD && -n $(git -C "$repo_dir" status --porcelain -- "$rel") ]]; then
+    echo "uncommitted edits, file modified $(date -r "$file" '+%Y-%m-%d %H:%M')"
+    return
+  fi
+  commit=$(git -C "$repo_dir" log -1 --format='%h %cs (%cr)' "$rev" -- "$rel")
+  echo "${commit:-never committed on $rev}"
+}
+
 root=$(workspace_root "$target")
 specs_dir="$root/api-docs/.specs"
 mkdir -p "$specs_dir"
@@ -42,6 +54,7 @@ if [[ ! -d $repo_dir/.git ]]; then
   name=$(basename "${target%.*}")
   spec=$target
   ref="file"
+  changed="file modified $(date -r "$spec" '+%Y-%m-%d %H:%M')"
 else
   name=$repo
   if [[ -f $target ]]; then
@@ -69,14 +82,23 @@ else
     spec=${found[0]}
     ref="working tree ($(git -C "$repo_dir" branch --show-current || true))"
     ref=${ref/\(\)/(detached HEAD)}
+    changed=$(spec_changed "$repo_dir" HEAD "$rel" "$spec")
   else
-    GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND="ssh -o BatchMode=yes" git -C "$repo_dir" fetch --quiet origin 2>/dev/null || echo "fetch failed; using origin/HEAD as last fetched" >&2
+    # The Claude Code sandbox points TMPDIR at /tmp/claude-<uid> and blocks
+    # writes to a sibling clone's .git, so a fetch there can only fail.
+    if [[ ${TMPDIR:-} == @(/private|)/tmp/claude-* ]]; then
+      echo "sandboxed: skipping fetch; using origin/HEAD as last fetched" >&2
+    else
+      GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND="ssh -o BatchMode=yes" git -C "$repo_dir" fetch --quiet origin 2>/dev/null || echo "fetch failed; using origin/HEAD as last fetched" >&2
+    fi
     spec="$specs_dir/$name.${rel##*.}"
     if git -C "$repo_dir" show "origin/HEAD:$rel" >"$spec" 2>/dev/null; then
       ref="origin/HEAD $(git -C "$repo_dir" log -1 --format='%h %cr' origin/HEAD)"
+      changed=$(spec_changed "$repo_dir" origin/HEAD "$rel" "$spec")
     else
       spec=${found[0]}
       ref="working tree ($rel is not on origin/HEAD)"
+      changed=$(spec_changed "$repo_dir" HEAD "$rel" "$spec")
     fi
   fi
 fi
@@ -96,6 +118,7 @@ fi
 rm -f "$log"
 
 echo "$out"
-echo "spec:   ${rel:-$spec}"
-echo "raw:    $spec"
-echo "ref:    $ref"
+echo "spec:    ${rel:-$spec}"
+echo "raw:     $spec"
+echo "ref:     $ref"
+echo "changed: $changed"
