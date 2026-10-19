@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Passwords come from fnox: ~/.local/bin/wrapped/mvn runs Maven under `fnox exec`,
+  which injects LIFLIG_GITHUB_PAT and NEXUS_PASSWORD. Both usernames are the login
+  name, so nothing personal or secret is stored here.
+
+  repositoryOrigins (Maven 3.10+) binds each server's credentials to its host. The
+  repositories are declared in project POMs, which Maven reads after it scopes
+  credentials, so without these it warns on every build that it cannot tell
+  where the credentials belong.
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
+   https://maven.apache.org/xsd/settings-1.0.0.xsd">
+  <servers>
+    <server>
+      <id>github</id>
+      <username>${user.name}</username>
+      <password>${env.LIFLIG_GITHUB_PAT}</password>
+      <repositoryOrigins>
+        <repositoryOrigin>https://maven.pkg.github.com</repositoryOrigin>
+      </repositoryOrigins>
+    </server>
+    <server>
+      <id>vy-nexus</id>
+      <username>${user.name}</username>
+      <password>${env.NEXUS_PASSWORD}</password>
+      <repositoryOrigins>
+        <repositoryOrigin>https://nexus.common-services.vydev.io</repositoryOrigin>
+      </repositoryOrigins>
+    </server>
+  </servers>
+</settings>
