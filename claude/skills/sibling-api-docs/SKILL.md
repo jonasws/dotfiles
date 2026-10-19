@@ -35,7 +35,10 @@ The repo you are working in is not a sibling: read its own source as usual.
 ```
 
 It prints the output directory, the spec's path in the repo, the raw copy it
-rendered (`raw:`), and the git ref. Cite the ref.
+rendered (`raw:`), the git ref, and when the spec file itself last changed
+(`changed:`, the last commit touching it, or the file's mtime when it has
+uncommitted edits or is not in git). Cite the ref. Mention `changed:` when the
+answer hinges on a recent API change or the spec has not moved in months.
 
 - Finds the spec with `fd`. Specs pinned by the snapshot test
   (`**/src/test/resources/__snapshots__/openapi-schema.json`) win over hand-kept
@@ -43,7 +46,9 @@ rendered (`raw:`), and the git ref. Cite the ref.
   instead of the repo to pick one.
 - Renders the spec **as on `origin/HEAD`**, after a fetch, so a feature branch or
   uncommitted edits in the clone do not leak in. Add `--working-tree` only when the
-  question is about the checked-out branch, and say which branch.
+  question is about the checked-out branch, and say which branch. Inside the
+  sandbox the fetch is skipped, so the render is as of the last fetch; the script
+  says so on stderr. Pass that on when freshness matters.
 - Writes to `<root>/api-docs/<repo>/`. The workspace roots are not git repos, so
   nothing lands in a commit.
 - Re-render every time before reading: it takes under a second, so there is no
