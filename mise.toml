@@ -152,6 +152,7 @@ target = "~/.claude"
 "~/.claude/skills/jvm-sandbox-tests" = { mode = "symlink" }
 "~/.claude/skills/markdown-preview" = { mode = "symlink" }
 "~/.claude/skills/maven-kotlin-builds" = { mode = "symlink" }
+"~/.claude/skills/sibling-api-docs" = { mode = "symlink" }
 "~/.claude/skills/systematic-debugging" = { mode = "symlink" }
 "~/.claude/skills/test-driven-development" = { mode = "symlink" }
 "~/.claude/skills/watch-subagents" = { mode = "symlink" }
@@ -218,13 +219,18 @@ root = "lazyvim"
 target = "~/.config/nvim"
 mode = "symlink"
 
-[dotfile_groups.lnav]
 [dotfile_groups.leaf]
 root = "leaf"
 target = "~/.config/leaf"
 
+[dotfile_groups.lnav]
 root = "lnav"
 target = "~/.config/lnav"
+
+[dotfile_groups.maven]
+# Only settings.xml: ~/.m2 also holds the local repository.
+root = "maven"
+target = "~/.m2"
 
 [dotfile_groups.mdcat]
 root = "mdcat"
