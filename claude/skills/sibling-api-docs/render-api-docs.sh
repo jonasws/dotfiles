@@ -109,7 +109,7 @@ if [[ -d $out ]]; then
   rm -rf "$out"
 fi
 
-log=$(mktemp)
+log=$(mktemp "${TMPDIR:-/tmp}/render-api-docs.XXXXXX")
 if ! ppress -b --no-html --no-json -o "$out" "$spec" >"$log" 2>&1; then
   cat "$log" >&2
   rm -f "$log"
