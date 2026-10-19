@@ -1,0 +1,70 @@
+[metadata]
+name = "claude-sessions"
+description = """
+Fuzzy find and resume Claude Code sessions.
+
+Lists what `claude --resume` can open in the current project, newest first:
+sessions started in this git repo or its worktrees, or in this directory
+outside a repo. Each row is the time since last activity, the session title
+(with the branch when it is not main/master), and the session id. The
+preview shows the session's directory and dates, its first prompt, and the
+last turns of the conversation.
+
+Enter resumes the session in its own directory, ctrl-f resumes it as a fork
+under a new session id, ctrl-y copies the session id.
+
+Sessions come from the Agent SDK's listSessions() rather than by parsing
+~/.claude/projects/*.jsonl, whose format is internal to Claude Code.
+"""
+requirements = ["bun", "claude"]
+
+[source]
+# bash: tv runs commands through $SHELL (fish), which costs about 80ms a run.
+shell = "bash"
+command = "~/.config/television/scripts/claude-sessions.ts list"
+# `ansi` and `display` are mutually exclusive, so the session id stays visible
+# text, dimmed at the end of the row, and is split back off for the output.
+ansi = true
+output = "{strip_ansi|split: :-1}"
+# The script already orders by last activity; frecency would reshuffle it.
+no_sort = true
+frecency = false
+
+[preview]
+shell = "bash"
+command = "~/.config/television/scripts/claude-sessions.ts preview '{strip_ansi|split: :-1}'"
+
+[ui]
+layout = "landscape"
+input_header = "Claude sessions"
+
+[ui.preview_panel]
+size = 60
+header = "Claude session"
+scrollbar = true
+
+[keybindings]
+shortcut = "f5"
+enter = "actions:resume"
+ctrl-f = "actions:fork"
+ctrl-y = "actions:copy"
+
+# `execute` replaces tv with claude, so quitting claude lands in the shell
+# rather than back in the picker, which `fork` would do.
+[actions.resume]
+description = "Resume the session in its own directory"
+command = "dir=$(~/.config/television/scripts/claude-sessions.ts cwd '{strip_ansi|split: :-1}') && cd \"$dir\" && exec claude --resume '{strip_ansi|split: :-1}'"
+shell = "bash"
+mode = "execute"
+
+[actions.fork]
+description = "Resume the session as a fork with a new session id"
+command = "dir=$(~/.config/television/scripts/claude-sessions.ts cwd '{strip_ansi|split: :-1}') && cd \"$dir\" && exec claude --resume '{strip_ansi|split: :-1}' --fork-session"
+shell = "bash"
+mode = "execute"
+
+[actions.copy]
+shell = "bash"
+description = "Copy the session id"
+command = "printf %s '{strip_ansi|split: :-1}' | pbcopy"
+mode = "fork"
