@@ -1,33 +1,6 @@
+# herdr configuration, linked to ~/.config/herdr/config.toml.
+# Only non-default values live here: `herdr --default-config` prints the rest.
 onboarding = false
-# herdr configuration
-# Place this file at ~/.config/herdr/config.toml
-
-# Show first-run notification setup on startup.
-# Missing also shows onboarding; set false after you've chosen.
-# onboarding = true
-
-[theme]
-# Built-in themes: catppuccin, terminal, tokyo-night, dracula, nord,
-#                  gruvbox, one-dark, solarized, kanagawa, rose-pine,
-#                  vesper
-# name = "catppuccin"
-
-# Follow host terminal light/dark appearance and switch Herdr UI themes.
-# Existing manual behavior is unchanged unless this is true.
-# auto_switch = false
-# dark_name = "catppuccin"
-# light_name = "catppuccin-latte"
-
-# Override individual color tokens on top of the base theme.
-# Accepts: hex (#rrggbb), named colors, rgb(r,g,b), or panel_bg = "reset"
-# [theme.custom]
-# panel_bg = "reset"
-# accent = "#f5c2e7"
-# red = "#ff6188"
-# green = "#a6e3a1"
-
-name = "catppuccin"
-auto_switch = false
 
 # Catppuccin Mocha
 [theme.custom]
@@ -38,109 +11,27 @@ accent = "#cba6f7"
 overlay0 = "#7f849c"
 overlay1 = "#9399b2"
 
-[terminal]
-# Executable used for new interactive panes.
-# Empty means $SHELL, then /bin/sh.
-# default_shell = ""
-
-# Startup mode for new interactive pane shells: "auto", "login", or "non_login".
-# "auto" uses login shells on macOS and keeps the current behavior elsewhere.
-# shell_mode = "auto"
-
-# CWD policy for new panes, tabs, and workspaces when no explicit --cwd is provided.
-# Use "follow" to inherit the source pane/workspace, "home" for $HOME,
-# "current" for Herdr's process directory, or a fixed path such as "~/Projects".
-# new_cwd = "follow"
-
-[update]
-# Update channel used by background version checks and `herdr update`.
-# Defaults to "stable" on Linux/macOS and "preview" on Windows.
-# Set explicitly to choose stable releases or opt-in preview builds.
-# channel = "stable"
-
-# Check herdr.dev for new Herdr versions in the background.
-# version_check = true
-
-# Check herdr.dev for remote agent-detection manifest updates in the background.
-# manifest_check = true
-
+# A [[keys.command]] on a default's key silently disables that default, and
+# `herdr config check` stays quiet about it. Displaced on purpose:
+#   prefix+l        focus_pane_right  (lazygit; ctrl+l covers it)
+#   prefix+shift+l  swap_pane_right   (lazygit log)
+#   prefix+r        resize_mode       (git repo picker; ctrl+shift+hjkl resizes)
 [keys]
-# Prefix key to enter prefix mode (default: "ctrl+b")
-# Examples: "ctrl+b", "f12", "esc", "-"
-# Action bindings use explicit syntax: "prefix+n" requires the prefix;
-# "ctrl+alt+n" is a direct terminal-mode shortcut.
-# Accepted key syntax: plain keys, ctrl/shift/alt/cmd/super modifiers, and special keys like enter/tab/esc/left/right/up/down.
-# Named punctuation such as minus, comma, ampersand, plus, and backtick is also accepted.
-# Most reliable direct bindings are ctrl+letter, function keys, and explicit modified chords.
-# alt+..., cmd/super, and punctuation-with-modifiers may depend on your terminal/tmux setup.
-# ctrl+s is XOFF (terminal flow control). Shells with `stty ixon` still set will
-# appear to freeze on it — `stty -ixon` in the shell rc frees the key.
-prefix = "ctrl+b"
-
-# Prefix-mode actions
-# help = "prefix+?"
-# settings = "prefix+s"
-# detach = "prefix+q"
-# reload_config = "prefix+shift+r"
-# open_notification_target = "prefix+o"
-# workspace_picker = "prefix+w"
-# goto = "prefix+g"
-# new_workspace = "prefix+shift+n"
-# new_worktree = "prefix+shift+g"
-# open_worktree = ""    # optional, unset by default
-# Paired with new_worktree (prefix+shift+g) on the same letter. Ctrl rather than
-# alt because Option is the us-altgr-intl compose layer. Opens a confirmation
-# prompt before the checkout is removed.
+# Ctrl rather than alt throughout: Option is the us-altgr-intl compose layer.
 remove_worktree = "prefix+ctrl+g"
-# rename_workspace = "prefix+shift+w"
-# close_workspace = "prefix+shift+d"
-# previous_workspace = "" # optional, unset by default
-# next_workspace = ""     # optional, unset by default
-# The custom attention jump (scripts/next-agent.sh) is commented out below.
+# Steps through agents in sidebar order. For attention order, prefix+g then
+# b filters Go To to blocked agents.
 next_agent = "prefix+a"
-previous_agent = "prefix+semicolon"
-# focus_agent = ""        # optional indexed binding, e.g. "prefix+alt+1..9"
-# remote_image_paste = "ctrl+v" # only active in herdr --remote; empty disables raw-key image paste
-# new_tab = "prefix+c"
-# rename_tab = "prefix+shift+t"
-# previous_tab = "prefix+p"
-# next_tab = "prefix+n"
-# switch_tab = "prefix+1..9"
-# switch_workspace = ""   # optional indexed binding, e.g. "prefix+shift+1..9"
-# close_tab = "prefix+shift+x"
-# rename_pane = "prefix+shift+p"
-# edit_scrollback = "prefix+e"
-# focus_pane_left = "prefix+h"
-# focus_pane_down = "prefix+j"
-# focus_pane_up = "prefix+k"
-# focus_pane_right = "prefix+l"
-# cycle_pane_next = "prefix+tab"
-# cycle_pane_previous = "prefix+shift+tab"
-# last_pane = ""          # optional, unset by default; bind e.g. "prefix+tab" for global back-and-forth
-# last_pane = "prefix+semicolon"  # disabled while testing multiple clients
-# split_vertical = "prefix+v"
-# split_horizontal = "prefix+minus"
-# close_pane = "prefix+x"
-# zoom = "prefix+z"       # legacy alias: fullscreen
-# resize_mode = "prefix+r"
-toggle_sidebar = "prefix+b"
-# Stands in for the ctrl+l that herdr-splits takes for navigation. Keeps the
-# current prompt line and leaves full-screen apps alone.
+previous_agent = "prefix+shift+a"
+next_workspace = "prefix+ctrl+n"
+previous_workspace = "prefix+ctrl+p"
+switch_workspace = "prefix+shift+1..9"
+# herdr-splits takes ctrl+l, so clearing moves here.
 clear_pane = "prefix+ctrl+l"
 
-# Navigate-mode movement. These local shortcuts win while navigate mode is open.
-# They are independent from focus_pane_*. Do not include prefix+, esc, enter, tab, or 1..9 here.
-#
-# Reassigned so j/k walk the workspace list in the prefix+w picker, matching the
-# vertical axis the picker actually renders. j/k are herdr's defaults for pane
-# down/up, so pane up/down moves onto the arrows that workspace nav vacated.
-# `herdr config check` does not flag duplicate navigate-mode keys, so this has to
-# stay collision-free by hand.
-#
-#   j / k        workspace down / up
-#   h / l        pane left / right
-#   down / up    pane down / up
-#   left / right pane left / right (hardcoded, always available)
+# Navigate mode (prefix+w): j/k walk the workspace list, which the picker
+# renders vertically, so pane up/down moves to the arrows. Not checked for
+# duplicates by `herdr config check`.
 navigate_workspace_up = "k"
 navigate_workspace_down = "j"
 navigate_pane_left = "h"
@@ -148,50 +39,23 @@ navigate_pane_right = "l"
 navigate_pane_down = "down"
 navigate_pane_up = "up"
 
-# Custom commands use the same binding syntax.
-# type = "shell" runs detached in the background.
-# type = "pane" opens a temporary pane and closes it when the command exits.
-# type = "popup" opens a session-modal terminal without changing the tab layout.
-# Popup width and height accept terminal cells or percentages such as "80%".
-# On Windows, command strings run through cmd.exe /d /c.
-# [[keys.command]]
-# key = "prefix+alt+g"
-# type = "popup"
-# command = "lazygit"
-# width = "80%"
-# height = "80%"
-
-# Fuzzy pane picker, and the Cmd+K bar: ctrl+alt+k is what the terminal sends
-# for Cmd+K. prefix+a still steps through the attention queue one agent at a
-# time; this jumps straight to any pane. The channel lists panes attention-first
-# (blocked, done, idle, working, other commands, shells), Tab cycles the scope,
-# and Enter focuses the selected pane over the socket API.
+# Pane picker, attention-first. ctrl+alt+k is what WezTerm sends for Cmd+K.
 # Channel: television/cable/mine/herdr-sessions.toml
 [[keys.command]]
-key = ["prefix+f", "prefix+k", "ctrl+alt+k"]
+key = ["prefix+f", "ctrl+alt+k"]
 type = "popup"
 command = "tv herdr-sessions"
 width = "90%"
 height = "80%"
 
-# Herdr F1: the agents in this session as a race in the browser. Clicking a car
-# focuses that agent's pane.
-# Requires the plugin, installed from upstream:
-#     herdr plugin install hmu332233/herdr-f1
-# prefix+shift+f rather than the upstream README's prefix+f, which the pane
-# picker above already owns. Reopening while the dashboard runs just points the
-# browser at it again; `herdr plugin action invoke dev.minung.herdr-f1.stop`
-# shuts it down.
+# Plugin: herdr plugin install hmu332233/herdr-f1
 [[keys.command]]
 key = "prefix+shift+f"
 type = "plugin_action"
 command = "dev.minung.herdr-f1.open"
 description = "open F1 dashboard"
 
-# Lazygit in a session-modal popup, so it does not disturb the tab layout:
-# prefix+l opens on the files view, prefix+shift+l on the commit log. The
-# script starts lazygit in the repo of the pane the key was pressed in, and
-# layers lazygit/popup.yml on top so Esc at the top level closes the popup.
+# Opens in the focused pane's repo; lazygit/popup.yml makes Esc close it.
 [[keys.command]]
 key = "prefix+l"
 type = "popup"
@@ -208,11 +72,7 @@ description = "lazygit: log"
 width = "80%"
 height = "80%"
 
-# Git repo picker in a session-modal popup. `-k` overrides just the `enter`
-# binding for this invocation, from git-repos.toml's default `actions:cd`
-# to its `actions:workspace` (open/focus a Herdr workspace for the repo) --
-# no separate cable channel needed for that. Overrides resize mode's
-# prefix+r on purpose.
+# Enter opens or focuses a workspace for the repo instead of cd.
 # Channel: television/cable/git-repos.toml
 [[keys.command]]
 key = "prefix+r"
@@ -221,10 +81,6 @@ command = "tv git-repos -k 'enter=\"actions:workspace\"'"
 width = "90%"
 height = "80%"
 
-# AWS profile picker in a session-modal popup, so it does not disturb the tab
-# layout. No -k override needed -- the channel's own `enter` binding is
-# already actions:open-browser. ctrl-e (actions:export) still works too,
-# since there is no way to unbind a channel keybinding per-invocation.
 # Channel: television/cable/aws-profiles.toml
 [[keys.command]]
 key = "prefix+shift+o"
@@ -233,21 +89,10 @@ command = "tv aws-profiles"
 width = "80%"
 height = "80%"
 
-# --- herdr-splits.nvim -------------------------------------------------------
-# Unified pane/split navigation across herdr panes and Neovim windows.
-# Requires the herdr-side plugin:
-#     herdr plugin install lmilojevicc/herdr-splits.nvim
-# The matching Neovim side lives in lazyvim/.../plugins/herdr-splits.lua.
-#
-# These are direct (non-prefix) bindings, so they take ctrl+h/j/k/l and
-# ctrl+shift+h/j/k/l away from whatever runs inside a pane. ctrl+l no longer
-# clears a shell and ctrl+j no longer sends a newline in readline — same
-# trade-off tmux users make with vim-tmux-navigator. prefix+ctrl+l clears the
-# pane instead (clear_pane above); `ctrl+v ctrl+l` sends the raw key.
-#
-# Resize is on ctrl+shift rather than alt because Option is the us-altgr-intl
-# compose layer (Option+l is ø) and must stay free for text input.
-
+# herdr-splits: ctrl+hjkl moves and ctrl+shift+hjkl resizes across herdr panes
+# and Neovim windows. Plugin: linked from ~/herdr-splits.nvim, a fork of
+# lmilojevicc/herdr-splits.nvim, so `herdr plugin update` skips it.
+# Neovim side: lazyvim/.../plugins/herdr-splits.lua
 [[keys.command]]
 key = "ctrl+h"
 type = "plugin_action"
@@ -288,11 +133,8 @@ key = "ctrl+shift+l"
 type = "plugin_action"
 command = "herdr-splits.resize-right"
 
-# tsk: the task board shared by me and my Claude sessions, across every repo.
-# Registered with `tsk setup herdr` (mise: github:smarzban/tsk), which
-# links the herdr-tsk plugin and adds these two bindings. Capture moved off
-# tsk's default prefix+a, which next_agent owns. prefix+t toggles: it closes a
-# board in the tab in view, and otherwise opens or focuses one.
+# tsk board, set up by `tsk setup herdr`. Capture moved off tsk's default
+# prefix+a, which next_agent owns.
 [[keys.command]]
 key = "prefix+t"
 type = "shell"
@@ -305,18 +147,6 @@ type = "plugin_action"
 command = "herdr-tsk.quick-capture"
 description = "tsk quick capture"
 
-# Disabled while checking it against multiple attached clients: the script
-# starts its ring from the server-wide focused agent, not the pressing client's.
-# Agents are sorted by space, so the built-in next_agent no longer lands on
-# blocked agents first. This visits blocked, then done, then any agent.
-# [[keys.command]]
-# key = "prefix+a"
-# type = "shell"
-# command = "~/.config/herdr/scripts/next-agent.sh"
-# description = "next agent needing attention"
-
-# Edit the notes of the task under the tsk board cursor in nvim; ctrl+e is
-# tsk's own edit key.
 [[keys.command]]
 key = "prefix+ctrl+e"
 type = "popup"
@@ -325,161 +155,29 @@ description = "edit tsk notes in nvim"
 width = "80%"
 height = "80%"
 
-# Subagent viewers for the Claude session in this pane, opened on demand: the
-# Claude hooks only record subagents. Pressed in the viewer tab, it closes it.
 # Script: claude/hooks/subagent-viewer.sh
 [[keys.command]]
 key = "prefix+shift+s"
 type = "shell"
 command = "bash ~/.claude/hooks/subagent-viewer.sh toggle"
 description = "toggle subagent viewers"
-# -----------------------------------------------------------------------------
-
-# Legacy indexed shortcut config is still parsed for compatibility.
-# Prefer switch_tab, switch_workspace, and focus_agent for new configs.
-# [keys.indexed]
-# tabs = ""       # e.g. "ctrl" makes ctrl+1..9 switch tabs directly
-# workspaces = "" # e.g. "ctrl+shift" makes ctrl+shift+1..9 switch workspaces directly
-# agents = ""     # e.g. "alt" makes alt+1..9 focus agent rows directly
-
-# [worktrees]
-# directory = "~/.herdr/worktrees"
 
 [ui]
-# Sidebar width (auto-scaled based on workspace names, this sets the default)
+# fish/functions/herdr.fish rewrites this line for wide terminals.
 sidebar_width = 34
-
-# Minimum sidebar width when expanded (columns)
 sidebar_min_width = 26
-
-# Maximum sidebar width when expanded (columns)
 sidebar_max_width = 48
-
-# Start with the sidebar collapsed. Changes take effect on the next launch.
-# sidebar_start_collapsed = false
-
-# Collapsed sidebar presentation: "compact" keeps the narrow status rail, "hidden" uses zero width.
-# sidebar_collapsed_mode = "compact"
-
-# Terminal width at or below which Herdr uses the mobile single-column layout.
-# Increase this for foldables, tablets, or wide phone terminals.
-# mobile_width_threshold = 64
-
-# Capture mouse input for Herdr's mouse UI.
-# Set false to let the terminal handle normal clicks, such as Cmd-clicking URLs.
-# Pane apps like lazygit and btop can still receive mouse when they request it.
-# mouse_capture = true
-
-# Automatically copy text selected by mouse drag.
-# Set false to keep drag selection visible without copying; double-click still copies a word.
-# copy_on_select = true
-
-# Host cursor policy: "auto", "native", or "drawn".
-# "auto" draws Herdr's own cursor on native Windows builds and WSL to avoid ConPTY cursor flicker, and uses the native terminal cursor elsewhere.
-# "native" always uses the outer terminal cursor. "drawn" always draws Herdr's cursor as terminal cell content.
-# host_cursor = "auto"
-
-# Optional modifier that forwards right-click hold/drag gestures to pane apps instead of opening Herdr's pane menu.
-# Empty/off disables this. Shift is intentionally unsupported because terminals commonly reserve Shift+mouse.
-# right_click_passthrough_modifier = ""
-
-# Force a full redraw when the outer terminal regains focus.
-# Set false to reduce visible flashing when switching back to Herdr.
-# Trade-off: rare host terminal surface corruption may persist until the next full redraw.
-# redraw_on_focus_gained = true
-
-# Pane scrollback lines to scroll per mouse wheel notch.
-# mouse_scroll_lines = 3
-
-# Ask for confirmation before closing a workspace
-# confirm_close = true
-
-# Ask for a tab name before creating a new tab.
-# Set false to create tabs immediately with generated names.
-# prompt_new_tab_name = true
-
-# Ask for a workspace name before interactive creation.
-# prompt_new_workspace_name = false
-
-# Draw borders around split panes.
-# pane_borders = true
-
-# Keep split panes visually separated instead of sharing divider borders.
-# pane_gaps = true
-
-# Show detected/reported agent labels in split pane borders when no manual pane name is set.
-# show_agent_labels_on_pane_borders = false
-
-# Hide the tab row when a workspace has exactly one tab.
-# New tabs can still be created with the configured keybinding.
-# hide_tab_bar_when_single_tab = false
-
-# Agent panel ordering: "spaces" (grouped by space) or "priority" (attention queue).
-# "workspaces" is accepted as an alias for "spaces".
-# agent_panel_sort = "spaces"
-
-# Expanded agent rows. Built-ins are state_icon, state_text, workspace, tab, pane, agent,
-# terminal_title, and terminal_title_stripped.
-# Custom values reported through pane metadata use a $name token.
-# A token occurrence may be styled with { token = "workspace", fg = "#89b4fa", bold = true, dim = false }.
-# Omitted style fields preserve the contextual default.
-# [ui.sidebar.agents]
-# Blank rows between agent entries. Set to 1 to restore the previous spacing.
-# row_gap = 0
-# rows = [["state_icon", "workspace", "tab"], ["agent"]]
-# Optional canonical agent IDs replace the default rows for matching agents.
-# [ui.sidebar.agents.rows_by_agent]
-# claude = [["state_icon", "workspace", "tab"], ["terminal_title_stripped"], ["agent"]]
-
-# Expanded space rows. Built-ins are state_icon, state_text, workspace, branch, and git_status.
-# Custom values reported through workspace metadata use a $name token, for example $jj_status.
-# Inline token styles accept strict #RGB/#RRGGBB foregrounds plus bold and dim booleans.
-# [ui.sidebar.spaces]
-# Blank rows between space entries. Set to 1 to restore the previous spacing.
-# row_gap = 0
-# rows = [["state_icon", "workspace"], ["branch", "git_status"]]
-
-# Accent color for highlights, borders, and navigation UI.
-# Accepts: hex (#89b4fa), named colors (cyan, blue, magenta), or rgb(r,g,b)
-# accent = "cyan"
-
-# Background notification popup delivery
-# Wide enough for most Claude topics on one row. Pinned by min_width too, since
-# herdr otherwise shrinks it to fit the workspace names.
-# sidebar_width = 34
-# sidebar_min_width = 34
 show_agent_labels_on_pane_borders = true
-# Agents follow the spaces list, where worktree spaces sit under their repo.
-agent_panel_sort = "spaces"
-
-# The tab row carries real information now -- herdr-automatic-rename labels each
-# tab with its foreground program, or the agent's topic when one is running --
-# so it stays visible even for a lone tab.
-hide_tab_bar_when_single_tab = false
-
-# Tabs are named by dan.pane-topic-sync from the pane's live topic, so there is
-# nothing left to type at creation time. Turning this off is what hands tab
-# labels over to the plugin; leaving it on means the plugin refuses to touch a
-# tab you named by hand.
+# Tabs are named by dan.pane-topic-sync, which leaves hand-named tabs alone.
 prompt_new_tab_name = false
-
-# The default is "{hostname}: {workspace}", which tells you nothing you cannot
-# already see. {terminal_title} is the focused pane's topic, so the WezTerm
-# window title -- the only part of herdr visible from cmd-tab and Mission
-# Control -- names the task rather than the machine.
+# The only part of herdr visible from cmd-tab and Mission Control.
 window_title = "{workspace}: {terminal_title}"
 
-# Claude rows drop the "claude" agent label: the pane border already shows it.
-#
-# $ctx is context window remaining (%) with the status line's thresholds and
-# colours, reported by claude/statusline-command.sh. It leads its row because
-# herdr cannot right-align a token: first in the row, the numbers form a column.
+# $ctx is context remaining (%), reported by claude/statusline-command.sh. It
+# leads its row so the numbers line up, since tokens cannot be right-aligned.
 [ui.sidebar.agents.rows_by_agent]
 claude = [
-  [
-    "state_icon",
-    "terminal_title_stripped",
-  ],
+  ["state_icon", "terminal_title_stripped"],
   [
     { token = "$ctx", fg = "#74c7ec", rules = [
       { lt = 11, fg = "#f38ba8", bold = true },
@@ -489,85 +187,13 @@ claude = [
   ],
 ]
 
+# OSC 9 through WezTerm; clicking the toast does nothing.
 [ui.toast]
-# off = disable pop-up notifications
-# herdr = show in-app toasts
-# terminal = ask the outer terminal to show a desktop notification
-# system = ask the OS notification service directly
-# delivery = "off"
-# delay_seconds = 1
-
-# OSC 9 through WezTerm. Clicking the toast does nothing: OSC 9 carries no click
-# action, so it cannot take you to the pane that fired.
 delivery = "terminal"
 delay_seconds = 5
-[ui.toast.herdr]
-# position = "bottom-right"
 
-[ui.toast.clipboard]
-# enabled = true
-# position = "bottom-center"
-
-# Play sounds when agents change state in background workspaces
 [ui.sound]
 enabled = false
-# Optional custom mp3 sound files. Relative paths are resolved from this config file's directory.
-# path = "sounds/notification.mp3"   # one mp3 file for all sound notifications
-# done_path = "sounds/done.mp3"      # overrides only finished notifications
-# request_path = "sounds/request.mp3" # overrides only needs-attention notifications
-
-# Per-agent overrides: default | on | off
-# By default, droid is muted.
-[ui.sound.agents]
-# droid = "off"
-claude = "on"
-
-[session]
-# Resume supported AI-agent panes into their native conversation sessions after
-# a Herdr server restart. Requires official integrations that report session refs.
-resume_agents_on_restore = true
-
-[remote]
-# Whether herdr manages the ssh config used for `herdr --remote`.
-# When true (default), herdr runs remote ssh through a generated config that
-# includes your ~/.ssh/config first and adds ServerAliveInterval/
-# ServerAliveCountMax as fallbacks (so any keepalive values you set yourself
-# still win) to survive idle network/NAT timeouts. Herdr also uses a private
-# per-attach OpenSSH control socket to reuse the first authenticated connection.
-# Set false to run plain ssh against your ssh config unchanged — this does not
-# force keepalive or multiplexing off, it only stops herdr from adding its own.
-# manage_ssh_config = true
 
 [experimental]
-# Allow launching herdr from inside a herdr-managed pane.
-# allow_nested = false
-# Experimental local Kitty graphics rendering for attached clients.
-# Requires a Kitty graphics-compatible outer terminal. WezTerm qualifies:
-# herdr gates this on TERM_PROGRAM being wezterm/ghostty/kitty (src/client/mod.rs).
-kitty_graphics = true
-# Save recent pane screen history across full server restarts.
 pane_history = true
-# While prefix mode is active, temporarily switch the macOS host input
-# source to an ASCII-capable keyboard layout so prefix commands register
-# even when a CJK IME is active, then restore the previous input source
-# when prefix mode exits. macOS only; best-effort. Default: false.
-# switch_ascii_input_source_in_prefix = false
-# Expose the focused pane's cursor to the outer terminal so macOS input
-# methods keep tracking the candidate window when TUIs paint their own
-# cursor (Claude Code, pi, codex). Trade-off: extra cursor visible for
-# apps that hide it without painting a replacement (vim normal mode, etc.).
-# reveal_hidden_cursor_for_cjk_ime = false
-# Optional allow-list: only reveal for focused panes whose detected agent
-# matches one of these names. Empty means apply to any focused pane.
-# If the list contains no valid names, the reveal does not apply.
-# Accepted: pi, claude, codex, gemini, cursor, devin, cline, opencode,
-# copilot, kimi, kiro, droid, amp, grok, hermes, kilo, qodercli, qoder.
-# cjk_ime_agents = []
-# Cursor shape rendered when reveal_hidden_cursor_for_cjk_ime is true.
-# Values: block, steady_block (default), underline, steady_underline, bar, steady_bar.
-# cjk_ime_cursor_shape = "steady_block"
-
-[advanced]
-# Maximum scrollback buffer size in bytes retained per pane terminal.
-# Matches Ghostty's default scrollback-limit behavior.
-# scrollback_limit_bytes = 10000000

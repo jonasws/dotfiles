@@ -133,10 +133,9 @@ config.keys = {
   },
 
   { key = 'k', mods = 'CMD', action = wezterm.action.SendString '\x1b[107;7u' },
-  -- Escape hatch out of a nested multiplexer. herdr's nav_at_edge is only
-  -- 'wrap' or 'stop' — neither hands the chord back to the outer terminal — so
-  -- CTRL+hjkl can never cross from a herdr pane to a sibling WezTerm pane.
-  -- LEADER+hjkl always moves WezTerm panes, whatever runs inside them.
+  -- CTRL+hjkl leaves herdr through herdr-splits' nav_at_edge = 'forward', which
+  -- needs `wezterm` and `jq` on the herdr server's PATH. LEADER+hjkl always
+  -- moves WezTerm panes, whatever runs inside them.
   { key = 'h', mods = 'LEADER', action = act.ActivatePaneDirection 'Left' },
   { key = 'j', mods = 'LEADER', action = act.ActivatePaneDirection 'Down' },
   { key = 'k', mods = 'LEADER', action = act.ActivatePaneDirection 'Up' },
