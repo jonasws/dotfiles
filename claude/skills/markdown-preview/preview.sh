@@ -1,29 +1,18 @@
 #!/usr/bin/env bash
-# Open a live markdown preview in a Herdr split pane.
+# Open a live markdown preview with leaf in a Herdr split pane.
 #
 # Usage: preview.sh [--direction right|down] [--focus] FILE
 #        preview.sh --close FILE
-#        preview.sh watch FILE        (internal: the loop that runs inside the pane)
 #
 # One pane per file. Running it again for a file whose pane is still open does
-# nothing, because the pane already redraws on every save; --close removes it.
+# nothing, because leaf already reloads on every save; --close removes it.
 #
 # The split targets the pane this runs in (--current), not whichever pane the
 # UI has focused, so a second attached client cannot steer it somewhere else.
 set -euo pipefail
 
-self=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/$(basename "${BASH_SOURCE[0]}")
-state_dir=${XDG_STATE_HOME:-$HOME/.local/state}/markdown-preview
-
 die() { printf 'markdown-preview: %s\n' "$1" >&2; exit "${2:-1}"; }
 abs() { (cd "$(dirname "$1")" && printf '%s/%s\n' "$PWD" "$(basename "$1")"); }
-state_file() { printf '%s/%s.pane' "$state_dir" "$(printf '%s' "$1" | shasum | cut -c1-16)"; }
-
-# mdcat redraws on every change itself, including when an editor saves by
-# replacing the file.
-watch_loop() {
-  exec mdcat --watch "$1"
-}
 
 direction=right focus=false close=false
 while [[ ${1:-} == --* ]]; do
@@ -35,11 +24,6 @@ while [[ ${1:-} == --* ]]; do
   esac
 done
 
-if [[ ${1:-} == watch ]]; then
-  shift
-  watch_loop "${1:?usage: preview.sh watch FILE}"
-fi
-
 [[ $direction == right || $direction == down ]] || die "--direction must be right or down" 2
 file=${1:?usage: preview.sh [--direction right|down] [--focus] FILE}
 [[ -f $file ]] || die "no such file: $file"
@@ -47,19 +31,29 @@ file=$(abs "$file")
 [[ $file != *\'* ]] || die "paths containing a single quote are not supported"
 
 if [[ ${HERDR_ENV:-} != 1 ]] || ! command -v herdr >/dev/null; then
-  printf 'markdown-preview: not inside Herdr. View it with: mdcat -p %q\n' "$file" >&2
+  printf 'markdown-preview: not inside Herdr. View it with: leaf -w %q\n' "$file" >&2
   exit 3
 fi
-command -v mdcat >/dev/null || die "mdcat is not installed"
-mdcat --help | grep -q -- --watch || die "this mdcat has no --watch; upgrade it"
+command -v leaf >/dev/null || die "leaf is not installed (mise use -g github:RivoLink/leaf)"
 command -v jq >/dev/null || die "jq is not installed"
 
-sf=$(state_file "$file")
+# The pane is found again by its label and working directory rather than by an
+# id stored on disk: the label names the file and the pane starts in the file's
+# directory, so the pair is unique per absolute path. Nothing is written outside
+# Herdr, which keeps the script usable from a sandbox that cannot write to
+# ~/.local/state.
+dir=$(dirname "$file")
+label="leaf $(basename "$file")"
+find_pane() {
+  herdr pane list | jq -r --arg l "$label" --arg d "$dir" \
+    '.result.panes[] | select(.label == $l and .cwd == $d) | .pane_id' | head -1
+}
+
+existing=$(find_pane)
 
 if $close; then
-  if [[ -f $sf ]]; then
-    herdr pane close "$(<"$sf")" >/dev/null 2>&1 || true
-    rm -f "$sf"
+  if [[ -n $existing ]]; then
+    herdr pane close "$existing" >/dev/null 2>&1 || true
     echo "closed preview of $file"
   else
     echo "no preview open for $file"
@@ -67,14 +61,14 @@ if $close; then
   exit 0
 fi
 
-if [[ -f $sf ]] && herdr pane get "$(<"$sf")" >/dev/null 2>&1; then
-  echo "already open in pane $(<"$sf"); it refreshes when $file is saved"
+if [[ -n $existing ]]; then
+  echo "already open in pane $existing; it reloads when $file is saved"
   exit 0
 fi
 
-mkdir -p "$state_dir"
-cmd="bash '$self' watch '$file'"
-split=(pane split --current --direction "$direction" --cwd "$PWD")
+# exec, so quitting leaf ends the pane's process and Herdr closes the pane.
+cmd="exec leaf -w '$file'"
+split=(pane split --current --direction "$direction" --cwd "$dir")
 $focus || split+=(--no-focus)
 
 # The user's fish setup can start a command in a fresh pane through the
@@ -87,11 +81,11 @@ fi
 
 pane=$(herdr "${split[@]}" | jq -r '.result.pane.pane_id')
 [[ -n $pane && $pane != null ]] || die "herdr did not return a pane id"
-printf '%s' "$pane" >"$sf"
+herdr pane rename "$pane" "$label" >/dev/null
 
 if [[ ! -f $helper ]]; then
   sleep 1
-  herdr pane run "$pane" "clear; $cmd; exit" >/dev/null
+  herdr pane run "$pane" "$cmd" >/dev/null
 fi
 
-echo "previewing $file in pane $pane (refreshes on save, Ctrl-C closes it)"
+echo "previewing $file in pane $pane (reloads on save, q closes it)"
