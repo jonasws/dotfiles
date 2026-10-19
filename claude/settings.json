@@ -52,7 +52,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "opus",
+  "model": "sonnet",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "SessionStart": [
@@ -107,7 +107,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.local/share/mise/shims/atuin hook claude-code",
+            "command": "~/.local/share/mise/installs/atuin/latest/atuin-aarch64-apple-darwin/atuin hook claude-code",
             "timeout": 5
           }
         ]
@@ -119,7 +119,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.local/share/mise/shims/atuin hook claude-code",
+            "command": "~/.local/share/mise/installs/atuin/latest/atuin-aarch64-apple-darwin/atuin hook claude-code",
             "timeout": 5
           }
         ]
@@ -131,7 +131,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "~/.local/share/mise/shims/atuin hook claude-code",
+            "command": "~/.local/share/mise/installs/atuin/latest/atuin-aarch64-apple-darwin/atuin hook claude-code",
             "timeout": 5
           }
         ]
@@ -215,6 +215,14 @@
   },
   "spinnerTipsEnabled": false,
   "effortLevel": "high",
+  "modelSettings": {
+    "claude-sonnet-5-5": {
+      "effortLevel": "medium"
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "medium"
+    }
+  },
   "awaySummaryEnabled": false,
   "tui": "default",
   "timeFormat": "24-hour",
