@@ -52,7 +52,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "sonnet",
+  "model": "opus",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "SessionStart": [
