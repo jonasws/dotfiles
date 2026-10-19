@@ -44,8 +44,10 @@ if stale && mkdir "$lock" 2>/dev/null; then
 fi
 
 {
+  # `if`, not `&&`: the loop's status is its last test, and a trailing non-repo
+  # would otherwise abort the group under `set -e` before the cache is read.
   zoxide query -l | while IFS= read -r dir; do
-    [[ -d $dir/.git ]] && printf '%s\n' "$dir"
+    if [[ -d $dir/.git ]]; then printf '%s\n' "$dir"; fi
   done
   [[ -s $cache ]] && cat "$cache"
 } | awk '!seen[$0]++'
