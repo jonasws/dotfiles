@@ -56,9 +56,13 @@
       "Bash(git reset --hard*)",
       "Bash(herdr agent prompt *)",
       "Bash(herdr agent start *)",
+      "Bash(herdr pane close *)",
+      "Bash(herdr pane move *)",
+      "Bash(herdr pane run *)",
       "Bash(herdr pane send-keys *)",
       "Bash(herdr pane send-text *)",
       "Bash(herdr server *)",
+      "Bash(herdr tab close *)",
       "Bash(herdr workspace close *)"
     ],
     "defaultMode": "auto"
