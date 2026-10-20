@@ -220,19 +220,63 @@
     },
     "filesystem": {
       "allowWrite": [
+        "~/CX",
+        "~/CNOPS",
+        "~/CN-TERMINAL",
+        "~/dotfiles",
+        "~/.herdr/worktrees",
+        "~/herdr-splits.nvim",
         "~/Library/Caches/mise",
         "~/.m2/repository",
         "~/Library/Application Support/kotlin",
-        "~/.tsk",
-        "~/CX/api-docs",
-        "~/CNOPS/api-docs",
-        "~/CN-TERMINAL/api-docs"
+        "~/.tsk"
+      ],
+      "denyWrite": [
+        "~/dotfiles/claude",
+        "~/dotfiles/fish",
+        "~/dotfiles/fnox",
+        "~/dotfiles/herdr"
       ],
       "denyRead": [
-        "~/.ssh/id_rsa",
-        "~/.aws/credentials",
-        "~/.config/fnox/age*.txt",
-        "~/dotfiles/fnox/age*.txt"
+        "~/",
+        "~/dotfiles/fnox/age*.txt",
+        "~/.m2/settings-security*.xml*"
+      ],
+      "allowRead": [
+        "~/CX",
+        "~/CNOPS",
+        "~/CN-TERMINAL",
+        "~/dotfiles",
+        "~/.herdr/worktrees",
+        "~/herdr-splits.nvim",
+        "~/.local/bin",
+        "~/.local/share/mise",
+        "~/.local/state/mise",
+        "~/.config/mise",
+        "~/.config/git",
+        "~/catppuccin/delta/catppuccin.gitconfig",
+        "~/.config/herdr",
+        "~/.config/colima",
+        "~/.config/tuicr",
+        "~/.config/hunk",
+        "~/.claude/skills",
+        "~/.claude/plugins",
+        "~/.claude/shell-snapshots",
+        "~/.agents/skills",
+        "~/.tsk",
+        "~/.m2",
+        "~/.cargo/bin",
+        "~/.cargo/registry",
+        "~/.cargo/git",
+        "~/.rustup",
+        "~/.npm",
+        "~/.docker/config.json",
+        "~/.docker/contexts",
+        "~/.testcontainers.properties",
+        "~/.docker-java.properties",
+        "~/.cdk",
+        "~/Library/Caches/mise",
+        "~/Library/Application Support/kotlin"
       ]
     }
   },
