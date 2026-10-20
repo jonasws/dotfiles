@@ -1,2 +1,14 @@
 [flavor]
 dark = "catppuccin-mocha"
+
+# git.yazi signs in Catppuccin Mocha
+[git]
+unknown = { fg = "#6c7086" }
+ignored = { fg = "#6c7086" }
+untracked = { fg = "#a6e3a1" }
+unstaged = { fg = "#fab387" }
+staged = { fg = "#89b4fa" }
+added = { fg = "#a6e3a1", bold = true }
+deleted = { fg = "#f38ba8", bold = true }
+updated = { fg = "#f9e2af" }
+clean = { fg = "#6c7086" }

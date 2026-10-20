@@ -13,6 +13,16 @@ use = "aresler/path-from-root"
 rev = "3daa62f"
 hash = "f3375d21ceb5f49d2d50ad199262006a"
 
+[[plugin.deps]]
+use = "Rolv-Apneseth/starship"
+rev = "ea92cf4"
+hash = "9776f378459072b6c2875eae5addc49d"
+
+[[plugin.deps]]
+use = "yazi-rs/plugins:git"
+rev = "9166202"
+hash = "347cc6b190eb0c2fd60513cc7ae37412"
+
 [[flavor.deps]]
 use = "yazi-rs/flavors:catppuccin-mocha"
 rev = "1183892"

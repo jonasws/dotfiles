@@ -133,6 +133,16 @@ run = "mime-ext.remote"
 prio = "high"
 group = "mime"
 
+[[plugin.prepend_fetchers]]
+url = "*"
+run = "git"
+group = "git"
+
+[[plugin.prepend_fetchers]]
+url = "*/"
+run = "git"
+group = "git"
+
 [plugin]
 fetchers = [
   # Mimetype
