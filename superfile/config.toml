@@ -168,7 +168,7 @@ enable_md5_checksum = false
 #
 #-- Zoxide Support - Smart directory navigation!
 # Requires: zoxide
-zoxide_support = false
+zoxide_support = true
 
 #-- File opening rules
 # Map file extensions to commands used to open them.

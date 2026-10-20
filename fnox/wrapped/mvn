@@ -33,6 +33,16 @@ fi
 # .mvn/maven.config so that CI keeps its warm daemon.
 set -- -Dkotlin.compiler.daemon=false "$@"
 
+# Maven Resolver 2 (Maven 3.10+) asks every remote repository for a
+# .meta/prefixes.txt to skip lookups it knows will miss. GitHub Packages serves
+# none: the capralifecycle/* wildcard URL answers 422, and Flyway's own POM
+# declares a GitHub Packages repository we hold no credentials for, which answers
+# 401. Both only produce a warning on every build, so stop asking those two.
+set -- \
+  -Daether.remoteRepositoryFilter.prefixes.resolvePrefixFiles.github=false \
+  -Daether.remoteRepositoryFilter.prefixes.resolvePrefixFiles.flyway-community-db-support=false \
+  "$@"
+
 # Transfer progress is worth watching live and is pure noise in a log file that
 # gets read afterwards, and Maven offers no way to switch it back on once -ntp
 # is passed. Key it off the terminal instead of deciding once for every build.

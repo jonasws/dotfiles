@@ -1,2 +1,2 @@
 theme = "catppuccin-mocha"
-diff_view = "unified"      # or "unified"
+diff_view = "unified"      # or "side-by-side"

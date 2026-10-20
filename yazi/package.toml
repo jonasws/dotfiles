@@ -1,11 +1,11 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:piper"
-rev = "603fa36"
+rev = "9166202"
 hash = "d1e0499cae5f3aeb628c267616d4b682"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mime-ext"
-rev = "603fa36"
+rev = "9166202"
 hash = "7d3b7f99e600fd7e77ebc5eb8423a897"
 
 [[plugin.deps]]

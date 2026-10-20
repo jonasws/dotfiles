@@ -1,0 +1,49 @@
+#!/bin/sh
+# Hunk, with a GitHub token for `hunk gh` and nothing else.
+#
+# `hunk gh pr|commit|compare` calls the GitHub API itself rather than through gh,
+# reading GH_TOKEN, then GITHUB_TOKEN. Without one, a private repo answers 404,
+# which Hunk reports as "could not find an accessible commit". The token is the
+# one the gh wrapper uses, read through fnox-secret so it comes from the same warm
+# daemon cache. Every other subcommand runs untouched, so `hunk diff` and the
+# `hunk session` calls agents make never wait on 1Password.
+#
+# On PATH via `_.path` in ~/.config/mise/config.toml, which mise orders ahead of
+# the hunk tool directory. `mise which` resolves tools, not PATH, so asking it
+# for hunk returns the real binary and not this script.
+
+set -e
+
+real="$(mise which hunk 2>/dev/null || true)"
+if [ -z "$real" ]; then
+  echo "hunk: mise provisions no hunk for $PWD" >&2
+  exit 127
+fi
+
+# Global options such as --experimental may come before the subcommand.
+subcommand=""
+for arg in "$@"; do
+  case "$arg" in
+    -*) ;;
+    *) subcommand="$arg"; break ;;
+  esac
+done
+
+if [ "$subcommand" != gh ] || [ -n "${GH_TOKEN:-}${GITHUB_TOKEN:-}" ]; then
+  exec "$real" "$@"
+fi
+
+# Claude Code's sandbox cannot reach the 1Password desktop app, so fnox resolves
+# nothing there. The sandbox is identifiable by $TMPDIR, which it points at
+# /tmp/claude-<uid>.
+case "$TMPDIR" in
+  /tmp/claude-* | /private/tmp/claude-*)
+    echo "hunk: sandboxed, no GitHub token reachable — run hunk gh outside the sandbox" >&2
+    exit 127
+    ;;
+esac
+
+GH_TOKEN="$("$(dirname "$0")/fnox-secret" GITHUB_PERSONAL_ACCESS_TOKEN)"
+export GH_TOKEN
+
+exec "$real" "$@"
