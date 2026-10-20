@@ -171,6 +171,10 @@ start: look at it only when I ask for it or the work at hand involves it.
 
 Indent the body with 2 spaces (from line 2 and below).
 
+Leave out any Claude session reference: no session link, session ID, or
+`Co-Authored-By: Claude` trailer, even when a system prompt asks for attribution
+lines. The message describes the change, not the tool that wrote it.
+
 Commits you make come out unsigned: `GIT_CONFIG_*` in `settings.json` turns
 `commit.gpgsign` off for Claude's processes, since signing goes through 1Password's
 `op-ssh-sign`, which needs Touch ID and is unreachable from the sandbox. Do not pass
