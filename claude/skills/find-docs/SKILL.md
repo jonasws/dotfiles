@@ -38,36 +38,46 @@ Two signals settle most cases: **is there a named artifact** (library, service, 
 
 ## Context7 — library and framework documentation
 
-Context7 is three GET endpoints on `context7.com`, called with `curl`; there is no CLI to install. Every Bash command in a session already carries `CONTEXT7_API_KEY`: a SessionStart hook (`claude/hooks/context7-env.sh`) fetches it from fnox, so requests authenticate inside the sandbox too. In a sandboxed session, name `context7.com` on the command, and pass an explicit `timeout` on the Bash call (60000 is plenty) so a hung request doesn't consume the whole turn.
+Context7 is three GET endpoints on `context7.com`, called with `curl`; there is no CLI to install. Every Bash command in a session already carries `CONTEXT7_API_KEY`: a SessionStart hook (`claude/hooks/context7-env.sh`) fetches it from fnox, so requests authenticate inside the sandbox too. In a sandboxed session, name `context7.com` on the command. Keep the curl flags as shown: `-s` drops the progress meter, `-S` still prints a one-line reason when the connection fails (plain `-s` prints nothing and exits 6, which reads like an empty result), `--fail-with-body` exits non-zero on an HTTP error while keeping Context7's one-line JSON reason, and `--max-time 30` bounds a hung request. Never add `-v` or `-i`; headers and TLS chatter are noise in context.
 
-**Search first.** One request, no library ID: Context7 picks the libraries, ranks snippets across them, and returns prompt-ready text with each snippet's library and source URL.
+Two ways in, and the first match in this table decides. Count calls against the backend budget of about three: search is one call, resolving a library and then querying it is two, and each query on an ID you already hold is one.
+
+| The question | Call | Calls |
+|---|---|---|
+| You hold a Context7 ID (`/org/project`): from the user, or from the `Library:` line of an earlier search result | `context` with that ID | 1 |
+| A pinned version of one library | `libs/search` for its indexed versions, then `context` with the versioned ID (`/vercel/next.js/v13.5.11`); skip the resolve when you hold that ID | 2, or 1 |
+| A first question, the library named or not | search, with a `library` hint when you know it | 1 |
+| How two to four libraries work together | search, one `library` hint each | 1 |
+| Search came back thin, wrong-library or 404 after a hint | `libs/search` to see the candidates and pick one, then `context` | 2 |
+
+**Search** sends one question; Context7 picks the libraries, ranks snippets across them, and returns prompt-ready text with each snippet's library and source URL. It is Context7's own recommendation for a quick, grounded answer.
 
 ```bash
-curl -sG https://context7.com/api/v3/search -H "Authorization: Bearer $CONTEXT7_API_KEY" \
+curl -sSG --fail-with-body --max-time 30 https://context7.com/api/v3/search -H "Authorization: Bearer $CONTEXT7_API_KEY" \
   --data-urlencode 'query=How do I write a server filter in http4k?' \
   --data-urlencode language=Kotlin
 ```
 
-Add hints when the stack is known: `library=` (a name or a Context7 ID; repeat for up to four), `version=` (needs a `library` hint), and `type=json` for `codeSnippets` and `infoSnippets` with per-snippet token counts, when results need filtering before they are read. A 404 (`no_documentation_found`) means nothing matched, not that the endpoint is down: rephrase, add a `library` hint, or pick the library yourself.
+Hints: `library=` (a name or a Context7 ID; repeat for up to four; a name can match several libraries, as `Next.js` matches both `/vercel/next.js` and `/websites/nextjs`, so pass the ID to hold search to one), `version=` such as `15.4.0` (needs a `library` hint, and is a preference, not a pin: with the exact ID `/vercel/next.js` and `version=13.5.11`, one of four snippets still came from `canary`, where `context` on `/vercel/next.js/v13.5.11` returned only 13.5.11 sources), and `type=json` for `codeSnippets` and `infoSnippets` with per-snippet token counts, when results need filtering before they are read. A 404 (`no_documentation_found`) means nothing matched, not that the endpoint is down: rephrase, add a `library` hint, or pick the library yourself.
 
-**Pick the library yourself** when one library is the whole question: follow-ups against it, a specific version, or a search that came back thin. Resolve the name to an ID, then query that ID:
+**Pick the library yourself** (the Context API) for follow-ups on one library, or when search picked the wrong one. Follow-ups reuse the ID a search result already named; resolve with `libs/search` only when no result has given you the right one. `libs/search` also lists the versions a library has indexed, which search does not show.
 
 ```bash
-curl -sG https://context7.com/api/v2/libs/search -H "Authorization: Bearer $CONTEXT7_API_KEY" \
+curl -sSG --fail-with-body --max-time 30 https://context7.com/api/v2/libs/search -H "Authorization: Bearer $CONTEXT7_API_KEY" \
   --data-urlencode libraryName=http4k --data-urlencode 'query=server filters' \
   | jq -r '.results[:5][] | [.id, .title, .totalSnippets, .trustScore, .benchmarkScore, ((.versions // [])[:5] | join(","))] | @tsv'
 
-curl -sG https://context7.com/api/v2/context -H "Authorization: Bearer $CONTEXT7_API_KEY" \
+curl -sSG --fail-with-body --max-time 30 https://context7.com/api/v2/context -H "Authorization: Bearer $CONTEXT7_API_KEY" \
   --data-urlencode libraryId=/http4k/api \
   --data-urlencode 'query=How do I write a server filter?' \
   --data-urlencode language=Kotlin
 ```
 
-Skip the resolve step only when you were handed an ID in `/org/project` form; IDs always carry the leading `/`, and a guessed one returns `404 library_not_found`. Use the official name with its real punctuation — `"Next.js"` not `nextjs`, `"Three.js"` not `threejs` — because ranking keys off it; if the matches look wrong, try another spelling before rewording the query. Prefer high `totalSnippets`, `trustScore` and `benchmarkScore`; when two libraries fit about equally, name both and say which you picked. A named version maps to `/org/project/<version>` (or `@<version>`), using the closest one `versions` lists.
+Skip the resolve step when you hold an ID in `/org/project` form, from the user or a search result; never guess one. IDs always carry the leading `/`, and a guessed one returns `404 library_not_found`. Use the official name with its real punctuation — `"Next.js"` not `nextjs`, `"Three.js"` not `threejs` — because ranking keys off it; if the matches look wrong, try another spelling before rewording the query. Prefer the official, primary source over community forks and mirrors, then high `totalSnippets`, `trustScore` and `benchmarkScore`; when two libraries fit about equally, name both and say which you picked. A named version maps to `/org/project/<version>` (or `@<version>`), using the closest one `versions` lists; check that the snippets' source URLs carry that tag.
 
 Pass `language` on both paths so examples in it rank first. In the repos under `~/CX`, `~/CNOPS` and `~/CN-TERMINAL` that is Kotlin, unless the file at hand is TypeScript (the `*-infra` CDK apps, web apps).
 
-One topic per query, on either path. `"routing and auth and caching in Next.js"` returns shallow results for all three; three separate queries return real ones. Describe what to look up in the documentation rather than the task you are trying to finish, and keep credentials, proprietary code and personal data out of the query string.
+One topic per query, on either path, unless the topic is how libraries interact, which is one search with several hints. `"routing and auth and caching in Next.js"` returns shallow results for all three; three separate queries return real ones. Describe what to look up in the documentation rather than the task you are trying to finish, and keep credentials, proprietary code and personal data out of the query string.
 
 **Errors** come back as JSON with `error` and `message`. `429` means the monthly quota is exhausted: say so, and if `CONTEXT7_API_KEY` is empty in the session, say the hook did not resolve it. Then answer from training knowledge *and mark which parts those are*. Silently degrading to memory is the failure mode that misleads. `401` means a bad key; `503` is a transient search failure worth one retry.
 
@@ -113,7 +123,7 @@ defuddle parse <url> --md -o page.md    # then grep the file, never cat it
 
 This is the default because of what the alternatives get wrong, not because it is cheap. Most lookups are a search for something specific — a flag, a default, a signature, whether a thing exists at all — and that fact sits wherever the page happens to put it. Any tool that returns the first N characters is answering a different question, and when the fact falls outside the window you conclude "the page doesn't document this" with nothing to indicate you were cut off. A grep over the complete text cannot produce that false negative, and it surfaces the neighbors you did not know to ask about: the same grep that found one timeout variable in a 155 KB page turned up a second one that changed the answer.
 
-It takes HTML on stdin too (`curl -L <url> | defuddle parse --md`) when the fetch needs your own redirects, headers or cookies, and `--user-agent` when a site 403s the default one.
+It takes HTML on stdin too (`curl -sSL <url> | defuddle parse --md`) when the fetch needs your own redirects, headers or cookies, and `--user-agent` when a site 403s the default one.
 
 Its one blind spot is client-rendered pages: there is no JS engine, so an SPA or an interactive API reference yields a skeleton rather than the content. That failure is at least loud — `defuddle parse <url> -p wordCount` shows a few hundred words where a full API reference should run to thousands, and you escalate knowing why. Silent truncation elsewhere gives you no such signal, which is the real argument for starting here.
 
@@ -138,4 +148,4 @@ Cap each backend at about three calls. The real stop signal is information gain 
 
 ## Reporting what you found
 
-Name the backend and the identifier so the lookup is reproducible: the Context7 library ID, the AWS doc URL, `owner/repo` plus path or issue number, the fetched URL. If part of the answer came from training data rather than a lookup, mark that part. The point of routing through here is that the user can tell which claims were actually verified.
+Name the backend and the identifier so the lookup is reproducible: the Context7 library ID (with its version when the answer depends on one), the AWS doc URL, `owner/repo` plus path or issue number, the fetched URL. If part of the answer came from training data rather than a lookup, mark that part. The point of routing through here is that the user can tell which claims were actually verified.
