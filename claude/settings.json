@@ -405,5 +405,8 @@
       "startupTimeout": 120000
     }
   },
-  "permissionRules": []
+  "permissionRules": [],
+  "attribution": {
+    "commit": ""
+  }
 }
