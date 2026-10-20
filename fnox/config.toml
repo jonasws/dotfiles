@@ -68,6 +68,11 @@ MISE_GITHUB_TOKEN= { provider = "onepass", value = "op://Employee/mise github to
 # tier belongs to the hosted endpoint at mcp.exa.ai, not to the package.
 GITHUB_PERSONAL_ACCESS_TOKEN= { provider = "onepass", value = "op://Employee/Liflig Github PAT/token", env = false }
 EXA_API_KEY= { provider = "onepass", value = "op://Employee/Exa API Key/password", env = false }
+#
+# CONTEXT7_API_KEY: claude/hooks/context7-env.sh puts it into every Claude Code
+# Bash command at session start, so the find-docs skill's Context7 API calls
+# authenticate inside the sandbox. Read-only docs quota, so that wide visibility is fine.
+CONTEXT7_API_KEY= { provider = "onepass", value = "op://Employee/Context7 API Key/credential", env = false }
 
 # Read by the `gcal` fish function, which resolves each value with
 # `fnox get -P gcalcli --no-defaults`. gcalcli takes the OAuth client only as
