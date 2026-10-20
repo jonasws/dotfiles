@@ -130,6 +130,22 @@ the tests before calling the work done.
 
 For a change to a CDK app (the `*-infra` repos), run `cdk-reviewer` before committing.
 
+## Code review TUIs
+
+Hunk and tuicr both show diffs in a Herdr pane. Pick by who writes the comments:
+
+- **An agent annotates a diff for me** → Hunk (`hunk-review` skill, `cdk-reviewer`).
+  Live notes with STML markup, navigation and `--watch`; notes live in the Hunk
+  daemon, not on disk.
+- **A person wrote the review** — me on an agent's change, or a teammate on a PR →
+  tuicr (`tuicr` skill). Comments persist as session JSON and
+  `tuicr review comments` reads them without the TUI.
+
+A teammate's review submitted on GitHub is never stored in a tuicr session, so
+`tuicr review comments` will not show it. tuicr has no headless export either. For
+the review as a file, I run `pr-review <N> > file.md` (a fish function over
+`gh api graphql`; `--all` keeps resolved threads) and hand you the path.
+
 ## Task board
 
 Work that outlives one session goes on the tsk board (`tsk`, installed by mise
