@@ -79,6 +79,8 @@ Pass `language` on both paths so examples in it rank first. In the repos under `
 
 One topic per query, on either path, unless the topic is how libraries interact, which is one search with several hints. `"routing and auth and caching in Next.js"` returns shallow results for all three; three separate queries return real ones. Describe what to look up in the documentation rather than the task you are trying to finish, and keep credentials, proprietary code and personal data out of the query string.
 
+Queries that do not depend on each other, such as the topics of a split question or the same question against two versioned IDs, go out as parallel Bash calls in one response. Not chained with `&&` and not fanned out with `xargs -P`: separate calls keep each result attributed to its query, with its own exit code and error reason.
+
 **Errors** come back as JSON with `error` and `message`. `429` means the monthly quota is exhausted: say so, and if `CONTEXT7_API_KEY` is empty in the session, say the hook did not resolve it. Then answer from training knowledge *and mark which parts those are*. Silently degrading to memory is the failure mode that misleads. `401` means a bad key; `503` is a transient search failure worth one retry.
 
 ## aws-knowledge MCP — anything AWS
