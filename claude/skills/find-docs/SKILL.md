@@ -4,7 +4,7 @@ description: >-
   The single entrypoint for looking anything up outside this machine — library and
   framework docs, AWS service behavior, another project's source or changelog, and
   general web research. Routes the question to the right backend before spending a
-  remote call: Context7 CLI for library/SDK/CLI docs, the aws-knowledge MCP for AWS,
+  remote call: the Context7 API for library/SDK/CLI docs, the aws-knowledge MCP for AWS,
   the github MCP for repo-specific source and history, exa for everything else.
 
   Use whenever exact signatures, config options, version-specific behavior, error
@@ -28,7 +28,7 @@ From there the only question is which door. Picking wrong costs twice: a wasted 
 
 | The question is about | Backend | Entry point |
 |---|---|---|
-| A named library, framework, SDK, or CLI tool — API, config, migration | Context7 | `npx ctx7@latest library` then `docs` |
+| A named library, framework, SDK, or CLI tool — API, config, migration | Context7 | `curl` the search endpoint; `libs/search` then `context` to go deep |
 | AWS — service behavior, API/CLI params, CloudFormation/CDK, regional availability | aws-knowledge MCP | `aws___search_documentation` |
 | A specific repo or org (never `nsbno` — see below) — source, issues, PRs, releases, changelogs, "when did this change" | github MCP | `search_code`, `search_issues`, `list_releases` |
 | Everything else — news, comparisons, ecosystem questions, "does a tool exist for X" | exa MCP | `web_search_exa` |
@@ -38,20 +38,38 @@ Two signals settle most cases: **is there a named artifact** (library, service, 
 
 ## Context7 — library and framework documentation
 
-Always invoke as `npx ctx7@latest`, never a global `ctx7` binary and never `npm install -g` — `npx` pins the latest version per call and matches this environment's permission allow-list. Pass an explicit `timeout` on the Bash call (60000 is plenty); an `npx` that hangs on a cold cache otherwise consumes the whole turn.
+Context7 is three GET endpoints on `context7.com`, called with `curl`; there is no CLI to install. Every Bash command in a session already carries `CONTEXT7_API_KEY`: a SessionStart hook (`claude/hooks/context7-env.sh`) fetches it from fnox, so requests authenticate inside the sandbox too. In a sandboxed session, name `context7.com` on the command, and pass an explicit `timeout` on the Bash call (60000 is plenty) so a hung request doesn't consume the whole turn.
 
-Two steps: resolve a name to a library ID, then query that ID.
+**Search first.** One request, no library ID: Context7 picks the libraries, ranks snippets across them, and returns prompt-ready text with each snippet's library and source URL.
 
 ```bash
-npx ctx7@latest library "Next.js" "How to set up app router with middleware"
-npx ctx7@latest docs /vercel/next.js "How to add authentication middleware to app router"
+curl -sG https://context7.com/api/v3/search -H "Authorization: Bearer $CONTEXT7_API_KEY" \
+  --data-urlencode 'query=How do I write a server filter in http4k?' \
+  --data-urlencode language=Kotlin
 ```
 
-Call `library` first unless you were handed an ID in `/org/project` or `/org/project/version` form. Use the official name with its real punctuation — `"Next.js"` not `nextjs`, `"Three.js"` not `threejs` — because ranking keys off it. Results carry Code Snippet counts, Source Reputation and a Benchmark Score; prefer high coverage and High/Medium reputation, and take a version-specific ID (`/vercel/next.js/v14.3.0-canary.87`) when a version was named.
+Add hints when the stack is known: `library=` (a name or a Context7 ID; repeat for up to four), `version=` (needs a `library` hint), and `type=json` for `codeSnippets` and `infoSnippets` with per-snippet token counts, when results need filtering before they are read. A 404 (`no_documentation_found`) means nothing matched, not that the endpoint is down: rephrase, add a `library` hint, or pick the library yourself.
 
-One topic per query. `"routing and auth and caching in Next.js"` returns shallow results for all three; three separate `docs` calls return real ones. Describe what to look up in the documentation rather than the task you are trying to finish, and keep credentials, proprietary code and personal data out of the query string.
+**Pick the library yourself** when one library is the whole question: follow-ups against it, a specific version, or a search that came back thin. Resolve the name to an ID, then query that ID:
 
-**Quota errors** (`Monthly quota reached`, `quota exceeded`): say the Context7 quota is exhausted, suggest `npx ctx7@latest login` for higher limits, and if that is declined, answer from training knowledge *and mark which parts those are*. Silently degrading to memory is the failure mode that misleads.
+```bash
+curl -sG https://context7.com/api/v2/libs/search -H "Authorization: Bearer $CONTEXT7_API_KEY" \
+  --data-urlencode libraryName=http4k --data-urlencode 'query=server filters' \
+  | jq -r '.results[:5][] | [.id, .title, .totalSnippets, .trustScore, .benchmarkScore, ((.versions // [])[:5] | join(","))] | @tsv'
+
+curl -sG https://context7.com/api/v2/context -H "Authorization: Bearer $CONTEXT7_API_KEY" \
+  --data-urlencode libraryId=/http4k/api \
+  --data-urlencode 'query=How do I write a server filter?' \
+  --data-urlencode language=Kotlin
+```
+
+Skip the resolve step only when you were handed an ID in `/org/project` form; IDs always carry the leading `/`, and a guessed one returns `404 library_not_found`. Use the official name with its real punctuation — `"Next.js"` not `nextjs`, `"Three.js"` not `threejs` — because ranking keys off it; if the matches look wrong, try another spelling before rewording the query. Prefer high `totalSnippets`, `trustScore` and `benchmarkScore`; when two libraries fit about equally, name both and say which you picked. A named version maps to `/org/project/<version>` (or `@<version>`), using the closest one `versions` lists.
+
+Pass `language` on both paths so examples in it rank first. In the repos under `~/CX`, `~/CNOPS` and `~/CN-TERMINAL` that is Kotlin, unless the file at hand is TypeScript (the `*-infra` CDK apps, web apps).
+
+One topic per query, on either path. `"routing and auth and caching in Next.js"` returns shallow results for all three; three separate queries return real ones. Describe what to look up in the documentation rather than the task you are trying to finish, and keep credentials, proprietary code and personal data out of the query string.
+
+**Errors** come back as JSON with `error` and `message`. `429` means the monthly quota is exhausted: say so, and if `CONTEXT7_API_KEY` is empty in the session, say the hook did not resolve it. Then answer from training knowledge *and mark which parts those are*. Silently degrading to memory is the failure mode that misleads. `401` means a bad key; `503` is a transient search failure worth one retry.
 
 ## aws-knowledge MCP — anything AWS
 
