@@ -49,14 +49,24 @@ url_api = "https://api.github.com/repos/FiloSottile/age/releases/assets/53554189
 provenance = "github-attestations"
 
 [[tools."aqua:anthropics/claude-code"]]
-version = "2.1.303"
+version = "2.1.304"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
 [tools."aqua:anthropics/claude-code"."platforms.macos-arm64"]
-checksum = "sha256:cf40802aba7ff81f3c9085b7016e181a9ad2bc2ea9afa0853bff2fd2b496855c"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.303/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/654495511"
+checksum = "sha256:bb2fb10066e34c67facad46bf94d47e72c4d808a7a23590224544ee4b4aadaea"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.304/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/657250421"
+
+[[tools."aqua:asciinema/asciinema"]]
+version = "3.2.1"
+backend = "aqua:asciinema/asciinema"
+specifiers = ["latest"]
+
+[tools."aqua:asciinema/asciinema"."platforms.macos-arm64"]
+checksum = "sha256:1f0c76da7855601df93e5dccdf69b7c683b81beff1411e38b3802de1f5fc7a1c"
+url = "https://github.com/asciinema/asciinema/releases/download/v3.2.1/asciinema-aarch64-apple-darwin"
+url_api = "https://api.github.com/repos/asciinema/asciinema/releases/assets/449290357"
 
 [[tools."aqua:aws/session-manager-plugin"]]
 version = "1.2.896.0"
@@ -393,16 +403,15 @@ url_api = "https://api.github.com/repos/ouch-org/ouch/releases/assets/537367166"
 provenance = "github-attestations"
 
 [[tools."github:pamburus/hl"]]
-version = "0.36.3"
+version = "0.36.4"
 backend = "github:pamburus/hl"
 specifiers = ["latest"]
 
 [tools."github:pamburus/hl"."platforms.macos-arm64"]
-checksum = "sha256:613a787040fcf77026b9a0c49b9873a2f8466bf8dd40b098bd3333918d26b6b5"
-url = "https://github.com/pamburus/hl/releases/download/v0.36.3/hl-macos-arm64.tar.gz"
-url_api = "https://api.github.com/repos/pamburus/hl/releases/assets/446079901"
+checksum = "sha256:ef490ecefe9e8d539ece622b54da35c09c3a9a8625fa2ae11a963cf6e94e9d22"
+url = "https://github.com/pamburus/hl/releases/download/v0.36.4/hl-macos-arm64.tar.gz"
+url_api = "https://api.github.com/repos/pamburus/hl/releases/assets/657592810"
 provenance = "github-attestations"
-provenance_verified = true
 
 [[tools."github:pb33f/openapi-changes"]]
 version = "0.2.13"
@@ -521,14 +530,14 @@ url = "https://github.com/herdrdev/herdr/releases/download/v0.9.5/herdr-macos-aa
 url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/640898230"
 
 [[tools.hunk]]
-version = "0.23.0"
+version = "0.24.0"
 backend = "aqua:modem-dev/hunk"
 specifiers = ["latest"]
 
 [tools.hunk."platforms.macos-arm64"]
-checksum = "sha256:ae42cfe52798a4f51d25f63ceb8685ca2a6cb3039a124d6a6fc172a112f8d6b8"
-url = "https://github.com/modem-dev/hunk/releases/download/v0.23.0/hunkdiff-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/modem-dev/hunk/releases/assets/601411924"
+checksum = "sha256:f876f1e86d6ba88e120937eb79f63889762a29fed951236d6de69ce3ff967819"
+url = "https://github.com/modem-dev/hunk/releases/download/v0.24.0/hunkdiff-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/modem-dev/hunk/releases/assets/656237354"
 
 [[tools.hwatch]]
 version = "0.4.2"
@@ -801,7 +810,7 @@ url = "https://github.com/jdx/usage/releases/download/v6.9.0/usage-universal-app
 signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [[tools.uv]]
-version = "0.13.1"
+version = "0.13.3"
 backend = "asdf:uv"
 specifiers = ["latest"]
 
