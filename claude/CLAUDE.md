@@ -158,13 +158,9 @@ Indent the body with 2 spaces (from line 2 and below).
 Commits you make come out unsigned: `GIT_CONFIG_*` in `settings.json` turns
 `commit.gpgsign` off for Claude's processes, since signing goes through 1Password's
 `op-ssh-sign`, which needs Touch ID and is unreachable from the sandbox. Do not pass
-`-S`. After committing, tell me how many unsigned commits there are and give me the
-command to re-sign them, with the base filled in (the upstream, or the commit before
-the first unsigned one):
-
-```bash
-git rebase --autostash --exec 'git commit --amend --no-edit --no-verify -S' @{upstream}
-```
+`-S`. After committing, tell me how many unsigned commits there are and remind me to
+run `resign-commits` (a fish function), naming a base only when the branch has no
+upstream. It signs from the oldest unsigned commit up, leaving earlier commits alone.
 
 ## Code comments
 
