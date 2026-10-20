@@ -1,0 +1,21 @@
+# section	key	description	custom
+# From television/config.toml.
+move	ctrl+j / ctrl+k	Next / previous entry
+move	ctrl+n / ctrl+p	Next / previous entry
+move	ctrl+up / ctrl+down	Previous / next query from history
+select	enter	Confirm
+select	tab / shift+tab	Toggle selection (in hotkeys: next tool)	★
+select	ctrl+y	Copy entry to clipboard
+preview	ctrl+d / ctrl+u	Scroll preview half page
+preview	shift+j / shift+k	Scroll preview a line
+preview	ctrl+o	Toggle preview
+channel	ctrl+s	Cycle sources
+channel	ctrl+r	Reload source
+channel	ctrl+t	Channel switcher (remote control)
+ui	ctrl+l	Toggle layout
+ui	ctrl+h	Help
+ui	f12	Toggle status bar
+input	ctrl+w	Delete word
+input	ctrl+c	Clear line
+input	ctrl+a / ctrl+e	Start / end of input
+app	esc	Quit

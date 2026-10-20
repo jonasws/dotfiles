@@ -1,0 +1,51 @@
+# section	key	description	custom
+# <leader> is ; by default. ? in tuicr shows the full list.
+move	j / k	Scroll down / up
+move	ctrl+d / ctrl+u	Half page down / up
+move	g / G	First / last file
+move	{N}G	Go to source line N
+move	{ / }	Previous / next file
+move	[ / ]	Previous / next hunk
+move	m / M	Next / previous comment
+move	enter	Expand or collapse hidden context
+move	zt / zz / zb	Cursor line to top / center / bottom
+search	/	Search diff (regex, case-insensitive)
+search	n / N	Next / previous match
+search	esc	Clear match highlighting
+review	r	Toggle file reviewed
+review	R	Toggle hunk reviewed
+review	c	Line comment (file comment off a diff line)
+review	C	File comment
+review	;c	Review-level comment
+review	v / V	Visual mode for a range comment
+review	dd	Delete comment at cursor
+review	i / A	Edit comment (cursor at start / end)
+review	e	Open file in $EDITOR at the line
+review	y / Y	Copy review / comment at cursor
+panels	tab / shift+tab	Cycle focus between panels
+panels	;h / ;l / ;k / ;j	Focus panel left / right / up / down
+panels	;e	Toggle file list
+panels	;s	Toggle commit selector
+panels	;n	Toggle relative line numbers
+tree	space	Expand / collapse directory
+tree	o / O	Expand / collapse all
+tree	i / e	Include / exclude files by regex
+tree	I / E	Clear include / exclude filter
+comment	tab	Cycle comment type
+comment	enter / ctrl+s	Save comment
+comment	shift+enter / ctrl+j	Newline
+comment	esc	Cancel
+commands	:submit	Submit review to GitHub (comment, approve, request changes, draft)
+commands	:clip	Copy review to clipboard
+commands	:summary	List pending comments
+commands	:diff	Toggle unified / side-by-side
+commands	:f	Toggle single-file view
+commands	:commits	Pick commits to review
+commands	:prs	Pick a pull request
+commands	:sessions	Resume a saved review
+commands	:stage	Stage reviewed files
+commands	:set noreviewed	Hide reviewed files (r then walks to the next)
+commands	:e	Reload diff
+commands	:w	Save session
+commands	ZZ / :wq	Save and quit
+commands	ZQ / :q!	Quit without saving

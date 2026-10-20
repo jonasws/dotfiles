@@ -99,6 +99,14 @@ command = "tv git-repos -k 'enter=\"actions:workspace\"'"
 width = "90%"
 height = "80%"
 
+# Channel: television/cable/mine/hotkeys.toml
+[[keys.command]]
+key = "prefix+shift+h"
+type = "popup"
+command = "tv hotkeys"
+width = "90%"
+height = "80%"
+
 # Channel: television/cable/aws-profiles.toml
 [[keys.command]]
 key = "prefix+shift+o"

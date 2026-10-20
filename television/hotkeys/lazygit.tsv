@@ -1,0 +1,68 @@
+# section	key	description	custom
+# Mine (★) come from lazygit/config.yml and lazygit/popup.yml.
+global	?	Keybindings menu for the focused panel
+global	1..5	Jump to panel (status/files/branches/commits/stash)
+global	h / l	Previous/next panel
+global	[ / ]	Previous/next tab within a panel
+global	/	Filter or search the panel
+global	:	Run a shell command
+global	p / P	Pull / push
+global	f	Fetch
+global	R	Refresh
+global	z / ctrl+z	Undo / redo (reflog based)
+global	+ / _	Next/previous screen mode (half, full)
+global	W	Diffing menu
+global	ctrl+r	Switch to recent repo
+global	@	Command log options
+global	esc	Back / cancel; quits lazygit inside a herdr popup	★
+global	q	Quit
+files	space	Stage/unstage file
+files	a	Stage/unstage all
+files	enter	Stage individual lines/hunks
+files	c	Commit
+files	C	Commit using $EDITOR
+files	A	Amend last commit
+files	d	Discard changes in file
+files	D	Reset options (nuke, hard, soft)
+files	s / S	Stash all / stash options
+files	e / o	Edit / open file
+files	i	Ignore or exclude file
+files	`	Toggle file tree view
+files	ctrl+b	Filter files by status
+files	R	Show commits not authored by renovate	★
+staging	space	Stage/unstage line or range
+staging	a	Toggle hunk select
+staging	v	Range select
+staging	tab	Switch staged/unstaged side
+staging	E	Edit hunk
+branches	space	Checkout
+branches	n	New branch
+branches	c	Checkout by name
+branches	d	Delete branch
+branches	R	Rename branch
+branches	r	Rebase checked-out branch onto this
+branches	M	Merge into checked-out branch
+branches	f	Fast-forward from upstream
+branches	u	Upstream options
+branches	w	Worktree options
+commits	enter	View commit files
+commits	r / R	Reword / reword in $EDITOR
+commits	s	Squash into the commit below
+commits	f	Fixup into the commit below
+commits	F	Create fixup commit for this one
+commits	S	Apply fixup commits above
+commits	d	Drop commit
+commits	e	Edit (start interactive rebase here)
+commits	ctrl+j / ctrl+k	Move commit down/up
+commits	A	Amend with staged changes
+commits	t	Revert commit
+commits	g	Reset options
+commits	C / V	Copy (cherry-pick) / paste
+commits	T	Tag commit
+commits	B	Mark as base commit for rebase
+commits	y	Copy attribute (hash, message, URL…)
+commits	o	Open commit in browser
+stash	space	Apply stash
+stash	g	Pop stash
+stash	d	Drop stash
+stash	n	New branch from stash

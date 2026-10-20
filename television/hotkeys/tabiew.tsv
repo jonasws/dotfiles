@@ -1,0 +1,20 @@
+# section	key	description	custom
+move	h / j / k / l	Navigate cells
+move	b / w	Previous / next column
+move	ctrl+d / ctrl+u	Half page down / up
+move	ctrl+f / ctrl+b	Page down / up
+move	g / G	First / last row
+sheet	enter	Open row as a sheet
+sheet	f	Sheet: toggle default / JSON format
+sheet	c	Sheet: copy row
+view	e	Toggle auto-fit
+view	t	Tab switcher
+view	/	Fuzzy search
+view	ctrl+r	Reset data frame
+commands	:	Command palette
+commands	:q <sql>	SQL query (table is _ or the file name)
+commands	:f <expr>	Filter (SQL WHERE)
+commands	:s <cols>	Select columns
+commands	:o <cols>	Order by
+app	q	Close table
+app	Q	Quit

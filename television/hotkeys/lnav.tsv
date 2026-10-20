@@ -1,0 +1,48 @@
+# section	key	description	custom
+move	j / k	Line down / up
+move	space / b	Page down / up
+move	ctrl+d / ctrl+u	Half page down / up
+move	g / G	Top / bottom
+move	h / l	Left / right half a page
+move	e / E	Next / previous error
+move	w / W	Next / previous warning
+move	f / F	Next / previous file
+move	o / O	Next / previous message with the same opid
+move	s / S	Next / previous slow-down in log rate
+move	{ / }	Previous / next section
+time	d / D	Forward / back 24 hours
+time	0 / )	Next / previous day
+time	7 / 8	Previous / next minute
+time	1..6	Next nth ten minutes of the hour
+search	/	Search by regex
+search	n / N	Next / previous hit
+search	> / <	Next / previous hit horizontally
+prompt	:	Command (:filter-in, :filter-out, :goto …)
+prompt	;	SQL query
+prompt	|	Run an lnav script
+prompt	ctrl+]	Abort prompt
+marks	m	Mark line
+marks	M	Mark range from last mark
+marks	J / K	Mark down / up
+marks	u / U	Next / previous bookmark
+marks	c	Copy marked lines
+marks	C	Clear marks
+views	t	Text file view
+views	i	Histogram view
+views	v	SQL result view
+views	P	Pretty-print view
+views	p	Show parser results for the line
+views	T	Elapsed time since a bookmark
+views	z / Z	Zoom histogram in / out
+views	tab	Focus files / filters panel
+views	`	Focus breadcrumb bar
+display	x	Hide / show log fields
+display	ctrl+w	Toggle word wrap
+display	ctrl+f	Toggle all filters
+display	ctrl+x	Toggle cursor mode
+display	=	Pause / resume loading
+display	ctrl+l	Lo-fi mode (dump to terminal)
+app	ctrl+r	Reset session
+app	X	Close current file
+app	?	Help
+app	q / a	Back to previous view (quit) / restore it

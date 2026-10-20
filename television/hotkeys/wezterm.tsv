@@ -1,0 +1,19 @@
+# section	key	description	custom
+# Mine (★) come from wezterm/dot-wezterm.lua. Leader is cmd+l.
+panes	cmd+d	Split vertical	★
+panes	cmd+r	Split horizontal	★
+panes	cmd+.	Pick a pane	★
+panes	cmd+l h/j/k/l	Move to WezTerm pane, whatever runs inside	★
+panes	ctrl+h/j/k/l	Leaves herdr at its edge into the next WezTerm pane	★
+workspaces	alt+9	Fuzzy workspace launcher	★
+workspaces	alt+tab	Next workspace	★
+scroll	cmd+s	Scroll mode (j/k, ctrl+d/u, g/G, /, q)	★
+scroll	cmd+l enter	Copy mode	★
+select	cmd+o	Quick-select a URL and open it	★
+select	cmd+shift+t	Search for a 32-hex id (trace/request id)	★
+select	ctrl+shift+space	Quick-select (paths, hashes, …)
+app	cmd+p	Command palette	★
+app	cmd+k	Sends ctrl+alt+k: herdr pane picker	★
+app	shift+enter	Newline in Claude Code (sends esc+CR)	★
+app	cmd+f	Search scrollback
+app	cmd+t / cmd+w	New tab / close tab
