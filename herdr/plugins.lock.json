@@ -1,0 +1,38 @@
+[
+  {
+    "id": "dan.pane-topic-sync",
+    "enabled": true,
+    "source": "danbuhler/herdr-pane-topic-sync",
+    "commit": "a2eb4b254c1ecb12a0fa9bc7a1e18c8a1a553d5d"
+  },
+  {
+    "id": "dev.minung.herdr-f1",
+    "enabled": true,
+    "source": "hmu332233/herdr-f1",
+    "commit": "d527a49d94e35cffac83936156119720db0006d0"
+  },
+  {
+    "id": "herdr-automatic-rename",
+    "enabled": true,
+    "source": "qu8n/herdr-automatic-rename",
+    "commit": "10fa87c3c56ed0f265ebf081d83763325f77f589"
+  },
+  {
+    "id": "herdr-bar",
+    "enabled": true,
+    "source": "jeffarese/herdr-bar",
+    "commit": "eecb1d53f5ae16e2d7674429f384c8fabb0bc178"
+  },
+  {
+    "id": "herdr-splits",
+    "enabled": true,
+    "source": "local",
+    "commit": null
+  },
+  {
+    "id": "herdr-tsk",
+    "enabled": true,
+    "source": "local",
+    "commit": null
+  }
+]
