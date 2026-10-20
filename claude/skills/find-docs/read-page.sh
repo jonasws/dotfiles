@@ -8,7 +8,8 @@
 # so `read-page.sh <url> > page.md` gives a file to grep. Nothing reaches stdout
 # or leaf unless a page came back: on failure the reason goes to stderr and the
 # exit status is 1. A conversion is announced on stderr, because an extraction
-# can drop what the page itself had.
+# can drop what the page itself had. One request per page: defuddle converts the
+# body that request returned.
 set -euo pipefail
 
 url=${1:?usage: read-page.sh <url>}
@@ -19,23 +20,32 @@ trap 'rm -f "$page"' EXIT
 # picks markdown and one with only HTML still answers 2xx.
 reply=$(curl -sSL --max-time 30 \
   -H 'Accept: text/markdown, text/x-markdown;q=0.95, text/html;q=0.9, application/xhtml+xml;q=0.9, text/plain;q=0.8' \
-  -o "$page" -w '%{http_code} %{content_type}' "$url" 2>/dev/null) || reply="000 "
-code=${reply%% *}
-type=${reply#* }
+  -o "$page" -w '%{http_code}\t%{content_type}\t%{url_effective}' "$url") || exit 1
+IFS=$'\t' read -r code type final <<<"$reply"
 
-case "$code $type" in
+if [[ $code != 2?? ]]; then
+  echo "read-page: $url answered $code" >&2
+  exit 1
+fi
+
+case "$type" in
   # Plain text such as llms.txt is already readable as markdown.
-  2??\ text/markdown* | 2??\ text/x-markdown* | 2??\ text/plain*) ;;
+  text/markdown* | text/x-markdown* | text/plain*) ;;
+  text/html* | application/xhtml+xml*)
+    echo "read-page: $url has no markdown version; converting its HTML with defuddle" >&2
+    # defuddle reads the body already fetched instead of fetching again. A
+    # <base> tag stands in for the URL it would otherwise have, so relative
+    # links still resolve; a page's own <base> comes first and wins.
+    perl -0pi -e '
+      BEGIN { $b = shift } next if /<base\s/i;
+      s/(<head\b[^>]*>)/$1<base href="$b">/i or $_ = qq(<base href="$b">) . $_;
+    ' "$final" "$page"
+    converted=$(defuddle parse - --md <"$page") || exit 1
+    printf '%s\n' "$converted" >"$page"
+    ;;
   *)
-    if [[ $code == 000 ]]; then
-      echo "read-page: the request to $url failed; trying defuddle" >&2
-    else
-      echo "read-page: $url answered $code ${type:-without a content type}; converting with defuddle" >&2
-    fi
-    # defuddle fetches again with the URL rather than taking the body on stdin:
-    # it needs the URL to resolve relative links and to pick site extractors.
-    # It accepts only 2xx HTML and says why on stderr otherwise.
-    defuddle parse "$url" --md -o "$page" >/dev/null || exit 1
+    echo "read-page: $url answered ${type:-without a content type}, which is neither markdown nor HTML" >&2
+    exit 1
     ;;
 esac
 
