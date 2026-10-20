@@ -179,8 +179,8 @@ Commits you make come out unsigned: `GIT_CONFIG_*` in `settings.json` turns
 `commit.gpgsign` off for Claude's processes, since signing goes through 1Password's
 `op-ssh-sign`, which needs Touch ID and is unreachable from the sandbox. Do not pass
 `-S`. After committing, tell me how many unsigned commits there are and remind me to
-run `resign-commits` (a fish function), naming a base only when the branch has no
-upstream. It signs from the oldest unsigned commit up, leaving earlier commits alone.
+run `! resign-commits` (a script in `~/.local/bin`), naming a base only when the
+branch has no upstream. It signs from the oldest unsigned commit up, leaving earlier commits alone.
 
 ## Code comments
 
