@@ -163,7 +163,7 @@ command to re-sign them, with the base filled in (the upstream, or the commit be
 the first unsigned one):
 
 ```bash
-git rebase --exec 'git commit --amend --no-edit --no-verify -S' @{upstream}
+git rebase --autostash --exec 'git commit --amend --no-edit --no-verify -S' @{upstream}
 ```
 
 ## Code comments
