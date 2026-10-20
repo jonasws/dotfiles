@@ -32,7 +32,7 @@ From there the only question is which door. Picking wrong costs twice: a wasted 
 | AWS — service behavior, API/CLI params, CloudFormation/CDK, regional availability | aws-knowledge MCP | `aws___search_documentation` |
 | A specific repo or org (never `nsbno` — see below) — source, issues, PRs, releases, changelogs, "when did this change" | github MCP | `search_code`, `search_issues`, `list_releases` |
 | Everything else — news, comparisons, ecosystem questions, "does a tool exist for X" | exa MCP | `web_search_exa` |
-| Reading a URL you already have | `defuddle`, locally | `defuddle parse <url> --md -o page.md`, then grep — see [Reading a page](#reading-a-page) |
+| Reading a URL you already have | `read-page.sh`, locally | `read-page.sh <url> > page.md`: the server's markdown, else HTML via `defuddle`; then grep — see [Reading a page](#reading-a-page) |
 
 Two signals settle most cases: **is there a named artifact** (library, service, repo), and **is the answer stable documentation or a changing fact**. Documentation about a named artifact goes to Context7 or aws-knowledge; a changing fact about a named repo goes to github; anything with no named artifact goes to exa.
 
@@ -117,17 +117,21 @@ The residual: no named library, no AWS service, no specific repo. Comparisons, e
 
 ## Reading a page
 
-`defuddle` is installed, so reach for it directly — parse to a file and grep it:
+Read a page with the skill's own script, into a file, and grep it:
 
 ```bash
-defuddle parse <url> --md -o page.md    # then grep the file, never cat it
+~/.claude/skills/find-docs/read-page.sh <url> > page.md    # then grep the file, never cat it
 ```
 
-This is the default because of what the alternatives get wrong, not because it is cheap. Most lookups are a search for something specific — a flag, a default, a signature, whether a thing exists at all — and that fact sits wherever the page happens to put it. Any tool that returns the first N characters is answering a different question, and when the fact falls outside the window you conclude "the page doesn't document this" with nothing to indicate you were cut off. A grep over the complete text cannot produce that false negative, and it surfaces the neighbors you did not know to ask about: the same grep that found one timeout variable in a 155 KB page turned up a second one that changed the answer.
+It sends one request that prefers markdown and accepts HTML (`Accept: text/markdown, …, text/html;q=0.9`). When the server answers with its own markdown, that is the page's source: no extraction loss, and usually smaller than the rendered page. Many docs sites serve it (`context7.com/docs` does). Otherwise the script converts the HTML with `defuddle` and says so on stderr (`converting with defuddle`); say in the report when a page came through that path, since an extraction is good to read but a reconstruction, and a missing detail may be missing from the conversion rather than from the page. On failure it exits 1 with the reason on stderr and writes nothing to stdout, so an empty `page.md` never stands in for a page. defuddle accepts only 2xx HTML, so don't retry the script against JSON or PDF URLs. (On a terminal the script opens the page in `leaf` instead; the user has it as the `docs` fish function.)
 
-It takes HTML on stdin too (`curl -sSL <url> | defuddle parse --md`) when the fetch needs your own redirects, headers or cookies, and `--user-agent` when a site 403s the default one.
+When you know the site but not which page covers something, read `<site>/llms.txt` first: many docs sites publish one, a plain index of their pages with a line on each (Context7's markdown pages point to theirs, `context7.com/docs/llms.txt`). Grepping it finds the page in one call instead of guessing URLs.
 
-Its one blind spot is client-rendered pages: there is no JS engine, so an SPA or an interactive API reference yields a skeleton rather than the content. That failure is at least loud — `defuddle parse <url> -p wordCount` shows a few hundred words where a full API reference should run to thousands, and you escalate knowing why. Silent truncation elsewhere gives you no such signal, which is the real argument for starting here.
+Reading into a file is the default because of what the alternatives get wrong, not because it is cheap. Most lookups are a search for something specific — a flag, a default, a signature, whether a thing exists at all — and that fact sits wherever the page happens to put it. Any tool that returns the first N characters is answering a different question, and when the fact falls outside the window you conclude "the page doesn't document this" with nothing to indicate you were cut off. A grep over the complete text cannot produce that false negative, and it surfaces the neighbors you did not know to ask about: the same grep that found one timeout variable in a 155 KB page turned up a second one that changed the answer.
+
+When the fetch needs your own headers or cookies, call `defuddle` directly: it takes HTML on stdin (`curl -sSL <url> | defuddle parse - --md`), and `--user-agent` when a site 403s the default one.
+
+defuddle's one blind spot is client-rendered pages: there is no JS engine, so an SPA or an interactive API reference yields a skeleton rather than the content. That failure is at least loud — `defuddle parse <url> -p wordCount` shows a few hundred words where a full API reference should run to thousands, and you escalate knowing why. Silent truncation elsewhere gives you no such signal, which is the real argument for starting here.
 
 One escape from there:
 
