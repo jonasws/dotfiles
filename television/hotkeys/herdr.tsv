@@ -1,0 +1,49 @@
+# section	key	description	custom
+# Prefix is ctrl+b. Mine (★) come from herdr/config.toml.
+pickers	prefix+f / cmd+k	Pane picker, attention first (tv herdr-sessions)	★
+pickers	prefix+r	Git repo picker, Enter opens a workspace	★
+pickers	prefix+g	Go to (then b: blocked agents only)
+pickers	prefix+w	Navigate mode: workspace list and panes
+pickers	prefix+shift+o	AWS profile picker → console	★
+pickers	prefix+shift+h	Hotkeys cheat sheet (tv hotkeys)	★
+pickers	prefix+shift+f	F1 dashboard (herdr-f1 plugin)	★
+popups	prefix+l	lazygit status popup (Esc closes)	★
+popups	prefix+shift+l	lazygit log popup	★
+popups	prefix+y	yazi popup	★
+popups	prefix+t	Toggle tsk board	★
+popups	prefix+ctrl+t	tsk quick capture	★
+popups	prefix+ctrl+e	Edit tsk notes in nvim	★
+popups	prefix+shift+s	Toggle subagent viewers	★
+panes	ctrl+h/j/k/l	Move across herdr panes and nvim windows	★
+panes	ctrl+shift+h/j/k/l	Resize pane / nvim window	★
+panes	prefix+h/j/k	Focus pane left/down/up (prefix+l is lazygit)
+panes	prefix+tab / prefix+shift+tab	Cycle panes next/previous
+panes	prefix+v	Split vertical
+panes	prefix+minus	Split horizontal
+panes	prefix+x	Close pane
+panes	prefix+z	Zoom pane
+panes	prefix+shift+p	Rename pane
+panes	prefix+e	Edit scrollback in $EDITOR
+panes	prefix+ctrl+l	Clear pane	★
+tabs	prefix+c	New tab
+tabs	prefix+n / prefix+p	Next/previous tab
+tabs	prefix+1..9	Switch to tab N
+tabs	prefix+shift+t	Rename tab
+tabs	prefix+shift+x	Close tab
+workspaces	prefix+shift+n	New workspace
+workspaces	prefix+ctrl+n / prefix+ctrl+p	Next/previous workspace	★
+workspaces	prefix+shift+1..9	Switch to workspace N	★
+workspaces	prefix+shift+w	Rename workspace
+workspaces	prefix+shift+d	Close workspace
+workspaces	prefix+shift+g	New worktree
+workspaces	prefix+ctrl+g	Remove worktree	★
+agents	prefix+a / prefix+shift+a	Next/previous agent (sidebar order)	★
+agents	prefix+o	Open notification target
+navigate	j / k	Workspace down/up (in prefix+w)	★
+navigate	h / l	Pane left/right (in prefix+w)
+navigate	down / up	Pane down/up (in prefix+w)	★
+app	prefix+?	Help
+app	prefix+s	Settings
+app	prefix+b	Toggle sidebar
+app	prefix+shift+r	Reload config
+app	prefix+q	Detach

@@ -1,0 +1,30 @@
+# section	key	description	custom
+move	j / k	Down / up
+move	space / b	Page down / up
+move	ctrl+d / ctrl+u	Half page down / up
+move	g / G	Top / bottom
+move	J / K	Next / previous sibling
+move	%	Matching bracket
+move	@	Go to symbol
+move	ctrl+g	Go to $ref
+move	[ / ]	Back / forward
+fold	l / h	Expand / collapse
+fold	L / H	Expand / collapse recursively
+fold	e / E	Expand / collapse all
+fold	1..9	Collapse to level N
+search	/	Search by regex
+search	n / N	Next / previous match
+query	.	Query input (tab completes keys)
+query	:	Command line
+copy	yy / yv	Copy value
+copy	yk	Copy key
+copy	yp	Copy path
+copy	yb	Copy key and value
+view	z	Toggle string wrap
+view	s	Toggle sizes / line numbers
+view	p	Preview node
+edit	d	Delete node
+edit	r	Reload file
+app	P	Print node to stdout and exit
+app	?	Help
+app	q	Quit

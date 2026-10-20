@@ -1,0 +1,53 @@
+# section	key	description	custom
+# Mine (★) come from yazi/keymap.toml.
+move	h / j / k / l	Parent / down / up / enter
+move	gg / G	Top / bottom
+move	H / L	Back / forward in history
+move	K / J	Scroll preview up/down
+move	z	Jump via zoxide	★
+move	Z	Jump via fzf	★
+move	gr	cd to git root	★
+move	gh / gc / gd	cd home / config / Downloads
+move	g space	cd interactively
+select	space	Toggle selection
+select	v / V	Visual mode / visual unset mode
+select	ctrl+a	Select all
+select	ctrl+r	Invert selection
+select	esc	Exit visual mode, clear selection
+files	o / enter	Open
+files	O	Open interactively (choose opener)
+files	y / x	Yank / cut
+files	p / P	Paste / paste overwriting
+files	Y / X	Cancel yank
+files	-	Symlink absolute path of yanked files
+files	_	Symlink relative path of yanked files
+files	d	Trash
+files	D	Delete permanently
+files	a	Create (end with / for a directory)
+files	r	Rename
+files	.	Toggle hidden files
+copy	cc	Copy file path
+copy	cd	Copy directory path
+copy	cf	Copy filename
+copy	cn	Copy filename without extension
+copy	cr	Copy path relative to git root	★
+search	f	Filter current directory
+search	/ / ?	Find next / previous
+search	n / N	Next / previous match
+search	s	Search names with fd
+search	S	Search contents with ripgrep
+search	ctrl+s	Cancel search
+sort	,	Sort prefix (,m mtime ,n natural ,s size ,a alpha; uppercase reverses)
+sort	m	Linemode prefix (ms size, mp permissions, mm mtime, mn none)
+tabs	t	New tab
+tabs	1..9	Switch to tab N
+tabs	[ / ]	Previous / next tab
+tabs	{ / }	Swap tab left / right
+tabs	ctrl+c	Close tab
+shell	!	Open $SHELL here	★
+shell	;	Run a shell command
+shell	:	Run a shell command, blocking
+app	w	Task manager
+app	~ / F1	Help
+app	q	Quit (cd into the directory with y)
+app	Q	Quit without changing directory

@@ -1,0 +1,38 @@
+# section	key	description	custom
+# Remap in hunk/config.toml under [keybindings]. F10 opens the menus.
+move	j / k	Line or note down / up
+move	d / u	Half page down / up
+move	space / b	Page down / up
+move	g / G	Top / bottom
+move	] / [	Next / previous hunk
+move	. / ,	Next / previous file
+move	} / {	Next / previous annotated hunk
+move	left / right	Scroll code sideways (shift: fast)
+search	/	Search diff content
+search	n / N	Next / previous match
+notes	a	Toggle agent notes (on in my config)	★
+notes	c	Add a review note
+notes	ctrl+s	Save draft note
+notes	E	Edit note in the hunk
+notes	R	Reply to note
+notes	D	Delete note
+select	v	Start visual line selection
+select	y	Copy selection
+view	1 / 2 / 0	Unified / split / auto layout
+view	s	Toggle files pane
+view	z	Expand / collapse context
+view	w	Toggle line wrap
+view	l	Toggle line numbers
+view	m	Toggle hunk headers
+view	M	Toggle menu bar (off in my config)	★
+view	t	Theme picker
+app	tab	Switch focus between files and filter
+app	e	Open file in $EDITOR
+app	r	Refresh
+app	?	Help
+app	q	Quit
+log	j / k	Next / previous commit (hunk log)
+log	v	Start range selection
+log	J / K	Extend selection down / up
+log	enter	Open selection as a review
+log	y	Copy commit id
