@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+# Sign the unsigned commits between a base (default: upstream) and HEAD.
+# A script rather than a fish function so it also runs from Claude Code's `!`
+# prompt, which uses bash. Kept to bash 3.2 for machines without Homebrew bash.
+set -euo pipefail
+
+usage() {
+  echo "usage: resign-commits [base]   # base defaults to the branch's upstream" >&2
+  exit 2
+}
+
+case "${1:-}" in -h | --help) usage ;; esac
+[ $# -le 1 ] || usage
+
+base=${1:-}
+if [ -z "$base" ]; then
+  base=$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null) || {
+    echo "resign-commits: no upstream; pass a base commit" >&2
+    exit 2
+  }
+fi
+
+# %G? needs gpg.ssh.allowedSignersFile to verify and reports N without it,
+# so look for the signature header instead of verifying it.
+unsigned=()
+for c in $(git rev-list --reverse "$base..HEAD"); do
+  git cat-file commit "$c" | grep -q '^gpgsig' || unsigned+=("$c")
+done
+
+if [ ${#unsigned[@]} -eq 0 ]; then
+  echo "resign-commits: every commit in $base..HEAD is signed"
+  exit 0
+fi
+
+# Commits before the oldest unsigned one keep their hashes; everything after
+# it is rewritten anyway once its parent changes, so all of it gets signed.
+oldest=${unsigned[0]}
+total=$(git rev-list --count "$oldest^..HEAD" 2>/dev/null || git rev-list --count HEAD)
+echo "resign-commits: ${#unsigned[@]} unsigned, signing $total from $(git rev-parse --short "$oldest")"
+
+if [ "$oldest" = "$(git rev-parse HEAD)" ]; then
+  git commit --amend --no-edit --no-verify --gpg-sign
+elif git rev-parse -q --verify "$oldest^" >/dev/null; then
+  git rebase --gpg-sign --force-rebase --rebase-merges --autostash "$oldest^"
+else
+  git rebase --gpg-sign --force-rebase --rebase-merges --autostash --root
+fi

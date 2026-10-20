@@ -345,4 +345,5 @@ mode = "symlink"
 # Directories that sit beside a group's target rather than inside it.
 [dotfiles]
 "~/.local/bin/wrapped" = { source = "fnox/wrapped", mode = "symlink" }
+"~/.local/bin/resign-commits" = { source = "bin/resign-commits", mode = "symlink" }
 "~/.config/herdr-automatic-rename" = { source = "herdr/automatic-rename", mode = "symlink" }
