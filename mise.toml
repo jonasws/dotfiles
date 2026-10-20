@@ -70,6 +70,18 @@ description = "Upgrade global agent skills"
 # symlink intact across runs.
 run = "npx -y skills@latest update --global --yes"
 
+[tasks."update:herdr-plugins"]
+description = "Upgrade herdr plugins installed from GitHub"
+# herdr keeps its plugin registry in ~/.config/herdr/plugins.json, next to
+# absolute install paths and timestamps, so it cannot be linked from here.
+# herdr/plugins.lock.json is a snapshot of just the source and commit of each
+# plugin, so an upgraded plugin shows up in the `update` task's closing git
+# status. Local plugins are listed without a commit: bulk update skips them.
+run = [
+  "herdr plugin update --yes",
+  """herdr plugin list --json | jq '[.result.plugins[] | {id: .plugin_id, enabled, source: (if .source.kind == "github" then "\\(.source.owner)/\\(.source.repo)" else .source.kind end), commit: .source.resolved_commit}] | sort_by(.id)' > herdr/plugins.lock.json""",
+]
+
 [tasks."update:yazi"]
 description = "Upgrade yazi plugins and flavors"
 run = "ya pkg upgrade"
@@ -101,7 +113,7 @@ run = [
 
 [tasks.update]
 description = "Daily upgrade, then show what changed"
-depends = ["update:brew", "update:mise", "update:skills", "update:yazi", "update:nvim"]
+depends = ["update:brew", "update:mise", "update:skills", "update:herdr-plugins", "update:yazi", "update:nvim"]
 run = "git status --short"
 
 [tasks."update:weekly"]
