@@ -31,7 +31,7 @@ brew "circleci"
 # Cross-platform make
 brew "cmake"
 # Container runtimes on MacOS (and Linux) with minimal setup
-brew "colima"
+brew "colima", restart_service: :changed
 # Command-line csv viewer
 brew "csvlens"
 # Library and utilities for processing GIFs

@@ -101,6 +101,7 @@ atuin = "latest"
 "aqua:showwin/speedtest-go" = "latest"
 "github:RivoLink/leaf" = "latest"
 "aqua:bensadeh/tailspin" = "latest"
+"aqua:asciinema/asciinema" = "latest"
 
 [settings]
 # No `lockfile = true`: that creates a mise.lock in every project mise touches,
