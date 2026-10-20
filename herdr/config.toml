@@ -72,6 +72,24 @@ description = "lazygit: log"
 width = "80%"
 height = "80%"
 
+# Yazi in the focused pane's directory. The pick variant types the files chosen
+# with Enter into that pane, as @path when an agent runs there.
+[[keys.command]]
+key = "prefix+y"
+type = "popup"
+command = "~/.config/herdr/scripts/yazi-popup.sh"
+description = "yazi: browse"
+width = "80%"
+height = "80%"
+
+[[keys.command]]
+key = "prefix+shift+y"
+type = "popup"
+command = "~/.config/herdr/scripts/yazi-popup.sh pick"
+description = "yazi: pick files into pane"
+width = "80%"
+height = "80%"
+
 # Enter opens or focuses a workspace for the repo instead of cd.
 # Channel: television/cable/git-repos.toml
 [[keys.command]]
