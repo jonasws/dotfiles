@@ -284,13 +284,25 @@ local function pane_owns_splits(pane)
   return proc ~= nil and proc:match '[/\\]herdr$' ~= nil
 end
 
+---Pickers bind CTRL+hjkl themselves (tv: select with j/k, help on h, layout on
+---l), so while one runs it gets all four; the pane is left once it exits.
+local pickers = { tv = true, fzf = true }
+
+local function picker_wants(pane, kind)
+  if kind ~= 'move' then
+    return false
+  end
+  local proc = pane:get_foreground_process_name()
+  return proc ~= nil and pickers[proc:match '[^/\\]+$'] == true
+end
+
 local function split_nav(kind, key, direction)
   local mods = kind == 'resize' and 'CTRL|SHIFT' or 'CTRL'
   return {
     key = key,
     mods = mods,
     action = wezterm.action_callback(function(win, pane)
-      if pane_owns_splits(pane) then
+      if pane_owns_splits(pane) or picker_wants(pane, kind) then
         win:perform_action(act.SendKey { key = key, mods = mods }, pane)
       elseif kind == 'resize' then
         win:perform_action(act.AdjustPaneSize { direction, 3 }, pane)
