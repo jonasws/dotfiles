@@ -2,17 +2,23 @@
 # Read a web page as markdown: the server's own markdown or plain text when it
 # has one, otherwise its HTML converted by defuddle.
 #
-# Usage: read-page.sh <url>
+# Usage: read-page.sh [-o <file>] <url>
 #
-# On a terminal the page opens in leaf; otherwise the markdown goes to stdout,
-# so `read-page.sh <url> > page.md` gives a file to grep. Nothing reaches stdout
+# With -o the markdown goes to <file> and one line saying so to stdout. Without
+# it, on a terminal the page opens in leaf; otherwise the markdown goes to
+# stdout, so `read-page.sh <url> > page.md` also gives a file to grep. Nothing reaches stdout
 # or leaf unless a page came back: on failure the reason goes to stderr and the
 # exit status is 1. A conversion is announced on stderr, because an extraction
 # can drop what the page itself had. One request per page: defuddle converts the
 # body that request returned.
 set -euo pipefail
 
-url=${1:?usage: read-page.sh <url>}
+out=
+if [[ ${1:-} == -o ]]; then
+  out=${2:?usage: read-page.sh [-o <file>] <url>}
+  shift 2
+fi
+url=${1:?usage: read-page.sh [-o <file>] <url>}
 page=$(mktemp "${TMPDIR:-/tmp}/read-page.XXXXXX")
 trap 'rm -f "$page"' EXIT
 
@@ -54,7 +60,10 @@ if [[ ! -s $page ]]; then
   exit 1
 fi
 
-if [[ -t 1 ]]; then
+if [[ -n $out ]]; then
+  cp "$page" "$out"
+  echo "read-page: wrote $(wc -c <"$out" | tr -d ' ') bytes to $out"
+elif [[ -t 1 ]]; then
   leaf <"$page"
 else
   cat "$page"

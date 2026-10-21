@@ -146,6 +146,10 @@ target = "~/.config/atuin"
 root = "aws"
 target = "~/.aws"
 
+[dotfile_groups.bash]
+root = "bash"
+target = "~"
+
 [dotfile_groups.bat]
 root = "bat"
 target = "~/.config/bat"

@@ -119,6 +119,12 @@ only when `git status -sb` shows the default branch, clean, and not behind
 `origin`; otherwise use `git grep` on `origin/HEAD`. When the question is about the
 checked-out branch itself, search the working tree and say which branch it was.
 
+## Looking things up
+
+When I name exa, github, Context7 or a docs site for a lookup, load the `find-docs` skill
+first and treat the name as a preference for that source, not as the tool call to make.
+The skill decides how to search and read it, and when to hand a survey to a subagent.
+
 ## Subagents and models
 
 The main session runs Opus and does the deciding: design, debugging, and reviewing
@@ -181,6 +187,19 @@ Commits you make come out unsigned: `GIT_CONFIG_*` in `settings.json` turns
 `-S`. After committing, tell me how many unsigned commits there are and remind me to
 run `! resign-commits` (a script in `~/.local/bin`), naming a base only when the
 branch has no upstream. It signs from the oldest unsigned commit up, leaving earlier commits alone.
+
+## Response style
+
+The Concise output style sets the voice. These add what it leaves open:
+
+- Concise shortens wording, not findings. In research and comparisons, keep every
+  relevant finding, source and caveat, and mark what is anecdote versus measured.
+- Group and rank long lists, strongest first. Show every relevant item; never hold
+  some back to keep a list short.
+- End with a next action only when a decision of mine is pending. A finished task
+  gets one line saying it is done; an exploration does not get a pitch.
+- Give a time estimate only when I ask or when it changes a decision. Estimate your
+  own run time and list my part (approvals, review, manual testing) separately.
 
 ## Code comments
 

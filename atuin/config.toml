@@ -29,3 +29,10 @@ workspaces = true
   { when = "input-empty", action = "exit" },
   { action = "vim-enter-normal" },
 ]
+
+[daemon]
+enabled = true
+autostart = true
+
+[threads]
+capture = true

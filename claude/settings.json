@@ -111,6 +111,7 @@
     "defaultMode": "auto"
   },
   "model": "opus",
+  "outputStyle": "Concise",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "SessionStart": [
@@ -214,7 +215,7 @@
     "playwright-skill@playwright-skill": true,
     "typescript-lsp@claude-plugins-official": true,
     "obsidian@obsidian-skills": true,
-    "i-have-adhd@i-have-adhd": true,
+    "i-have-adhd@i-have-adhd": false,
     "feature-dev@claude-plugins-official": false,
     "skill-creator@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": true,
