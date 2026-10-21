@@ -18,11 +18,12 @@
 # SubagentStart also fires when a subagent is resumed and on each message to an
 # agent-team teammate, so agents that already have a viewer are skipped.
 #
-# Requires: jq, herdr, HERDR_ENV=1. Outside herdr the hook does nothing.
+# Requires: jq, herdr. Outside herdr the hook does nothing.
 
 set -uo pipefail
 
-[ "${HERDR_ENV:-}" = 1 ] || exit 0
+# Key commands run outside any pane: they get HERDR_SOCKET_PATH but no HERDR_ENV.
+[ "${HERDR_ENV:-}" = 1 ] || [ -n "${HERDR_SOCKET_PATH:-}" ] || exit 0
 
 mode=${1:-start}
 root="${XDG_STATE_HOME:-$HOME/.local/state}/claude-subagent-viewer"
