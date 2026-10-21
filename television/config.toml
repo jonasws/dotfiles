@@ -176,6 +176,7 @@ ctrl-l = "toggle_layout"
 # ----------------------------------------
 backspace = "delete_prev_char"
 ctrl-w = "delete_prev_word"
+alt-backspace = "delete_prev_word"
 ctrl-c = "delete_line"
 delete = "delete_next_char"
 left = "go_to_prev_char"

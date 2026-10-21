@@ -14,6 +14,12 @@ brew "readline"
 brew "bash"
 # Cryptography and SSL/TLS Toolkit
 brew "openssl@3"
+# Cryptography and SSL/TLS Toolkit; provides the `openssl` command
+brew "openssl@4"
+# Get a file from an HTTP, HTTPS or FTP server (keg-only: PATH adds opt/curl/bin)
+brew "curl"
+# OpenBSD freely-licensed SSH connectivity tools
+brew "openssh"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
 # Bash scripts that integrate bat with various command-line tools

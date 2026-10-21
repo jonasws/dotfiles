@@ -5,7 +5,9 @@ description: >-
   framework docs, AWS service behavior, another project's source or changelog, and
   general web research. Routes the question to the right backend before spending a
   remote call: the Context7 API for library/SDK/CLI docs, the aws-knowledge MCP for AWS,
-  the github MCP for repo-specific source and history, exa for everything else.
+  the github MCP for repo-specific source and history, Claude Code's own docs site for
+  Claude Code itself, exa for everything else. Surveys across many sources (comparisons,
+  "what exists for X") go to the `researcher` subagent; see the skill.
 
   Use whenever exact signatures, config options, version-specific behavior, error
   strings, release timing, or current facts matter and training data may be stale —
@@ -30,15 +32,39 @@ From there the only question is which door. Picking wrong costs twice: a wasted 
 |---|---|---|
 | A named library, framework, SDK, or CLI tool — API, config, migration | Context7 | `curl` the search endpoint; `libs/search` then `context` to go deep |
 | AWS — service behavior, API/CLI params, CloudFormation/CDK, regional availability | aws-knowledge MCP | `aws___search_documentation` |
+| Claude Code itself — settings, env vars, slash commands, hooks, compaction, caching, output styles, plugins | code.claude.com docs, locally | grep `llms.txt`, then `read-page.sh` the `.md` pages — see [Claude Code](#claude-code--its-own-documentation) |
 | A specific repo or org (never `nsbno` — see below) — source, issues, PRs, releases, changelogs, "when did this change" | github MCP | `search_code`, `search_issues`, `list_releases` |
 | Everything else — news, comparisons, ecosystem questions, "does a tool exist for X" | exa MCP | `web_search_exa` |
-| Reading a URL you already have | `read-page.sh`, locally | `read-page.sh <url> > page.md`: the server's markdown, else HTML via `defuddle`; then grep — see [Reading a page](#reading-a-page) |
+| Reading a URL you already have | `read-page.sh`, locally | `read-page.sh -o page.md <url>`: the server's markdown, else HTML via `defuddle`; then grep — see [Reading a page](#reading-a-page) |
 
 Two signals settle most cases: **is there a named artifact** (library, service, repo), and **is the answer stable documentation or a changing fact**. Documentation about a named artifact goes to Context7 or aws-knowledge; a changing fact about a named repo goes to github; anything with no named artifact goes to exa.
 
+When the user names a tool ("use exa", "check github"), read it as where to look, not how. Keep the rest of this skill: full-text exa search, pages read into files, the official docs before blog posts. Say so when the named source can't answer and you went elsewhere. For example, the github MCP can't search Discussions, so those go to exa.
+
+## When to survey in a subagent
+
+If you are the `researcher` subagent, skip this section and do the lookups yourself.
+
+Every page and search result you read stays in the main session's context until compaction. A survey can pull in dozens of them for a conclusion of twenty lines. Hand it to a subagent when any of these holds:
+
+- The question spans several backends or sources and asks for a comparison or a list: "what exists for X", "compare A, B and C", "what do users report", star counts and maintenance across many repos.
+- It will likely take more than about five search or read calls, or several pages read in full.
+- The user asks for it: "in a subagent", "in the background", "fan out".
+
+If an inline lookup passes about five calls with no answer in sight, hand the rest to a subagent, with what you have found so far in the brief.
+
+Stay inline for one fact, one config value, one page or one changelog. Also stay inline when the answer hinges on exact wording you need to quote, or when the user is likely to follow up on the sources themselves. A subagent returns a summary, and its pages are gone with it.
+
+How to delegate:
+
+- **Agent type:** use `researcher`, which starts fresh with this skill preloaded and without Edit or Write, and returns ranked, cited findings in a fixed shape. Restate the question in full, since it doesn't see this conversation. Use `fork` only when the question depends on what was already discussed. A fork inherits the whole context and runs on the session's model, so it costs more.
+- **Brief:** the question in full, the sources the user named, and anything already found or ruled out. The `researcher` agent has the report shape built in, so give it only what differs, such as a table's columns. A `fork` needs the shape spelled out: a ranked list with every relevant item, each with its source, marked measured or anecdotal, plus what stayed open.
+- **Splitting:** when the parts are independent, split by source or by candidate and send the agents in one message so they run in parallel. One agent per source (docs, GitHub issues, community threads) suits "docs versus reality" questions. One agent per candidate suits tool comparisons.
+- **Afterwards:** check the summary against a source or two before building on it. Report it with its citations, like any other lookup.
+
 ## Context7 — library and framework documentation
 
-Context7 is three GET endpoints on `context7.com`, called with `curl`; there is no CLI to install. Every Bash command in a session already carries `CONTEXT7_API_KEY`: a SessionStart hook (`claude/hooks/context7-env.sh`) fetches it from fnox, so requests authenticate inside the sandbox too. In a sandboxed session, name `context7.com` on the command. Keep the curl flags as shown: `-s` drops the progress meter, `-S` still prints a one-line reason when the connection fails (plain `-s` prints nothing and exits 6, which reads like an empty result), `--fail-with-body` exits non-zero on an HTTP error while keeping Context7's one-line JSON reason, and `--max-time 30` bounds a hung request. Never add `-v` or `-i`; headers and TLS chatter are noise in context.
+Context7 is three GET endpoints on `context7.com`, called through the skill's `context7.sh` (`~/.claude/skills/find-docs/context7.sh`): `search`, `libs` or `context`, then one `<name>=<value>` argument per parameter, quoted when it has spaces. It wraps curl with flags that keep failures readable and silence the noise, and adds the key: every Bash command in a session carries `CONTEXT7_API_KEY`, which a SessionStart hook (`claude/hooks/context7-env.sh`) fetches from fnox, so requests authenticate inside the sandbox too. In a sandboxed session, name `context7.com` on the command. The `researcher` subagent can run Context7 only this way.
 
 Two ways in, and the first match in this table decides. Count calls against the backend budget of about three: search is one call, resolving a library and then querying it is two, and each query on an ID you already hold is one.
 
@@ -53,9 +79,7 @@ Two ways in, and the first match in this table decides. Count calls against the 
 **Search** sends one question; Context7 picks the libraries, ranks snippets across them, and returns prompt-ready text with each snippet's library and source URL. It is Context7's own recommendation for a quick, grounded answer.
 
 ```bash
-curl -sSG --fail-with-body --max-time 30 https://context7.com/api/v3/search -H "Authorization: Bearer $CONTEXT7_API_KEY" \
-  --data-urlencode 'query=How do I write a server filter in http4k?' \
-  --data-urlencode language=Kotlin
+~/.claude/skills/find-docs/context7.sh search 'query=How do I write a server filter in http4k?' language=Kotlin
 ```
 
 Hints: `library=` (a name or a Context7 ID; repeat for up to four; a name can match several libraries, as `Next.js` matches both `/vercel/next.js` and `/websites/nextjs`, so pass the ID to hold search to one), `version=` such as `15.4.0` (needs a `library` hint, and is a preference, not a pin: with the exact ID `/vercel/next.js` and `version=13.5.11`, one of four snippets still came from `canary`, where `context` on `/vercel/next.js/v13.5.11` returned only 13.5.11 sources), and `type=json` for `codeSnippets` and `infoSnippets` with per-snippet token counts, when results need filtering before they are read. A 404 (`no_documentation_found`) means nothing matched, not that the endpoint is down: rephrase, add a `library` hint, or pick the library yourself.
@@ -63,15 +87,11 @@ Hints: `library=` (a name or a Context7 ID; repeat for up to four; a name can ma
 **Pick the library yourself** (the Context API) for follow-ups on one library, or when search picked the wrong one. Follow-ups reuse the ID a search result already named; resolve with `libs/search` only when no result has given you the right one. `libs/search` also lists the versions a library has indexed, which search does not show.
 
 ```bash
-curl -sSG --fail-with-body --max-time 30 https://context7.com/api/v2/libs/search -H "Authorization: Bearer $CONTEXT7_API_KEY" \
-  --data-urlencode libraryName=http4k --data-urlencode 'query=server filters' \
-  | jq -r '.results[:5][] | [.id, .title, .totalSnippets, .trustScore, .benchmarkScore, ((.versions // [])[:5] | join(","))] | @tsv'
-
-curl -sSG --fail-with-body --max-time 30 https://context7.com/api/v2/context -H "Authorization: Bearer $CONTEXT7_API_KEY" \
-  --data-urlencode libraryId=/http4k/api \
-  --data-urlencode 'query=How do I write a server filter?' \
-  --data-urlencode language=Kotlin
+~/.claude/skills/find-docs/context7.sh libs libraryName=http4k 'query=server filters'
+~/.claude/skills/find-docs/context7.sh context libraryId=/http4k/api 'query=How do I write a server filter?' language=Kotlin
 ```
+
+`libs` prints the top five candidates as TSV: id, title, totalSnippets, trustScore, benchmarkScore and up to five indexed versions.
 
 Skip the resolve step when you hold an ID in `/org/project` form, from the user or a search result; never guess one. IDs always carry the leading `/`, and a guessed one returns `404 library_not_found`. Use the official name with its real punctuation — `"Next.js"` not `nextjs`, `"Three.js"` not `threejs` — because ranking keys off it; if the matches look wrong, try another spelling before rewording the query. Prefer the official, primary source over community forks and mirrors, then high `totalSnippets`, `trustScore` and `benchmarkScore`; when two libraries fit about equally, name both and say which you picked. When none of the results is the library asked about, say so and suggest a better name or query rather than querying the closest wrong one. A named version maps to `/org/project/<version>` (or `@<version>`), using the closest one `versions` lists; check that the snippets' source URLs carry that tag.
 
@@ -93,6 +113,16 @@ AWS docs are a distinct corpus with their own retrieval, so a Lambda or IAM ques
 - `aws___read_documentation` only when the chunks genuinely lack it — a visibly truncated enumeration, or nothing on-topic after refining the query.
 - `aws___retrieve_skill` when a search result carries a `skill_name`. That expands into a guided AWS workflow, and nothing else surfaces it, so it goes unused unless you reach for it deliberately.
 - `aws___get_regional_availability` for "is X in eu-west-1", with exact catalog names; `aws___list_regions` resolves a region code first, which is cheaper than having a guessed one rejected.
+
+## Claude Code — its own documentation
+
+Claude Code changes weekly and the docs track each release, so answer from them, never from memory. They are not in Context7, and exa returns stale blog posts. Every page has a markdown version: add `.md` to its URL, like `https://code.claude.com/docs/en/settings-reference.md`.
+
+1. Read the index into the scratchpad and grep it: `read-page.sh -o llms.txt https://code.claude.com/docs/llms.txt`, then `rg -i '<topic>' llms.txt`. It has one line per page.
+2. Read the two or three pages that match into files. Grep them together for the setting or variable name. Behavior is often split across pages: `settings-reference.md` has the key, `env-vars.md` the override, `prompt-caching.md` or `model-config.md` the reasoning. A grep across the files finds the cross-references.
+3. Check the local setup before you recommend a value: `~/dotfiles/claude/settings.json` (symlinked as `~/.claude/settings.json`) and `claude --version` against the docs' "Requires Claude Code vX" lines.
+
+For bugs, regressions or "does anyone else see this", search the `anthropics/claude-code` issues through the github MCP. For a broad how-to question whose page reads would flood this context, delegate to the `claude-code-guide` subagent instead. It returns a conclusion without the exact quotes, so cite the doc page yourself when the answer depends on a value.
 
 ## github MCP — source, history, and changelogs
 
@@ -122,7 +152,7 @@ The residual: no named library, no AWS service, no specific repo. Comparisons, e
 Read a page with the skill's own script, into a file, and grep it:
 
 ```bash
-~/.claude/skills/find-docs/read-page.sh <url> > page.md    # then grep the file, never cat it
+~/.claude/skills/find-docs/read-page.sh -o <scratchpad>/page.md <url>    # then grep the file, never cat it
 ```
 
 It sends one request that prefers markdown and accepts HTML (`Accept: text/markdown, …, text/html;q=0.9`). When the server answers with its own markdown, that is the page's source: no extraction loss, and usually smaller than the rendered page. Many docs sites serve it (`context7.com/docs` does). Otherwise the script converts the HTML with `defuddle` and says so on stderr (`converting with defuddle`); say in the report when a page came through that path, since an extraction is good to read but a reconstruction, and a missing detail may be missing from the conversion rather than from the page. On failure it exits 1 with the reason on stderr and writes nothing to stdout, so an empty `page.md` never stands in for a page. It reads only markdown, plain text and HTML, so it rejects JSON and PDF URLs with the content type it got; don't retry those. (On a terminal the script opens the page in `leaf` instead; the user has it as the `docs` fish function.)
