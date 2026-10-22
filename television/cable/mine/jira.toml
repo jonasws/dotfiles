@@ -1,0 +1,57 @@
+[metadata]
+name = "jira"
+description = """
+Jira issues over the REST API, one source per board, with a read-only scoped
+API token from the "Atlassian API Token" item in 1Password.
+
+Tab cycles the boards: CN Ops (board 131) and CN Kunde (board 353), each its
+saved board filter, as active lanes and backlog. Rows: key, lane, priority,
+type, age, assignee, summary, epic. Lists show their last result at once and
+refresh in the background. Enter opens the issue in the browser, ctrl-y copies
+the key. Script: television/scripts/jira.sh.
+"""
+requirements = ["fnox", "curl", "jq", "pandoc", "leaf"]
+
+[source]
+# bash: tv runs commands through $SHELL (fish), which costs about 80ms a run.
+shell = "bash"
+# Each board's saved filter (CN Ops: board 131, filter 10467; CN Kunde: board
+# 353, filter 10468), split into the board's active lanes and its backlog.
+# Jira drops a referenced filter's own ORDER BY, hence the explicit Rank. The
+# trailing number caps the issues fetched.
+command = [
+  { name = "CN Ops", run = '''~/.config/television/scripts/jira.sh list 'filter = 10467 AND (statusCategory = "In Progress" OR status = "Selected for Development") ORDER BY Rank ASC' 100''' },
+  { name = "CN Kunde", run = '''~/.config/television/scripts/jira.sh list 'filter = 10468 AND (statusCategory = "In Progress" OR status = "Selected for Development") ORDER BY Rank ASC' 100''' },
+  { name = "CN Ops backlog", run = '''~/.config/television/scripts/jira.sh list 'filter = 10467 AND status = Backlog ORDER BY Rank ASC' 50''' },
+  { name = "CN Kunde backlog", run = '''~/.config/television/scripts/jira.sh list 'filter = 10468 AND status = Backlog ORDER BY Rank ASC' 50''' },
+]
+ansi = true
+output = "{strip_ansi|split: :0}"
+# Keep Jira's order (the board's rank) rather than tv's.
+no_sort = true
+frecency = false
+# Rereads the cache, which a background refetch replaces at most once a
+# minute, so this costs no API calls of its own.
+watch = 5.0
+
+[preview]
+shell = "bash"
+command = "~/.config/television/scripts/jira.sh preview '{strip_ansi|split: :0}'"
+
+[ui]
+layout = "portrait"
+input_header = "Jira"
+
+[ui.preview_panel]
+size = 60
+header = "{strip_ansi|split: :0}"
+scrollbar = true
+
+[keybindings]
+tab = "cycle_sources"
+enter = "actions:open"
+
+[actions.open]
+description = "Open the issue in the browser"
+command = "~/.config/television/scripts/jira.sh open '{strip_ansi|split: :0}'"
+mode = "fork"
