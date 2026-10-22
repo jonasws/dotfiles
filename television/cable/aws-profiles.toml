@@ -6,9 +6,15 @@ requirements = ["awk"]
 [source]
 # bash: tv runs commands through $SHELL (fish), which costs about 80ms a run.
 shell = "bash"
-command = "awk -F'[][]' '/^\\[profile cn/ {sub(/^profile /, \"\", $2); print $2}' ~/.aws/config 2>/dev/null"
+# One source per org, by profile prefix. Tab cycles them.
+command = [
+  { name = "CNOPS", run = "awk -F'[][]' '/^\\[profile cnops-/ {sub(/^profile /, \"\", $2); print $2}' ~/.aws/config 2>/dev/null" },
+  { name = "CX", run = "awk -F'[][]' '/^\\[profile cn-cx-/ {sub(/^profile /, \"\", $2); print $2}' ~/.aws/config 2>/dev/null" },
+  { name = "CN-TERMINAL", run = "awk -F'[][]' '/^\\[profile cn-terminal-/ {sub(/^profile /, \"\", $2); print $2}' ~/.aws/config 2>/dev/null" },
+]
 
 [keybindings]
+tab = "cycle_sources"
 enter = "actions:open-browser"
 
 [actions.open-browser]
