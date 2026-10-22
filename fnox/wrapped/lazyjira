@@ -1,0 +1,39 @@
+#!/bin/sh
+# lazyjira, with an Atlassian API token from fnox and nothing else.
+#
+# lazyjira reads JIRA_HOST, JIRA_EMAIL and JIRA_API_TOKEN ahead of its config
+# and auth.json, so `lazyjira auth` is never needed and no token sits on disk.
+# All three come from one 1Password item, read through fnox-secret from the
+# shared daemon cache and exported to this one process only.
+#
+# On PATH via `_.path` in ~/.config/mise/config.toml, ahead of the lazyjira tool
+# directory. `mise which lazyjira` returns the real binary, not this script.
+
+set -e
+
+real="$(mise which lazyjira 2>/dev/null || true)"
+if [ -z "$real" ]; then
+  echo "lazyjira: mise provisions no lazyjira for $PWD" >&2
+  exit 127
+fi
+
+# Claude Code's sandbox cannot reach 1Password, and Jira content is not to
+# reach an agent.
+case "$TMPDIR" in
+  /tmp/claude-* | /private/tmp/claude-*)
+    echo "lazyjira: sandboxed, not available to agents" >&2
+    exit 127
+    ;;
+esac
+
+secret="$(dirname "$0")/fnox-secret"
+JIRA_HOST="$("$secret" JIRA_HOST)"
+case "$JIRA_HOST" in
+  http://* | https://*) ;;
+  *) JIRA_HOST="https://$JIRA_HOST" ;;
+esac
+JIRA_EMAIL="$("$secret" JIRA_EMAIL)"
+JIRA_API_TOKEN="$("$secret" JIRA_API_TOKEN)"
+export JIRA_HOST JIRA_EMAIL JIRA_API_TOKEN
+
+exec "$real" "$@"
