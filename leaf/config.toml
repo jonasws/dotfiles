@@ -1,2 +1,3 @@
 # Only what differs from leaf defaults; see the sample config.toml in RivoLink/leaf.
 theme = "catppuccin-mocha"
+file-history-length = 20
