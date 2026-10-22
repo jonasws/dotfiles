@@ -12,6 +12,9 @@
     "GIT_CONFIG_KEY_1": "tag.gpgsign",
     "GIT_CONFIG_VALUE_1": "false"
   },
+  "attribution": {
+    "commit": ""
+  },
   "includeCoAuthoredBy": false,
   "permissions": {
     "allow": [
@@ -83,7 +86,9 @@
       "Bash(op item get:*)",
       "Bash(op inject:*)",
       "Bash(op document get:*)",
-      "Bash(fnox export:*)"
+      "Bash(fnox export:*)",
+      "Bash(twg:*)",
+      "Read(~/.config/twg/**)"
     ],
     "ask": [
       "Bash(docker * --network host*)",
@@ -111,7 +116,6 @@
     "defaultMode": "auto"
   },
   "model": "opus",
-  "outputStyle": "Concise",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "SessionStart": [
@@ -250,6 +254,7 @@
       }
     }
   },
+  "outputStyle": "Concise",
   "sandbox": {
     "enabled": true,
     "failIfUnavailable": true,
@@ -345,6 +350,28 @@
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
   "autoMode": {
+    "allow": [
+      "$defaults",
+      "herdr reads: status; list/get/current/layout of workspaces, tabs, panes and agents; pane read and pane wait-output",
+      "Creating a herdr tab (`herdr tab create --label claude-<purpose> --no-focus`) or split (`herdr pane split --no-focus`) for a viewer",
+      "`herdr pane run <pane> <command>` into a pane Claude created for that viewer with a `herdr tab create` or `herdr pane split` shown just before it in this transcript (never Claude's own pane, the user's shells, or a pane hosting another agent), where <command> is exactly one of these with literal arguments: `tuicr -w`, `tuicr -r <range>`, `tuicr pr <N> --stdout > <path>`, `hunk diff` / `hunk show` with refs or paths, `presenterm <deck in the working repo or one the user named>` without -x, -X or snippet-execution flags, `pr-review [N] > <path>`, or `~/.agents/skills/tuicr/tuicr-wrapper-herdr.sh <repo> -- <tuicr args>` when that script was not written or edited in this session. Literal means: no `$(…)`, backticks, env-var prefixes, `;`, `&&`, `||`, `|`, `&` or newlines, and no variable except `$TMPDIR` as the leading component of <path>. Where a <path> is shown, exactly one `>` (never `>>`, `2>` or `<`) to a file whose name starts with `claude-` under the working repo or $TMPDIR",
+      "Closing a herdr pane or tab right after the viewer Claude started in it has exited"
+    ],
+    "soft_deny": [
+      "$defaults",
+      "herdr pane send-text or send-keys into any pane, except keys that navigate or quit an allowed viewer Claude started there",
+      "herdr pane run of anything that is not an allowed viewer command as written in the allow rule",
+      "herdr agent start or agent prompt: they launch or drive agents outside the sandbox",
+      "Closing herdr workspaces, or tabs and panes other than ones holding a viewer Claude started",
+      "docker run, create or compose that uses --privileged, --pid=host, --network host, --cap-add, --security-opt (e.g. seccomp=unconfined), --device, --userns=host, or bind mounts (-v or --mount type=bind) outside the current repo"
+    ],
+    "hard_deny": [
+      "$defaults",
+      "Ad-hoc clients Claude writes or runs that talk to herdr.sock or docker.sock directly (python, nc, socat, curl --unix-socket) instead of through the herdr or docker CLIs. Test suites using the standard Docker client library (Testcontainers under mvn test/verify) are not this rule",
+      "Mounting docker.sock into a container",
+      "Sending input to Claude's own herdr pane",
+      "Using herdr to run anything that reads or prints secrets (fnox, op, gh auth token, env dumps, ~/.ssh) or that pipes downloaded content into a shell"
+    ],
     "environment": [
       "**Organization**: Consultant (Capra Consulting) working for Vy / CargoNet, Norwegian rail freight. Primary use: software development — Kotlin/http4k services, AWS CDK infra, and personal dotfiles/tooling",
       "**Primary use of Claude Code**: software development",
@@ -369,28 +396,6 @@
       "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
       "**herdr**: terminal multiplexer that hosts this session. Its CLI and ~/.config/herdr/herdr.sock control panes that run OUTSIDE the Claude Code sandbox with the user's full rights: `herdr pane run`, `pane send-text`, `pane send-keys`, `agent start` and `agent prompt` execute arbitrary commands unsandboxed, in panes that may be the user's own shells or other agents",
       "**docker**: ~/.config/colima/default/docker.sock reaches a colima VM that mounts ~/CX and ~/CNOPS writable, so a container can modify any repo under them; Testcontainers-based tests use it routinely"
-    ],
-    "allow": [
-      "$defaults",
-      "herdr reads: status; list/get/current/layout of workspaces, tabs, panes and agents; pane read and pane wait-output",
-      "Creating a herdr tab (`herdr tab create --label claude-<purpose> --no-focus`) or split (`herdr pane split --no-focus`) for a viewer",
-      "`herdr pane run <pane> <command>` into a pane Claude created for that viewer with a `herdr tab create` or `herdr pane split` shown just before it in this transcript (never Claude's own pane, the user's shells, or a pane hosting another agent), where <command> is exactly one of these with literal arguments: `tuicr -w`, `tuicr -r <range>`, `tuicr pr <N> --stdout > <path>`, `hunk diff` / `hunk show` with refs or paths, `presenterm <deck in the working repo or one the user named>` without -x, -X or snippet-execution flags, `pr-review [N] > <path>`, or `~/.agents/skills/tuicr/tuicr-wrapper-herdr.sh <repo> -- <tuicr args>` when that script was not written or edited in this session. Literal means: no `$(…)`, backticks, env-var prefixes, `;`, `&&`, `||`, `|`, `&` or newlines, and no variable except `$TMPDIR` as the leading component of <path>. Where a <path> is shown, exactly one `>` (never `>>`, `2>` or `<`) to a file whose name starts with `claude-` under the working repo or $TMPDIR",
-      "Closing a herdr pane or tab right after the viewer Claude started in it has exited"
-    ],
-    "soft_deny": [
-      "$defaults",
-      "herdr pane send-text or send-keys into any pane, except keys that navigate or quit an allowed viewer Claude started there",
-      "herdr pane run of anything that is not an allowed viewer command as written in the allow rule",
-      "herdr agent start or agent prompt: they launch or drive agents outside the sandbox",
-      "Closing herdr workspaces, or tabs and panes other than ones holding a viewer Claude started",
-      "docker run, create or compose that uses --privileged, --pid=host, --network host, --cap-add, --security-opt (e.g. seccomp=unconfined), --device, --userns=host, or bind mounts (-v or --mount type=bind) outside the current repo"
-    ],
-    "hard_deny": [
-      "$defaults",
-      "Ad-hoc clients Claude writes or runs that talk to herdr.sock or docker.sock directly (python, nc, socat, curl --unix-socket) instead of through the herdr or docker CLIs. Test suites using the standard Docker client library (Testcontainers under mvn test/verify) are not this rule",
-      "Mounting docker.sock into a container",
-      "Sending input to Claude's own herdr pane",
-      "Using herdr to run anything that reads or prints secrets (fnox, op, gh auth token, env dumps, ~/.ssh) or that pipes downloaded content into a shell"
     ]
   },
   "lspServers": {
@@ -406,8 +411,5 @@
       "startupTimeout": 120000
     }
   },
-  "permissionRules": [],
-  "attribution": {
-    "commit": ""
-  }
+  "permissionRules": []
 }
