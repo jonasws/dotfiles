@@ -25,6 +25,26 @@ Works for every way a worktree gets created — `git worktree add`, `herdr
 worktree create`, and Claude Code's `EnterWorktree` — because all of them shell
 out to real git, which runs `post-checkout` inside the new worktree.
 
+`hooks/verify-signed-push` refuses a push that carries commits of mine without
+a signature that verifies against `allowed_signers`. Commits made where
+1Password is out of reach, such as Claude Code's sandbox, come out unsigned,
+and `resign-commits` can only fix them before they are pushed.
+
+It checks only commits that are new to the remote and committed by
+`user.email`. Unsigned commits already on the remote never block a push, and
+neither do other people's commits or GitHub's merge commits. Bypass it once
+with `git push --no-verify`.
+
+Unlike `post-checkout`, it is global with no backfill: `config` registers it as
+`hook.verify-signed-push`, a config-based hook (git 2.54+). Git runs config
+hooks in every repo, before the repo's own `pre-push` from `.git/hooks` or its
+`core.hooksPath`, and never instead of them. `git hook list pre-push` shows it.
+Turn it off for one repo with:
+
+```sh
+git config hook.verify-signed-push.enabled false
+```
+
 ## Existing repos need one backfill
 
 `init.templateDir` seeds `.git/hooks` at clone and init time, so repos cloned
@@ -55,7 +75,9 @@ trap here:
 
 `init.templateDir` has none of those problems. It seeds real files into
 `.git/hooks`, leaves `core.hooksPath` unset, and coexists with pre-commit,
-husky and lefthook.
+husky and lefthook. Config-based hooks (`hook.<name>.*`, git 2.54+) avoid them
+too and need no backfill, which is why `verify-signed-push` uses one.
+`post-checkout` could move to one as well; it predates them.
 
 ## Things worth knowing
 

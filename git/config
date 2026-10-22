@@ -59,9 +59,22 @@
 	allowedSignersFile = ~/.config/git/allowed_signers
 [commit]
 	gpgsign = true
+
+# Runs in every repo, alongside the repo's own pre-push hook. Config-based
+# hooks need git 2.54+; older git ignores this section. See README.
+[hook "verify-signed-push"]
+	event = pre-push
+	command = ~/.config/git/hooks/verify-signed-push
+
 [grep]
 	patternType = perl
 [merge]
 	tool = nvimdiff
 [mergetool "nvimdiff"]
 	layout = "LOCAL,BASE,REMOTE / MERGED"
+[credential "https://github.com"]
+	helper = 
+	helper = !/Users/jonasws/.local/share/mise/installs/github-cli/2.102.0/gh_2.102.0_macOS_arm64/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper = 
+	helper = !/Users/jonasws/.local/share/mise/installs/github-cli/2.102.0/gh_2.102.0_macOS_arm64/bin/gh auth git-credential

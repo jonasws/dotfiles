@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+#
+# Global pre-push hook: refuse to push my own commits unless they carry a
+# signature that verifies against ~/.config/git/allowed_signers.
+#
+# Commits made where 1Password is out of reach (Claude Code's sandbox, for
+# one) come out unsigned. Once pushed, signing them means rewriting published
+# history, so catch them here, while `resign-commits` can still fix them.
+#
+# Only commits that are new to the remote and committed by user.email are
+# checked: other people's commits are not mine to sign, and GitHub's merge
+# commits are signed by GitHub's key, which is not in allowed_signers.
+#
+# Bypass once with `git push --no-verify`.
+#
+# Registered as hook.verify-signed-push in ~/.config/git/config, so it runs in
+# every repo, before and in addition to the repo's own pre-push hook.
+# Kept to bash 3.2 for machines without Homebrew bash.
+
+set -uo pipefail
+
+remote=${1:-}
+me=$(git config user.email) || exit 0
+zero=$(git hash-object --stdin </dev/null | tr 0-9a-f 0)
+
+bad=""
+while read -r local_ref local_sha remote_ref remote_sha; do
+	# Deleting a remote branch pushes no commits.
+	[[ $local_sha == "$zero" ]] && continue
+
+	# New to the remote: not reachable from anything it is known to have.
+	# --remotes only matches when $remote is a named remote, so also exclude
+	# the commit being replaced when it is known locally.
+	exclude=(--remotes="$remote")
+	if [[ $remote_sha != "$zero" ]] && git cat-file -e "$remote_sha^{commit}" 2>/dev/null; then
+		exclude+=("$remote_sha")
+	fi
+
+	# %G? is G only for a good signature from a key in allowed_signers.
+	while read -r sha status email; do
+		[[ $email == "$me" && $status != G ]] || continue
+		case $status in
+		N) why="unsigned" ;;
+		U) why="signed by $(git log -1 --format=%GK "$sha"), not in allowed_signers" ;;
+		*) why="signature status $status" ;;
+		esac
+		bad+="  $(git log -1 --format='%h %s' "$sha")  ($local_ref -> $remote_ref)"$'\n'"    $why"$'\n'
+	done < <(git log --format='%H %G? %ce' "$local_sha" --not "${exclude[@]}")
+done
+
+[[ -z $bad ]] && exit 0
+
+cat >&2 <<EOF
+pre-push: refusing to push commits of yours without a verified signature:
+
+${bad}
+Sign unsigned ones with \`resign-commits\` (unpushed commits since the
+upstream); for a key not in allowed_signers, add it to
+~/.config/git/allowed_signers. Then push again. Push anyway with
+\`git push --no-verify\`.
+EOF
+exit 1

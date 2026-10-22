@@ -74,6 +74,14 @@ EXA_API_KEY= { provider = "onepass", value = "op://Employee/Exa API Key/password
 # authenticate inside the sandbox. Read-only docs quota, so that wide visibility is fine.
 CONTEXT7_API_KEY= { provider = "onepass", value = "op://Employee/Context7 API Key/credential", env = false }
 
+# Atlassian API token for Jira Cloud, with the account and site it belongs to.
+# Read by the lazyjira wrapper in ~/.local/bin/wrapped, which exports them to
+# lazyjira only. `env = false`.
+JIRA_API_TOKEN= { provider = "onepass", value = "op://Employee/Atlassian API Token/credential", env = false }
+JIRA_CLOUD_ID= { provider = "onepass", value = "op://Employee/Atlassian API Token/cloudid", env = false }
+JIRA_EMAIL= { provider = "onepass", value = "op://Employee/Atlassian API Token/username", env = false }
+JIRA_HOST= { provider = "onepass", value = "op://Employee/Atlassian API Token/hostname", env = false }
+
 # Read by the `gcal` fish function, which resolves each value with
 # `fnox get -P gcalcli --no-defaults`. gcalcli takes the OAuth client only as
 # `--client-id` / `--client-secret` flags, so the values are read into the
