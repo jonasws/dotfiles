@@ -188,7 +188,8 @@ config.keys = {
     action = act.QuickSelectArgs {
       label = 'open url',
       patterns = {
-        [[https?:\/\/[^\s"'<>,]+]], -- URL with http or https, excluding trailing commas
+        -- http(s) URL; parens only as a balanced pair, so a wrapping ")" is left out
+        [[https?://(?:[^\s"'<>,()]|\([^\s"'<>,()]*\))+]],
         [[ext\+container:(?:name=[^&\s]+)(?:&[a-zA-Z]+=(?:[^&\s]+))*]], -- Firefox container URLs
       },
       action = wezterm.action_callback(function(window, pane)
