@@ -1,0 +1,197 @@
+#!/bin/sh
+# The only way a sandboxed pi changes the herdr layout or drives another agent.
+#
+#   pi-herdr spawn NAME [--down] [--cwd DIR] [-- PI_ARGS...]
+#   pi-herdr prompt [--wait] [--timeout MS] NAME TEXT...
+#   pi-herdr interrupt NAME
+#   pi-herdr stop NAME
+#
+# Reads (`herdr agent read`, `agent wait`, `pane read`, `agent list`) stay
+# plain herdr commands. This script exists because nono can only match argv
+# token by token, and the herdr commands a fleet needs cannot be made safe that
+# way: `agent start --kind pi --kind claude` starts claude, and a split's
+# `--env=HERDR_EXEC_CMD=...` runs anything in the new pane's unsandboxed shell
+# (fish/conf.d/50-herdr-exec.fish). So the pi-agent nono profile denies the
+# session every mutating herdr command and lists this script as a mediated
+# command: the agent reaches it only through nono's shim, and nono runs it in
+# a command sandbox that can exec nothing but /bin/sh and the herdr shim. That
+# is why everything below is shell builtins.
+#
+# Every argv here is built from fixed words and validated values, and every
+# child is `--kind pi`, so it starts through fnox/wrapped/pi and lands in its
+# own pi-agent sandbox. Targets must be agents this script named (pi-*) that
+# herdr currently sees running pi, so a fleet cannot prompt, interrupt or close
+# the user's own panes or another kind of agent.
+
+set -eu
+
+die() {
+  printf 'pi-herdr: %s\n' "$*" >&2
+  exit 2
+}
+
+usage() {
+  printf '%s\n' \
+    'usage:' \
+    '  pi-herdr spawn NAME [--down] [--cwd DIR] [-- PI_ARGS...]' \
+    '  pi-herdr prompt [--wait] [--timeout MS] NAME TEXT...' \
+    '  pi-herdr interrupt NAME' \
+    '  pi-herdr stop NAME' \
+    'NAME is pi- followed by a-z, 0-9, - or _, at most 32 characters.' >&2
+  exit 2
+}
+
+[ "${HERDR_ENV:-}" = 1 ] || die "not running inside a herdr pane"
+
+# herdr allows [a-z][a-z0-9_-]{0,31}; the pi- prefix marks fleet children.
+check_name() {
+  case $1 in
+    pi-*) ;;
+    *) die "agent names start with pi-: $1" ;;
+  esac
+  case $1 in
+    *[!a-z0-9_-]*) die "agent names use a-z, 0-9, - and _: $1" ;;
+  esac
+  [ "${#1}" -le 32 ] || die "agent names are at most 32 characters: $1"
+}
+
+check_ms() {
+  case $1 in
+    '' | *[!0-9]*) die "not a number of milliseconds: $1" ;;
+  esac
+}
+
+# A new pane's login shell runs mise activation and, through it, whatever a
+# trusted mise.toml in that directory asks for, so children start only in the
+# work dirs the pi-agent profile makes writable.
+check_cwd() {
+  case $1 in
+    */../* | */.. | *//*) die "cwd must be a plain absolute path: $1" ;;
+    "$HOME"/CX/* | "$HOME"/CNOPS/* | "$HOME"/CN-TERMINAL/* | "$HOME"/dotfiles | "$HOME"/dotfiles/* | "$HOME"/.herdr/worktrees/*) ;;
+    "$HOME"/CX | "$HOME"/CNOPS | "$HOME"/CN-TERMINAL) ;;
+    *) die "children start under ~/CX, ~/CNOPS, ~/CN-TERMINAL, ~/dotfiles or ~/.herdr/worktrees, not $1" ;;
+  esac
+}
+
+# Pulls "key":"value" out of herdr's compact JSON. The first match is the
+# right one for the responses used here: the new pane in `pane split`, the
+# agent in `agent get`.
+json_field() {
+  case $2 in
+    *"\"$1\":\""*) ;;
+    *) return 1 ;;
+  esac
+  rest=${2#*\""$1"\":\"}
+  printf '%s\n' "${rest%%\"*}"
+}
+
+# Escaped quotes inside a title can never produce "agent":"pi", and
+# "display_agent" has no quote before "agent".
+require_pi_agent() {
+  check_name "$1"
+  info=$(herdr agent get "$1") || die "no live agent named $1"
+  case $info in
+    *'"agent":"pi"'*) ;;
+    *) die "$1 is not a pi agent" ;;
+  esac
+}
+
+cmd_spawn() {
+  [ $# -ge 1 ] || usage
+  name=$1
+  shift
+  check_name "$name"
+  direction=right
+  cwd=${PWD:-}
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --down) direction=down; shift ;;
+      --cwd)
+        [ $# -ge 2 ] || usage
+        cwd=$2
+        shift 2
+        ;;
+      --) shift; break ;;
+      *) die "unknown spawn option: $1" ;;
+    esac
+  done
+  check_cwd "$cwd"
+
+  split=$(herdr pane split --current --direction "$direction" --cwd "$cwd" --no-focus)
+  pane=$(json_field pane_id "$split") || die "pane split returned no pane_id"
+  case $pane in
+    *[!A-Za-z0-9:_-]* | '') die "unexpected pane id: $pane" ;;
+  esac
+
+  # agent start types the command into the pane, and fish drops keystrokes
+  # that arrive before it has finished starting. The first prompt is the
+  # signal; carry on regardless if it never shows.
+  herdr pane wait-output "$pane" --regex '\S' --timeout 15000 >/dev/null 2>&1 || :
+
+  # nono plus pi startup is slower than herdr's 30s default allows for. The
+  # session name goes into pi's terminal title, which herdr's sidebar shows.
+  exec herdr agent start "$name" --kind pi --pane "$pane" --timeout 90000 -- --name "$name" "$@"
+}
+
+cmd_prompt() {
+  wait=
+  timeout=
+  while [ $# -gt 0 ]; do
+    case $1 in
+      --wait) wait=--wait; shift ;;
+      --timeout)
+        [ $# -ge 2 ] || usage
+        check_ms "$2"
+        timeout=$2
+        shift 2
+        ;;
+      -*) die "unknown prompt option: $1" ;;
+      *) break ;;
+    esac
+  done
+  [ $# -ge 2 ] || usage
+  name=$1
+  shift
+  require_pi_agent "$name"
+  text=$*
+  # herdr reads a leading -- in the text as an option.
+  case $text in
+    -*) text=" $text" ;;
+  esac
+  if [ -n "$timeout" ]; then
+    [ -n "$wait" ] || die "--timeout needs --wait"
+    exec herdr agent prompt "$name" "$text" --wait --timeout "$timeout"
+  fi
+  if [ -n "$wait" ]; then
+    exec herdr agent prompt "$name" "$text" --wait
+  fi
+  exec herdr agent prompt "$name" "$text"
+}
+
+cmd_interrupt() {
+  [ $# -eq 1 ] || usage
+  require_pi_agent "$1"
+  exec herdr agent send-keys "$1" esc
+}
+
+cmd_stop() {
+  [ $# -eq 1 ] || usage
+  require_pi_agent "$1"
+  pane=$(json_field pane_id "$info") || die "agent get returned no pane_id"
+  case $pane in
+    *[!A-Za-z0-9:_-]* | '') die "unexpected pane id: $pane" ;;
+  esac
+  exec herdr pane close "$pane"
+}
+
+[ $# -ge 1 ] || usage
+sub=$1
+shift
+case $sub in
+  spawn) cmd_spawn "$@" ;;
+  prompt) cmd_prompt "$@" ;;
+  interrupt) cmd_interrupt "$@" ;;
+  stop) cmd_stop "$@" ;;
+  -h | --help | help) usage ;;
+  *) die "unknown command: $sub" ;;
+esac
