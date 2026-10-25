@@ -1,0 +1,9 @@
+{
+  "servers": {
+    "kotlin-lsp": {
+      "command": "/Users/jonasws/.local/bin/intellij-server",
+      "args": ["--stdio"],
+      "warmupTimeoutMs": 120000
+    }
+  }
+}

@@ -1,0 +1,157 @@
+# omp approval and privacy policy. Not linked into ~/.omp/agent: the launcher
+# (fnox/wrapped/omp) names this file by its repo path in PI_CONFIG_FILES, so it
+# loads as a settings overlay. That layer outranks ~/.omp/agent/config.yml and every
+# repository's .omp/config.yml and .claude/settings.json, which omp merges in as
+# project settings, so a checkout cannot loosen a key pinned here. Only explicit
+# --config overlays, runtime flags (--approval-mode, --yolo) and setting env
+# vars rank higher, and those come from whoever starts omp, not from a repo.
+#
+# This is the soft layer. It decides what omp asks before running, not what a
+# command can reach once it runs: nono (nono/profiles/omp.json) is the hard
+# boundary, and anything approved here still runs inside it. A pattern sees the
+# command line as typed, so a script file, an alias or the eval tool's Python
+# or JavaScript gets past it; see omp/README.md for which rules that leaves
+# soft and why.
+#
+# Keys and semantics: docs/approval-mode.md and docs/settings.md upstream.
+
+tools:
+  # yolo + targeted prompts is omp's nearest equivalent of Claude Code's auto
+  # mode: nono contains every command, so prompting for each one would buy
+  # little, while the patterns below still stop or ask for the ones that act
+  # beyond the sandbox. Subagents always run yolo; a `prompt` there rejects.
+  approvalMode: yolo
+  approval:
+    # eval runs Python and JavaScript that can spawn processes directly, which
+    # bash.patterns never sees (docs/approval-mode.md "Safety overrides").
+    eval: prompt
+
+bash:
+  # Evaluated in order, first match wins. `deny` and `prompt` also match each
+  # segment of a compound command (`cd x && gh ...`). `*` matches any text,
+  # spaces included.
+  patterns:
+    # ── Credentials: claude/settings.json permissions.deny ──────────────────
+    # 1Password and fnox are unreachable inside nono anyway; refusing up front
+    # keeps the agent from retrying ways around that.
+    - { match: "gh", approval: deny }
+    - { match: "gh *", approval: deny }
+    - { match: "*/gh *", approval: deny }
+    - { match: "fnox *get*", approval: deny }
+    - { match: "fnox *export*", approval: deny }
+    - { match: "op read*", approval: deny }
+    - { match: "op * read *", approval: deny }
+    - { match: "op item get*", approval: deny }
+    - { match: "op * item get*", approval: deny }
+    - { match: "op inject*", approval: deny }
+    - { match: "op * inject*", approval: deny }
+    - { match: "op document get*", approval: deny }
+    - { match: "op * document get*", approval: deny }
+    - { match: "twg", approval: deny }
+    - { match: "twg *", approval: deny }
+
+    # ── Raw socket clients: autoMode hard_deny ──────────────────────────────
+    # herdr.sock and docker.sock are granted to the sandbox for the herdr and
+    # docker CLIs. Anything naming a socket directly (nc -U, socat, curl
+    # --unix-socket, python) is talking past those CLIs, as is mounting
+    # docker.sock into a container.
+    - { match: "*herdr.sock*", approval: deny }
+    - { match: "*docker.sock*", approval: deny }
+    - { match: "*agent.sock*", approval: deny }
+
+    # ── herdr: autoMode allow / soft_deny ───────────────────────────────────
+    # A herdr pane starts a fresh login shell outside every sandbox, so these
+    # run arbitrary commands with the user's full rights. omp cannot tell a
+    # pane it created from the user's own shell, so where Claude's auto mode
+    # allows "only into panes it made", this asks every time.
+    - { match: "herdr pane run *", approval: prompt }
+    - { match: "herdr pane send-text *", approval: prompt }
+    - { match: "herdr pane send-keys *", approval: prompt }
+    - { match: "herdr agent prompt *", approval: prompt }
+    - { match: "herdr agent send-keys *", approval: prompt }
+    - { match: "herdr terminal *", approval: prompt }
+    # `omp` in a new pane resolves to the launcher on PATH, so it lands in the
+    # same sandbox as this one. Every other kind starts uncontained.
+    - { match: "herdr agent start * --kind omp", approval: allow }
+    - { match: "herdr agent start * --kind omp *", approval: allow }
+    - { match: "herdr agent start * --kind=omp*", approval: allow }
+    - { match: "herdr agent start *", approval: prompt }
+    - { match: "herdr pane close *", approval: prompt }
+    - { match: "herdr pane move *", approval: prompt }
+    - { match: "herdr tab close *", approval: prompt }
+    - { match: "herdr workspace close *", approval: prompt }
+    - { match: "herdr server *", approval: prompt }
+    - { match: "herdr plugin *", approval: prompt }
+    - { match: "herdr integration *", approval: prompt }
+
+    # ── git: claude/settings.json permissions.ask ───────────────────────────
+    # `git *push*` rather than `git push` so `git -C <dir> push` matches too.
+    - { match: "git *push* --force*", approval: prompt }
+    - { match: "git *push* -f*", approval: prompt }
+    - { match: "git *push* --delete*", approval: prompt }
+    - { match: "git *push* -d *", approval: prompt }
+    - { match: "git *push* :*", approval: prompt }
+    - { match: "git *reset* --hard*", approval: prompt }
+    - { match: "git *clean* -*f*", approval: prompt }
+    - { match: "git *rebase*", approval: prompt }
+
+    # ── docker: permissions.ask and autoMode soft_deny ──────────────────────
+    # colima mounts ~/CX and ~/CNOPS writable into its VM, so a container can
+    # reach files nono denies (.env, .git/hooks) through a bind mount.
+    - { match: "docker * --privileged*", approval: prompt }
+    - { match: "docker * --pid=host*", approval: prompt }
+    - { match: "docker * --pid host*", approval: prompt }
+    - { match: "docker * --network host*", approval: prompt }
+    - { match: "docker * --network=host*", approval: prompt }
+    - { match: "docker * --net=host*", approval: prompt }
+    - { match: "docker * --userns=host*", approval: prompt }
+    - { match: "docker * --cap-add*", approval: prompt }
+    - { match: "docker * --security-opt*", approval: prompt }
+    - { match: "docker * --device*", approval: prompt }
+    - { match: "docker * -v *", approval: prompt }
+    - { match: "docker * --volume*", approval: prompt }
+    - { match: "docker * --mount*", approval: prompt }
+
+  # A repo's .envrc would load into the bash session; it is where secrets sit.
+  # mise, not direnv, provides tool environments here.
+  direnv: "off"
+
+# Project .mcp.json / .omp/mcp.json / .claude/.mcp.json servers start without a
+# trust prompt in omp, unlike Claude Code. User-level ~/.omp/agent/mcp.json
+# (omp/mcp.json) still loads.
+mcp:
+  enableProjectConfig: false
+
+# Pinned so no repository can opt in foreign user-level sources (~/.claude.json
+# MCP servers, ~/.claude/settings.json, ~/.codex) for itself.
+enabledProviders: []
+
+# The github tool drives gh, which has no credentials and is denied above;
+# the github MCP server (omp/mcp.json) covers public repos.
+github:
+  enabled: false
+
+# Native desktop control: screenshots, input and clipboard outside any window.
+computer:
+  enabled: false
+
+# ── Privacy ─────────────────────────────────────────────────────────────────
+# OTLP export only happens when OTEL_* endpoints are set; pinned off so a repo
+# .env or config cannot turn it on. dev.autoqa reports tool failures, session
+# context included, to qa.omp.sh.
+telemetry:
+  otlpExportEnabled: false
+dev:
+  autoqa: false
+# Sessions are published to the my.omp.sh relay only when a person runs
+# /collab or /share; this keeps a repo from making every session start hosted.
+collab:
+  autoStart: "off"
+# Replace the values of *KEY*/*TOKEN*/*SECRET* environment variables, and
+# credential-shaped strings in tool output, with placeholders before they
+# reach Anthropic. The launcher puts ANTHROPIC_API_KEY and EXA_API_KEY into
+# omp's environment; this keeps a `printenv` or a leaked .env out of the
+# transcript the provider stores. Not a containment: placeholders in the
+# model's tool arguments are restored before the tool runs (docs/secrets.md).
+secrets:
+  enabled: true

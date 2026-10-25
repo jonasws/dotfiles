@@ -1,0 +1,121 @@
+{
+  "$schema": "https://raw.githubusercontent.com/always-further/nono/refs/heads/main/crates/nono-cli/data/nono-profile.schema.json",
+  "extends": "default",
+  "meta": {
+    "name": "omp",
+    "description": "oh-my-pi agent: Claude Code's sandbox containment from claude/settings.json, for a whole-process sandbox. Launched by fnox/wrapped/omp; see omp/README.md.",
+    "author": "jonasws"
+  },
+  "groups": {
+    "include": ["bun_runtime", "mise_manager", "node_runtime", "rust_runtime", "java_runtime", "git_config"]
+  },
+  "security": {
+    "signal_mode": "allow_same_sandbox",
+    "process_info_mode": "allow_same_sandbox",
+    "ipc_mode": "full"
+  },
+  "workdir": {
+    "access": "readwrite"
+  },
+  "filesystem": {
+    "allow": [
+      "$HOME/CX",
+      "$HOME/CNOPS",
+      "$HOME/CN-TERMINAL",
+      "$HOME/dotfiles",
+      "$HOME/.herdr/worktrees",
+      "$HOME/herdr-splits.nvim",
+      "$HOME/Library/Caches/mise",
+      "$HOME/.m2/repository",
+      "$HOME/Library/Application Support/kotlin",
+      "$HOME/.tsk",
+      "$HOME/.omp"
+    ],
+    "read": [
+      "$HOME/.local/state/mise",
+      "$HOME/.config/git",
+      "$HOME/.config/herdr",
+      "$HOME/.config/colima",
+      "$HOME/.config/tuicr",
+      "$HOME/.config/hunk",
+      "$HOME/.agents/skills",
+      "$HOME/.claude/skills",
+      "$HOME/.m2",
+      "$HOME/.cargo/bin",
+      "$HOME/.cargo/registry",
+      "$HOME/.cargo/git",
+      "$HOME/.docker/contexts",
+      "$HOME/.cdk"
+    ],
+    "read_file": [
+      "$HOME/catppuccin/delta/catppuccin.gitconfig",
+      "$HOME/.docker/config.json",
+      "$HOME/.testcontainers.properties",
+      "$HOME/.docker-java.properties",
+      "$HOME/.gitignore",
+      "$HOME/.rgignore"
+    ],
+    "bypass_protection": [
+      "$HOME/.docker/config.json",
+      "$HOME/.docker/contexts"
+    ],
+    "deny": [
+      "$HOME/dotfiles/fnox/age*.txt",
+      "$HOME/.m2/settings-security*.xml*"
+    ]
+  },
+  "network": {
+    "block": false
+  },
+  "environment": {
+    "deny_vars": [
+      "GH_TOKEN",
+      "GITHUB_TOKEN",
+      "LIFLIG_GITHUB_PAT",
+      "NEXUS_PASSWORD",
+      "JIRA_API_TOKEN",
+      "AWS_ACCESS_KEY_ID",
+      "AWS_SECRET_ACCESS_KEY",
+      "AWS_SESSION_TOKEN",
+      "OP_SESSION_*",
+      "OP_SERVICE_ACCOUNT_TOKEN"
+    ],
+    "set_vars": {
+      "OMP_SANDBOX": "nono",
+      "GIT_CONFIG_COUNT": "2",
+      "GIT_CONFIG_KEY_0": "commit.gpgsign",
+      "GIT_CONFIG_VALUE_0": "false",
+      "GIT_CONFIG_KEY_1": "tag.gpgsign",
+      "GIT_CONFIG_VALUE_1": "false",
+      "OTEL_SDK_DISABLED": "true",
+      "PI_AUTO_QA": "0",
+      "RIPGREP_CONFIG_PATH": "$HOME/dotfiles/ripgrep/dot-ripgreprc"
+    }
+  },
+  "unsafe_macos_seatbelt_rules": [
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/claude\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/fish\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/fnox\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/herdr\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/nono\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/omp\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/mise-global\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/git\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/bin\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.omp/agent/config.yml\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.omp/agent/config.yaml\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.omp/agent/AGENTS.md\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.omp/agent/RULES.md\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.omp/agent/mcp.json\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.omp/agent/lsp.json\"))",
+    "(deny file-read-data (regex \"/[^/]*[.]env$\"))",
+    "(deny file-read-data (regex \"/[^/]*[.]env[.][^/]*$\"))",
+    "(deny file-read-data (regex \"/[^/]*-env$\"))",
+    "(deny file-write* (regex \"/[.]git/hooks(/|$)\"))",
+    "(deny file-write* (regex \"/[.]git/config$\"))",
+    "(deny file-write* (regex \"/[.]claude/(settings[^/]*[.]json|hooks|commands|agents)(/|$)\"))",
+    "(deny file-write* (regex \"/[.]mcp[.]json$\"))",
+    "(deny file-write* (regex \"/[.]envrc$\"))",
+    "(deny file-write* (regex \"/[.](vscode|idea)(/|$)\"))"
+  ]
+}

@@ -82,6 +82,20 @@ run = [
   """herdr plugin list --json | jq '[.result.plugins[] | {id: .plugin_id, enabled, source: (if .source.kind == "github" then "\\(.source.owner)/\\(.source.repo)" else .source.kind end), commit: .source.resolved_commit}] | sort_by(.id)' > herdr/plugins.lock.json""",
 ]
 
+[tasks."update:omp"]
+description = "Refresh herdr's omp integration and upgrade omp plugins"
+# After update:mise, so a new herdr's integration and a new omp are in place.
+# herdr bundles its omp extension in the binary and writes it to
+# ~/.omp/agent/extensions only on install, so a herdr upgrade leaves the old
+# copy reporting until this runs again; install is idempotent. `omp` here is
+# the launcher in ~/.local/bin/wrapped, so plugin installs run in the sandbox
+# too; it skips fnox for `plugin`, which calls no model.
+depends = ["update:mise"]
+run = [
+  "herdr integration install omp",
+  "omp plugin upgrade",
+]
+
 [tasks."update:yazi"]
 description = "Upgrade yazi plugins and flavors"
 run = "ya pkg upgrade"
@@ -113,7 +127,7 @@ run = [
 
 [tasks.update]
 description = "Daily upgrade, then show what changed"
-depends = ["update:brew", "update:mise", "update:skills", "update:herdr-plugins", "update:yazi", "update:nvim"]
+depends = ["update:brew", "update:mise", "update:skills", "update:herdr-plugins", "update:omp", "update:yazi", "update:nvim"]
 run = "git status --short"
 
 [tasks."update:weekly"]
@@ -268,6 +282,15 @@ mode = "symlink"
 root = "nushell"
 target = "~/.config/nushell"
 exclude = ["functions"]
+
+[dotfile_groups.omp]
+# Config only: omp keeps sessions, agent.db, memories, natives and herdr's
+# extension beside these files in ~/.omp/agent. policy.yml stays here, read
+# by the launcher (fnox/wrapped/omp) from the repo path, since a copy in
+# ~/.omp, which the agent can write, would be no policy at all.
+root = "omp"
+target = "~/.omp/agent"
+exclude = ["README.md", "policy.yml"]
 
 [dotfile_groups.otree]
 root = "otree"

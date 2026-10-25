@@ -89,6 +89,14 @@ actionlint = "latest"
 pre-commit = "latest"
 "aqua:github/github-mcp-server" = "latest"
 "aqua:anthropics/claude-code" = "latest"
+# oh-my-pi. The release binary rather than npm:@oh-my-pi/pi-coding-agent: one
+# Bun-compiled executable with its Rust natives inside, where the npm package
+# needs a global bun to run its `#!/usr/bin/env bun` entry and pulls the
+# natives in as per-platform packages. mise strips the `-darwin-arm64` suffix,
+# so it lands as `omp`, and verifies it against the release's SHA256SUMS.txt.
+# Only run through ~/.local/bin/wrapped/omp, which puts it in its nono sandbox
+# (omp/README.md); omp's own updater is off (startup.checkUpdate).
+"github:can1357/oh-my-pi" = "latest"
 hwatch = "latest"
 "ubi:thiagokokada/gh-gfm-preview" = "latest"
 usage = "6.9.0"
@@ -127,6 +135,7 @@ minimum_release_age_excludes = [
   "github:always-further/nono",
   "aqua:github/github-mcp-server",
   "aqua:anthropics/claude-code",
+  "github:can1357/oh-my-pi",
   "pipx:mcp2cli",
   "go:github.com/isaacphi/mcp-language-server",
   "npm:@earendil-works/pi-coding-agent",

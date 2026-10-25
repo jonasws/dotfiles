@@ -26,10 +26,11 @@ fi
 
 # Claude Code's sandbox cannot reach the 1Password desktop app, so fnox resolves
 # nothing there and `fnox exec` fails outright. The sandbox is identifiable by
-# $TMPDIR, which it points at /tmp/claude-<uid>. Agents use the github MCP
-# server instead, which Claude Code starts outside the sandbox under fnox.
+# $TMPDIR, which it points at /tmp/claude-<uid>; the omp launcher (./omp) does
+# the same with /tmp/omp-<uid> for omp's nono sandbox. Agents use the github
+# MCP server instead, which Claude Code starts outside the sandbox under fnox.
 case "$TMPDIR" in
-  /tmp/claude-* | /private/tmp/claude-*)
+  /tmp/claude-* | /private/tmp/claude-* | /tmp/omp-* | /private/tmp/omp-*)
     echo "gh: sandboxed, no credential reachable — use the github MCP tools" >&2
     exit 127
     ;;

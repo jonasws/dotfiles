@@ -1,0 +1,145 @@
+#!/bin/sh
+# oh-my-pi, contained: every `omp` on PATH runs under nono with the `omp`
+# profile (nono/profiles/omp.json), the omp counterpart of Claude Code's
+# sandbox settings in claude/settings.json. Design: omp/README.md.
+#
+# omp has no OS sandbox of its own (its approval modes decide what to ask, not
+# what a command can reach), so the whole process goes in: the bash tool,
+# eval kernels, LSP servers, MCP servers and in-process subagents all inherit
+# it. Being first on PATH is what makes that hold beyond this terminal. A herdr
+# pane starts a fresh shell outside every sandbox, so `herdr agent start
+# --kind omp` and herdr's own `omp --resume=<id>` after a server restart type
+# `omp` into such a shell, and land here. So do mise tasks and anything else
+# that resolves omp through PATH, the way fnox/wrapped/gh shadows gh.
+#
+# On PATH via `_.path` in ~/.config/mise/config.toml, ahead of the tool
+# directory of github:can1357/oh-my-pi. `mise which` resolves tools, not PATH,
+# so asking it for omp returns the real binary and not this script.
+
+set -e
+
+real="$(mise which omp 2>/dev/null || true)"
+if [ -z "$real" ]; then
+  echo "omp: mise provisions no oh-my-pi for $PWD" >&2
+  exit 127
+fi
+
+# Approval and privacy policy, loaded as a settings overlay so it outranks the
+# global config and any repository's .omp/config.yml. PI_CONFIG_FILES rather
+# than --config because every subcommand reads it, while --config before a
+# subcommand name is dropped (docs/settings.md "One-shot overlays"). Last in
+# the list, so it wins over other entries there; an explicit --config typed on
+# the command line still ranks above it.
+policy="$HOME/dotfiles/omp/policy.yml"
+if [ ! -f "$policy" ]; then
+  echo "omp: $policy is missing, refusing to start without the policy" >&2
+  exit 1
+fi
+PI_CONFIG_FILES="${PI_CONFIG_FILES:+$PI_CONFIG_FILES:}$policy"
+export PI_CONFIG_FILES
+
+# Already inside the sandbox: omp started from omp's own bash tool (`omp
+# commit`, a nested session). The sandbox is inherited by every child process,
+# so this one is contained already, and fnox could not reach 1Password from
+# here to resolve the credentials again; the parent's are in the environment.
+# OMP_SANDBOX comes from the profile's set_vars. An agent that unsets it only
+# reaches the fnox and nono calls below, still inside the sandbox it is in, so
+# the check can fail closed but never open.
+if [ "${OMP_SANDBOX:-}" = nono ]; then
+  exec "$real" "$@"
+fi
+
+nono="$(command -v nono || true)"
+if [ -z "$nono" ]; then
+  echo "omp: nono is not on PATH, refusing to run omp uncontained" >&2
+  exit 127
+fi
+
+# Subcommands that manage omp itself and call no model need no credentials;
+# skipping fnox spares them a 1Password prompt on a cold daemon.
+needs_secrets=1
+for arg in "$@"; do
+  case "$arg" in
+    --version | --help | -h) needs_secrets= ;;
+    -*) continue ;;
+    config | plugin | install | completions | agents | gc | ps) needs_secrets= ;;
+  esac
+  break
+done
+
+# Credentials, resolved here because 1Password is unreachable from inside the
+# sandbox (claude/CLAUDE.md "Sandbox and secrets"). fnox-secret explains how
+# the calls share one Touch ID per cold start. They reach omp as environment
+# variables, and so every command omp runs can read them; omp's `secrets`
+# setting (policy.yml) keeps their values out of what is sent to Anthropic,
+# but not out of a command that sends them elsewhere. Hence only low-stakes
+# credentials go in, and the Anthropic key should be one with a spend limit:
+#
+# - ANTHROPIC_API_KEY: the model provider. API key, not subscription OAuth.
+# - EXA_API_KEY: omp's built-in web_search (modelRoles.web in omp/config.yml)
+#   calls api.exa.ai itself, so no exa MCP server is needed.
+# - CONTEXT7_API_KEY: for the context7 skill's curl calls, the same wide
+#   visibility claude/hooks/context7-env.sh gives it in Claude Code.
+# - GITHUB_PERSONAL_ACCESS_TOKEN: MISE_GITHUB_TOKEN (public-repo read only),
+#   under the name fnox/wrapped/github-mcp-server hands to the server. omp
+#   starts that server as its own child, inside the sandbox, so the wrapper
+#   cannot fetch the token there; it uses this one when it is already set.
+#   The full-access GitHub token never enters: gh is denied in policy.yml.
+if [ -n "$needs_secrets" ]; then
+  secret="$(dirname "$0")/fnox-secret"
+  ANTHROPIC_API_KEY="$("$secret" ANTHROPIC_API_KEY)"
+  EXA_API_KEY="$("$secret" EXA_API_KEY)"
+  CONTEXT7_API_KEY="$("$secret" CONTEXT7_API_KEY)"
+  GITHUB_PERSONAL_ACCESS_TOKEN="$("$secret" MISE_GITHUB_TOKEN)"
+  export ANTHROPIC_API_KEY EXA_API_KEY CONTEXT7_API_KEY GITHUB_PERSONAL_ACCESS_TOKEN
+fi
+
+# A temp dir of its own, as Claude Code's /tmp/claude-<uid>, so the wrappers
+# next to this script can tell they run sandboxed: the mvn wrapper goes
+# --offline and gh, hunk and lazyjira stop before asking 1Password. Under nono
+# $TMPDIR is otherwise the same /var/folders path as in an ordinary shell.
+tmp="/tmp/omp-$(id -u)"
+mkdir -m 700 "$tmp" 2>/dev/null || true
+# /tmp is shared: refuse a path someone else created or pointed elsewhere.
+if [ -L "$tmp" ] || [ ! -d "$tmp" ] || [ -z "$(find "$tmp" -prune -user "$(id -u)")" ]; then
+  echo "omp: $tmp is not a directory of your own" >&2
+  exit 1
+fi
+TMPDIR="$tmp/"
+export TMPDIR
+
+# nono refuses $HOME as the working directory, since it contains nono's own
+# state. omp itself moves to a temp dir when started in ~ (--allow-home), so
+# make that move first.
+if [ "$PWD" = "$HOME" ]; then
+  cd "$TMPDIR"
+fi
+
+set -- --profile omp --allow-cwd -- "$real" "$@"
+
+# Unix sockets, granted only when they exist: nono rejects a socket path that
+# is not there yet, and colima or herdr may simply not be running. Each one
+# reaches past the sandbox, as in Claude's sandbox.network.allowUnixSockets:
+#
+# - herdr.sock drives panes that run outside the sandbox. The herdr CLI and
+#   herdr's omp extension (state reporting, session resume) need it.
+#   policy.yml gates the commands that execute through it; see omp/README.md
+#   for why that gate is soft. OMP_HERDR_SOCKET=0 leaves it out, at the cost
+#   of herdr's sidebar state and every herdr command.
+# - docker.sock reaches the colima VM, which mounts ~/CX and ~/CNOPS writable.
+#   Testcontainers needs it.
+# - The 1Password SSH agent, for git over ssh.
+herdr_sock="${HERDR_SOCKET_PATH:-$HOME/.config/herdr/herdr.sock}"
+if [ "${HERDR_ENV:-}" = 1 ] && [ "${OMP_HERDR_SOCKET:-1}" != 0 ] && [ -S "$herdr_sock" ]; then
+  set -- --allow-unix-socket "$herdr_sock" "$@"
+fi
+docker_sock="$HOME/.config/colima/default/docker.sock"
+if [ -S "$docker_sock" ]; then
+  set -- --allow-unix-socket "$docker_sock" "$@"
+fi
+op_sock="$HOME/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+if [ -S "$op_sock" ]; then
+  set -- --allow-unix-socket "$op_sock" "$@"
+fi
+
+exec "$nono" run "$@"

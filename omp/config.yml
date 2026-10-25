@@ -1,0 +1,139 @@
+# oh-my-pi (omp) settings, linked to ~/.omp/agent/config.yml.
+#
+# Preferences only. Everything that decides what the agent may do lives in
+# policy.yml next to this file, which the launcher (fnox/wrapped/omp) loads as
+# a settings overlay: an overlay outranks this file AND a repository's own
+# .omp/config.yml or .claude/settings.json, which omp merges in as project
+# settings. A key set here can be overridden by any repo; a key set there
+# cannot. Precedence and merge rules: docs/settings.md#precedence upstream.
+#
+# omp runs inside nono, which denies writes to ~/dotfiles/omp, so /settings,
+# `omp config set` and /model role assignments cannot save from a session.
+# Edit this file instead: interactive sessions watch it and reload live.
+# `omp config list` (run outside a session) prints every key with its default.
+
+# ── Models ──────────────────────────────────────────────────────────────────
+# Anthropic API key only (no subscription OAuth): the launcher resolves
+# ANTHROPIC_API_KEY from fnox. enabledModels restricts chat models to the one
+# provider, so a key some other tool leaves in the environment cannot route a
+# turn to another vendor. Roles: docs/settings.md#models.
+modelProviderOrder:
+  - anthropic
+enabledModels:
+  - anthropic/*
+defaultThinkingLevel: medium
+modelRoles:
+  default: anthropic/claude-opus-5-5:medium
+  slow: anthropic/claude-opus-5-5:high
+  plan: anthropic/claude-opus-5-5:high
+  # Subagents spawned by `task`: the mechanical half, as the Sonnet implementer
+  # is for Claude Code (claude/CLAUDE.md "Subagents and models").
+  task: anthropic/claude-sonnet-5-5:medium
+  smol: anthropic/claude-haiku-5-5
+  commit: anthropic/claude-haiku-5-5
+  # tiny and memory default to local ONNX models that omp downloads on first
+  # use; haiku keeps every model call on the one provider and off the disk.
+  tiny: anthropic/claude-haiku-5-5
+  memory: anthropic/claude-haiku-5-5
+  # Read by /advisor on and --advisor. advisor.enabled stays off: a second
+  # model reviewing every turn roughly doubles spend.
+  advisor: anthropic/claude-sonnet-5-5:medium
+  # web_search backend. EXA_API_KEY comes from fnox through the launcher, the
+  # same key the exa MCP server uses for Claude Code. web/hosted falls back to
+  # the active Claude model's own server-side web search, on the same API key
+  # (docs/tools/web_search.md). An explicit chain, so the default one's
+  # keyless engines (Parallel, DuckDuckGo, Google scraping) never run.
+  web: web/exa
+retry:
+  fallbackChains:
+    web:
+      - web/exa
+      - web/hosted
+
+# ── Discovery ───────────────────────────────────────────────────────────────
+# What omp inherits from other tools' files. Foreign USER-level sources
+# (~/.claude, ~/.codex, ...) are opt-in through enabledProviders and stay off:
+# ~/.claude/CLAUDE.md is written for Claude Code's tools and sandbox, and
+# ~/.claude.json would hand omp Claude's MCP servers, whose fnox wrappers
+# cannot reach 1Password from inside nono. ~/.omp/agent/AGENTS.md (omp/AGENTS.md
+# here) is the user-level context instead, and shadows every other user file.
+#
+# Project-level sources stay on: a repo's CLAUDE.md, AGENTS.md, .claude/skills,
+# .claude/commands and .github/copilot-instructions.md load as written, which
+# is what lets omp work in the nsbno/capralifecycle repos without a port.
+# Both CLAUDE.md and AGENTS.md load where a repo has both (deliberate upstream,
+# can1357/oh-my-pi#2612; #10049 asks for a per-file switch). The pinned values
+# live in policy.yml, since a repo could otherwise opt itself in.
+#
+# The one user-level exception is skills: the legacy per-capability toggle
+# admits ~/.claude/skills without the rest of ~/.claude. ~/.agents/skills
+# (herdr, hunk-review, tuicr, context7) loads by default through the `agents`
+# provider. Skipped: skills that drive Claude Code itself — its Task tool,
+# subagent transcripts, or code.claude.com docs and the researcher subagent.
+skills:
+  enableClaudeUser: true
+  ignoredSkills:
+    - dispatching-parallel-agents
+    - watch-subagents
+    - find-docs
+
+# ── Batteries ───────────────────────────────────────────────────────────────
+# Subagents (`task`): `isolated: true` gives a worker its own copy-on-write
+# copy of the checkout (APFS clone on macOS) under ~/.omp/wt, applied back as a
+# patch. Off by default upstream; opting in still leaves each task to ask.
+# Limits mirror CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS / _SPAWN_DEPTH in
+# claude/settings.json. Subagents run in-process, so they share omp's sandbox.
+task:
+  isolation:
+    enabled: true
+  maxConcurrency: 3
+  maxRecursionDepth: 2
+  # LSP for subagents too: Kotlin navigation is the point of having it.
+  enableLsp: true
+
+# Agent-curated memory (retain/recall/learn tools), project-scoped, stored in
+# ~/.omp/agent/memories. `local` runs the summary pipeline on the memory role;
+# mnemopi would also download an embedding model.
+memory:
+  backend: local
+
+# Session recap after the terminal sits idle; costs one smol call.
+recap:
+  enabled: true
+
+# Format-on-write stays off: the repos format in their builds (ktlint, spotless).
+lsp:
+  enabled: true
+  diagnosticsOnWrite: true
+
+# Long commands background themselves instead of blocking the turn.
+bash:
+  autoBackground:
+    enabled: true
+
+# Route `cat`/`head` to read, `rg`/`grep` to grep, `sed -i` to edit and so on,
+# with omp's built-in rule set (DEFAULT_BASH_INTERCEPTOR_RULES upstream): the
+# native tools read through the LSP-aware summarizer and the hashline anchors.
+# The omp counterpart of the search-tool table in claude/CLAUDE.md.
+bashInterceptor:
+  enabled: true
+
+# Services, terminals and `!` commands; the bash tool itself uses omp's
+# embedded brush shell. Homebrew bash 5, as CLAUDE_CODE_SHELL pins for Claude:
+# auto-detection would pick $SHELL, which is zsh here (claude/CLAUDE.md "Shell
+# for the Bash tool"). omp refuses to start when this path does not exist.
+shellPath: /opt/homebrew/bin/bash
+
+# ── Interface ───────────────────────────────────────────────────────────────
+personality: pragmatic
+tui:
+  vimMode: true
+statusLine:
+  preset: default
+startup:
+  # mise owns the binary (mise-global/config.toml); omp's own updater would
+  # try to replace it under ~/.local/share/mise, which nono makes read-only.
+  checkUpdate: false
+  # Onboarding writes its progress into this file, which is read-only here.
+  setupWizard: false
+  changelogMode: summary

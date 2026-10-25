@@ -14,7 +14,13 @@ if [ -z "$real" ]; then
   exit 127
 fi
 
-GITHUB_PERSONAL_ACCESS_TOKEN="$("$(dirname "$0")/fnox-secret" MISE_GITHUB_TOKEN)"
+# omp starts its MCP servers inside its nono sandbox, where 1Password is out of
+# reach, so the omp launcher (./omp) resolves the same MISE_GITHUB_TOKEN up
+# front and hands it down under this name. fnox keeps the full-access token of
+# that name at `env = false`, so it is never in an environment to inherit.
+if [ -z "${GITHUB_PERSONAL_ACCESS_TOKEN:-}" ]; then
+  GITHUB_PERSONAL_ACCESS_TOKEN="$("$(dirname "$0")/fnox-secret" MISE_GITHUB_TOKEN)"
+fi
 export GITHUB_PERSONAL_ACCESS_TOKEN
 
 exec "$real" "$@" --read-only

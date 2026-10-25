@@ -212,6 +212,13 @@ claude = [
     "workspace",
   ],
 ]
+# omp reports its own state over herdr's socket (`herdr integration install
+# omp`) but no context gauge, so its second row names the agent instead: the
+# one cue that tells an omp pane from a Claude pane in the same workspace.
+omp = [
+  ["state_icon", "terminal_title_stripped"],
+  ["agent", "workspace"],
+]
 
 # OSC 9 through WezTerm; clicking the toast does nothing.
 [ui.toast]

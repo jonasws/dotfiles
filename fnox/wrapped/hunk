@@ -35,9 +35,9 @@ fi
 
 # Claude Code's sandbox cannot reach the 1Password desktop app, so fnox resolves
 # nothing there. The sandbox is identifiable by $TMPDIR, which it points at
-# /tmp/claude-<uid>.
+# /tmp/claude-<uid>; omp's launcher (./omp) uses /tmp/omp-<uid> the same way.
 case "$TMPDIR" in
-  /tmp/claude-* | /private/tmp/claude-*)
+  /tmp/claude-* | /private/tmp/claude-* | /tmp/omp-* | /private/tmp/omp-*)
     echo "hunk: sandboxed, no GitHub token reachable — run hunk gh outside the sandbox" >&2
     exit 127
     ;;
