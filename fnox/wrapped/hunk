@@ -35,9 +35,9 @@ fi
 
 # Claude Code's sandbox cannot reach the 1Password desktop app, so fnox resolves
 # nothing there. The sandbox is identifiable by $TMPDIR, which it points at
-# /tmp/claude-<uid>.
-case "$TMPDIR" in
-  /tmp/claude-* | /private/tmp/claude-*)
+# /tmp/claude-<uid>; pi's nono sandbox sets AGENT_SANDBOX instead.
+case "${AGENT_SANDBOX:-}:$TMPDIR" in
+  nono:* | *:/tmp/claude-* | *:/private/tmp/claude-*)
     echo "hunk: sandboxed, no GitHub token reachable — run hunk gh outside the sandbox" >&2
     exit 127
     ;;
