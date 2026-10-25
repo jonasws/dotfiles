@@ -74,6 +74,12 @@ EXA_API_KEY= { provider = "onepass", value = "op://Employee/Exa API Key/password
 # authenticate inside the sandbox. Read-only docs quota, so that wide visibility is fine.
 CONTEXT7_API_KEY= { provider = "onepass", value = "op://Employee/Context7 API Key/credential", env = false, sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBdlRnWnNDZ3ZjNGE0L1JKcEdwQ0hYRFRPZmg2T01NRmNOdnNPZitoRWVkMAp3bVQ2eTJhRW5iU3I5UEp6VXJVYURNY1FlU3FTcWszZ2NjSFRNK0Z4RGJnCi0+IF5vS0pHYSE3LWdyZWFzZQp0WENLOWtENHpIV2gvZ0Y2MFJ3aFd3NW9YdHpiMExvCi0tLSBNOVVKZmJvcmdHQlRRQzFTWndUVEZxSVRKd1dDeEtsa1lEQ0xaMUNWM2lJCi9nfagSeNi3LBlQ0bn28YjsuGyK1AhHBz8d5qI+ApXRHBg8xZLvt1i0+1tiv+Ce2v5wm0BaHmP+zgHcR0yFqLobURt6zE8aqIcCAOg=:vymc9emby2BS3DNfJ0CK61Rbr2EAOkoqzmPISdKbVcqzDzpYVhT4NVEyHvgK6qy5ZSkAG3xht73FNt5cgifcsA7sqq87Jwk=" } }
 
+# ANTHROPIC_API_KEY: the model provider for API-key agents (oh-my-pi; no
+# subscription OAuth). The ~/.local/bin/wrapped/omp launcher fetches it with
+# fnox-secret before entering the sandbox and passes it to omp alone, so
+# `env = false`. No sync blob yet: `mise run sync-secrets` adds it.
+ANTHROPIC_API_KEY= { provider = "onepass", value = "op://Employee/Anthropic API Key/credential", env = false }
+
 # Atlassian API token for Jira Cloud, with the account and site it belongs to.
 # Read by the lazyjira wrapper in ~/.local/bin/wrapped, which exports them to
 # lazyjira only. `env = false`.
