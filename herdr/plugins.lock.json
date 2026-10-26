@@ -15,13 +15,13 @@
     "id": "herdr-automatic-rename",
     "enabled": true,
     "source": "qu8n/herdr-automatic-rename",
-    "commit": "f4f1b90827a2e9b4757d2df9673590ddbfa8a4b5"
+    "commit": "a99754357fdea3119c430fd0cad822eef9047895"
   },
   {
     "id": "herdr-bar",
     "enabled": true,
     "source": "jeffarese/herdr-bar",
-    "commit": "261de9b0441a6972941414bbf16eb4f5df27ac34"
+    "commit": "1ec84901d7922987b4273e4ae98c33bd5d251fab"
   },
   {
     "id": "herdr-splits",
