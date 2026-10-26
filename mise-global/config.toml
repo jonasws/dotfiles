@@ -90,12 +90,16 @@ pre-commit = "latest"
 "aqua:github/github-mcp-server" = "latest"
 "aqua:anthropics/claude-code" = "latest"
 hwatch = "latest"
-"ubi:thiagokokada/gh-gfm-preview" = "latest"
+"github:thiagokokada/gh-gfm-preview" = "latest"
 usage = "6.9.0"
 # The task board (claude/CLAUDE.md "Task board"). After an upgrade, refresh the
-# Claude skill: tsk's own `tsk update` only manages installer copies. The herdr
-# plugin needs nothing, since `tsk setup herdr` was run through the install
-# dir's `latest` symlink. `|| true` because an unchanged skill exits 1.
+# Claude skill: tsk's own `tsk update` only manages installer copies. `|| true`
+# because an unchanged skill exits 1.
+# The herdr plugin pins the binary path it was registered from. Register it
+# through mise's `latest` symlink, which follows upgrades, not the versioned
+# directory or the shim (setup refuses a shim: it does not resolve to tsk). In
+# a terminal, answering no to prefix+t, which herdr/scripts/tsk-toggle.sh owns:
+#   ~/.local/share/mise/installs/github-smarzban-tsk/latest/tsk setup herdr
 "github:smarzban/tsk" = { version = "latest", postinstall = "\"$MISE_TOOL_INSTALL_PATH/tsk\" setup claude || true" }
 atuin = "latest"
 "aqua:showwin/speedtest-go" = "latest"
