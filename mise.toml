@@ -208,6 +208,7 @@ exclude = ["README.md"]
 
 [dotfile_groups.git.entries]
 "~/.config/git/template" = { mode = "symlink" }
+"~/.config/git/hooks" = { mode = "symlink" }
 
 [dotfile_groups.herdr]
 root = "herdr"
@@ -229,6 +230,10 @@ dot_prefix = true
 [dotfile_groups.lazygit]
 root = "lazygit"
 target = "~/.config/jesseduffield/lazygit"
+
+[dotfile_groups.lazyjira]
+root = "lazyjira"
+target = "~/.config/lazyjira"
 
 [dotfile_groups.lazyvim]
 root = "lazyvim"
