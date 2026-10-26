@@ -188,6 +188,15 @@ type = "shell"
 command = "bash ~/.claude/hooks/subagent-viewer.sh toggle"
 description = "toggle subagent viewers"
 
+# proc's live process table for the focused pane's project; ctrl+c closes it.
+[[keys.command]]
+key = "prefix+ctrl+w"
+type = "popup"
+command = 'cd "${HERDR_ACTIVE_PANE_CWD:-$PWD}" && exec proc watch --in .'
+description = "proc: processes in this project"
+width = "80%"
+height = "80%"
+
 [ui]
 # fish/functions/herdr.fish rewrites this line for wide terminals.
 sidebar_width = 34

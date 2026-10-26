@@ -14,6 +14,7 @@ popups	prefix+t	Toggle tsk board	★
 popups	prefix+ctrl+t	tsk quick capture	★
 popups	prefix+ctrl+e	Edit tsk notes in nvim	★
 popups	prefix+shift+s	Toggle subagent viewers	★
+popups	prefix+ctrl+w	Processes in this project (proc watch)	★
 panes	ctrl+h/j/k/l	Move across herdr panes and nvim windows	★
 panes	ctrl+shift+h/j/k/l	Resize pane / nvim window	★
 panes	prefix+h/j/k	Focus pane left/down/up (prefix+l is lazygit)

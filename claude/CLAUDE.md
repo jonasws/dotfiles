@@ -27,6 +27,21 @@ Non-default tools; reach for them deliberately. Match tool to question shape, no
 - `sd` over `sed` for find & replace: global by default, no BSD `-i ''` quirk.
   Literal `$` is `$$`. Fall back to `sed`/`awk` only for line-addressed ops.
 
+## Processes and ports
+
+`proc` over `lsof`, `ps`, `pgrep` and `kill` pipelines. A target is a port (`:3000`),
+a PID, a name or a comma-separated mix; `--in .` keeps it to this project, `--json`
+prints one document, and exit 2 means nothing matched.
+
+- Look freely: `proc on :3000`, `proc why :3000`, `proc in .`, `proc orphans --in .`,
+  `proc wait :3000`.
+- `kill`, `stop`, `free`, `freeze`, `thaw` and `unstick` ask first, their `k`, `s`
+  and `u` aliases included. Stop only what this session started: the herdr server,
+  a nono supervisor or a 1Password helper share the machine. `--dry-run` shows the
+  targets before the ask.
+- Inside the sandbox other processes may be hidden. If a port you know is busy comes
+  back empty, say so rather than concluding it is free.
+
 ## Shell for the Bash tool
 
 `CLAUDE_CODE_SHELL=/opt/homebrew/bin/bash` in `~/.claude/settings.json` pins Bash
