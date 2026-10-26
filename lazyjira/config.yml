@@ -1,0 +1,46 @@
+# lazyjira configuration, linked to ~/.config/lazyjira (LAZYJIRA_CONFIG_DIR).
+# Only non-default values live here; docs/Config.md in textfuel/lazyjira has
+# the rest. Host, email and token come from the wrapper in ~/.local/bin/wrapped,
+# so there is no auth.json.
+jira:
+  serverType: cloud
+
+gui:
+  theme: catppuccin-mocha
+  issueListFields: [key, status, type, priority, assignee, updated, summary]
+  typeIcons: { Task: "T", Bug: "B", Story: "S", Epic: "E", Sub-task: "s" }
+  # The status column is one character wide, so these stand in for the lane.
+  statusIcons:
+    Backlog: "·"
+    Selected for Development: "○"
+    In Progress: "●"
+
+# The boards' saved filters: CN Ops is board 131 (filter 10467), CN Kunde is
+# board 353 (filter 10468). Jira drops a referenced filter's own ORDER BY.
+maxResults: 100
+issueTabs:
+  - name: CN Ops
+    jql: filter = 10467 AND (statusCategory = "In Progress" OR status = "Selected for Development") ORDER BY Rank ASC
+  - name: CN Kunde
+    jql: filter = 10468 AND (statusCategory = "In Progress" OR status = "Selected for Development") ORDER BY Rank ASC
+  - name: CN Ops backlog
+    jql: filter = 10467 AND status = Backlog ORDER BY Rank ASC
+    maxResults: 50
+  - name: CN Kunde backlog
+    jql: filter = 10468 AND status = Backlog ORDER BY Rank ASC
+    maxResults: 50
+  - name: Mine
+    jql: assignee = currentUser() AND statusCategory != Done ORDER BY updated DESC
+
+cache:
+  enabled: true
+  ttl: 5m
+refresh:
+  autoRefresh: true
+  interval: 2m
+
+customCommands:
+  - key: ctrl+y
+    name: Copy issue key
+    command: "printf %s {{.Key}} | pbcopy"
+    suspend: false

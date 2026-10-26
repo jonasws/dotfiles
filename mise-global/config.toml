@@ -102,6 +102,7 @@ usage = "6.9.0"
 #   ~/.local/share/mise/installs/github-smarzban-tsk/latest/tsk setup herdr
 "github:smarzban/tsk" = { version = "latest", postinstall = "\"$MISE_TOOL_INSTALL_PATH/tsk\" setup claude || true" }
 atuin = "latest"
+"aqua:textfuel/lazyjira" = "latest"
 "aqua:showwin/speedtest-go" = "latest"
 "github:RivoLink/leaf" = "latest"
 "aqua:bensadeh/tailspin" = "latest"
@@ -155,6 +156,8 @@ credential_command = "~/.local/bin/wrapped/fnox-secret MISE_GITHUB_TOKEN"
 [env]
 # mise upgrades tsk; its board banner would otherwise advise `tsk update`.
 TSK_NO_UPDATE_CHECK = "1"
+# lazyjira defaults to ~/Library/Application Support on macOS.
+LAZYJIRA_CONFIG_DIR = "{{env.HOME}}/.config/lazyjira"
 
 # Commands that must run under `fnox exec` to receive their credentials. mise
 # orders these ahead of tool directories, so the wrapper here wins over the
