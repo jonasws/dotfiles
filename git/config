@@ -74,7 +74,7 @@
 	layout = "LOCAL,BASE,REMOTE / MERGED"
 [credential "https://github.com"]
 	helper = 
-	helper = !/Users/jonasws/.local/share/mise/installs/github-cli/2.102.0/gh_2.102.0_macOS_arm64/bin/gh auth git-credential
+	helper = !gh auth git-credential
 [credential "https://gist.github.com"]
 	helper = 
-	helper = !/Users/jonasws/.local/share/mise/installs/github-cli/2.102.0/gh_2.102.0_macOS_arm64/bin/gh auth git-credential
+	helper = !gh auth git-credential
