@@ -1,5 +1,4 @@
 {
-  "idleCompaction": false,
   "env": {
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
     "ENABLE_TOOL_SEARCH": "auto",
@@ -88,11 +87,19 @@
       "Bash(op inject:*)",
       "Bash(op document get:*)",
       "Bash(fnox export:*)",
-      "Read(~/.config/twg/**)",
+      "Read(~/.config/twg/auth-profiles.json)",
+      "Read(~/.config/twg/consent.json)",
+      "Read(~/.config/twg/install.json)",
+      "Read(~/.config/twg/skills-lifecycle.json)",
+      "Read(~/.config/twg/tenant-contexts/**)",
       "Read(~/Library/Caches/twg/**)",
       "Edit(~/.config/twg/**)",
       "Edit(~/Library/Caches/twg/**)",
-      "Bash(*/.config/twg*)",
+      "Bash(*twg/auth-profiles.json*)",
+      "Bash(*twg/consent.json*)",
+      "Bash(*twg/install.json*)",
+      "Bash(*twg/skills-lifecycle.json*)",
+      "Bash(*twg/tenant-contexts*)",
       "Bash(*Library/Caches/twg*)",
       "Bash(*security find-generic-password*)",
       "Bash(*security dump-keychain*)"
@@ -123,7 +130,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "sonnet",
+  "model": "opus",
   "disableClaudeAiConnectors": true,
   "hooks": {
     "SessionStart": [
@@ -448,7 +455,11 @@
       "denyRead": [
         "~/",
         "~/dotfiles/fnox/age*.txt",
-        "~/.config/twg",
+        "~/.config/twg/auth-profiles.json",
+        "~/.config/twg/consent.json",
+        "~/.config/twg/install.json",
+        "~/.config/twg/skills-lifecycle.json",
+        "~/.config/twg/tenant-contexts",
         "~/Library/Caches/twg",
         "~/.m2/settings-security*.xml*"
       ],
@@ -463,6 +474,7 @@
         "~/.local/share/mise",
         "~/.local/state/mise",
         "~/.config/mise",
+        "~/.config/twg/skills",
         "~/.config/git",
         "~/catppuccin/delta/catppuccin.gitconfig",
         "~/.config/herdr",
@@ -506,6 +518,7 @@
   "skipDangerousModePermissionPrompt": true,
   "theme": "dark-ansi",
   "editorMode": "vim",
+  "idleCompaction": false,
   "remoteControlAtStartup": false,
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
