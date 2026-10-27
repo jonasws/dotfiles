@@ -46,6 +46,16 @@
       "skillFolderHash": "0034f4b0686e5856ab7950653f5b517bbde99a03",
       "installedAt": "2026-10-19T10:12:17.770Z",
       "updatedAt": "2026-10-19T10:12:17.770Z"
+    },
+    "proc-cli": {
+      "source": "yazeed/proc-cli",
+      "sourceType": "github",
+      "sourceUrl": "https://github.com/yazeed/proc-cli.git",
+      "skillPath": "skills/proc-cli/SKILL.md",
+      "skillFolderHash": "21317da61071cb8bb43564478945c3f52b995309",
+      "pluginName": "proc-cli",
+      "installedAt": "2026-10-27T12:07:52.433Z",
+      "updatedAt": "2026-10-27T12:07:52.433Z"
     }
   },
   "dismissed": {
