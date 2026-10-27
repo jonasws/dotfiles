@@ -356,6 +356,13 @@ root = "tuicr"
 target = "~/.config/tuicr"
 mode = "symlink"
 
+[dotfile_groups.tuios]
+# The whole directory: the keybind manager and `tuios config` rewrite
+# config.toml, and plugins.lock and themes/ are written next to it.
+root = "tuios"
+target = "~/.config/tuios"
+mode = "symlink"
+
 [dotfile_groups.wezterm]
 root = "wezterm"
 dot_prefix = true

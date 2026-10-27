@@ -1,0 +1,275 @@
+# tuios configuration, linked to ~/.config/tuios/config.toml.
+# `tuios list-options` and the docs at https://tuios.dev/docs/configuration
+# have every key. Keys here mirror herdr/config.toml where tuios has a match:
+# a herdr workspace is a tuios session, a herdr tab a tuios workspace, a herdr
+# pane a tuios window.
+
+# A config file that leaves `daemon` and `tiled` out reads them as false, the
+# floating, standalone start of tuios before 0.8. Both stay spelled out even
+# though they match the documented defaults.
+[startup]
+daemon = true
+tiled = true
+layout = "bsp"
+# herdr has no window mode: keys go to the pane, and the prefix does the rest.
+start_in_terminal_mode = true
+
+[appearance]
+theme = "catppuccin_mocha"
+# Catppuccin Mocha mauve, herdr's accent, and surface1.
+border_focused_color = "#cba6f7"
+border_unfocused_color = "#45475a"
+# Split across the longer side, so a new pane on a wide screen goes right and
+# on a tall one goes down, close to picking herdr's split direction by hand.
+tiling_scheme = "longest_side"
+
+# herdr's sidebar sits on the left.
+[appearance.sidebar]
+position = "left"
+width = 34
+
+[keybindings]
+# Option is the us-altgr-intl compose layer, so the characters it types go to
+# the pane and never run an alt+ binding.
+option_glyphs = "type"
+
+# ctrl+p belongs to fish and Neovim, alt+space to text. The palette stays on
+# prefix+P.
+[keybindings.global]
+command_palette = []
+launcher = []
+
+[keybindings.prefix_mode]
+# herdr: prefix+v splits right and prefix+c opens a tab (a tuios workspace).
+prefix_split_vertical = ["v", "|", "\\"]
+# herdr: prefix+1..9 picks a tab.
+switch_workspace_1 = ["1"]
+switch_workspace_2 = ["2"]
+switch_workspace_3 = ["3"]
+switch_workspace_4 = ["4"]
+switch_workspace_5 = ["5"]
+switch_workspace_6 = ["6"]
+switch_workspace_7 = ["7"]
+switch_workspace_8 = ["8"]
+switch_workspace_9 = ["9"]
+prefix_select_0 = []
+prefix_select_1 = []
+prefix_select_2 = []
+prefix_select_3 = []
+prefix_select_4 = []
+prefix_select_5 = []
+prefix_select_6 = []
+prefix_select_7 = []
+prefix_select_8 = []
+prefix_select_9 = []
+prefix_review = ["ctrl+v"]
+prefix_new_window = []
+new_workspace = ["c"]
+next_workspace = ["n"]
+prev_workspace = ["p"]
+prefix_next_window = ["tab"]
+prefix_prev_window = ["shift+tab"]
+# herdr: prefix+q detaches, prefix+g is Go To, prefix+w picks a workspace.
+prefix_detach = ["d", "q"]
+prefix_quit = []
+choose_tree = ["g", "/"]
+toggle_scratch = ["G"]
+prefix_session_switcher = ["w"]
+prefix_workspace = ["ctrl+w"]
+# herdr: prefix+ctrl+n/p step through workspaces, here sessions.
+next_session = ["ctrl+n", ")"]
+prev_session = ["ctrl+p", "("]
+# herdr: prefix+a steps to the next agent. Here it goes to the oldest one that
+# needs you, and prefix+A to the newest finished turn.
+prefix_next_attention = ["a", "o"]
+launcher = ["ctrl+a"]
+prefix_next_finished = ["A"]
+prefix_agents_settings = []
+clear_scrollback = ["ctrl+l"]
+# Freed for the command keys below, which a tuios action would otherwise win.
+prefix_layout = ["ctrl+o"]
+prefix_window = ["T"]
+prefix_tape = []
+prefix_toggle_other_rail = []
+prefix_file_search = ["ctrl+f"]
+prefix_rename_window = ["ctrl+r"]
+
+# Like herdr, nothing but the prefix and the command keys below is taken from
+# the pane. Focus moves on ctrl+hjkl, windows and tabs on the prefix.
+[keybindings.terminal_mode]
+terminal_exit_mode = []
+terminal_focus_left = []
+terminal_focus_down = []
+terminal_focus_up = []
+terminal_focus_right = []
+terminal_next_window = []
+terminal_prev_window = []
+
+[keybindings.workspaces]
+switch_workspace_1 = []
+switch_workspace_2 = []
+switch_workspace_3 = []
+switch_workspace_4 = []
+switch_workspace_5 = []
+switch_workspace_6 = []
+switch_workspace_7 = []
+switch_workspace_8 = []
+switch_workspace_9 = []
+move_and_follow_1 = []
+move_and_follow_2 = []
+move_and_follow_3 = []
+move_and_follow_4 = []
+move_and_follow_5 = []
+move_and_follow_6 = []
+move_and_follow_7 = []
+move_and_follow_8 = []
+move_and_follow_9 = []
+send_to_workspace_1 = []
+send_to_workspace_2 = []
+send_to_workspace_3 = []
+send_to_workspace_4 = []
+send_to_workspace_5 = []
+send_to_workspace_6 = []
+send_to_workspace_7 = []
+send_to_workspace_8 = []
+send_to_workspace_9 = []
+
+[keybindings.window_management]
+next_session = []
+prev_session = []
+
+# herdr-splits: ctrl+hjkl moves and ctrl+shift+hjkl resizes across panes and
+# Neovim windows. It runs unchanged through the herdr compat API, once enabled
+# from a terminal outside tuios: `tuios plugins enable herdr-splits`.
+[[keybindings.command]]
+key = "ctrl+h"
+type = "plugin_action"
+command = "herdr-splits.nav-left"
+
+[[keybindings.command]]
+key = "ctrl+j"
+type = "plugin_action"
+command = "herdr-splits.nav-down"
+
+[[keybindings.command]]
+key = "ctrl+k"
+type = "plugin_action"
+command = "herdr-splits.nav-up"
+
+[[keybindings.command]]
+key = "ctrl+l"
+type = "plugin_action"
+command = "herdr-splits.nav-right"
+
+[[keybindings.command]]
+key = "ctrl+shift+h"
+type = "plugin_action"
+command = "herdr-splits.resize-left"
+
+[[keybindings.command]]
+key = "ctrl+shift+j"
+type = "plugin_action"
+command = "herdr-splits.resize-down"
+
+[[keybindings.command]]
+key = "ctrl+shift+k"
+type = "plugin_action"
+command = "herdr-splits.resize-up"
+
+[[keybindings.command]]
+key = "ctrl+shift+l"
+type = "plugin_action"
+command = "herdr-splits.resize-right"
+
+# The herdr popups and pickers, through scripts/as-herdr.sh, which hands them
+# the herdr variables they read. ctrl+alt+k is what WezTerm sends for Cmd+K.
+[[keybindings.command]]
+key = "prefix+f"
+name = "pane-picker"
+type = "popup"
+command = "~/.config/tuios/scripts/as-herdr.sh tv herdr-sessions"
+description = "Pane picker"
+width = "90%"
+height = "80%"
+
+[[keybindings.command]]
+key = "ctrl+alt+k"
+name = "pane-picker-cmd-k"
+type = "popup"
+command = "~/.config/tuios/scripts/as-herdr.sh tv herdr-sessions"
+description = "Pane picker"
+width = "90%"
+height = "80%"
+
+[[keybindings.command]]
+key = "prefix+l"
+type = "popup"
+command = "~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/lazygit-popup.sh status"
+description = "lazygit: status"
+
+[[keybindings.command]]
+key = "prefix+L"
+type = "popup"
+command = "~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/lazygit-popup.sh log"
+description = "lazygit: log"
+
+[[keybindings.command]]
+key = "prefix+y"
+type = "popup"
+command = "~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/yazi-popup.sh"
+description = "yazi: browse"
+
+[[keybindings.command]]
+key = "prefix+Y"
+type = "popup"
+command = "~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/yazi-popup.sh pick"
+description = "yazi: pick files into pane"
+
+# Enter opens or focuses a session for the repo.
+[[keybindings.command]]
+key = "prefix+r"
+type = "popup"
+command = "~/.config/tuios/scripts/as-herdr.sh tv git-repos -k 'enter=\"actions:workspace\"'"
+description = "Git repo picker"
+width = "90%"
+
+[[keybindings.command]]
+key = "prefix+H"
+type = "popup"
+command = "tv hotkeys"
+description = "Hotkeys"
+width = "90%"
+
+[[keybindings.command]]
+key = "prefix+O"
+type = "popup"
+command = "tv aws-profiles"
+description = "AWS profiles"
+
+# tsk board, through the herdr-tsk plugin (`tuios plugins enable herdr-tsk`).
+[[keybindings.command]]
+key = "prefix+t"
+type = "shell"
+command = "~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/tsk-toggle.sh"
+description = "Toggle tsk board"
+
+[[keybindings.command]]
+key = "prefix+ctrl+t"
+type = "plugin_action"
+command = "herdr-tsk.quick-capture"
+description = "tsk quick capture"
+
+[[keybindings.command]]
+key = "prefix+ctrl+e"
+type = "popup"
+command = "~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/tsk-notes.sh"
+description = "Edit tsk notes in nvim"
+
+[[keybindings.command]]
+key = "prefix+S"
+type = "shell"
+command = "~/.config/tuios/scripts/as-herdr.sh bash ~/.claude/hooks/subagent-viewer.sh toggle"
+description = "Toggle subagent viewers"
+
+[plugins]
+enabled = ["herdr-splits", "herdr-tsk"]
