@@ -7,7 +7,9 @@ description: >-
   remote call: the Context7 API for library/SDK/CLI docs, the aws-knowledge MCP for AWS,
   the github MCP for repo-specific source and history, Claude Code's own docs site for
   Claude Code itself, exa for everything else. Surveys across many sources (comparisons,
-  "what exists for X") go to the `researcher` subagent; see the skill.
+  "what exists for X") go to the `researcher` subagent; see the skill. Not for the
+  company's own Atlassian data (Jira, Confluence, Bitbucket, internal research): that is
+  the `twg` skill's job, and the skill says where the line falls.
 
   Use whenever exact signatures, config options, version-specific behavior, error
   strings, release timing, or current facts matter and training data may be stale —
@@ -34,6 +36,7 @@ From there the only question is which door. Picking wrong costs twice: a wasted 
 | AWS — service behavior, API/CLI params, CloudFormation/CDK, regional availability | aws-knowledge MCP | `aws___search_documentation` |
 | Claude Code itself — settings, env vars, slash commands, hooks, compaction, caching, output styles, plugins | code.claude.com docs, locally | grep `llms.txt`, then `read-page.sh` the `.md` pages — see [Claude Code](#claude-code--its-own-documentation) |
 | A specific repo or org (never `nsbno` — see below) — source, issues, PRs, releases, changelogs, "when did this change" | github MCP | `search_code`, `search_issues`, `list_releases` |
+| The company's own Atlassian data — Jira issues, Confluence pages, Bitbucket PRs, owners, status, internal research | `twg` skill, not a backend here | load `twg`; see [twg](#twg--the-companys-own-atlassian-data) |
 | Everything else — news, comparisons, ecosystem questions, "does a tool exist for X" | exa MCP | `web_search_exa` |
 | Reading a URL you already have | `read-page.sh`, locally | `read-page.sh -o page.md <url>`: the server's markdown, else HTML via `defuddle`; then grep — see [Reading a page](#reading-a-page) |
 
@@ -170,6 +173,45 @@ One escape from there:
 - **`web_fetch_exa`** for the client-rendered case `defuddle` cannot reach, or several URLs in one call. Always pass `maxCharacters`: omitting it truncates at about 3000 characters — silently, mid-sentence — and no env var or config changes that default. Exa bills `/contents` per page rather than per character, so raising it costs nothing in money; what it costs is context, because this result lands in the conversation and cannot be grepped first. Around 25000 is a working figure for reading a page properly. Wanting much more than that is the signal to go back to `defuddle` and a file: one large documentation page came back as 285,798 characters, roughly 71k tokens, which is most of a context window spent on a single fetch. And whatever the cap, this is the wrong tool for "list every X", where a truncated answer is indistinguishable from a complete one.
 
 When the URL came from a search you just ran, reconsider the order: `web_search_advanced_exa` returns each result's full text in the search call itself, so searching and then fetching each hit pays twice for what one call already had.
+
+## twg — the company's own Atlassian data
+
+`twg` is the Teamwork Graph CLI, logged in to the company's Atlassian site. Its skills (`twg`
+and the `twg-*` companions in `~/.claude/skills`) are not a backend of this skill: they
+read private, authenticated company data, where this skill reads public documentation.
+Hand off rather than searching the open web for something only the company knows.
+
+| The question | Go to |
+|---|---|
+| A Jira issue, board, sprint or project; a Confluence page or space; a Bitbucket PR | `twg` (it routes to `twg-jira`, `twg-confluence`, `twg-engineering-work`) |
+| Who owns, approves or is the SME for something | `twg` → `twg-responsibility-routing` |
+| Status of a project or person, "catch me up", go/no-go | `twg` → `twg-status-rollups`, `twg-context-discovery` |
+| Incidents, on-call, reliability | `twg` → `twg-operational-health` |
+| "Find out what we know internally about X" across Confluence, Jira, Slack, Drive | `twg` → `twg-agentic-search` |
+| How twg itself works: a flag, a command, what it costs | here. Read developer.atlassian.com/platform/teamwork-graph/twg-cli, or `twg help <command>` |
+| A public library, AWS service, open-source repo or web topic | the backends above, even when the work happens in a Jira or Confluence context |
+
+Rules of thumb:
+
+- **Load `twg` first and let it route.** It picks the companion skill; do not load the
+  `twg-*` skills directly unless `twg` told you to.
+- **Company or public decides it, not the topic.** "How does http4k filter work" is
+  Context7 whether or not a Confluence page also mentions it. "What did we decide about
+  our http4k filters" is twg.
+- **Questions that need both** go in two steps: public docs here, company context
+  through twg, then combine. Mark which claim came from which.
+- **Private-org source code** stays in the local clones (CLAUDE.md's GitHub section).
+  `twg search-code` may index Bitbucket or connected GitHub, but whether it covers
+  those orgs is unverified; try it only when a clone is missing, and say what the
+  index covered.
+- **Billing.** Plain reads and writes (`twg jira workitem get`, `twg confluence content
+  get`) are free. Enriched commands (`twg context …`, `twg docs get|query`,
+  `twg collaborators`, Rovo search) spend Rovo credits, up to 10 per call. Prefer the
+  plain read when it answers the question, and check `twg help <command>` for the
+  `[Enriched]` label.
+- **Permissions.** Every `twg` call prompts (`ask`), and its credential directories are
+  unreadable to the agent. Never try to read them; if auth fails, ask the user to run
+  `twg setup`.
 
 ## When a backend misses
 
