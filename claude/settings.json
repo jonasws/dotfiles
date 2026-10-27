@@ -88,8 +88,14 @@
       "Bash(op inject:*)",
       "Bash(op document get:*)",
       "Bash(fnox export:*)",
-      "Bash(twg:*)",
-      "Read(~/.config/twg/**)"
+      "Read(~/.config/twg/**)",
+      "Read(~/Library/Caches/twg/**)",
+      "Edit(~/.config/twg/**)",
+      "Edit(~/Library/Caches/twg/**)",
+      "Bash(*/.config/twg*)",
+      "Bash(*Library/Caches/twg*)",
+      "Bash(*security find-generic-password*)",
+      "Bash(*security dump-keychain*)"
     ],
     "ask": [
       "Bash(docker * --network host*)",
@@ -112,7 +118,8 @@
       "Bash(herdr pane send-text *)",
       "Bash(herdr server *)",
       "Bash(herdr tab close *)",
-      "Bash(herdr workspace close *)"
+      "Bash(herdr workspace close *)",
+      "Bash(twg:*)"
     ],
     "defaultMode": "auto"
   },
@@ -441,6 +448,8 @@
       "denyRead": [
         "~/",
         "~/dotfiles/fnox/age*.txt",
+        "~/.config/twg",
+        "~/Library/Caches/twg",
         "~/.m2/settings-security*.xml*"
       ],
       "allowRead": [
