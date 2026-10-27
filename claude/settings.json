@@ -144,6 +144,24 @@
             "async": true
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/sh -c 'rex __internal session-start --agent claude 2>/dev/null || true'",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "SubagentStart": [
@@ -156,6 +174,15 @@
             "async": true
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "SessionEnd": [
@@ -164,6 +191,15 @@
           {
             "type": "command",
             "command": "bash '/Users/jonasws/.claude/hooks/subagent-viewer.sh' end",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
             "timeout": 5
           }
         ]
@@ -179,6 +215,15 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PostToolUse": [
@@ -191,6 +236,15 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
+            "timeout": 5
+          }
+        ]
       }
     ],
     "PostToolUseFailure": [
@@ -200,6 +254,103 @@
           {
             "type": "command",
             "command": "~/.local/share/mise/installs/atuin/latest/atuin-aarch64-apple-darwin/atuin hook claude-code",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "PermissionRequest": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
+            "timeout": 310
+          }
+        ]
+      }
+    ],
+    "PermissionDenied": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "ElicitationResult": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "StopFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "tuios agent-hook claude-code --integration 3",
             "timeout": 5
           }
         ]
