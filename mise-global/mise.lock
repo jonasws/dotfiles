@@ -841,6 +841,15 @@ checksum = "sha256:94ae7177d499f74e7544243ffe9c82371183ca11a6363f198a4b3d0e29f82
 url = "https://github.com/alexpasmantier/television/releases/download/0.15.9/tv-0.15.9-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/alexpasmantier/television/releases/assets/447568866"
 
+[[tools.twg]]
+version = "1.3.9"
+backend = "http:twg"
+specifiers = ["latest"]
+
+[tools.twg."platforms.macos-arm64"]
+checksum = "blake3:0cfbab741218db73a4387cf3fd367645e186d210211e0be508c3769a62a25bc1"
+url = "https://teamwork-graph.atlassian.com/cli/twg-darwin-arm64-v1.3.9"
+
 [[tools.usage]]
 version = "6.9.0"
 backend = "packslip:github.com/jdx/usage"
