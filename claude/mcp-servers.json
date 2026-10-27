@@ -1,0 +1,50 @@
+{
+  "atuin": {
+    "type": "stdio",
+    "command": "$HOME/.local/share/mise/installs/atuin/latest/atuin-aarch64-apple-darwin/atuin",
+    "args": ["mcp"],
+    "env": {}
+  },
+  "aws-knowledge": {
+    "type": "http",
+    "url": "https://knowledge-mcp.global.api.aws"
+  },
+  "exa": {
+    "type": "stdio",
+    "command": "$HOME/.local/bin/wrapped/exa-mcp-server",
+    "args": [],
+    "env": {
+      "ENABLED_TOOLS": "web_search_exa,web_fetch_exa,web_search_advanced_exa,agent_run"
+    }
+  },
+  "fff": {
+    "type": "stdio",
+    "command": "$HOME/.local/share/mise/installs/github-dmtr-kovalenko-fff/latest/fff-mcp",
+    "args": ["--no-update-check"],
+    "env": {}
+  },
+  "github": {
+    "type": "stdio",
+    "command": "$HOME/.local/bin/wrapped/github-mcp-server",
+    "args": ["stdio"],
+    "env": {}
+  },
+  "journey": {
+    "type": "http",
+    "url": "http://localhost:8765/mcp"
+  },
+  "ruteplan": {
+    "type": "http",
+    "url": "https://ruteplan-mcp.trafficinfo.vydev.io/mcp"
+  },
+  "semble": {
+    "type": "stdio",
+    "command": "uvx",
+    "args": ["--from", "semble[mcp]", "semble"],
+    "env": {}
+  },
+  "superlogical": {
+    "type": "http",
+    "url": "https://www.superlogical.com/rex/community-mcp"
+  }
+}

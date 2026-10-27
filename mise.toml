@@ -111,6 +111,23 @@ run = [
   "brew list --versions | sort > homebrew/Brewfile.versions",
 ]
 
+[tasks."sync:claude-mcp"]
+description = "Merge claude/mcp-servers.json into the user-scope MCP servers in ~/.claude.json"
+# ~/.claude.json also holds session history and OAuth state, so it cannot be
+# linked from here. Declared servers overwrite same-named entries; servers
+# added by hand stay. $HOME in the JSON is expanded here, not by Claude Code.
+# Written via a temp file and rename so a running session never reads half a file.
+run = """
+set -euo pipefail
+target="$HOME/.claude.json"
+tmp="$(mktemp "$target.XXXXXX")"
+jq --arg home "$HOME" --slurpfile servers '{{config_root}}/claude/mcp-servers.json' \
+  '.mcpServers = ((.mcpServers // {}) + ($servers[0] | walk(if type == "string" then gsub("\\\\$HOME"; $home) else . end)))' \
+  "$target" > "$tmp"
+chmod 600 "$tmp"
+mv "$tmp" "$target"
+"""
+
 [tasks.update]
 description = "Daily upgrade, then show what changed"
 depends = ["update:brew", "update:mise", "update:skills", "update:herdr-plugins", "update:yazi", "update:nvim"]
@@ -157,6 +174,8 @@ target = "~/.config/bat"
 [dotfile_groups.claude]
 root = "claude"
 target = "~/.claude"
+# Read by sync:claude-mcp, not by Claude Code.
+exclude = ["mcp-servers.json"]
 
 # ~/.claude/skills also holds skills installed from elsewhere, so each skill
 # kept here is linked on its own rather than the whole directory.
