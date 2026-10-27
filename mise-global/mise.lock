@@ -50,14 +50,14 @@ url_api = "https://api.github.com/repos/FiloSottile/age/releases/assets/53554189
 provenance = "github-attestations"
 
 [[tools."aqua:anthropics/claude-code"]]
-version = "2.1.310"
+version = "2.1.311"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
 [tools."aqua:anthropics/claude-code"."platforms.macos-arm64"]
-checksum = "sha256:cf47d30004ff26e5cfed6004a29ca94e05ad53d6f890ee1be8bb582e8ce2a5b5"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.310/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/670426479"
+checksum = "sha256:28dc437c4530e4fbd5e4f8924119cb001c332b64de5e817b35898c39ec107155"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.311/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/679248777"
 
 [[tools."aqua:asciinema/asciinema"]]
 version = "3.2.1"
@@ -226,13 +226,13 @@ checksum = "blake3:d10419d5ff12642d628f3cca6661628071b36c73e9f4a452b026f73b4959b
 url = "https://download.docker.com/mac/static/stable/aarch64/docker-29.9.2.tgz"
 
 [[tools.fnox]]
-version = "1.42.1"
+version = "1.43.0"
 backend = "packslip:github.com/jdx/fnox"
 specifiers = ["latest"]
 
 [tools.fnox."platforms.macos-arm64"]
-checksum = "sha256:06cd00e066958d49d96ae137f2162b92cfb0a66e4eb5a9e6efad32a306bf8b95"
-url = "https://github.com/jdx/fnox/releases/download/v1.42.1/fnox-aarch64-apple-darwin.tar.gz"
+checksum = "sha256:34e69cd24a7605c00ee0e9edce39d8f32b6e68c857c05ad4bb376716c598e66d"
+url = "https://github.com/jdx/fnox/releases/download/v1.43.0/fnox-aarch64-apple-darwin.tar.gz"
 signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [[tools.fzf]]
@@ -266,15 +266,26 @@ checksum = "sha256:4284325e09e3e2bd62eea76e803701d81750619f951956e5698d208c37c9b
 url = "https://github.com/BurntSushi/bttf/releases/download/0.1.4/bttf-0.1.4-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/BurntSushi/bttf/releases/assets/432196770"
 
+[[tools."github:Gaurav-Gosain/tuios"]]
+version = "0.11.1"
+backend = "github:Gaurav-Gosain/tuios"
+specifiers = ["latest"]
+
+[tools."github:Gaurav-Gosain/tuios"."platforms.macos-arm64"]
+checksum = "sha256:9f64c873d4c69c4797136960349eb32aac5daf5aeeab4c15f5605f80cdf86458"
+checksum_source = "mise-versions"
+url = "https://github.com/Gaurav-Gosain/tuios/releases/download/v0.11.1/tuios_0.11.1_Darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/Gaurav-Gosain/tuios/releases/assets/678224122"
+
 [[tools."github:RivoLink/leaf"]]
-version = "1.29.1"
+version = "1.29.2"
 backend = "github:RivoLink/leaf"
 specifiers = ["latest"]
 
 [tools."github:RivoLink/leaf"."platforms.macos-arm64"]
-checksum = "sha256:c35a30d42600cc9574b44a39ed71fcf382f8513bf58ceb6cd11b9980b49f130c"
-url = "https://github.com/RivoLink/leaf/releases/download/1.29.1/leaf-macos-arm64"
-url_api = "https://api.github.com/repos/RivoLink/leaf/releases/assets/641708748"
+checksum = "sha256:940b0fcbb57e8fafab0c2ae8a19cee6cefede1e61f72a76a2d93553ae503d85a"
+url = "https://github.com/RivoLink/leaf/releases/download/1.29.2/leaf-macos-arm64"
+url_api = "https://api.github.com/repos/RivoLink/leaf/releases/assets/675966700"
 
 [[tools."github:achristmascarl/rainfrog"]]
 version = "0.4.6"
@@ -287,14 +298,14 @@ url = "https://github.com/achristmascarl/rainfrog/releases/download/v0.4.6/rainf
 url_api = "https://api.github.com/repos/achristmascarl/rainfrog/releases/assets/586344632"
 
 [[tools."github:agavra/tuicr"]]
-version = "0.27.0"
+version = "0.28.0"
 backend = "github:agavra/tuicr"
 specifiers = ["latest"]
 
 [tools."github:agavra/tuicr"."platforms.macos-arm64"]
-checksum = "sha256:170b2e5290435faaf663c9498b1385493df7c336646b74c9336388844e028dcf"
-url = "https://github.com/agavra/tuicr/releases/download/v0.27.0/tuicr-0.27.0-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/agavra/tuicr/releases/assets/584424400"
+checksum = "sha256:4138f2d243422aff68b32ec52fb1524cbadffcf6763b34fc180f25f0ac971674"
+url = "https://github.com/agavra/tuicr/releases/download/v0.28.0/tuicr-0.28.0-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/agavra/tuicr/releases/assets/677485838"
 
 [[tools."github:always-further/nono"]]
 version = "0.80.0"
@@ -495,6 +506,17 @@ checksum = "sha256:f538960fdbfc5a5ea6effd59b0874e0ad87277a69b731ff2e4487689466a7
 url = "https://github.com/walles/moor/releases/download/v2.19.5/moor-v2.19.5-darwin-arm64"
 url_api = "https://api.github.com/repos/walles/moor/releases/assets/647837788"
 
+[[tools."github:yazeed/proc-cli"]]
+version = "1.14.5"
+backend = "github:yazeed/proc-cli"
+specifiers = ["latest"]
+
+[tools."github:yazeed/proc-cli"."platforms.macos-arm64"]
+checksum = "sha256:c0c58f9786267ad3ea034a01cda6086b831f462cf3be7a64d90913193f60e976"
+url = "https://github.com/yazeed/proc-cli/releases/download/v1.14.5/proc-darwin-aarch64.tar.gz"
+url_api = "https://api.github.com/repos/yazeed/proc-cli/releases/assets/676745436"
+provenance = "github-attestations"
+
 [[tools.gitu]]
 version = "0.43.0"
 backend = "aqua:altsem/gitu"
@@ -630,7 +652,7 @@ checksum = "sha512:908b1501bfb420bf7c8affb855534a9c407fd6099367bfb9f2f2dcb8e9799
 url = "https://archive.apache.org/dist/maven/maven-3/3.10.0/binaries/apache-maven-3.10.0-bin.tar.gz"
 
 [[tools.mitmproxy]]
-version = "12.3.0"
+version = "12.3.1"
 backend = "pypi:mitmproxy"
 specifiers = ["latest"]
 
@@ -744,13 +766,13 @@ url = "https://github.com/pre-commit/pre-commit/releases/download/v4.7.0/pre-com
 url_api = "https://api.github.com/repos/pre-commit/pre-commit/releases/assets/637459099"
 
 [[tools.python]]
-version = "3.15.1"
+version = "3.15.2"
 backend = "core:python"
 specifiers = ["latest"]
 
 [tools.python."platforms.macos-arm64"]
-checksum = "sha256:1a4eb4d5aa82400de6eeb94e6fc6d870f5fabc97eb1d801f7eeba8072117b11c"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261021/cpython-3.15.1+20261021-aarch64-apple-darwin-install_only_stripped.tar.gz"
+checksum = "blake3:20b7ad4c4944023af58dee5d5ce5551509b1bbd13c4bb62534005b9ff43ed674"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20261026/cpython-3.15.2+20261026-aarch64-apple-darwin-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [[tools.rust]]
