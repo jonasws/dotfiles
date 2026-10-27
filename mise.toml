@@ -287,6 +287,10 @@ root = "presenterm"
 target = "~/.config/presenterm"
 mode = "symlink"
 
+[dotfile_groups.rex]
+root = "rex"
+target = "~/.config/rex"
+
 [dotfile_groups.ripgrep]
 root = "ripgrep"
 dot_prefix = true
