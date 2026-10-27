@@ -4,7 +4,7 @@
 
 -- Inside a herdr session herdr-splits.nvim owns these chords so they cross the
 -- Neovim/herdr-pane boundary; outside one smart-splits.nvim does the same job
--- against wezterm. Both expose move_cursor_* and resize_*, so the bindings below
+-- against Rex panes. Both expose move_cursor_* and resize_*, so the bindings below
 -- are identical either way — only the backend differs.
 local in_herdr = vim.env.HERDR_ENV == "1"
 local mc = require("util.multicursor")
