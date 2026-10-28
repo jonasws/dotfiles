@@ -169,3 +169,8 @@ rex.bind("ctrl+cmd+[", "previous_agent")
 rex.bind("ctrl+b>a", "next_agent")
 rex.bind("ctrl+b>shift+a", "previous_agent")
 rex.bind("ctrl+b>ctrl+b", "pane.send_key", { key = "ctrl+b" })
+
+-- herdr's command keys (herdr.lua), behind herdr's ctrl+b prefix: ctrl+b then
+-- shift+f for herdr-f1, f or Cmd+K for the pane picker. The table is
+-- television/hotkeys/rex.tsv.
+require("herdr").bind()
