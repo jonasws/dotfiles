@@ -1,0 +1,8 @@
+#!/bin/sh
+# herdr/ctl.mjs with node from PATH, or from mise when Rex starts it outside
+# an interactive shell.
+dir=$(dirname "$(realpath "$0")")
+if command -v node >/dev/null 2>&1; then
+  exec node "$dir/ctl.mjs" "$@"
+fi
+exec mise exec node@24 -- node "$dir/ctl.mjs" "$@"
