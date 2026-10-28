@@ -18,18 +18,6 @@ M.PROTOCOL = 22
 
 -- ── Calling Rex ────────────────────────────────────────────────────────────
 
--- Calls a method with each argument table in turn until one is accepted.
--- Where the docs leave an argument name open, the likeliest goes first.
-function M.try(method, ...)
-  local last
-  for i = 1, select("#", ...) do
-    local result, err = rex.call(method, (select(i, ...)))
-    if result ~= nil then return result end
-    last = err
-  end
-  return nil, last
-end
-
 function M.session_call(method, session_id, args)
   args = args or {}
   args.session_id = session_id
@@ -506,6 +494,51 @@ function M.neighbor(layout, pane_id, direction)
     end
   end
   return best
+end
+
+local function first_leaf(node)
+  if type(node) ~= "table" then return nil end
+  if node.block_id then return node.block_id end
+  for _, child in ipairs(children(node)) do
+    local leaf = first_leaf(child)
+    if leaf then return leaf end
+  end
+end
+
+local function holds(node, block_id)
+  if type(node) ~= "table" then return false end
+  if node.block_id then return node.block_id == block_id end
+  for _, child in ipairs(children(node)) do
+    if holds(child, block_id) then return true end
+  end
+  return false
+end
+
+-- The border session.resize_pane needs to grow `block_id` toward `direction`:
+-- the nearest split on that axis with the block on the opposite side. Returns
+-- Rex's direction, a block on each side, and the split's current ratio.
+function M.border(session_id, block_id, direction)
+  local view = M.view(session_id)
+  local block = view.blocks[block_id]
+  local window = block and view.windows[block.window_id]
+  if not window then return nil end
+  local across = direction == "left" or direction == "right"
+  local pane_first = direction == "right" or direction == "down"
+  local found
+  local function descend(node)
+    local split = split_of(node)
+    if split and #sides(node) == 2 then
+      local in_a, in_b = holds(split.a, block_id), holds(split.b, block_id)
+      if (in_a or in_b) and split.across == across and in_a == pane_first then
+        found = { direction = across and "horizontal" or "vertical", before = first_leaf(split.a), after = first_leaf(split.b), ratio = split.ratio }
+      end
+    end
+    for _, child in ipairs(children(node)) do
+      if holds(child, block_id) then descend(child) end
+    end
+  end
+  descend(window.node)
+  return found
 end
 
 -- ── Finding things by herdr id ─────────────────────────────────────────────

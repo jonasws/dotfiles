@@ -60,7 +60,7 @@ return function(H)
     local owner = plugins.pane_owner(params.pane_id)
     local p = H.pane(params.pane_id)
     if not owner or not p then return H.fail("plugin_pane_not_found", "no plugin pane " .. tostring(params.pane_id)) end
-    model.try("block.close", { session_id = p.session_id, block_id = p.block_id })
+    rex.call("block.close", { session_id = p.session_id, block_id = p.block_id })
     plugins.forget_pane(params.pane_id)
     model.invalidate(p.session_id, p.block_id)
     return { type = "plugin_pane_closed", pane_id = params.pane_id }
