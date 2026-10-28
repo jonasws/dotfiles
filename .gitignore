@@ -23,3 +23,5 @@ television/cable/*
 /.tmp
 /superfile/theme
 /fnox/age-se.txt
+
+karabiner-ts/node_modules/
