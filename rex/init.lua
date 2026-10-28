@@ -170,6 +170,53 @@ rex.bind("ctrl+b>a", "next_agent")
 rex.bind("ctrl+b>shift+a", "previous_agent")
 rex.bind("ctrl+b>ctrl+b", "pane.send_key", { key = "ctrl+b" })
 
+-- Rex has no copy mode yet, so Ctrl+B e stands in for herdr's edit_scrollback.
+-- It snapshots the pane's screen and scrollback into a floating $EDITOR (Neovim
+-- by default) with the cursor on the last line. buftype=nofile keeps the buffer
+-- editable but refuses :w and never counts as modified, so you can reshape text
+-- before yanking it and :q closes without a warning. A full-screen program has
+-- no scrollback, so inside one the snapshot is just its screen.
+rex.action({
+  name = "edit_scrollback",
+  title = "Edit Scrollback in $EDITOR",
+  run = function()
+    local shot = rex.block.call("com.superlogical.terminal", "format", {
+      format = "text",
+      trim = true,
+      unwrap = true,
+    })
+    if not shot or not shot.content then
+      return
+    end
+    local path = os.tmpname()
+    local file = io.open(path, "w")
+    if not file then
+      return
+    end
+    file:write(shot.content)
+    file:close()
+    rex.session.new_layer({
+      bounds = { 0.04, 0.04, 0.92, 0.92 },
+      focus = true,
+      layout = {
+        block = {
+          flavor = "com.superlogical.terminal.shell",
+          label = "scrollback",
+          options = {
+            command = {
+              "sh", "-c",
+              'f=$1; "${EDITOR:-nvim}" -n -c "setlocal buftype=nofile" + "$f"; rm -f "$f"',
+              "sh", path,
+            },
+          },
+        },
+      },
+    })
+  end,
+})
+
+rex.bind("ctrl+b>e", "edit_scrollback")
+
 -- herdr's command keys (herdr.lua), behind herdr's ctrl+b prefix: ctrl+b then
 -- shift+f for herdr-f1, f or Cmd+K for the pane picker. The table is
 -- television/hotkeys/rex.tsv.
