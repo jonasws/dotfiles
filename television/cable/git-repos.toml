@@ -44,3 +44,12 @@ description = "Open as a Herdr workspace, or focus it if already open"
 command = "~/.config/television/scripts/herdr-workspace.sh '{}'"
 shell = "bash"
 mode = "execute"
+
+# Rex's ctrl+b>r passes `-k 'enter="actions:rex"'`. A Rex session plays a
+# herdr workspace's part, so a repo opens as a tab of the current one; the
+# open_repo action lives in rex/herdr.lua.
+[actions.rex]
+description = "Open as a Rex tab, or focus it if already open"
+command = "rex do open_repo path='{}'"
+shell = "bash"
+mode = "execute"

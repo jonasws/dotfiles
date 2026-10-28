@@ -1,0 +1,24 @@
+# section	key	description	custom
+# Prefix is ctrl+b, as in herdr. Mine (★) come from rex/init.lua and rex/herdr.lua.
+pickers	prefix+f / cmd+k	Pane picker over Rex's herdr socket (tv herdr-sessions)	★
+pickers	prefix+r	Git repo picker, Enter opens or focuses a tab	★
+pickers	prefix+shift+h	Hotkeys cheat sheet (tv hotkeys)	★
+pickers	prefix+shift+o	AWS profile picker → console	★
+pickers	prefix+shift+f	herdr-f1 dashboard in the browser	★
+pickers	cmd+shift+p / cmd+p	Command palette	★
+popups	prefix+l	lazygit status in a zoomed pane	★
+popups	prefix+shift+l	lazygit log in a zoomed pane	★
+popups	prefix+y	yazi in a zoomed pane	★
+popups	prefix+shift+y	yazi, Enter types the picks into the pane	★
+popups	prefix+t	Toggle tsk board (herdr-tsk plugin)	★
+popups	prefix+ctrl+t	tsk quick capture	★
+popups	prefix+ctrl+e	Edit tsk notes in nvim	★
+popups	prefix+shift+s	Toggle subagent viewers	★
+panes	cmd+d	Split down	★
+panes	cmd+r	Split right	★
+panes	ctrl+h/j/k/l	Move across Rex panes and nvim windows	★
+panes	ctrl+shift+h/j/k/l	Resize pane / nvim window	★
+panes	cmd+shift+enter	Zoom pane	★
+panes	cmd+ctrl+=	Balance panes	★
+agents	prefix+a / prefix+shift+a	Next/previous agent, across sessions	★
+font	cmd+= / cmd+- / cmd+0	Font size up / down / reset	★
