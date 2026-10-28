@@ -111,7 +111,7 @@ api["session.set_label"] = function(a) state.sessions[a.session_id].label = a.la
 api["session.zoom_block"] = function(a) state.sessions[a.session_id].zoomed = a.zoom and a.block_id or nil; return {} end
 api["session.new_split"] = function(a)
   local sid = a.session_id
-  local anchor = a.block_id or state.sessions[sid].focused
+  local anchor = a.anchor_id or state.sessions[sid].focused
   local wid = window_of(anchor)
   state.next_block = state.next_block + 1
   local bid = B(state.next_block)

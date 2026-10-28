@@ -102,12 +102,9 @@ function H.split(anchor, direction, layout, focus, ratio)
     side = "after", focus = focus ~= false, layout = layout,
   }
   if ratio then args.ratio = ratio end
-  local with_anchor = {}
-  for k, v in pairs(args) do with_anchor[k] = v end
-  with_anchor.block_id = anchor.block_id
-  with_anchor.session_id = anchor.session_id
   args.session_id = anchor.session_id
-  local result, err = model.try("session.new_split", with_anchor, args)
+  args.anchor_id = anchor.block_id
+  local result, err = rex.call("session.new_split", args)
   if not result then return nil, err end
   model.invalidate(anchor.session_id)
   local bid = result.block_ids and result.block_ids[1]
@@ -147,10 +144,9 @@ function H.read(p, params)
   local source = params.source or "recent"
   local ansi = params.format == "ansi" and params.strip_ansi == false
   local unwrap = source == "recent_unwrapped"
-  local result = model.try(model.TERMINAL .. ".format",
-    { session_id = p.session_id, block_id = p.block_id, args = { format = ansi and "vt" or "text", trim = true, unwrap = unwrap } },
-    { session_id = p.session_id, block_id = p.block_id, args = { trim = true } })
-  local text = result and (result.content or result.text or result.screen) or ""
+  local result = model.terminal("format", p.session_id, p.block_id,
+    { format = ansi and "vt" or "text", trim = true, unwrap = unwrap })
+  local text = result and result.content or ""
   local lines = {}
   for line in (text .. "\n"):gmatch("([^\n]*)\n") do lines[#lines + 1] = line end
   while #lines > 0 and lines[#lines] == "" do lines[#lines] = nil end
@@ -178,10 +174,7 @@ end
 -- Types bytes into a terminal, as if typed. Enter is not pressed for you.
 function H.type(p, bytes)
   if bytes == "" then return true end
-  local result, err = model.try(model.TERMINAL .. ".write",
-    { session_id = p.session_id, block_id = p.block_id, args = { data = bytes } },
-    { session_id = p.session_id, block_id = p.block_id, args = { text = bytes } },
-    { session_id = p.session_id, block_id = p.block_id, args = { bytes = bytes } })
+  local result, err = model.terminal("write", p.session_id, p.block_id, { data = bytes })
   if not result then return nil, err end
   return true
 end

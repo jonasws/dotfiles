@@ -68,9 +68,14 @@ return function(H)
   M["tab.move"] = function(p)
     local t = find(p.tab_id)
     if not t then return missing(p.tab_id) end
-    local _, err = model.try("session.move_window",
-      { session_id = t.session_id, window_id = t.window_id, index = p.insert_index },
-      { session_id = t.session_id, window_id = t.window_id, position = p.insert_index })
+    local others = {}
+    for _, wid in ipairs(model.view(t.session_id).window_order) do
+      if wid ~= t.window_id then others[#others + 1] = wid end
+    end
+    local _, err = rex.call("session.move_window", {
+      session_id = t.session_id, window_id = t.window_id,
+      before_window_id = others[(tonumber(p.insert_index) or #others) + 1],
+    })
     if err then return H.fail("rex_error", err) end
     model.invalidate(t.session_id)
     return { type = "tab_info", tab = info(t) }

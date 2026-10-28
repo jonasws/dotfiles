@@ -48,9 +48,7 @@ return function(H)
   -- A new session, with one tab and terminal in `cwd`.
   M["workspace.create"] = function(p)
     local layout = H.terminal_layout(p.cwd, p.env)
-    local created, err = model.try("session.create",
-      { label = p.label, layout = layout },
-      { label = p.label })
+    local created, err = rex.call("session.create", { label = p.label, initial_windows = { { layout = layout } } })
     if not created then return H.fail("rex_error", err) end
     model.invalidate_sessions()
     local sid = created.session_id or (created.session and created.session.session_id)
@@ -67,11 +65,8 @@ return function(H)
   M["workspace.close"] = function(p)
     local s = find(p.workspace_id)
     if not s then return H.fail("workspace_not_found", "no workspace " .. tostring(p.workspace_id)) end
-    local _, err = model.try("session.destroy", { session_id = s.session_id })
-    if err then
-      local _, err2 = model.try("session.close", { session_id = s.session_id })
-      if err2 then return H.fail("rex_error", err2) end
-    end
+    local _, err = rex.call("session.destroy", { session_id = s.session_id })
+    if err then return H.fail("rex_error", err) end
     model.invalidate_sessions()
     return { type = "ok" }
   end

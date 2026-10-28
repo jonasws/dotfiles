@@ -161,7 +161,7 @@ return function(H)
   M["pane.close"] = function(params)
     local p = H.pane(params.pane_id)
     if not p then return missing(params.pane_id) end
-    local _, err = model.try("block.close", { session_id = p.session_id, block_id = p.block_id })
+    local _, err = rex.call("block.close", { session_id = p.session_id, block_id = p.block_id })
     if err then return H.fail("rex_error", err) end
     H.plugins.forget_pane(params.pane_id)
     model.invalidate(p.session_id, p.block_id)
@@ -199,9 +199,17 @@ return function(H)
     local p = H.pane_or_focused(params.pane_id)
     if not p then return missing(params.pane_id) end
     local amount = params.amount and math.max(1, math.floor(params.amount)) or 3
-    local _, err = model.try("session.resize_pane",
-      { session_id = p.session_id, block_id = p.block_id, direction = params.direction, amount = amount },
-      { session_id = p.session_id, direction = params.direction, amount = amount })
+    local border = model.border(p.session_id, p.block_id, params.direction)
+    local err = border == nil and "no pane to resize against" or nil
+    if border then
+      local grow = (params.direction == "right" or params.direction == "down") and 1 or -1
+      local _
+      _, err = rex.call("session.resize_pane", {
+        session_id = p.session_id, direction = border.direction,
+        before_block_id = border.before, after_block_id = border.after,
+        ratio = math.max(0.05, math.min(0.95, border.ratio + grow * amount / 1000)),
+      })
+    end
     model.invalidate(p.session_id)
     return { type = "pane_resize", resize = {
       changed = err == nil, reason = err and "rex_error" or nil,
@@ -219,10 +227,8 @@ return function(H)
       return { type = "pane_swap", swap = { changed = false, reason = "no_target", source_pane_id = source_id,
         focused_pane_id = focused_pane_id(source), layout = layout_of(source) } }
     end
-    local _, err = model.try("session.swap_blocks",
-      { session_id = source.session_id, block_id = source.block_id, other_block_id = target.block_id },
-      { session_id = source.session_id, block_ids = { source.block_id, target.block_id } },
-      { session_id = source.session_id, first_block_id = source.block_id, second_block_id = target.block_id })
+    local _, err = rex.call("session.swap_blocks",
+      { session_id = source.session_id, block_id = source.block_id, other_block_id = target.block_id })
     if err then return H.fail("rex_error", err) end
     model.invalidate(source.session_id)
     return { type = "pane_swap", swap = { changed = true, source_pane_id = source_id, target_pane_id = target_id,
@@ -238,10 +244,10 @@ return function(H)
       return H.fail("unsupported", "Rex can move a pane beside another pane only")
     end
     local before = H.pane_info(p)
-    local _, err = model.try("session.move_block",
-      { session_id = p.session_id, block_id = p.block_id, target_block_id = target.block_id,
-        direction = dest.split == "down" and "vertical" or "horizontal", side = "after" },
-      { session_id = p.session_id, block_id = p.block_id, target_block_id = target.block_id })
+    local _, err = rex.call("session.move_block", {
+      session_id = p.session_id, block_id = p.block_id, anchor_block_id = target.block_id,
+      direction = dest.split == "down" and "vertical" or "horizontal", side = "after",
+    })
     if err then return H.fail("rex_error", err) end
     model.invalidate(p.session_id)
     model.invalidate(target.session_id)
@@ -373,7 +379,7 @@ return function(H)
     while #H.popups > 0 do
       local p = table.remove(H.popups)
       if model.view(p.session_id).blocks[p.block_id] then
-        model.try("block.close", { session_id = p.session_id, block_id = p.block_id })
+        rex.call("block.close", { session_id = p.session_id, block_id = p.block_id })
         model.invalidate(p.session_id, p.block_id)
         return { type = "ok" }
       end
