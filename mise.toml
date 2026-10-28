@@ -233,6 +233,11 @@ root = "fish"
 target = "~/.config/fish"
 exclude = ["README.md"]
 
+[dotfile_groups.firefox]
+root = "firefox"
+target = "~/.local/bin"
+mode = "symlink-each"
+
 [dotfile_groups.fnox]
 root = "fnox"
 target = "~/.config/fnox"
