@@ -5,6 +5,7 @@ pickers	prefix+r	Git repo picker, Enter opens or focuses a tab	★
 pickers	prefix+shift+h	Hotkeys cheat sheet (tv hotkeys)	★
 pickers	prefix+shift+o	AWS profile picker → console	★
 pickers	prefix+shift+f	herdr-f1 dashboard in the browser	★
+pickers	prefix+ctrl+f	3D F1 dashboard in a tab	★
 pickers	cmd+shift+p / cmd+p	Command palette	★
 popups	prefix+l	lazygit status in a zoomed pane	★
 popups	prefix+shift+l	lazygit log in a zoomed pane	★
@@ -23,3 +24,11 @@ panes	cmd+shift+enter	Zoom pane	★
 panes	cmd+ctrl+=	Balance panes	★
 agents	prefix+a / prefix+shift+a	Next/previous agent, across sessions	★
 font	cmd+= / cmd+- / cmd+0	Font size up / down / reset	★
+f1	tab / shift+tab	Next/previous car that needs you	★
+f1	j/k, g/G, 1–9	Cars in scope: next/previous, leader/last, Nth	★
+f1	h/l	Previous/next team	★
+f1	s/S, ! t *	Scope: cycle; needs you, team, all	★
+f1	⏎ / double-click	Jump to the agent's pane	★
+f1	a	Autopilot: follow the newest car that needs you	★
+f1	c/C, b	Camera; bird's eye on/off	★
+f1	?	All dashboard keys	★

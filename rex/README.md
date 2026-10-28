@@ -4,6 +4,124 @@ Configuration for [Rex](https://www.superlogical.com/rex/docs), linked to
 `~/.config/rex` by the `rex` dotfile group in `mise.toml`. Reload after
 changes with `rex config reload`.
 
+## F1 dashboard
+
+A port of the [herdr-f1](https://github.com/hmu332233/herdr-f1) idea to Rex,
+drawn in 3D inside the terminal with Kitty graphics instead of in a browser.
+Each Rex session is a team, and each terminal that reports a program status
+([OSC 7501](https://www.superlogical.com/rex/docs/build/program-status)) is a
+car. Rex dropped screen-scraping in favour of OSC 7501 in v0.1.0-preview.15, so
+any agent Rex shows a status badge for is on the grid.
+
+| Status    | On track                                                  |
+| --------- | --------------------------------------------------------- |
+| `working` | racing, at a pace that varies lap to lap                  |
+| `idle`    | parked in its pit box                                     |
+| `done`    | a slow cool-down lap, then the pits                       |
+| `blocked` | stopped on track with a flashing beacon; safety car out   |
+| `error`   | retired on the grass, smoking                             |
+
+When a terminal holds several records (an agent and its subagents), the most
+urgent one decides: blocked, then error, working, done, idle. Laps, gaps and
+positions are race fiction. The status message (`msg`) is real and shows in
+the standings and the team radio.
+
+Open it with `ctrl+b` `shift+f`, **Open F1 Dashboard** in the command palette,
+or `rex do f1` (`rex do f1 camera=birdseye` to start from above). It opens in a tab labelled `F1`, or focuses that tab if it is
+already open.
+
+The selected car is the one the TV and onboard cameras follow, the pit wall
+line under the picture describes (state, how long, its place in the queue,
+the full message), and Enter jumps to. With nothing selected the cameras
+follow the leader. The grouping follows the `herdr-sessions` tv channel and
+herdr's own keys: an attention queue, scopes that narrow the field, and
+teams to step between. `?` shows the same table in the dashboard.
+
+| Group  | Key | Does |
+| ------ | --- | ---- |
+| cars   | `j`/`k`, ↓/↑ | next / previous car in scope, in race order |
+|        | `g` / `G` | leader / last car |
+|        | `1`–`9` | the Nth car in scope |
+|        | `tab` / `shift+tab` | next / previous car that needs you: stopped, then failed, then finished and unseen, longest waiting first |
+| teams  | `l`/`h`, →/← | next / previous team (session or workspace), at its best-placed car |
+| scope  | `s` / `S` | cycle: all, needs you, racing, in the pits, one team |
+|        | `!` / `t` / `*` | needs you / the selected car's team / all |
+| act    | `⏎`, double-click | jump to the agent's pane |
+|        | `a` | autopilot: keep the newest car that needs you selected; any manual move turns it off |
+|        | `esc` | clear the selection, then the scope |
+| camera | `c` / `C` | next / previous camera: TV, helicopter, onboard, bird's eye |
+|        | `b` | bird's eye on/off |
+| other  | `?`, `q` | keys, quit |
+
+Cars outside the scope still race, with grey tags, and drop out of the
+standings. In the picture, click a car's tag or body to select it and
+double-click to jump. The mouse wheel steps through the scope.
+
+Tab is the attention queue rather than the scope cycle the tv channel gives
+it: in a picker the list is the point and Tab narrows it, but here the
+question is usually "who needs me next".
+
+The bird's-eye camera is fixed: it fits the whole circuit, pits and stands
+into the pane, turning the circuit to match a tall or wide pane, and stays put
+through the podium. Because nothing behind the cars moves, the scenery is
+drawn once and reused, so a frame costs about 2.5 ms instead of about 16.
+
+### In herdr and WezTerm
+
+The renderer needs only the basic Kitty graphics commands: transmit, place
+and delete, with zlib (`o=z`) compression. No animation or Unicode
+placeholders. That works in both:
+
+| Terminal | Kitty graphics | Source |
+| -------- | -------------- | ------ |
+| Rex      | complete since Mac v0.1.0-preview.19 | [changelog](https://discord.com/channels/1546797889009881158/1547349572299395172/1562927111927234657) |
+| WezTerm  | on by default since 20220101; most of the protocol, including `o=z`, without animation | [changelog](https://github.com/wezterm/wezterm/blob/main/docs/changelog.md), [`apc.rs`](https://github.com/wezterm/wezterm/blob/main/wezterm-escape-parser/src/apc.rs) |
+| herdr    | renders pane images and passes them to the outer terminal; on by default, `terminal.kitty_graphics = false` turns it off | [CHANGELOG](https://github.com/ogulcancelik/herdr/blob/main/CHANGELOG.md) |
+
+Only the data source is Rex-specific, so `--source` picks one:
+
+| `--source` | Reads | Jump |
+| ---------- | ----- | ---- |
+| `rex`      | Rex's herdr socket ([below](#herdr-in-rex)), started if needed | `pane.focus` |
+| `herdr`    | herdr's socket (`HERDR_SOCKET_PATH`, else `~/.config/herdr/herdr.sock`): `session.snapshot` plus `events.subscribe`, as herdr-f1 does | `pane.focus` |
+| `demo`     | fake agents | – |
+| `auto`     | Rex inside Rex (`REX_SESSION`), herdr inside herdr (`HERDR_PANE_ID`), else Rex when `rex` is on `PATH`, else herdr | |
+
+In herdr, `prefix+ctrl+f` opens it in a zoomed pane (`herdr/config.toml`).
+A herdr workspace is a team and its agents are the cars. A car's message
+is the agent's reported state label, or its `summary` token. herdr's
+`unknown` state waits in the pits. In plain WezTerm, run `~/.config/rex/f1/f1`
+in a tab. Rex only puts `rex` on `PATH` inside its own terminals, so set
+`REX_BIN` to race Rex agents from there.
+
+### How it fits together
+
+| File          | Role |
+| ------------- | ---- |
+| `f1.lua`      | The `f1` action and its `ctrl+b ctrl+f` key, loaded from `init.lua`. |
+| `f1/f1`       | Launcher. Uses `node` from `PATH`, or `mise exec node@24`. |
+| `f1/herdr.mjs` | Reads a herdr socket: herdr's own, or Rex's. |
+| `f1/f1.mjs`   | The dashboard: input, layout, standings, team radio. |
+| `f1/race.mjs` | The race simulation. |
+| `f1/scene.mjs`, `f1/broadcast.mjs` | The circuit, scenery and car models; car poses and cameras. |
+| `f1/raster.mjs` | A small z-buffered software rasteriser. No dependencies. |
+| `f1/output.mjs` | Kitty graphics frames (zlib RGB, two image ids so a new frame is placed before the old one is deleted), a half-block fallback, and PNG. |
+| `f1/sources.mjs` | The demo's fake agents. |
+
+A frame is 30 to 50 KiB on the wire at the default size. Rex's Kitty support
+has been complete since Mac v0.1.0-preview.19 and Linux server
+v0.1.0-preview.5. Settings:
+
+| Variable       | Default | |
+| -------------- | ------- | - |
+| `F1_FPS`       | `10`    | Frames per second, 1 to 30. |
+| `F1_MAX_WIDTH` | `800`   | Render width cap in pixels. Rex scales the image to the pane. |
+| `F1_CAMERA`    | `tv`    | `tv`, `heli`, `chase` or `birdseye`. |
+| `F1_GRAPHICS`  | `auto`  | `kitty` or `blocks` skips detection. |
+
+`f1/f1 --demo` races fake agents without Rex.
+`f1/f1 --demo --snapshot out.png --camera heli` writes a single frame.
+
 ## herdr in Rex
 
 Rex answers herdr's socket API, the way tuios does
@@ -127,6 +245,7 @@ prefix. Pane movement stays on `init.lua`'s Cmd chords and Ctrl+hjkl.
 | --- | ---- | ---- |
 | `ctrl+b f`, `cmd+k` | pane picker, attention first | `tv herdr-sessions` |
 | `ctrl+b shift+f` | herdr-f1 in the browser | its herdr plugin, else the `herdr-f1` CLI |
+| `ctrl+b ctrl+f` | the 3D dashboard | `f1`, in `f1.lua` |
 | `ctrl+b l` / `shift+l` | lazygit status / log | `herdr/scripts/lazygit-popup.sh` |
 | `ctrl+b y` / `shift+y` | yazi; or pick files into the pane | `herdr/scripts/yazi-popup.sh` |
 | `ctrl+b r` | git repos; Enter opens or focuses a tab | `tv git-repos`, its `rex` action |

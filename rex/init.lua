@@ -122,7 +122,8 @@ rex.action({
 
 rex.bind("ctrl+b>e", "edit_scrollback")
 
--- herdr's command keys (herdr.lua), behind herdr's ctrl+b prefix: ctrl+b then
--- shift+f for herdr-f1, f or Cmd+K for the pane picker. The table is
--- television/hotkeys/rex.tsv.
+-- The F1 dashboards (f1.lua) and herdr's command keys (herdr.lua), behind
+-- herdr's ctrl+b prefix: ctrl+b then shift+f for herdr-f1, ctrl+f for the 3D
+-- one, f or Cmd+K for the pane picker. The table is television/hotkeys/rex.tsv.
+require("f1")
 require("herdr").bind()

@@ -1,0 +1,8 @@
+#!/bin/sh
+# Starts the 3D dashboard. Rex starts this outside an interactive shell, so
+# fall back to mise when node isn't on PATH.
+dir=$(dirname "$(realpath "$0")")
+if command -v node >/dev/null 2>&1; then
+  exec node "$dir/f1.mjs" "$@"
+fi
+exec mise exec node@24 -- node "$dir/f1.mjs" "$@"
