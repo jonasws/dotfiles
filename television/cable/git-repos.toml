@@ -23,9 +23,16 @@ shell = "bash"
 command = "git -C {} log -n 200 --pretty=medium --all --graph --color"
 
 [keybindings]
-enter = "actions:cd"
+enter = "actions:open"
 ctrl-e = "actions:edit"
 ctrl-w = "actions:workspace"
+ctrl-y = "actions:copy_path"
+
+[actions.open]
+description = "Open as a Rex session or Herdr workspace, or cd in a plain shell"
+command = "~/.config/television/scripts/open-repo.sh '{}'"
+shell = "bash"
+mode = "execute"
 
 [actions.cd]
 shell = "bash"
@@ -45,11 +52,8 @@ command = "~/.config/television/scripts/herdr-workspace.sh '{}'"
 shell = "bash"
 mode = "execute"
 
-# Rex's ctrl+b>r passes `-k 'enter="actions:rex"'`. A Rex session plays a
-# herdr workspace's part, so a repo opens as a tab of the current one; the
-# open_repo action lives in rex/herdr.lua.
-[actions.rex]
-description = "Open as a Rex tab, or focus it if already open"
-command = "rex do open_repo path='{}'"
+[actions.copy_path]
+description = "Copy the repository path, with ~ for the home directory"
+command = """p='{}'; printf '%s' "${p/#$HOME/\\~}" | pbcopy"""
 shell = "bash"
 mode = "execute"
