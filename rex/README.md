@@ -133,12 +133,14 @@ prefix. Pane movement stays on `init.lua`'s Cmd chords and Ctrl+hjkl.
 | `ctrl+b shift+h` / `shift+o` | hotkeys / AWS profiles | `tv hotkeys` / `tv aws-profiles` |
 | `ctrl+b t` / `ctrl+t` / `ctrl+e` | tsk board / quick capture / edit notes | `tsk-toggle.sh`, the herdr-tsk plugin, `tsk-notes.sh` |
 | `ctrl+b shift+s` | subagent viewers | `claude/hooks/subagent-viewer.sh` |
+| `ctrl+b e` | scrollback in `$EDITOR`, in a floating layer | `edit_scrollback` in `init.lua` |
 | `ctrl+b a` / `shift+a` | next / previous agent, across sessions | `next_agent` / `previous_agent` |
 
 herdr's popup and pane keys open a zoomed split that closes with its command.
 Floating layers didn't draw full-screen programs until Rex fixed that on
 2026-10-27 ("Floating layers: no backdrop, and alternate-screen programs
-aren't drawn", Rex Beta feedback); the popups can move to layers next. A key's command gets what
+aren't drawn", Rex Beta feedback); `edit_scrollback` already uses one, and
+the popups can move to layers next. A key's command gets what
 herdr hands its command keys: `HERDR_ENV`, the socket, and
 `HERDR_ACTIVE_PANE_ID`, `_TAB_ID` and `_PANE_CWD` for the pane the key was
 pressed in. It runs through `$SHELL -l -c`, so PATH has mise's tools.

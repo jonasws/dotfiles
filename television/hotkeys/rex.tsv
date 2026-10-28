@@ -14,6 +14,7 @@ popups	prefix+t	Toggle tsk board (herdr-tsk plugin)	★
 popups	prefix+ctrl+t	tsk quick capture	★
 popups	prefix+ctrl+e	Edit tsk notes in nvim	★
 popups	prefix+shift+s	Toggle subagent viewers	★
+popups	prefix+e	Scrollback in $EDITOR, in a floating layer	★
 panes	cmd+d	Split down	★
 panes	cmd+r	Split right	★
 panes	ctrl+h/j/k/l	Move across Rex panes and nvim windows	★
