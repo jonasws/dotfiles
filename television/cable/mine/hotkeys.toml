@@ -1,7 +1,7 @@
 [metadata]
 name = "hotkeys"
 description = """
-Cheat sheet for my modal tools: herdr, lazygit, yazi, tuicr, hunk, television,
+Cheat sheet for my modal tools: herdr, Rex, lazygit, yazi, tuicr, hunk, television,
 fx, lnav, tabiew and WezTerm.
 
 Tab steps from all tools to one tool at a time. ★ marks a binding from my own
@@ -15,6 +15,7 @@ shell = "bash"
 command = [
   { name = "all", run = "~/.config/television/scripts/hotkeys.sh list" },
   { name = "herdr", run = "~/.config/television/scripts/hotkeys.sh list herdr" },
+  { name = "rex", run = "~/.config/television/scripts/hotkeys.sh list rex" },
   { name = "lazygit", run = "~/.config/television/scripts/hotkeys.sh list lazygit" },
   { name = "yazi", run = "~/.config/television/scripts/hotkeys.sh list yazi" },
   { name = "tuicr", run = "~/.config/television/scripts/hotkeys.sh list tuicr" },

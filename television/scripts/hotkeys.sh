@@ -9,12 +9,13 @@
 set -euo pipefail
 
 dir="$(cd "$(dirname "${BASH_SOURCE[0]}")/../hotkeys" && pwd)"
-order="herdr lazygit yazi tuicr hunk television fx lnav tabiew wezterm"
+order="herdr rex lazygit yazi tuicr hunk television fx lnav tabiew wezterm"
 
 # "r;g;b" for a 38;2 foreground escape.
 color() {
   case "$1" in
     herdr) echo "203;166;247" ;;      # mauve
+    rex) echo "243;139;168" ;;        # red
     lazygit) echo "250;179;135" ;;    # peach
     yazi) echo "249;226;175" ;;       # yellow
     tuicr) echo "166;227;161" ;;      # green

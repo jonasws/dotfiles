@@ -74,3 +74,8 @@ rex.bind("cmd+p", "client.palette.toggle")
 rex.bind("cmd+=", "client.font.increase")
 rex.bind("cmd+-", "client.font.decrease")
 rex.bind("cmd+0", "client.font.reset")
+
+-- herdr's command keys (herdr.lua), behind herdr's ctrl+b prefix: ctrl+b then
+-- shift+f for herdr-f1, f or Cmd+K for the pane picker. The table is
+-- television/hotkeys/rex.tsv.
+require("herdr").bind()
