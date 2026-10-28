@@ -58,7 +58,8 @@ mitmproxy = "latest"
 "github:riii111/sabiql" = "latest"
 "npm:dotenv-cli" = "latest"
 # herdr-f1 for Rex too: rex/herdr/ctl dashboard points it at Rex's herdr socket.
-"npm:herdr-f1" = "latest"
+# Under the npm download threshold (1000 a week), which mise exempts per tool.
+"npm:herdr-f1" = { version = "latest", allow_low_downloads = true }
 "github:always-further/nono" = "latest"
 "github:BurntSushi/bttf" = "latest"
 "github:achristmascarl/rainfrog" = "latest"
