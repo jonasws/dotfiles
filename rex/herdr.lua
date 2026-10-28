@@ -185,6 +185,7 @@ rex.action{
   args = { path = "string" },
   run = function(ctx, args)
     local label = args.path:gsub("/+$", ""):match("([^/]+)$") or args.path
+    model.invalidate(ctx.session_id)
     local view = model.view(ctx.session_id)
     for _, wid in ipairs(view.window_order) do
       if view.windows[wid].label == label then
