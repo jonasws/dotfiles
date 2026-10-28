@@ -74,3 +74,98 @@ rex.bind("cmd+p", "client.palette.toggle")
 rex.bind("cmd+=", "client.font.increase")
 rex.bind("cmd+-", "client.font.decrease")
 rex.bind("cmd+0", "client.font.reset")
+
+-- Next/previous agent, after herdr's next_agent/previous_agent. An agent is a
+-- terminal whose program reported a status record with an app (Claude Code
+-- does). Order follows the sidebar: sessions, then tabs, then pane layout order.
+-- Like herdr it wraps, and from a non-agent pane it lands on the first (next)
+-- or last (previous) agent.
+local TERMINAL = "com.superlogical.terminal"
+
+local function is_agent(session_id, block_id)
+  local res = rex.call("block.method", {
+    session_id = session_id,
+    block_id = block_id,
+    method = "program_status",
+  })
+  for _, record in ipairs(res and res.result and res.result.records or res and res.records or {}) do
+    if record.effective_app or record.app then
+      return true
+    end
+  end
+  return false
+end
+
+local function agents()
+  local found = {}
+  local listed = rex.call("session.list")
+  for _, session in ipairs(listed and listed.sessions or {}) do
+    local view = rex.session.view({ session_id = session.session_id })
+    for _, window in ipairs(view and view.windows or {}) do
+      for _, layer in ipairs(window.layers or {}) do
+        if layer.kind == "tiled" then
+          for _, block in ipairs(layer.blocks or {}) do
+            if block.creator_name == TERMINAL and is_agent(session.session_id, block.block_id) then
+              found[#found + 1] = {
+                session_id = session.session_id,
+                window_id = window.window_id,
+                block_id = block.block_id,
+              }
+            end
+          end
+        end
+      end
+    end
+  end
+  return found
+end
+
+local function cycle_agent(ctx, step)
+  local list = agents()
+  if #list == 0 then
+    return
+  end
+  local current
+  for i, agent in ipairs(list) do
+    if agent.block_id == ctx.block_id then
+      current = i
+    end
+  end
+  local target
+  if current then
+    target = list[(current - 1 + step) % #list + 1]
+  else
+    target = step > 0 and list[1] or list[#list]
+  end
+  if target.block_id == ctx.block_id then
+    return
+  end
+  rex.session.focus_block({ session_id = target.session_id, block_id = target.block_id })
+  -- focus_block only changes the server's idea of the active window; the app
+  -- needs session.select to show that tab, and the session if it differs.
+  rex.client.queue("session.select", {
+    session_id = target.session_id,
+    window_id = target.window_id,
+  })
+end
+
+rex.action({
+  name = "next_agent",
+  title = "Focus Next Agent",
+  run = function(ctx) cycle_agent(ctx, 1) end,
+})
+
+rex.action({
+  name = "previous_agent",
+  title = "Focus Previous Agent",
+  run = function(ctx) cycle_agent(ctx, -1) end,
+})
+
+rex.bind("ctrl+cmd+]", "next_agent")
+rex.bind("ctrl+cmd+[", "previous_agent")
+
+-- herdr's prefix, with its agent keys. Ctrl+B no longer reaches the terminal on
+-- its own, so Ctrl+B twice sends one through.
+rex.bind("ctrl+b>a", "next_agent")
+rex.bind("ctrl+b>shift+a", "previous_agent")
+rex.bind("ctrl+b>ctrl+b", "pane.send_key", { key = "ctrl+b" })
