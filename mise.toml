@@ -128,6 +128,17 @@ chmod 600 "$tmp"
 mv "$tmp" "$target"
 """
 
+[tasks."sync:rex-herdr"]
+description = "(Re)load the herdr socket server's LaunchAgent"
+# bootout fails when the agent is not loaded yet, which is fine.
+run = """
+set -euo pipefail
+plist="$HOME/Library/LaunchAgents/com.jonasws.rex-herdr.plist"
+[[ -e $plist ]] || { echo "$plist is missing: run 'mise dotfiles apply' first" >&2; exit 1; }
+launchctl bootout "gui/$(id -u)" "$plist" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$plist"
+"""
+
 [tasks."sync:karabiner"]
 description = "Generate karabiner.json from karabiner-ts and copy it to ~/.config/karabiner"
 dir = "{{config_root}}/karabiner-ts"
@@ -344,7 +355,12 @@ mode = "symlink"
 [dotfile_groups.rex]
 root = "rex"
 target = "~/.config/rex"
-exclude = ["README.md", "herdr/test"]
+exclude = ["README.md", "herdr/test", "launchd"]
+
+# The herdr socket server's LaunchAgent; see rex/herdr/serve.
+[dotfile_groups.rex-launchd]
+root = "rex/launchd"
+target = "~/Library/LaunchAgents"
 
 [dotfile_groups.ripgrep]
 root = "ripgrep"

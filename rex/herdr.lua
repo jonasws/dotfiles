@@ -2,8 +2,8 @@
 --
 -- herdr/server.lua answers herdr's socket API from Rex (see its header), so
 -- herdr tools work here unchanged: the herdr CLI, herdr-f1 and other herdr
--- plugins, and this repo's herdr scripts and tv channels. This file keeps that
--- server running, gives it herdr's command keys from herdr/config.toml behind
+-- plugins, and this repo's herdr scripts and tv channels. The LaunchAgent in
+-- rex/launchd keeps that server running; this file gives Rex herdr's command keys from herdr/config.toml behind
 -- the same ctrl+b prefix, and hands each key's command what herdr would.
 --
 -- Panes learn the socket from fish/conf.d/45-rex-herdr.fish, so herdr tools
@@ -19,19 +19,6 @@ local SHELL = "com.superlogical.terminal.shell"
 
 local M = {}
 
--- Starts the server unless it answers, and returns its socket path. ctl
--- checks the socket first, so this is cheap when it is already up, and safe
--- on every reload and `rex config check`.
-function M.socket()
-  local r, err = rex.exec({ CTL, "ensure" }, { timeout = 15 })
-  if r == nil then error(err, 0) end
-  if not r.ok then error("herdr socket: " .. (r.stderr ~= "" and r.stderr or r.stdout), 0) end
-  return (r.stdout:gsub("%s+$", ""))
-end
-
--- With the server: at load, so it comes up with Rex, without waiting on it.
-pcall(rex.exec.start, { CTL, "ensure" }, { detach = true })
-
 -- The pane a key was pressed in, as herdr names it.
 local function active(ctx)
   local view = model.view(ctx.session_id)
@@ -44,11 +31,12 @@ local function active(ctx)
   }
 end
 
--- What herdr hands its command keys: HERDR_ENV, the socket, and the pane,
--- tab and directory the key was pressed in.
+-- What herdr hands its command keys: HERDR_ENV, and the pane, tab and directory
+-- the key was pressed in. The socket path comes from fish/conf.d/45-rex-herdr.fish,
+-- which the login shell running the command loads, so no key needs the server up.
 function M.env(ctx)
   local a = active(ctx)
-  local env = { HERDR_ENV = "1", HERDR_SOCKET_PATH = M.socket(), HERDR_ACTIVE_PANE_CWD = a.cwd }
+  local env = { HERDR_ENV = "1", HERDR_ACTIVE_PANE_CWD = a.cwd }
   if a.pane then env.HERDR_ACTIVE_PANE_ID = a.pane end
   if a.tab then env.HERDR_ACTIVE_TAB_ID = a.tab end
   return env
@@ -129,7 +117,7 @@ command_key("herdr_lazygit_status", "herdr: lazygit Status", "popup", "~/.config
 command_key("herdr_lazygit_log", "herdr: lazygit Log", "popup", "~/.config/herdr/scripts/lazygit-popup.sh log")
 command_key("herdr_yazi", "herdr: yazi", "popup", "~/.config/herdr/scripts/yazi-popup.sh")
 command_key("herdr_yazi_pick", "herdr: yazi Pick into Pane", "popup", "~/.config/herdr/scripts/yazi-popup.sh pick")
-command_key("herdr_repos", "herdr: Git Repo Picker", "float", "tv git-repos -k 'enter=\"actions:rex\"'", { 0.9, 0.8 })
+command_key("herdr_repos", "herdr: Git Repo Picker", "float", "tv git-repos", { 0.9, 0.8 })
 command_key("herdr_hotkeys", "herdr: Hotkeys", "float", "tv hotkeys", { 0.9, 0.8 })
 command_key("herdr_aws", "herdr: AWS Profiles", "float", "tv aws-profiles", { 0.8, 0.8 })
 command_key("herdr_tsk", "herdr: Toggle tsk Board", "shell", "~/.config/herdr/scripts/tsk-toggle.sh")
@@ -171,48 +159,25 @@ rex.action{
   title = "herdr: Restart the herdr Socket",
   category = "herdr",
   run = function()
-    rex.exec({ CTL, "stop" }, { timeout = 5 })
-    return { socket = M.socket() }
-  end,
-}
-
--- A repo as a tab of this session, focused if one is already open: the Rex
--- side of television/cable/git-repos.toml's `rex` action.
-rex.action{
-  name = "open_repo",
-  title = "Open Repo as Tab",
-  category = "herdr",
-  args = { path = "string" },
-  run = function(ctx, args)
-    local label = args.path:gsub("/+$", ""):match("([^/]+)$") or args.path
-    model.invalidate(ctx.session_id)
-    local view = model.view(ctx.session_id)
-    for _, wid in ipairs(view.window_order) do
-      if view.windows[wid].label == label then
-        rex.session.focus_window{ window_id = wid }
-        return { window_id = wid, reused = true }
-      end
-    end
-    local w, err = rex.session.new_window{
-      layout = rex.layout.block{ flavor = SHELL, options = { cwd = args.path } },
-    }
-    if err ~= nil then error(err, 0) end
-    rex.session.set_window_label{ window_id = w.window_id, label = label }
-    return { window_id = w.window_id }
+    local r, err = rex.exec({ CTL, "restart" }, { timeout = 15 })
+    if r == nil then error(err, 0) end
+    if not r.ok then error(r.stderr, 0) end
   end,
 }
 
 -- Focuses a terminal and shows its session. Moving the app to another session
 -- is a client action, and from the CLI it needs Remote Control turned on in
--- the app's settings. The argument name is a guess: check `rex -C <client>
--- actions`.
+-- the app's settings.
 local function jump(ctx, target)
   local _, err = rex.session.focus_block{ session_id = target.session_id, block_id = target.block_id }
   if err ~= nil then error(err, 0) end
-  if target.session_id ~= ctx.session_id then
-    local ok, queued = pcall(rex.client.queue, "session.switch", { session_id = target.session_id })
-    if not ok then return { focused = true, switched = false, reason = tostring(queued) } end
-  end
+  model.invalidate(target.session_id)
+  local view = model.view(target.session_id)
+  local ok, queued = pcall(rex.client.queue, "session.select", {
+    session_id = target.session_id,
+    window_id = view.active_window,
+  })
+  if not ok then return { focused = true, switched = false, reason = tostring(queued) } end
   return { focused = true }
 end
 

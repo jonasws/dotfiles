@@ -2,7 +2,7 @@
 --
 --   rex do ~/.config/rex/herdr/server.lua --all
 --
--- (herdr/ctl.mjs starts it, and init.lua and the command keys ask ctl to).
+-- (herdr/serve runs it under launchd: rex/launchd/com.jonasws.rex-herdr.plist).
 -- This is tuios's approach (internal/session/herdr_api.go) for Rex: the API
 -- is answered here, in Lua, against Rex's live state through the script's own
 -- connection to the server, and Rex's events become herdr's. The only thing
@@ -29,7 +29,7 @@ local keys = require("herdr.keys")
 local plugins = require("herdr.plugins")
 
 local SOCKET = rex.args.socket or os.getenv("REX_HERDR_SOCKET")
-  or ((os.getenv("TMPDIR") or "/tmp"):gsub("/$", "") .. "/rex-herdr-" .. (os.getenv("UID") or "user") .. ".sock")
+  or ((os.getenv("XDG_STATE_HOME") or (os.getenv("HOME") .. "/.local/state")) .. "/rex/herdr.sock")
 plugins.socket = SOCKET
 
 local SHELL_FLAVOR = "com.superlogical.terminal.shell"
@@ -63,11 +63,21 @@ end
 
 function H.pane_info(p) return model.pane_info(p.session_id, p.block_id) end
 
--- Tells the app to show a session. A client action: it needs the app, with
--- Remote Control on when it comes from outside the app.
+-- Tells the app to show a session and its active window. focus_block and
+-- focus_window only move the server's idea of the focus; session.select is what
+-- switches the app's tab (session.switch takes no session: it opens the picker).
+-- A request handler has no client in scope for rex.client.queue, so the action
+-- goes through `rex do`, which uses the app client when exactly one is connected.
+local REX = os.getenv("REX_BIN") or "rex"
+
 function H.show_session(session_id)
   model.note_focus(session_id)
-  pcall(rex.client.queue, "session.switch", { session_id = session_id })
+  model.invalidate(session_id)
+  local view = model.view(session_id)
+  local argv = { REX, "do", "session.select", "session_id=" .. session_id }
+  if view and view.active_window then argv[#argv + 1] = "window_id=" .. view.active_window end
+  local h, err = rex.exec.start(argv, { detach = true })
+  if not h then rex.log("warn", "herdr: cannot show session: " .. tostring(err)) end
 end
 
 function H.focus_block(session_id, block_id)

@@ -1,8 +1,9 @@
 #!/bin/sh
 # herdr/ctl.mjs with node from PATH, or from mise when Rex starts it outside
-# an interactive shell.
+# an interactive shell, where PATH lacks both node and Homebrew.
 dir=$(dirname "$(realpath "$0")")
 if command -v node >/dev/null 2>&1; then
   exec node "$dir/ctl.mjs" "$@"
 fi
+PATH="/opt/homebrew/bin:/opt/homebrew/opt/mise/bin:$HOME/.local/bin:$PATH"
 exec mise exec node@24 -- node "$dir/ctl.mjs" "$@"

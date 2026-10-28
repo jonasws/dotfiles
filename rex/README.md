@@ -26,7 +26,8 @@ turns Rex's events into herdr's. Lua in Rex can't open sockets, so
 
 | File | Role |
 | ---- | ---- |
-| `herdr.lua` | The configuration side: starts the server with Rex, the command keys, `open_repo`, next/previous agent. |
+| `herdr.lua` | The configuration side: the command keys, next/previous agent. |
+| `herdr/serve`, `launchd/com.jonasws.rex-herdr.plist` | Run the server in the foreground under launchd. |
 | `herdr/server.lua` | The server: transport, dispatch, shared helpers. |
 | `herdr/methods/*.lua` | One table per herdr namespace: `session`, `workspace`, `tab`, `pane`, `agent`, `events`, `plugin`. |
 | `herdr/model.lua` | Reads Rex and builds herdr's WorkspaceInfo, TabInfo, PaneInfo, AgentInfo and layouts, cached until an event says what changed. |
@@ -35,7 +36,7 @@ turns Rex's events into herdr's. Lua in Rex can't open sockets, so
 | `herdr/plugins.lua` | herdr plugins from `~/.config/herdr/plugins.json`: actions, panes, startup and event hooks. |
 | `herdr/keys.lua`, `herdr/toml.lua` | Key names → bytes for `send_keys`; a small TOML reader. |
 | `herdr/bridge.mjs` | The socket. |
-| `herdr/ctl`, `herdr/ctl.mjs` | `ensure`, `stop`, `status`, `path`, `call METHOD [JSON]`, `dashboard`. |
+| `herdr/ctl`, `herdr/ctl.mjs` | `path`, `status`, `restart`, `call METHOD [JSON]`, `dashboard`. |
 | `herdr/test/` | End-to-end test: the real bridge and server, against a scripted Rex. `node rex/herdr/test/run.mjs`. |
 | `../fish/conf.d/45-rex-herdr.fish` | Gives every Rex pane `HERDR_SOCKET_PATH`, `HERDR_PANE_ID`, `HERDR_WORKSPACE_ID` and `HERDR_ENV`, as herdr and tuios do for theirs. |
 
@@ -107,15 +108,20 @@ consequences:
 
 ### Lifecycle
 
-`init.lua` starts the server when Rex loads it (`herdr/ctl ensure`, which
-does nothing when the socket already answers, so reloads and `rex config
-check` are harmless). The command keys run the same check, so a server that
-died comes back on the next key. The bridge exits when the script does, and
-the script when the bridge does, taking the socket with them.
-**herdr: Restart the herdr Socket** restarts it.
+The server is the `com.jonasws.rex-herdr` LaunchAgent: `launchd/com.jonasws.rex-herdr.plist`,
+linked into `~/Library/LaunchAgents` by the `rex-launchd` dotfile group, runs
+`herdr/serve`, which sets PATH and runs `rex do herdr/server.lua --all` in the
+foreground. launchd starts it at login and restarts it if it exits; `rex` starts
+the Rex server if it isn't running. Load it once, and again after editing the
+plist, with `mise -C ~/dotfiles run sync:rex-herdr`. Nothing in the keys or
+`init.lua` starts it. Tools only read the environment (`HERDR_SOCKET_PATH`).
+**herdr: Restart the herdr Socket** runs `launchctl kickstart -k`. The bridge
+exits when the script does, and the script when the bridge does, taking the
+socket with them.
 
-The socket is `$TMPDIR/rex-herdr-<uid>.sock`, or `REX_HERDR_SOCKET`. From a
-Rex pane, `herdr api snapshot` shows what herdr tools see.
+The socket is `$XDG_STATE_HOME/rex/herdr.sock` (`~/.local/state/rex/herdr.sock`),
+or `REX_HERDR_SOCKET`; the log is `herdr.log` beside it. From a Rex pane,
+`herdr api snapshot` shows what herdr tools see.
 
 ### Keys
 
@@ -135,6 +141,12 @@ prefix. Pane movement stays on `init.lua`'s Cmd chords and Ctrl+hjkl.
 | `ctrl+b shift+s` | subagent viewers | `claude/hooks/subagent-viewer.sh` |
 | `ctrl+b e` | scrollback in `$EDITOR`, in a floating layer | `edit_scrollback` in `init.lua` |
 | `ctrl+b a` / `shift+a` | next / previous agent, across sessions | `next_agent` / `previous_agent` |
+| `ctrl+b c` / `shift+x` / `shift+t` | new / close / rename tab | `client.tab.*` |
+| `ctrl+b n` / `p` / `1`–`9` | next / previous / numbered tab | `client.tab.next`, `previous`, `goto` |
+| `ctrl+b x` / `z` | close / zoom pane | `pane.close` / `pane.zoom` |
+| `ctrl+b v` / `-` | split right / down | `pane.split.right` / `.down` |
+| `ctrl+b shift+n` / `shift+d` / `shift+w` | new / close / rename session | `session.*` |
+| `ctrl+b ctrl+n` / `ctrl+p` | next / previous session | `session.next` / `previous` |
 
 herdr's popup and pane keys open a zoomed split that closes with its command.
 Floating layers didn't draw full-screen programs until Rex fixed that on
@@ -167,7 +179,3 @@ one open, the server tries the likeliest first and falls back
 - **Switching the app to another session:** the client action
   `session.switch` with a `session_id` argument. From outside the app it
   needs Remote Control turned on.
-- **Starting the server from Rex.** `herdr/ctl ensure` runs `rex do`, using
-  `REX_BIN` or `rex` on `PATH`. Rex puts `rex` on the `PATH` of its terminals;
-  whether the server's own environment has it isn't documented. If the keys
-  report that `rex` can't be found, set `REX_BIN` in the server's environment.
