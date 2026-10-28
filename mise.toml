@@ -309,6 +309,7 @@ mode = "symlink"
 [dotfile_groups.rex]
 root = "rex"
 target = "~/.config/rex"
+exclude = ["README.md", "herdr/test"]
 
 [dotfile_groups.ripgrep]
 root = "ripgrep"
