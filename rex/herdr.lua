@@ -78,6 +78,18 @@ function M.popup(ctx, command)
   return { block_id = id }
 end
 
+-- A popup as a floating layer, sized as herdr's width and height are (fractions
+-- of the window, centred). The layer closes when its command exits. For the tv
+-- pickers; Rex draws full-screen programs in layers since 2026-10-27.
+function M.float(ctx, command, width, height)
+  local _, err = rex.session.new_layer{
+    bounds = { (1 - width) / 2, (1 - height) / 2, width, height },
+    focus = true,
+    layout = rex.layout.block{ flavor = SHELL, options = { command = argv(command, M.env(ctx)), shell = "none" } },
+  }
+  if err ~= nil then error(err, 0) end
+end
+
 -- herdr's `type = "shell"`: runs in the background with the same variables.
 function M.shell(ctx, command)
   local h, err = rex.exec.start(argv(command, M.env(ctx)), { detach = true })
@@ -98,27 +110,28 @@ function M.plugin_action(ctx, action)
   if not r.ok then error(r.stdout ~= "" and r.stdout or r.stderr, 0) end
 end
 
-local function command_key(name, title, kind, command)
+local function command_key(name, title, kind, command, size)
   rex.action{
     name = name,
     title = title,
     category = "herdr",
     run = function(ctx)
       if kind == "popup" then return M.popup(ctx, command) end
+      if kind == "float" then return M.float(ctx, command, size[1], size[2]) end
       if kind == "shell" then return M.shell(ctx, command) end
       return M.plugin_action(ctx, command)
     end,
   }
 end
 
-command_key("herdr_panes", "herdr: Pane Picker", "popup", "tv herdr-sessions")
+command_key("herdr_panes", "herdr: Pane Picker", "float", "tv herdr-sessions", { 0.9, 0.8 })
 command_key("herdr_lazygit_status", "herdr: lazygit Status", "popup", "~/.config/herdr/scripts/lazygit-popup.sh status")
 command_key("herdr_lazygit_log", "herdr: lazygit Log", "popup", "~/.config/herdr/scripts/lazygit-popup.sh log")
 command_key("herdr_yazi", "herdr: yazi", "popup", "~/.config/herdr/scripts/yazi-popup.sh")
 command_key("herdr_yazi_pick", "herdr: yazi Pick into Pane", "popup", "~/.config/herdr/scripts/yazi-popup.sh pick")
-command_key("herdr_repos", "herdr: Git Repo Picker", "popup", "tv git-repos -k 'enter=\"actions:rex\"'")
-command_key("herdr_hotkeys", "herdr: Hotkeys", "popup", "tv hotkeys")
-command_key("herdr_aws", "herdr: AWS Profiles", "popup", "tv aws-profiles")
+command_key("herdr_repos", "herdr: Git Repo Picker", "float", "tv git-repos -k 'enter=\"actions:rex\"'", { 0.9, 0.8 })
+command_key("herdr_hotkeys", "herdr: Hotkeys", "float", "tv hotkeys", { 0.9, 0.8 })
+command_key("herdr_aws", "herdr: AWS Profiles", "float", "tv aws-profiles", { 0.8, 0.8 })
 command_key("herdr_tsk", "herdr: Toggle tsk Board", "shell", "~/.config/herdr/scripts/tsk-toggle.sh")
 command_key("herdr_tsk_capture", "herdr: tsk Quick Capture", "plugin_action", "herdr-tsk.quick-capture")
 command_key("herdr_tsk_notes", "herdr: Edit tsk Notes", "popup", "~/.config/herdr/scripts/tsk-notes.sh")

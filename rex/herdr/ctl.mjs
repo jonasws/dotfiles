@@ -48,7 +48,7 @@ async function alive() {
 async function ensure() {
   if (await alive()) return SOCKET;
   const log = openSync(LOG, 'a');
-  const child = spawn(REX, ['do', path.join(HERE, 'server.lua'), '--all', `socket=${SOCKET}`], {
+  const child = spawn(REX, ['do', path.join(HERE, 'server.lua'), '--all', `socket=${SOCKET}`, `dir=${HERE}`], {
     detached: true, stdio: ['ignore', log, log],
   });
   child.on('error', err => { console.error(`cannot run ${REX}: ${err.message}`); process.exit(1); });

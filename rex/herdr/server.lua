@@ -18,7 +18,8 @@
 -- that Rex can't do answers `unsupported`; one herdr doesn't have answers
 -- `invalid_request`, as herdr and tuios do.
 
-local here = debug.getinfo(1, "S").source:match("^@(.*/)") or "./"
+-- `rex do` gives a script no path of its own, so ctl passes its directory.
+local here = rex.args.dir and (rex.args.dir:gsub("/*$", "/")) or debug.getinfo(1, "S").source:match("^@(.*/)") or "./"
 package.path = here .. "../?.lua;" .. package.path
 
 local ids = require("herdr.ids")
