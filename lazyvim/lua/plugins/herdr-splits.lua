@@ -9,8 +9,9 @@ return {
     -- the same checkout, or the scripts keep coming from the GitHub install.
     dir = vim.fn.expand("~/herdr-splits.nvim"),
     -- Only meaningful inside a herdr session; outside one smart-splits.nvim
-    -- keeps driving the same chords against wezterm.
-    cond = vim.env.HERDR_ENV == "1",
+    -- keeps driving the same chords against wezterm. A Rex pane sets
+    -- HERDR_ENV=1 too, but there smart-splits' Rex backend drives them.
+    cond = vim.env.HERDR_ENV == "1" and (vim.env.REX_SESSION or "") == "",
     -- setup() writes herdr-splits.conf, which the herdr-side plugin scripts read
     -- to learn which chords to forward. That has to happen before the first
     -- keypress, so this can't lazy-load on `keys`.
