@@ -1,0 +1,16 @@
+#!/bin/sh
+# The herdr socket server in the foreground, for launchd (rex/launchd/
+# com.jonasws.rex-herdr.plist). launchd gives it neither the Rex terminals'
+# PATH nor a socket location, so both are set here. The socket path is the one
+# fish/conf.d/45-rex-herdr.fish and herdr/ctl.mjs compute.
+dir=$(dirname "$(realpath "$0")")
+state=${XDG_STATE_HOME:-$HOME/.local/state}
+socket=${REX_HERDR_SOCKET:-$state/rex/herdr.sock}
+rex_app="$HOME/Library/Application Support/com.superlogical.rex/RexServer/Versions/Current/Rex Server.app/Contents/MacOS/rex"
+
+PATH="$HOME/.local/share/mise/shims:/opt/homebrew/bin:$PATH"
+export PATH
+mkdir -p "$(dirname "$socket")"
+REX_BIN=${REX_BIN:-$rex_app}
+export REX_BIN
+exec "$REX_BIN" do "$dir/server.lua" --all "socket=$socket" "dir=$dir"

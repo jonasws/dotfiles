@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- herdr's socket API, answered by Rex (rex/herdr/serve). Linked into
+     ~/Library/LaunchAgents by the rex-launchd dotfile group; load it with
+     `mise -C ~/dotfiles run sync:rex-herdr`. launchd expands no ~ or $HOME,
+     hence the absolute paths. Starts the Rex server too if it is not running. -->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.jonasws.rex-herdr</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/jonasws/.config/rex/herdr/serve</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>ThrottleInterval</key>
+	<integer>10</integer>
+	<key>StandardOutPath</key>
+	<string>/Users/jonasws/.local/state/rex/herdr.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/jonasws/.local/state/rex/herdr.log</string>
+</dict>
+</plist>

@@ -1,5 +1,5 @@
 # Rex panes speak herdr. rex/herdr/server.lua answers herdr's socket API from
-# Rex (rex/herdr.lua keeps it running), so herdr tools work in a Rex pane once
+# Rex (the com.jonasws.rex-herdr LaunchAgent keeps it running), so herdr tools work in a Rex pane once
 # they know where it is and which pane they are in, as herdr and tuios tell
 # their own panes. The ids follow rex/herdr/ids.lua: w<12 hex of the
 # session>:p<12 hex of the block>.
@@ -18,9 +18,9 @@ end
 if set -q REX_HERDR_SOCKET
     set -gx HERDR_SOCKET_PATH $REX_HERDR_SOCKET
 else
-    set -l tmp /tmp
-    set -q TMPDIR; and set tmp (string replace -r '/+$' '' -- $TMPDIR)
-    set -gx HERDR_SOCKET_PATH $tmp/rex-herdr-(id -u).sock
+    set -l state $HOME/.local/state
+    set -q XDG_STATE_HOME; and set state $XDG_STATE_HOME
+    set -gx HERDR_SOCKET_PATH $state/rex/herdr.sock
 end
 set -gx HERDR_WORKSPACE_ID w(__rex_herdr_tail $REX_SESSION)
 set -gx HERDR_PANE_ID $HERDR_WORKSPACE_ID:p(__rex_herdr_tail $REX_BLOCK)
