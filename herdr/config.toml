@@ -55,6 +55,15 @@ type = "plugin_action"
 command = "dev.minung.herdr-f1.open"
 description = "open F1 dashboard"
 
+# The 3D dashboard from rex/f1, reading this herdr over its socket. herdr
+# renders pane Kitty graphics itself and passes them on to WezTerm. A zoomed
+# pane that closes when the dashboard quits.
+[[keys.command]]
+key = "prefix+ctrl+f"
+type = "pane"
+command = "~/.config/rex/f1/f1 --source herdr"
+description = "open 3D F1 dashboard"
+
 # Opens in the focused pane's repo; lazygit/popup.yml makes Esc close it.
 [[keys.command]]
 key = "prefix+l"
