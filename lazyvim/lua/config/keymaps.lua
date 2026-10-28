@@ -6,7 +6,9 @@
 -- Neovim/herdr-pane boundary; outside one smart-splits.nvim does the same job
 -- against Rex panes. Both expose move_cursor_* and resize_*, so the bindings below
 -- are identical either way — only the backend differs.
-local in_herdr = vim.env.HERDR_ENV == "1"
+-- A Rex pane sets HERDR_ENV=1 as well (fish/conf.d/45-rex-herdr.fish), and
+-- there smart-splits is the one that knows Rex's panes.
+local in_herdr = vim.env.HERDR_ENV == "1" and (vim.env.REX_SESSION or "") == ""
 local mc = require("util.multicursor")
 local ok, splits = pcall(require, in_herdr and "herdr-splits" or "smart-splits")
 
