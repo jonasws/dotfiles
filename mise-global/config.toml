@@ -57,6 +57,8 @@ mitmproxy = "latest"
 "github:mfontanini/presenterm" = "latest"
 "github:riii111/sabiql" = "latest"
 "npm:dotenv-cli" = "latest"
+# herdr-f1 for Rex too: rex/herdr/ctl dashboard points it at Rex's herdr socket.
+"npm:herdr-f1" = "latest"
 "github:always-further/nono" = "latest"
 "github:BurntSushi/bttf" = "latest"
 "github:achristmascarl/rainfrog" = "latest"
