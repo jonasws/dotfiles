@@ -10,7 +10,8 @@
 rex.bind("cmd+d", "pane.split", { direction = "down" })
 rex.bind("cmd+r", "pane.split", { direction = "right" })
 
--- Ctrl+hjkl moves and Ctrl+Shift+hjkl resizes across Rex panes and Neovim
+-- Ctrl+hjkl moves (unzooming a zoomed pane, wrapping at the edge) and
+-- Ctrl+Shift+hjkl resizes across Rex panes and Neovim
 -- windows as one grid. Neovim side: lazyvim/lua/plugins/smart-splits.lua, whose
 -- Rex backend calls back into the `rex` CLI at a Neovim edge. While Neovim runs
 -- in a pane the keys belong to it. Rex can't see that from the foreground
@@ -34,6 +35,45 @@ local function nvim_owns_keys(ctx)
   return false
 end
 
+-- Pickers use Ctrl+hjkl themselves (tv: help, layout, and walking its list), so
+-- while one runs in the foreground it gets the moves. They don't use
+-- Ctrl+Shift+hjkl, so resizing ignores this. Same list as wezterm/dot-wezterm.lua.
+local PICKERS = { tv = true, fzf = true }
+
+-- Ctrl+hjkl moves between the tiled panes, which a floating layer (a picker,
+-- the scrollback editor) sits on top of, so the layer gets the keys. A tv or
+-- fzf started by hand in a tiled pane is found by its foreground process; the
+-- layers' own commands run without job control, which hides the program behind
+-- `login`, so the process name can't be used there.
+local function in_floating_layer(ctx, view)
+  for _, window in ipairs(view and view.windows or {}) do
+    for _, layer in ipairs(window.layers or {}) do
+      if layer.kind == "floating" then
+        for _, block in ipairs(layer.blocks or {}) do
+          if block.block_id == ctx.block_id then
+            return true
+          end
+        end
+      end
+    end
+  end
+  return false
+end
+
+local function picker_wants_keys(ctx, view)
+  if in_floating_layer(ctx, view) then
+    return true
+  end
+  local res = rex.call("block.method", {
+    session_id = ctx.session_id,
+    block_id = ctx.block_id,
+    method = "process",
+  })
+  local info = res and res.result or res
+  local fg = info and info.foreground
+  return fg ~= nil and PICKERS[fg.name] == true
+end
+
 rex.action({
   name = "smart_splits_resize",
   title = "Smart Splits: Resize Pane",
@@ -51,10 +91,18 @@ rex.action({
 
 for key, direction in pairs({ h = "left", j = "down", k = "up", l = "right" }) do
   rex.bind("ctrl+" .. key, function(ctx)
-    if nvim_owns_keys(ctx) then
+    local view = rex.session.view({ session_id = ctx.session_id })
+    if nvim_owns_keys(ctx) or picker_wants_keys(ctx, view) then
       return false
     end
-    rex.session.focus_direction({ direction = direction })
+    -- A zoomed block reports every direction as an edge, so unzoom first, then
+    -- move, wrapping to the opposite side at an edge. Same as herdr-splits.
+    for _, window in ipairs(view and view.windows or {}) do
+      if window.zoomed_block_id and window.focused_block_id == ctx.block_id then
+        rex.session.zoom_block({ session_id = ctx.session_id, block_id = ctx.block_id, zoom = false })
+      end
+    end
+    rex.session.focus_direction({ direction = direction, wrap = true })
     return true
   end)
   rex.bind("ctrl+shift+" .. key, "smart_splits_resize", {
@@ -75,100 +123,40 @@ rex.bind("cmd+=", "client.font.increase")
 rex.bind("cmd+-", "client.font.decrease")
 rex.bind("cmd+0", "client.font.reset")
 
--- Next/previous agent, after herdr's next_agent/previous_agent. An agent is a
--- terminal whose program reported a status record with an app (Claude Code
--- does). Order follows the sidebar: sessions, then tabs, then pane layout order.
--- Like herdr it wraps, and from a non-agent pane it lands on the first (next)
--- or last (previous) agent.
-local TERMINAL = "com.superlogical.terminal"
-
-local function is_agent(session_id, block_id)
-  local res = rex.call("block.method", {
-    session_id = session_id,
-    block_id = block_id,
-    method = "program_status",
-  })
-  for _, record in ipairs(res and res.result and res.result.records or res and res.records or {}) do
-    if record.effective_app or record.app then
-      return true
-    end
-  end
-  return false
-end
-
-local function agents()
-  local found = {}
-  local listed = rex.call("session.list")
-  for _, session in ipairs(listed and listed.sessions or {}) do
-    local view = rex.session.view({ session_id = session.session_id })
-    for _, window in ipairs(view and view.windows or {}) do
-      for _, layer in ipairs(window.layers or {}) do
-        if layer.kind == "tiled" then
-          for _, block in ipairs(layer.blocks or {}) do
-            if block.creator_name == TERMINAL and is_agent(session.session_id, block.block_id) then
-              found[#found + 1] = {
-                session_id = session.session_id,
-                window_id = window.window_id,
-                block_id = block.block_id,
-              }
-            end
-          end
-        end
-      end
-    end
-  end
-  return found
-end
-
-local function cycle_agent(ctx, step)
-  local list = agents()
-  if #list == 0 then
-    return
-  end
-  local current
-  for i, agent in ipairs(list) do
-    if agent.block_id == ctx.block_id then
-      current = i
-    end
-  end
-  local target
-  if current then
-    target = list[(current - 1 + step) % #list + 1]
-  else
-    target = step > 0 and list[1] or list[#list]
-  end
-  if target.block_id == ctx.block_id then
-    return
-  end
-  rex.session.focus_block({ session_id = target.session_id, block_id = target.block_id })
-  -- focus_block only changes the server's idea of the active window; the app
-  -- needs session.select to show that tab, and the session if it differs.
-  rex.client.queue("session.select", {
-    session_id = target.session_id,
-    window_id = target.window_id,
-  })
-end
-
-rex.action({
-  name = "next_agent",
-  title = "Focus Next Agent",
-  run = function(ctx) cycle_agent(ctx, 1) end,
-})
-
-rex.action({
-  name = "previous_agent",
-  title = "Focus Previous Agent",
-  run = function(ctx) cycle_agent(ctx, -1) end,
-})
-
+-- Next/previous agent: the next_agent and previous_agent actions are defined in
+-- herdr.lua, which steps through herdr's agents across sessions.
 rex.bind("ctrl+cmd+]", "next_agent")
 rex.bind("ctrl+cmd+[", "previous_agent")
 
--- herdr's prefix, with its agent keys. Ctrl+B no longer reaches the terminal on
+-- herdr's prefix (its keys are in herdr.lua). Ctrl+B no longer reaches the terminal on
 -- its own, so Ctrl+B twice sends one through.
-rex.bind("ctrl+b>a", "next_agent")
-rex.bind("ctrl+b>shift+a", "previous_agent")
 rex.bind("ctrl+b>ctrl+b", "pane.send_key", { key = "ctrl+b" })
+
+-- herdr's default prefix keys for tabs, panes and workspaces (sessions here).
+-- Left out: prefix+h/j/k/l, which Ctrl+hjkl cover (and l is lazygit), and detach.
+for key, action in pairs({
+  ["c"] = "client.tab.new",
+  ["shift+x"] = "client.tab.close",
+  ["shift+t"] = "client.tab.rename",
+  ["n"] = "client.tab.next",
+  ["p"] = "client.tab.previous",
+  ["x"] = "pane.close",
+  ["z"] = "pane.zoom",
+  ["v"] = "pane.split.right",
+  ["-"] = "pane.split.down",
+  ["shift+n"] = "session.new",
+  ["shift+d"] = "session.close",
+  ["shift+w"] = "session.rename",
+  ["ctrl+n"] = "session.next",
+  ["ctrl+p"] = "session.previous",
+}) do
+  rex.bind("ctrl+b>" .. key, action)
+end
+
+-- prefix+1..9 jumps to that tab; Rex counts tabs from 1.
+for i = 1, 9 do
+  rex.bind("ctrl+b>" .. i, "client.tab.goto", { index = i })
+end
 
 -- Rex has no copy mode yet, so Ctrl+B e stands in for herdr's edit_scrollback.
 -- It snapshots the pane's screen and scrollback into a floating $EDITOR (Neovim
