@@ -1,0 +1,15 @@
+{
+  "lockfileVersion": 2,
+  "configVersion": 1,
+  "workspaces": {
+    "": {
+      "name": "karabiner-ts",
+      "dependencies": {
+        "karabiner.ts": "^1.38.0",
+      },
+    },
+  },
+  "packages": {
+    "karabiner.ts": ["karabiner.ts@1.38.0", "", {}, "sha512-ZF9fXZWoHuTbwasBj6LDUy4TP447x+onlWrjp5AMYMdJFXac+u832ut1tlhSDrpoy6n4sQzoOaS+3aytByzPRg=="],
+  }
+}

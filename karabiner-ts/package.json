@@ -1,0 +1,11 @@
+{
+  "name": "karabiner-ts",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun karabiner.config.ts"
+  },
+  "dependencies": {
+    "karabiner.ts": "^1.38.0"
+  }
+}
