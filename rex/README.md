@@ -4,6 +4,37 @@ Configuration for [Rex](https://www.superlogical.com/rex/docs), linked to
 `~/.config/rex` by the `rex` dotfile group in `mise.toml`. Reload after
 changes with `rex config reload`.
 
+## App settings
+
+Rex keeps its appearance settings in the app's user defaults
+(`com.superlogical.rex`), not in `init.lua`, so they are not tracked here. A
+settings file is accepted upstream ("settings in config files"), and an
+export of the GUI settings is promised. Until then, redo these by hand.
+
+Chosen to keep Catppuccin Mocha from brightening when the window gains focus
+(macOS 27.2, Rex Beta 0.1.0 build 1617):
+
+| Setting (Settings → Interface) | Value | Key |
+| ------------------------------ | ----- | --- |
+| Interface style | Classic | `Workspace.interfaceStyle` = `system` |
+| Use glass for panes | off | `Workspace.usesPaneGlass` |
+| Fade inactive panes | none | `Workspace.inactivePaneFadeMode` |
+| Fade panes for inactive windows (Panes → Customize pane behavior) | off | `Workspace.usesStandardInactiveWindowPaneStyles` |
+| Improve text contrast (Terminal) | off | `Workspace.terminalImproveTextContrast` |
+| Display P3 colour space | off | `Workspace.terminalUsesDisplayP3` |
+
+- Glass greys the window when it is unfocused, and no fade option controls
+  it. Classic with the fades off stays steady, though a few users report a
+  slight residual grey.
+- "Fade content for inactive windows" has no stored key here, so its default
+  is unknown. Check it in the same Panes menu.
+- `Workspace.tintsPanesWithProgramBackground` is a leftover: Blend program
+  backgrounds was removed in preview.16.
+- `defaults write com.superlogical.rex <key> -bool false` works, but quit Rex
+  first or it can write the old value back.
+- The monitor (Samsung C34J79x) runs picture mode Custom with factory colour
+  settings and the macOS `sRGB IEC61966-2.1` profile.
+
 ## herdr in Rex
 
 Rex answers herdr's socket API, the way tuios does
