@@ -51,6 +51,12 @@ resume_agents = "auto"
 new_window_when_empty = true
 
 # herdr's sidebar sits on the left.
+# Name agent panes after their topic, which the rail otherwise hides behind the
+# running command ("claude 1", "claude 2"). The daemon reads [hooks] at start,
+# so `tuios restart-server` picks a change up.
+[hooks]
+after-agent-state = "~/.config/tuios/scripts/auto-name.sh"
+
 [appearance.sidebar]
 position = "left"
 width = 34
