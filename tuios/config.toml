@@ -79,20 +79,45 @@ prefix_workspace = ["ctrl+w"]
 # herdr: prefix+ctrl+n/p step through workspaces, here sessions.
 next_session = ["ctrl+n", ")"]
 prev_session = ["ctrl+p", "("]
-# herdr: prefix+a steps to the next agent. Here it goes to the oldest one that
-# needs you, and prefix+A to the newest finished turn.
-prefix_next_attention = ["a", "o"]
+# herdr: prefix+a and prefix+A step through the agents, across sessions, in the
+# order of the rail's agents section. J and K are tuios's own keys for it. The
+# attention queue keeps o for the oldest item that needs you, and the newest
+# finished turn moves from O, which opens the AWS profiles, to ctrl+k.
+next_agent = ["a", "J"]
+prev_agent = ["A", "K"]
+prefix_next_attention = ["o"]
 launcher = ["ctrl+a"]
-prefix_next_finished = ["A"]
+prefix_next_finished = ["ctrl+k"]
 prefix_agents_settings = []
 clear_scrollback = ["ctrl+l"]
 # Freed for the command keys below, which a tuios action would otherwise win.
 prefix_layout = ["ctrl+o"]
-prefix_window = ["T"]
 prefix_tape = []
 prefix_toggle_other_rail = []
 prefix_file_search = ["ctrl+f"]
 prefix_rename_window = ["ctrl+r"]
+# herdr: prefix+e opens the pane's screen and scrollback in $EDITOR. The rail
+# toggle that had e takes E, the key tuios gives the editor.
+edit_scrollback = ["e"]
+prefix_explore = ["E"]
+# herdr: prefix+F opens the F1 dashboard, a command key below. The text hints
+# that had F move to ctrl+u.
+hints = ["ctrl+u"]
+
+# herdr's capital letters: prefix+shift+x closes a tab and shift+t renames it,
+# shift+n makes a workspace (here a session), shift+d closes it and shift+w
+# renames it. tuios's own owners of those keys move: the debug prefix to
+# ctrl+d, the window prefix to ctrl+x, the last message to ctrl+y and the
+# workspace switcher to ctrl+g.
+close_workspace = ["X"]
+rename_workspace = ["T"]
+new_session = ["N"]
+prefix_close_session = ["D"]
+rename_session = ["W"]
+prefix_debug = ["ctrl+d"]
+prefix_window = ["ctrl+x"]
+prefix_last_message = ["ctrl+y"]
+prefix_workspace_switcher = ["ctrl+g"]
 
 # Like herdr, nothing but the prefix and the command keys below is taken from
 # the pane. Focus moves on ctrl+hjkl, windows and tabs on the prefix.
@@ -271,5 +296,14 @@ type = "shell"
 command = "~/.config/tuios/scripts/as-herdr.sh bash ~/.claude/hooks/subagent-viewer.sh toggle"
 description = "Toggle subagent viewers"
 
+# F1 dashboard, through the herdr-f1 plugin (`herdr plugin install
+# hmu332233/herdr-f1`; tuios reads herdr's registry and leaves it off until it is
+# enabled below).
+[[keybindings.command]]
+key = "prefix+F"
+type = "plugin_action"
+command = "dev.minung.herdr-f1.open"
+description = "Open F1 dashboard"
+
 [plugins]
-enabled = ["herdr-splits", "herdr-tsk"]
+enabled = ["herdr-splits", "herdr-tsk", "dev.minung.herdr-f1"]
