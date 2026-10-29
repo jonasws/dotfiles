@@ -1,0 +1,76 @@
+[metadata]
+name = "tuios-sessions"
+description = """
+Fuzzy find and jump to tuios panes, in every session.
+
+Panes are an attention queue: errored, waiting on you, finished and unseen
+(longest waiting first), then working, other agents, panes running some other
+command, and idle shells. A row shows the session, the agent and its state,
+the pane's name and folder, what a working agent is doing right now, and tags:
+the kind of thing it waits on (approval, question, plan), context use,
+⌥ subagents, ↳ queued prompts, ✉ unread mail and the time in this state.
+
+It reads tuios directly, so unlike herdr-sessions it keeps needs_you,
+finished_unread and the Inbox kinds that herdr's compat API cannot express.
+Enter focuses the pane and switches the client to its session.
+
+Tab cycles the scope: all, agents, needs you, working, panes, shells. Typing a
+sigil first narrows the same way: @ agents, ? needs you, % panes, # shells.
+The preview shows the prompt an agent is blocked on, or the recap of its turn
+and its recent activity; ctrl-f cycles to the screen and the activity log.
+
+tuios only. For herdr and Rex use herdr-sessions.
+"""
+requirements = ["tuios", "nu"]
+
+[source]
+command = [
+  { name = "all", run = "~/.config/television/scripts/tuios-sessions.nu all" },
+  { name = "@ agents", run = "~/.config/television/scripts/tuios-sessions.nu agents" },
+  { name = "? needs you", run = "~/.config/television/scripts/tuios-sessions.nu needs" },
+  { name = "~ working", run = "~/.config/television/scripts/tuios-sessions.nu working" },
+  { name = "% panes", run = "~/.config/television/scripts/tuios-sessions.nu panes" },
+  { name = "# shells", run = "~/.config/television/scripts/tuios-sessions.nu shells" },
+]
+# tv runs commands through $SHELL (fish here), which costs about 70ms a run.
+shell = "bash"
+# ansi and display exclude each other, so the row leads with the token that the
+# preview and focus scripts recover with {strip_ansi|split: :0}.
+ansi = true
+output = "{strip_ansi|split: :0}"
+# State changes while the picker is open. Three tuios calls per refresh.
+watch = 2.0
+frecency = false
+
+[preview]
+shell = "bash"
+command = [
+  "~/.config/television/scripts/tuios-preview.sh '{strip_ansi|split: :0}' summary",
+  "~/.config/television/scripts/tuios-preview.sh '{strip_ansi|split: :0}' screen",
+  "~/.config/television/scripts/tuios-preview.sh '{strip_ansi|split: :0}' log",
+]
+
+[ui]
+layout = "portrait"
+input_header = "tuios panes"
+
+[ui.preview_panel]
+size = 62
+header = "{strip_ansi|split: :0}"
+scrollbar = true
+
+[keybindings]
+shortcut = "f4"
+# Cmd+K toggles the picker; inside it the chord closes the picker too.
+ctrl-alt-k = "quit"
+# Enter focuses one pane, so multi-select has no use and Tab cycles scopes.
+enter = "actions:focus"
+tab = "cycle_sources"
+
+# `execute` replaces tv with the command, so the popup is gone by the time the
+# focus lands.
+[actions.focus]
+shell = "bash"
+description = "Jump to the selected pane"
+command = "~/.config/television/scripts/tuios-focus.sh '{strip_ansi|split: :0}'"
+mode = "execute"
