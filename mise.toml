@@ -97,7 +97,17 @@ run = [
 description = "Reinstall the neovim nightly build behind the nvn alias"
 # Not in `update`: nightly is opt-in. --force because "nightly" is a fixed
 # version name, so mise otherwise treats an existing install as current.
-run = "mise install --force neovim@nightly"
+# Skipped when the installed build already carries the nightly tag's commit.
+run = """
+set -euo pipefail
+nvim="$HOME/.local/share/mise/installs/neovim/nightly/bin/nvim"
+sha=$(git ls-remote https://github.com/neovim/neovim refs/tags/nightly | cut -c1-7)
+if [ -x "$nvim" ] && "$nvim" --version | grep -q "+g$sha"; then
+  echo "neovim nightly is already at $sha"
+  exit 0
+fi
+mise install --force neovim@nightly
+"""
 
 [tasks."update:tuios-nightly"]
 description = "Build tuios from main and install it behind the tuios alias"
@@ -112,13 +122,45 @@ set -euo pipefail
 root="$HOME/.local/share/tuios-nightly"
 src="$root/src"
 if [ -d "$src/.git" ]; then
+  built=$(git -C "$src" rev-parse HEAD)
   git -C "$src" fetch --depth 1 origin main
   git -C "$src" reset --hard FETCH_HEAD
+  if [ -x "$root/bin/tuios" ] && [ "$built" = "$(git -C "$src" rev-parse HEAD)" ] \
+    && [ "$(cat "$root/built-commit" 2>/dev/null)" = "$built" ]; then
+    echo "tuios is already at ${built:0:7}"
+    exit 0
+  fi
 else
   mkdir -p "$root"
   git clone --depth 1 https://github.com/Gaurav-Gosain/tuios.git "$src"
 fi
 "$src/scripts/install.sh" pure --prefix "$root/bin" --keep-server
+git -C "$src" rev-parse HEAD > "$root/built-commit"
+"""
+
+[tasks."update:herdr-nightly"]
+description = "Install the newest herdr preview build behind the herdrn alias"
+# Not in `update`: nightly is opt-in. herdr publishes prebuilt preview builds
+# as prereleases, so this downloads one instead of compiling. It sits under its
+# own prefix because the mise-managed release shadows anything in ~/.local/bin.
+# Preview builds can lag the latest stable tag; the tag is printed. The
+# running server stays on its old build until `herdrn server stop`.
+run = """
+set -euo pipefail
+root="$HOME/.local/share/herdr-nightly"
+asset="herdr-macos-$(uname -m | sed 's/arm64/aarch64/')"
+tag=$(curl -fsSL "https://api.github.com/repos/herdrdev/herdr/releases?per_page=30" |
+  python3 -c 'import json,sys; print(next(r["tag_name"] for r in json.load(sys.stdin) if r["prerelease"]))')
+if [ -x "$root/bin/herdr" ] && [ "$(cat "$root/version" 2>/dev/null)" = "$tag" ]; then
+  echo "herdr is already at $tag"
+  exit 0
+fi
+mkdir -p "$root/bin"
+curl -fsSL -o "$root/bin/herdr.new" "https://github.com/herdrdev/herdr/releases/download/$tag/$asset"
+chmod +x "$root/bin/herdr.new"
+mv "$root/bin/herdr.new" "$root/bin/herdr"
+echo "$tag" > "$root/version"
+"$root/bin/herdr" --version
 """
 
 [tasks."update:manifests"]
