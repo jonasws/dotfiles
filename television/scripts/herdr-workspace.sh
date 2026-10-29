@@ -23,7 +23,11 @@ if [[ -n "$existing_workspace" ]]; then
   herdr workspace focus "$existing_workspace" >/dev/null
 else
   label="${repo_path##*/}"
-  herdr workspace create --cwd "$repo_path" --label "$label" --focus >/dev/null
+  created=$(herdr workspace create --cwd "$repo_path" --label "$label" --focus)
+  # tuios answers the same API but ignores --focus on a create, so focus the new
+  # workspace by id. herdr has focused it already, which makes this a no-op.
+  new_workspace=$(jq -r '.result.workspace.workspace_id // empty' <<<"$created")
+  [[ -z "$new_workspace" ]] || herdr workspace focus "$new_workspace" >/dev/null
 fi
 
 # Everything below only applies when the picker was run from outside herdr.
