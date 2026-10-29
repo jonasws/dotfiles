@@ -25,6 +25,9 @@ tiling_scheme = "longest_side"
 # Window slides and the copy sweep stay; overlay fades and the working-agent
 # shimmer go.
 motion = "basic"
+# The default cap of 12 cells cuts "dotfiles › topic" workspace names to
+# "dotfiles › …". The full name still shows on hover.
+dock_workspace_label_max = 28
 
 # Dock messages show the icon and text, without the side bar and countdown line.
 [notifications]
