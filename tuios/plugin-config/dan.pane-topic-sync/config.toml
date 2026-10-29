@@ -1,0 +1,21 @@
+# dan.pane-topic-sync
+#
+# Names each agent pane after its live topic, which the plugin reads from
+# herdr's `terminal_title_stripped`. With `show_agent_labels_on_pane_borders`
+# already true in herdr's config.toml, that topic is painted straight onto the
+# pane border, so two Claude panes in one tab stop both reading `claude`.
+#
+# Panes only. Tabs belong to qu8n/herdr-automatic-rename, which names them after
+# the foreground process (nvim, ssh, fish) and falls back to the agent's topic --
+# a superset of what this plugin would put there. Both renaming tabs would mean
+# two plugins fighting over one label.
+sync_panes = true
+sync_tabs = false
+
+# Manual names win. A pane renamed by hand is dropped from management until it
+# is handed back with `herdr pane rename <id> --clear`.
+respect_manual_names = true
+
+# Applied after formatting. Pane borders truncate on their own well before
+# this, so it mostly guards the state file against a runaway title.
+max_label_length = 60

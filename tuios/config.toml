@@ -22,6 +22,30 @@ border_unfocused_color = "#45475a"
 # Split across the longer side, so a new pane on a wide screen goes right and
 # on a tall one goes down, close to picking herdr's split direction by hand.
 tiling_scheme = "longest_side"
+# Window slides and the copy sweep stay; overlay fades and the working-agent
+# shimmer go.
+motion = "basic"
+
+# Dock messages show the icon and text, without the side bar and countdown line.
+[notifications]
+style = "plain"
+
+# The default right list minus "notifications". tuios announces "Window created
+# (N total)" and similar with no setting to turn them off, and the dock is the
+# only place they draw. Messages still go to the log viewer; agent alerts keep
+# the Inbox and the desktop notification.
+[dock]
+right = ["transfers", "copy-help", "cpu", "ram", "clock", "session-controls"]
+
+# herdr resumes agent conversations on its own after a restart. The default,
+# "ask", leaves a Resume row in the Inbox for each pane instead.
+[daemon]
+resume_agents = "auto"
+
+# herdr: prefix+c opens a tab in the focused pane's folder. A new workspace is
+# empty, and this opens its first pane in the folder of the pane you came from.
+[workspaces]
+new_window_when_empty = true
 
 # herdr's sidebar sits on the left.
 [appearance.sidebar]
@@ -211,64 +235,58 @@ command = "herdr-splits.resize-right"
 [[keybindings.command]]
 key = "prefix+f"
 name = "pane-picker"
-type = "popup"
-command = "~/.config/tuios/scripts/as-herdr.sh tv herdr-sessions"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh pane-picker 90% 80% -- tv tuios-sessions"
 description = "Pane picker"
-width = "90%"
-height = "80%"
 
 [[keybindings.command]]
 key = "ctrl+alt+k"
 name = "pane-picker-cmd-k"
-type = "popup"
-command = "~/.config/tuios/scripts/as-herdr.sh tv herdr-sessions"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh pane-picker 90% 80% -- tv tuios-sessions"
 description = "Pane picker"
-width = "90%"
-height = "80%"
 
 [[keybindings.command]]
 key = "prefix+l"
-type = "popup"
-command = "~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/lazygit-popup.sh status"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh lazygit 80% 60% -- ~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/lazygit-popup.sh status"
 description = "lazygit: status"
 
 [[keybindings.command]]
 key = "prefix+L"
-type = "popup"
-command = "~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/lazygit-popup.sh log"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh lazygit 80% 60% -- ~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/lazygit-popup.sh log"
 description = "lazygit: log"
 
 [[keybindings.command]]
 key = "prefix+y"
-type = "popup"
-command = "~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/yazi-popup.sh"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh yazi 80% 60% -- ~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/yazi-popup.sh"
 description = "yazi: browse"
 
 [[keybindings.command]]
 key = "prefix+Y"
-type = "popup"
-command = "~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/yazi-popup.sh pick"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh yazi 80% 60% -- ~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/yazi-popup.sh pick"
 description = "yazi: pick files into pane"
 
 # Enter opens or focuses a session for the repo.
 [[keybindings.command]]
 key = "prefix+r"
-type = "popup"
-command = "~/.config/tuios/scripts/as-herdr.sh tv git-repos -k 'enter=\"actions:workspace\"'"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh repo-picker 90% 60% -- ~/.config/tuios/scripts/as-herdr.sh tv git-repos -k 'enter=\"actions:workspace\"'"
 description = "Git repo picker"
-width = "90%"
 
 [[keybindings.command]]
 key = "prefix+H"
-type = "popup"
-command = "tv hotkeys"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh hotkeys 90% 60% -- tv hotkeys"
 description = "Hotkeys"
-width = "90%"
 
 [[keybindings.command]]
 key = "prefix+O"
-type = "popup"
-command = "tv aws-profiles"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh aws-profiles 80% 60% -- tv aws-profiles"
 description = "AWS profiles"
 
 # tsk board, through the herdr-tsk plugin (`tuios plugins enable herdr-tsk`).
@@ -286,8 +304,8 @@ description = "tsk quick capture"
 
 [[keybindings.command]]
 key = "prefix+ctrl+e"
-type = "popup"
-command = "~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/tsk-notes.sh"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh tsk-notes 80% 60% -- ~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/tsk-notes.sh"
 description = "Edit tsk notes in nvim"
 
 [[keybindings.command]]
@@ -306,4 +324,13 @@ command = "dev.minung.herdr-f1.open"
 description = "Open F1 dashboard"
 
 [plugins]
-enabled = ["herdr-splits", "herdr-tsk", "dev.minung.herdr-f1"]
+enabled = [
+  "herdr-splits",
+  "herdr-tsk",
+  "dev.minung.herdr-f1",
+  # Name agent panes after their live topic and workspaces after the pane
+  # running in them, so panes stop reading "claude 1", "claude 2". Settings are
+  # in ~/.config/herdr/plugins/config/.
+  "dan.pane-topic-sync",
+  "herdr-automatic-rename",
+]
