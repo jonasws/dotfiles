@@ -192,4 +192,5 @@ fnox sync -g -p sync-age -f
 
 [shell_alias]
 nvn = "~/.local/share/mise/installs/neovim/nightly/bin/nvim"
+tuios = "~/.local/share/tuios-nightly/bin/tuios"
 n = "nvim"
