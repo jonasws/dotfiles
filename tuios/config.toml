@@ -15,7 +15,7 @@ layout = "bsp"
 start_in_terminal_mode = true
 
 [appearance]
-theme = "catppuccin_mocha"
+theme = "mocha-surface"
 # Catppuccin Mocha mauve, herdr's accent, and surface1.
 border_focused_color = "#cba6f7"
 border_unfocused_color = "#45475a"

@@ -1,0 +1,11 @@
+{
+  "id": "mocha-surface",
+  "display_name": "Catppuccin Mocha (surface)",
+  "base": "catppuccin_mocha",
+  "chrome": {
+    "accent": "#cba6f7",
+    "surface": "#313244",
+    "dock": { "ground": "#181825" },
+    "rail": { "ground": "#181825" }
+  }
+}
