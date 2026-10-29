@@ -266,17 +266,6 @@ checksum = "sha256:4284325e09e3e2bd62eea76e803701d81750619f951956e5698d208c37c9b
 url = "https://github.com/BurntSushi/bttf/releases/download/0.1.4/bttf-0.1.4-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/BurntSushi/bttf/releases/assets/432196770"
 
-[[tools."github:Gaurav-Gosain/tuios"]]
-version = "0.11.1"
-backend = "github:Gaurav-Gosain/tuios"
-specifiers = ["latest"]
-
-[tools."github:Gaurav-Gosain/tuios"."platforms.macos-arm64"]
-checksum = "sha256:9f64c873d4c69c4797136960349eb32aac5daf5aeeab4c15f5605f80cdf86458"
-checksum_source = "mise-versions"
-url = "https://github.com/Gaurav-Gosain/tuios/releases/download/v0.11.1/tuios_0.11.1_Darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/Gaurav-Gosain/tuios/releases/assets/678224122"
-
 [[tools."github:RivoLink/leaf"]]
 version = "1.29.2"
 backend = "github:RivoLink/leaf"

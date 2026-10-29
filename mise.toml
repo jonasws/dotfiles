@@ -110,10 +110,10 @@ mise install --force neovim@nightly
 """
 
 [tasks."update:tuios-nightly"]
-description = "Build tuios from main and install it behind the tuios alias"
-# Not in `update`: nightly is opt-in. Installed beside the release from mise,
-# which sits ahead of ~/.local/bin on PATH and would shadow a build placed
-# there, so the binaries live under their own prefix and the alias points at it.
+description = "Build tuios from main and link it as tuios in ~/.local/bin"
+# Not in `update`: nightly is opt-in. tuios is not a mise tool: `restart-server`
+# starts the newer of the binary you ran and the one on PATH, and judges a dev
+# build older than any release, so a mise-managed release on PATH would win.
 # --keep-server leaves a running daemon on the previous build; `tuios
 # kill-server` switches over when the panes can be spared.
 tools = { go = "latest" }
@@ -136,6 +136,7 @@ else
 fi
 "$src/scripts/install.sh" pure --prefix "$root/bin" --keep-server
 git -C "$src" rev-parse HEAD > "$root/built-commit"
+ln -sfn "$root/bin/tuios" "$HOME/.local/bin/tuios"
 """
 
 [tasks."update:herdr-nightly"]

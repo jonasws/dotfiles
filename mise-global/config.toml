@@ -84,7 +84,6 @@ glow = "latest"
 pandoc = "latest"
 "cargo:mdcat" = "latest"
 herdr = "latest"
-"github:Gaurav-Gosain/tuios" = "latest"
 "github:yazeed/proc-cli" = "latest"
 "github:agavra/tuicr" = "latest"
 hunk = "latest"
@@ -155,7 +154,6 @@ minimum_release_age_excludes = [
   "github:walles/moor",
   "github:pamburus/hl",
   "github:mfontanini/presenterm",
-  "github:Gaurav-Gosain/tuios",
 ]
 
 [settings.github]
