@@ -36,6 +36,7 @@ config.tab_bar_at_bottom = true
 config.use_fancy_tab_bar = false
 
 config.enable_kitty_keyboard = false
+config.enable_kitty_graphics = true
 config.audible_bell = 'Disabled'
 config.front_end = 'WebGpu'
 
@@ -275,6 +276,7 @@ config.keys = {
 ---    handles crossing back out to WezTerm itself via `wezterm cli`.
 ---  * herdr — its own ctrl+hjkl / ctrl+shift+hjkl bindings drive herdr-splits,
 ---    which in turn reaches any Neovim nested inside a herdr pane.
+---  * tuios — same bindings, through the herdr-splits plugin (tuios/config.toml).
 local function pane_owns_splits(pane)
   if pane:get_user_vars().IS_NVIM == 'true' then
     return true
@@ -282,7 +284,7 @@ local function pane_owns_splits(pane)
   -- nil for panes WezTerm can't introspect (ssh/mux domains); those fall
   -- through to WezTerm-side movement, which is the right default there.
   local proc = pane:get_foreground_process_name()
-  return proc ~= nil and proc:match '[/\\]herdr$' ~= nil
+  return proc ~= nil and (proc:match '[/\\]herdr$' ~= nil or proc:match '[/\\]tuios$' ~= nil)
 end
 
 ---Pickers bind CTRL+hjkl themselves (tv: select with j/k, help on h, layout on
