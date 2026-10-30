@@ -166,7 +166,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "tuios agent-hook claude-code --integration 3",
+            "command": "/bin/sh -c 'rex __internal session-start --agent claude 2>/dev/null || true'",
             "timeout": 5
           }
         ]
@@ -175,7 +175,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "/bin/sh -c 'rex __internal session-start --agent claude 2>/dev/null || true'",
+            "command": "tuios agent-hook claude-code --integration 3",
             "timeout": 5
           }
         ]
