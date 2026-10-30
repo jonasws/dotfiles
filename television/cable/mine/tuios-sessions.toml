@@ -16,8 +16,9 @@ Enter focuses the pane and switches the client to its session.
 
 Tab cycles the scope: all, agents, needs you, working, panes, shells. Typing a
 sigil first narrows the same way: @ agents, ? needs you, % panes, # shells.
-The preview shows the prompt an agent is blocked on, or the recap of its turn
-and its recent activity; ctrl-f cycles to the screen and the activity log.
+The preview shows the pane as drawn; ctrl-f cycles to its scrollback, to the
+prompt an agent is blocked on or the recap of its turn, and to the activity
+log.
 
 tuios only. For herdr and Rex use herdr-sessions.
 """
@@ -45,8 +46,9 @@ frecency = false
 [preview]
 shell = "bash"
 command = [
-  "~/.config/television/scripts/tuios-preview.sh '{strip_ansi|split: :0}' summary",
   "~/.config/television/scripts/tuios-preview.sh '{strip_ansi|split: :0}' screen",
+  "~/.config/television/scripts/tuios-preview.sh '{strip_ansi|split: :0}' scrollback",
+  "~/.config/television/scripts/tuios-preview.sh '{strip_ansi|split: :0}' summary",
   "~/.config/television/scripts/tuios-preview.sh '{strip_ansi|split: :0}' log",
 ]
 
