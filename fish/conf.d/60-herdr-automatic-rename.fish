@@ -8,9 +8,11 @@
 # Loaded at 60 so it lands after 30-interactive.fish installs starship and the
 # other prompt integrations; the hook itself no-ops outside a herdr pane.
 #
-# Globbed rather than hardcoded: `herdr plugin install` puts the checkout in a
-# directory suffixed with an install hash, which changes on every update.
-for _f in $HOME/.config/herdr/plugins/github/herdr-automatic-rename-*/shell/hook.fish
+# Globbed rather than hardcoded: `herdr plugin install` puts the checkout in
+# <name>-<hash>/<install number>/checkout, and the install number changes on
+# every update. Newest first, so a leftover older install is only a fallback.
+set -l _hooks $HOME/.config/herdr/plugins/github-installations/herdr-automatic-rename-*/*/checkout/shell/hook.fish
+for _f in $_hooks[-1..1]
     test -r "$_f"; and source "$_f"; and break
 end
 
