@@ -152,6 +152,39 @@ A teammate's review submitted on GitHub is never stored in a tuicr session, so
 the review as a file, I run `pr-review <N> > file.md` (a fish function over
 `gh api graphql`; `--all` keeps resolved threads) and hand you the path.
 
+## Mermaid and TML in the terminal
+
+`sketch` (Mermaid to text, PNG, SVG) and `tml` (shows a TML document, or prints it
+once with `--print`) are standalone builds of tuios's renderers, in `~/.local/bin`.
+Use them in herdr and Rex panes; `sketch -h` and `tml -h` list the flags, and
+`tml --check` names the fix for each problem. Inside tuios (`TUIOS_ENV=1`) use
+`tuios mermaid` and `tuios tml`, and `tuios --skill tml` prints the TML format.
+Plain `tml` cannot return an answer, because redirected output prints instead of
+opening the UI; ask in the conversation or use `tuios tml show --wait`.
+
+## tuios: one session per repository
+
+I run one tuios session per repository or project, as I ran one herdr workspace
+per repo (a herdr workspace is a tuios session, a herdr tab a tuios workspace, a
+herdr pane a tuios window). `-s "$TUIOS_SESSION"` therefore only reaches agents
+working in the same repo. To reach an agent in another repo, address it by
+selector, which spans every session:
+
+```sh
+tuios list-agents --select 'session:dotfiles harness:claude-code'   # prints a --confirm token
+tuios send-agent-message --select 'session:dotfiles harness:claude-code' --confirm TOKEN 'TEXT'
+```
+
+- Sessions are named after the repo's directory (`dotfiles`, `cn-cx-infra`),
+  by the git-repos picker that opens them, so `session:<repo>` works. Use
+  `cwd:` for a session opened some other way, which tuios names
+  `session-<hex>`.
+- `send-agent-message -s OTHER -w ID` fails across sessions: the sender
+  defaults to this pane and is looked up in the target session.
+- A `--select` write lists the panes first and sends only when given the
+  token, which belongs to exactly that set of panes. Check that the set is
+  the one agent you meant before you send.
+
 ## Task board
 
 Work that outlives one session goes on the tsk board (`tsk`, installed by mise
