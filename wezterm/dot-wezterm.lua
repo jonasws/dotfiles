@@ -287,6 +287,11 @@ local function pane_owns_splits(pane)
   return proc ~= nil and (proc:match '[/\\]herdr$' ~= nil or proc:match '[/\\]tuios$' ~= nil)
 end
 
+local function pane_runs(pane, name)
+  local proc = pane:get_foreground_process_name()
+  return proc ~= nil and proc:match('[^/\\]+$') == name
+end
+
 ---Pickers bind CTRL+hjkl themselves (tv: select with j/k, help on h, layout on
 ---l), so while one runs it gets all four; the pane is left once it exits.
 local pickers = { tv = true, fzf = true }
@@ -305,7 +310,12 @@ local function split_nav(kind, key, direction)
     key = key,
     mods = mods,
     action = wezterm.action_callback(function(win, pane)
-      if pane_owns_splits(pane) or picker_wants(pane, kind) then
+      if kind == 'resize' and pane_runs(pane, 'tuios') then
+        -- Without the kitty protocol SendKey flattens CTRL+SHIFT+h to CTRL+h,
+        -- which tuios reads as navigation. Spell the chord as CSI u instead
+        -- (modifier 6 = shift + ctrl), as the Cmd+K binding above does.
+        win:perform_action(act.SendString(('\x1b[%d;6u'):format(key:byte())), pane)
+      elseif pane_owns_splits(pane) or picker_wants(pane, kind) then
         win:perform_action(act.SendKey { key = key, mods = mods }, pane)
       elseif kind == 'resize' then
         win:perform_action(act.AdjustPaneSize { direction, 3 }, pane)
