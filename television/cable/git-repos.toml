@@ -29,7 +29,7 @@ ctrl-w = "actions:workspace"
 ctrl-y = "actions:copy_path"
 
 [actions.open]
-description = "Open as a Rex session or Herdr workspace, or cd in a plain shell"
+description = "Open as a Rex session, tuios session or Herdr workspace, or cd in a plain shell"
 command = "~/.config/television/scripts/open-repo.sh '{}'"
 shell = "bash"
 mode = "execute"
@@ -47,8 +47,13 @@ shell = "bash"
 mode = "execute"
 
 [actions.workspace]
-description = "Open as a Herdr workspace, or focus it if already open"
-command = "~/.config/television/scripts/herdr-workspace.sh '{}'"
+description = "Open as a tuios session or Herdr workspace, or focus it if already open"
+command = """
+if [[ ${TUIOS_ENV:-} == 1 ]]; then
+  exec ~/.config/television/scripts/tuios-session.sh '{}'
+fi
+exec ~/.config/television/scripts/herdr-workspace.sh '{}'
+"""
 shell = "bash"
 mode = "execute"
 
