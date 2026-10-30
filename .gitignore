@@ -25,3 +25,8 @@ television/cable/*
 /fnox/age-se.txt
 
 karabiner-ts/node_modules/
+
+# Generated: the theme-reload marker tuios writes, and the conf that
+# herdr-splits.nvim regenerates on every setup().
+tuios/.reload-themes
+tuios/plugin-config/herdr-splits/

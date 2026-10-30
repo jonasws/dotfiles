@@ -10,7 +10,7 @@
 # The popup is found by NAME, which tuios accepts as a window target, so no
 # state is kept. COMMAND gets the pane the key was pressed in as
 # TUIOS_ACTIVE_PANE_ID and TUIOS_ACTIVE_PANE_CWD, because the popup's own
-# environment names the popup. A herdr script starts with as-herdr.sh.
+# environment names the popup.
 set -euo pipefail
 
 name=${1:?usage: toggle-popup.sh NAME [WIDTH HEIGHT] -- COMMAND...}

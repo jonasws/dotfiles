@@ -50,13 +50,13 @@ resume_agents = "auto"
 [workspaces]
 new_window_when_empty = true
 
-# herdr's sidebar sits on the left.
 # Name agent panes after their topic, which the rail otherwise hides behind the
 # running command ("claude 1", "claude 2"). The daemon reads [hooks] at start,
 # so `tuios restart-server` picks a change up.
 [hooks]
 after-agent-state = "~/.config/tuios/scripts/auto-name.sh"
 
+# herdr's sidebar sits on the left.
 [appearance.sidebar]
 position = "left"
 width = 34
@@ -239,8 +239,8 @@ key = "ctrl+shift+l"
 type = "plugin_action"
 command = "herdr-splits.resize-right"
 
-# The herdr popups and pickers, through scripts/as-herdr.sh, which hands them
-# the herdr variables they read. ctrl+alt+k is what WezTerm sends for Cmd+K.
+# Popups and pickers, opened by scripts/toggle-popup.sh in the directory of the
+# pane the key was pressed in. ctrl+alt+k is what WezTerm sends for Cmd+K.
 [[keybindings.command]]
 key = "prefix+f"
 name = "pane-picker"
@@ -258,32 +258,32 @@ description = "Pane picker"
 [[keybindings.command]]
 key = "prefix+l"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh lazygit 80% 60% -- ~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/lazygit-popup.sh status"
+command = "~/.config/tuios/scripts/toggle-popup.sh lazygit 80% 60% -- ~/.config/tuios/scripts/lazygit-popup.sh status"
 description = "lazygit: status"
 
 [[keybindings.command]]
 key = "prefix+L"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh lazygit 80% 60% -- ~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/lazygit-popup.sh log"
+command = "~/.config/tuios/scripts/toggle-popup.sh lazygit 80% 60% -- ~/.config/tuios/scripts/lazygit-popup.sh log"
 description = "lazygit: log"
 
 [[keybindings.command]]
 key = "prefix+y"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh yazi 80% 60% -- ~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/yazi-popup.sh"
+command = "~/.config/tuios/scripts/toggle-popup.sh yazi 80% 60% -- ~/.config/tuios/scripts/yazi-popup.sh"
 description = "yazi: browse"
 
 [[keybindings.command]]
 key = "prefix+Y"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh yazi 80% 60% -- ~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/yazi-popup.sh pick"
+command = "~/.config/tuios/scripts/toggle-popup.sh yazi 80% 60% -- ~/.config/tuios/scripts/yazi-popup.sh pick"
 description = "yazi: pick files into pane"
 
 # Enter opens or focuses a session for the repo.
 [[keybindings.command]]
 key = "prefix+r"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh repo-picker 90% 60% -- ~/.config/tuios/scripts/as-herdr.sh tv git-repos -k 'enter=\"actions:workspace\"'"
+command = "~/.config/tuios/scripts/toggle-popup.sh repo-picker 90% 60% -- tv git-repos"
 description = "Git repo picker"
 
 [[keybindings.command]]
@@ -298,30 +298,27 @@ type = "shell"
 command = "~/.config/tuios/scripts/toggle-popup.sh aws-profiles 80% 60% -- tv aws-profiles"
 description = "AWS profiles"
 
-# tsk board, through the herdr-tsk plugin (`tuios plugins enable herdr-tsk`).
+# tsk board, as a popup so opening it does not retile the agent panes. A popup
+# starts in the daemon's directory, so it changes to the pane's first: tsk
+# scopes the board to that repo. Quick capture is a popup the same way, 80x15
+# like herdr-tsk's; a save or a discard exits it.
 [[keybindings.command]]
 key = "prefix+t"
 type = "shell"
-command = "~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/tsk-toggle.sh"
+command = "~/.config/tuios/scripts/toggle-popup.sh tsk-board -- bash -c 'cd \"$TUIOS_ACTIVE_PANE_CWD\" && exec tsk'"
 description = "Toggle tsk board"
 
 [[keybindings.command]]
 key = "prefix+ctrl+t"
-type = "plugin_action"
-command = "herdr-tsk.quick-capture"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh tsk-capture 82 17 -- bash -c 'cd \"$TUIOS_ACTIVE_PANE_CWD\" && exec tsk capture'"
 description = "tsk quick capture"
 
 [[keybindings.command]]
 key = "prefix+ctrl+e"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh tsk-notes 80% 60% -- ~/.config/tuios/scripts/as-herdr.sh ~/.config/herdr/scripts/tsk-notes.sh"
+command = "~/.config/tuios/scripts/toggle-popup.sh tsk-notes 80% 60% -- ~/.config/tuios/scripts/tsk-notes.sh"
 description = "Edit tsk notes in nvim"
-
-[[keybindings.command]]
-key = "prefix+S"
-type = "shell"
-command = "~/.config/tuios/scripts/as-herdr.sh bash ~/.claude/hooks/subagent-viewer.sh toggle"
-description = "Toggle subagent viewers"
 
 # F1 dashboard, through the herdr-f1 plugin (`herdr plugin install
 # hmu332233/herdr-f1`; tuios reads herdr's registry and leaves it off until it is
@@ -335,7 +332,6 @@ description = "Open F1 dashboard"
 [plugins]
 enabled = [
   "herdr-splits",
-  "herdr-tsk",
   "dev.minung.herdr-f1",
   # Name agent panes after their live topic and workspaces after the pane
   # running in them, so panes stop reading "claude 1", "claude 2". Settings are

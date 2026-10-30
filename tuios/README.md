@@ -16,11 +16,13 @@ running daemon on its old build (`--keep-server`); `tuios kill-server` switches
 it over when the panes can be spared, and until then the daemon does not know
 the new actions.
 
-tuios answers herdr's socket API on its own socket plus `.herdr`
-([herdr Compatibility](https://tuios.dev/docs/herdr-compatibility)), so herdr
-tools run in it unchanged, and it runs herdr plugins as they are
-([Plugins](https://tuios.dev/docs/plugins)). A herdr workspace is a tuios
-session, a tab a tuios workspace, and a pane a tuios window. `config.toml`
+The command keys and scripts here use tuios's own commands (`tuios --skill`,
+`tuios <cmd> --help`); the herdr scripts in `herdr/scripts` stay herdr's. tuios
+also answers herdr's socket API on its own socket plus `.herdr`
+([herdr Compatibility](https://tuios.dev/docs/herdr-compatibility)), which is
+what lets it run herdr plugins as they are ([Plugins](https://tuios.dev/docs/plugins)).
+A herdr workspace is a tuios session, a tab a tuios workspace, and a pane a
+tuios window. `config.toml`
 follows `herdr/config.toml` key for key where tuios has a match.
 
 ## What Rex got, and where it is here
@@ -32,13 +34,13 @@ built-ins:
 | ------ | -------- |
 | `rex/herdr/` socket server, bridge and LaunchAgent | Built in. The daemon serves the herdr socket and starts when a session does. |
 | `fish/conf.d/45-rex-herdr.fish` | tuios sets `HERDR_SOCKET_PATH`, `HERDR_PANE_ID` and `HERDR_ENV` in its panes. |
-| `herdr.lua` command keys | `[[keybindings.command]]` entries, run through `scripts/as-herdr.sh`. |
+| `herdr.lua` command keys | `[[keybindings.command]]` entries: popups through `scripts/toggle-popup.sh`, the tsk board on `prefix+t` among them. herdr's subagent viewer key (`prefix+S`) is not ported: the rail already shows a row per subagent under its pane. |
 | Ctrl+hjkl that unzooms and wraps | The `herdr-splits` plugin, enabled in `[plugins]`. |
 | Neovim marker file for Ctrl+hjkl | Not needed. Panes have `HERDR_ENV=1`, so `herdr-splits.nvim` loads. |
 | Prefix chords for tabs, panes and sessions | `[keybindings.prefix_mode]`. |
 | `ctrl+b e`, scrollback in `$EDITOR` | The `edit_scrollback` action, on `prefix+e`. |
 | `ctrl+b a` / `shift+a` | The `next_agent` and `prev_agent` actions. |
-| Git repo picker opens a session | `herdr-workspace.sh` over the herdr socket, as before. |
+| Git repo picker opens a session | Enter and `ctrl-w` both run `television/scripts/tuios-session.sh`, which opens or switches to a session named after the repo. |
 | Hotkeys sheet | `herdr.tsv`, `prefix+shift+h`: the keys follow herdr's, and the differences are listed below. |
 | `herdr_f1`, the F1 dashboard | The `herdr-f1` plugin from herdr's registry, enabled in `[plugins]`, on `prefix+F`. |
 | Pickers in floating layers | Popups. |
@@ -67,15 +69,20 @@ as needed. tuios's own `J` and `K` keep doing the same. The attention queue
 keeps tuios's `o`, and `ctrl+k` takes the newest finished turn from `A`, since
 `O` opens the AWS profiles.
 
-`prefix+F` opens the F1 dashboard, as in herdr. Of herdr's other plugins, only
-`herdr-splits`, `herdr-tsk` and `herdr-f1` are enabled here; tuios leaves a
-plugin herdr installed off until it is listed in `[plugins]`. The rest
-(`dan.pane-topic-sync`, `herdr-automatic-rename`, `herdr-bar`) hook events and
-rename things, and have not been tried in tuios.
+`prefix+F` opens the F1 dashboard, as in herdr. tuios leaves a plugin herdr
+installed off until it is listed in `[plugins]`, and four are: `herdr-splits`,
+`herdr-f1`, and `dan.pane-topic-sync` with `herdr-automatic-rename`, which name
+agent panes after their topic and workspaces after the pane running in them
+(settings in `~/.config/herdr/plugins/config/`). `scripts/auto-name.sh` also
+names agent panes, from the `after-agent-state` hook. `herdr-tsk` is off: the
+tsk board and quick capture are popups on `prefix+t` and `prefix+ctrl+t`. The
+other installed plugins, `herdr-bar` among them, are off.
 
 Where tuios's keys differ from `herdr.tsv`: `o` goes to the oldest item that
 needs you, `ctrl+k` to the newest finished turn, `J` / `K` also step through
-agents, and `prefix+g` and `prefix+/` both open the pane navigator.
+agents, `prefix+g` and `prefix+/` both open the pane navigator, and
+`prefix+shift+s` (subagent viewers) is not bound, since the rail lists each
+pane's subagents.
 
 `prefix+e` opens the pane's screen and scrollback as plain text in the File
 editor setting, else `$EDITOR`, else `$VISUAL`, else `vi`. vi, vim and nvim open
@@ -85,11 +92,14 @@ in a private folder, removed when the editor exits.
 
 ### Git repos
 
-`prefix+r` opens `tv git-repos` with Enter on the picker's `workspace` action,
-through `as-herdr.sh`, so it runs `television/scripts/herdr-workspace.sh`
-against tuios's herdr socket: it focuses the session that has a pane in the repo
-or creates one there. tuios's `workspace.create` ignores `focus`, so the script
-focuses the new workspace by id after creating it.
+`prefix+r` opens `tv git-repos` in a popup. Enter runs the picker's `open`
+action, which in a tuios pane (`TUIOS_ENV=1`) runs
+`television/scripts/tuios-session.sh`: it switches to the session whose
+checkout is the repo, or creates one there with `tuios switch-session --create`.
+The session is named after the repo's directory, so `-s <repo>`, `tuios attach
+<repo>` and the `session:<repo>` selector reach it. A session tuios named
+`session-<hex>` is renamed on the way, and a name another repo already holds
+gets the parent directory in front (`CNOPS-<repo>`).
 
 ## Not yet checked
 
