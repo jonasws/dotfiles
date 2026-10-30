@@ -245,14 +245,14 @@ command = "herdr-splits.resize-right"
 key = "prefix+f"
 name = "pane-picker"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh pane-picker 90% 80% -- tv tuios-sessions"
+command = "~/.config/tuios/scripts/toggle-popup.sh pane-picker 90% 80% -- ~/.config/tuios/scripts/close-on-leave.sh tv tuios-sessions"
 description = "Pane picker"
 
 [[keybindings.command]]
 key = "ctrl+alt+k"
 name = "pane-picker-cmd-k"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh pane-picker 90% 80% -- tv tuios-sessions"
+command = "~/.config/tuios/scripts/toggle-popup.sh pane-picker 90% 80% -- ~/.config/tuios/scripts/close-on-leave.sh tv tuios-sessions"
 description = "Pane picker"
 
 [[keybindings.command]]
@@ -283,19 +283,19 @@ description = "yazi: pick files into pane"
 [[keybindings.command]]
 key = "prefix+r"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh repo-picker 90% 60% -- tv git-repos"
+command = "~/.config/tuios/scripts/toggle-popup.sh repo-picker 90% 60% -- ~/.config/tuios/scripts/close-on-leave.sh tv git-repos"
 description = "Git repo picker"
 
 [[keybindings.command]]
 key = "prefix+H"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh hotkeys 90% 60% -- tv hotkeys"
+command = "~/.config/tuios/scripts/toggle-popup.sh hotkeys 90% 60% -- ~/.config/tuios/scripts/close-on-leave.sh tv hotkeys"
 description = "Hotkeys"
 
 [[keybindings.command]]
 key = "prefix+O"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh aws-profiles 80% 60% -- tv aws-profiles"
+command = "~/.config/tuios/scripts/toggle-popup.sh aws-profiles 80% 60% -- ~/.config/tuios/scripts/close-on-leave.sh tv aws-profiles"
 description = "AWS profiles"
 
 # tsk board, as a popup so opening it does not retile the agent panes. A popup

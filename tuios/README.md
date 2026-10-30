@@ -43,7 +43,7 @@ built-ins:
 | Git repo picker opens a session | Enter and `ctrl-w` both run `television/scripts/tuios-session.sh`, which opens or switches to a session named after the repo. |
 | Hotkeys sheet | `herdr.tsv`, `prefix+shift+h`: the keys follow herdr's, and the differences are listed below. |
 | `herdr_f1`, the F1 dashboard | The `herdr-f1` plugin from herdr's registry, enabled in `[plugins]`, on `prefix+F`. |
-| Pickers in floating layers | Popups. |
+| Pickers in floating layers | Popups. The `tv` pickers run through `scripts/close-on-leave.sh`, which closes the popup when focus, the workspace or the session moves away from it. |
 | Cmd+D / Cmd+R, `ctrl+cmd+]` / `[`, font keys, theme import | The host terminal's job (WezTerm, `wezterm/dot-wezterm.lua`). Rex's prefix-free agent chords are not ported. |
 | LaunchAgent that keeps the server up | Not needed. On macOS, `tuios daemon-app install --login` runs the daemon as an app so panes keep local network access. |
 
