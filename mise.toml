@@ -88,6 +88,15 @@ herdr plugin update --yes
 herdr plugin list --json | jq '[.result.plugins[] | {id: .plugin_id, enabled, source: (if .source.kind == "github" then "\\(.source.owner)/\\(.source.repo)" else .source.kind end), commit: .source.resolved_commit}] | sort_by(.id)' > herdr/plugins.lock.json
 """
 
+[tasks."update:pi"]
+description = "Upgrade pi packages"
+# The real binary, not ~/.local/bin/wrapped/pi: that one always runs pi in its
+# nono sandbox, which may not write ~/.pi/agent/npm or git/, where packages
+# install. It updates the `packages` in pi/settings.json, none so far since the
+# extensions live in pi/extensions; pi itself is a mise tool and moves with
+# update:mise.
+run = '"$(mise which pi)" update --extensions'
+
 [tasks."update:yazi"]
 description = "Upgrade yazi plugins and flavors"
 run = "ya pkg upgrade"
@@ -242,7 +251,7 @@ echo "karabiner.json synced"
 
 [tasks.update]
 description = "Daily upgrade, then show what changed"
-depends = ["update:brew", "update:mise", "update:skills", "update:herdr-plugins", "update:yazi", "update:nvim"]
+depends = ["update:brew", "update:mise", "update:skills", "update:herdr-plugins", "update:pi", "update:yazi", "update:nvim"]
 run = "git status --short"
 
 [tasks."update:weekly"]
@@ -414,6 +423,14 @@ exclude = ["functions"]
 root = "otree"
 target = "~/.config"
 
+[dotfile_groups.pi]
+# Each file, not the directory: pi writes sessions/, trust.json, lock files and
+# its model cache beside its config, and those stay on this machine. bin/ holds
+# the helpers the nono profile names by their path in this repo.
+root = "pi"
+target = "~/.pi/agent"
+exclude = ["README.md", "bin"]
+
 [dotfile_groups.posting]
 root = "posting"
 target = "~/.config/posting"
@@ -509,4 +526,5 @@ mode = "symlink"
 [dotfiles]
 "~/.local/bin/wrapped" = { source = "fnox/wrapped", mode = "symlink" }
 "~/.local/bin/resign-commits" = { source = "bin/resign-commits", mode = "symlink" }
+"~/.local/bin/pi-herdr" = { source = "pi/bin/pi-herdr", mode = "symlink" }
 "~/.config/herdr-automatic-rename" = { source = "herdr/automatic-rename", mode = "symlink" }

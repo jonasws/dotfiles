@@ -1,0 +1,75 @@
+#!/bin/sh
+# pi, always inside the pi-agent nono sandbox (nono/profiles/pi-agent.jsonc).
+#
+# pi has no permission prompts and no sandbox of its own, so containment has
+# to come from outside the process, and it has to hold for every pi, not just
+# the first. herdr starts agents by typing the canonical executable into a
+# pane's fresh login shell (`herdr agent start --kind pi` types `pi ...`, and
+# so does its session restore), and that shell is outside any sandbox. This
+# script is what `pi` resolves to there: on PATH via `_.path` in
+# ~/.config/mise/config.toml, ahead of the npm tool's directory, like the gh
+# and mvn wrappers next to it. `mise which` resolves tools, not PATH, so asking
+# it for pi returns the real binary and not this script.
+#
+# Fails closed: if nono is missing or refuses the profile, pi does not start.
+# Package management (`pi update --extensions`, `pi install`) writes where the
+# sandbox may not, so it goes to the real binary explicitly; the update task
+# in mise.toml does that.
+#
+# No secret is fetched here. nono's credential proxy does that outside the
+# sandbox when pi first calls the API, and the profile explains it.
+
+set -e
+
+real="$(mise which pi 2>/dev/null || true)"
+if [ -z "$real" ]; then
+  echo "pi: mise provisions no pi-coding-agent for $PWD" >&2
+  exit 127
+fi
+
+# Inside a pi-agent sandbox already, e.g. the `pi -p` a review prompt runs
+# through bash: the parent's sandbox, proxy routes and phantom credentials are
+# inherited, and nono cannot nest. The marker alone is not trusted, since
+# anything can set a variable: every nono profile also denies listing
+# ~/Library/Keychains (a required group), which an unsandboxed process on
+# this machine can always do.
+if [ "${AGENT_SANDBOX:-}" = nono ] &&
+  ! ls "$HOME/Library/Keychains" >/dev/null 2>&1; then
+  exec "$real" "$@"
+fi
+
+# Claude Code's sandbox cannot host nono, and no credential is reachable from
+# it. The sandbox is identifiable by $TMPDIR, which it points at
+# /tmp/claude-<uid>.
+case "$TMPDIR" in
+  /tmp/claude-* | /private/tmp/claude-*)
+    echo "pi: inside Claude Code's sandbox; start pi from a shell or a herdr pane" >&2
+    exit 126
+    ;;
+esac
+
+# Resolved from $HOME so a project's mise.toml cannot choose the sandbox.
+nono="$(mise -C "$HOME" which nono 2>/dev/null || true)"
+if [ -z "$nono" ]; then
+  echo "pi: nono is not installed; refusing to run pi uncontained" >&2
+  exit 127
+fi
+
+# nono reads these as defaults for its own flags (--allow, --allow-domain,
+# --profile, ...), and XDG_CONFIG_HOME moves the profile directory, so none
+# may widen the sandbox from the launching environment.
+unset NONO_ALLOW NONO_ALLOW_DOMAIN NONO_ALLOW_NET NONO_BLOCK_NET \
+  NONO_CAPABILITY_ELEVATION NONO_CREDENTIAL NONO_DENY_DOMAIN \
+  NONO_ENV_CREDENTIAL NONO_NETWORK_PROFILE NONO_PROFILE NONO_PROXY_CA_CERT \
+  NONO_PROXY_CA_KEY NONO_PROXY_PASS NONO_REGISTRY NONO_TRUST_OVERRIDE \
+  NONO_TRUST_PROXY_CA NONO_UPSTREAM_BYPASS NONO_UPSTREAM_PROXY \
+  XDG_CONFIG_HOME XDG_STATE_HOME
+
+# nono runs pi in a pty of its own, so the pane's foreground process is nono,
+# not pi. herdr reads HERDR_AGENT from the foreground process's environment as
+# an agent hint, which keeps `agent start --kind pi`, `agent prompt` and the
+# sidebar working.
+HERDR_AGENT=pi
+export HERDR_AGENT
+
+exec "$nono" run --profile pi-agent --allow-cwd -- "$real" "$@"

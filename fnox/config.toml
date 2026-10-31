@@ -74,6 +74,12 @@ EXA_API_KEY= { provider = "onepass", value = "op://Employee/Exa API Key/password
 # authenticate inside the sandbox. Read-only docs quota, so that wide visibility is fine.
 CONTEXT7_API_KEY= { provider = "onepass", value = "op://Employee/Context7 API Key/credential", env = false, sync = { provider = "sync-age", value = "fnox-age-batch-v1:YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IHBpdi1wMjU2IGtGdElMdyBBeE1IVWZ3V0NUV2wwZUJBRzhQell2Y1AwQnY1RmRuejRtcjF0alAxMmFKVwpGbVVDT04vZXJZb09HQlIvVXlFbDV6TXlteGZvdUtkYmk1Y2JyQThLVkJ3Ci0+IC80LWdyZWFzZSA3a01BUXFFICdTIFlXZUc7KkcrICVqQipAN2BfCkpIUnFCaDhMUTJucG1xTU5UVlBxY3lEaQotLS0gY2lERWR4RElpV2d3dCtiK0RNNlNzU0NYVGVNWjhVS3VwQTZMUDlxaDh6TQpEPew1Vbh/IJ7TI1vuJREFaPKn8qd7EI6PQAEjDQrvsjgMZN7jV1fpqfb+To1IcZBgW386uhTfAyzDGUtMIUk+rX94U+aoegmpdxuY:kcwFMdxhBSEgXTVbI8liTOL+CPE+cgXjCoLdS8X6qE9vGi3aiRNYBO6XPCcgNj1wnSJtlG16vKif5eCdAnqiFnFXu11gpvY=" } }
 
+# Anthropic API key for pi. Never handed to pi itself: the pi-agent nono profile
+# reads it through pi/bin/pi-credential (outside the sandbox) and its proxy
+# injects it into requests to api.anthropic.com, while pi holds a phantom.
+# `env = false`; run `mise run sync-secrets` after adding or rotating it.
+ANTHROPIC_API_KEY= { provider = "onepass", value = "op://Employee/Anthropic API Key/credential", env = false }
+
 # Atlassian API token for Jira Cloud, with the account and site it belongs to.
 # Read by the lazyjira wrapper in ~/.local/bin/wrapped, which exports them to
 # lazyjira only. `env = false`.

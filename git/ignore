@@ -2,3 +2,5 @@
 **/.claude/.cc-writes/
 **/CLAUDE.local.md
 kls_database.db
+**/.pi/context/
+**/.pi/results/

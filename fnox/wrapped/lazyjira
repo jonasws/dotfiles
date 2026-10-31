@@ -18,9 +18,9 @@ if [ -z "$real" ]; then
 fi
 
 # Claude Code's sandbox cannot reach 1Password, and Jira content is not to
-# reach an agent.
-case "$TMPDIR" in
-  /tmp/claude-* | /private/tmp/claude-*)
+# reach an agent. pi's nono sandbox sets AGENT_SANDBOX.
+case "${AGENT_SANDBOX:-}:$TMPDIR" in
+  nono:* | *:/tmp/claude-* | *:/private/tmp/claude-*)
     echo "lazyjira: sandboxed, not available to agents" >&2
     exit 127
     ;;

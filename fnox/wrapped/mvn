@@ -22,7 +22,7 @@ fi
 # nothing there and `fnox exec` fails outright. Offline Maven never authenticates
 # against maven.pkg.github.com or vy-nexus, so it needs no credentials at all and
 # the wrapper gets out of the way. The sandbox is identifiable by $TMPDIR, which
-# it points at /tmp/claude-<uid>.
+# it points at /tmp/claude-<uid>; pi's nono sandbox sets AGENT_SANDBOX instead.
 #
 # The Kotlin compile daemon is detached and survives between builds, which makes
 # it the wrong process to hold the project's files. Under Claude Code's sandbox
@@ -65,8 +65,8 @@ MAVEN_OPTS="${MAVEN_OPTS:-\
 -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss}"
 export MAVEN_OPTS
 
-case "$TMPDIR" in
-  /tmp/claude-* | /private/tmp/claude-*)
+case "${AGENT_SANDBOX:-}:$TMPDIR" in
+  nono:* | *:/tmp/claude-* | *:/private/tmp/claude-*)
     echo "mvn: sandboxed, running --offline against ~/.m2/repository" >&2
     exec "$real" --offline "$@"
     ;;
