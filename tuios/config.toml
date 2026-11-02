@@ -118,10 +118,6 @@ width = 34
 group_main = true
 
 [keybindings]
-# Off the shell's ctrl+a/ctrl+e and Claude Code's ctrl+b (background a task).
-# Needs macOS's "Select the previous input source" shortcut turned off. Press
-# it twice to send it on, e.g. for blink.cmp's manual completion in Neovim.
-leader_key = "ctrl+space"
 # Option is the us-altgr-intl compose layer, so the characters it types go to
 # the pane and never run an alt+ binding.
 option_glyphs = "type"
