@@ -1,5 +1,5 @@
 # section	key	description	custom
-# Prefix is ctrl+b. Mine (★) come from tuios/config.toml; the rest are tuios's defaults.
+# Prefix is ctrl+space. Mine (★) come from tuios/config.toml; the rest are tuios's defaults.
 agents	prefix+i	Agents view: Inbox (Needs you), review, working, idle, settled
 agents	prefix+o	Oldest item that needs you (o again: next)
 agents	prefix+ctrl+k	Newest finished turn not seen (again: next older)	★
