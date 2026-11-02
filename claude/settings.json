@@ -386,7 +386,8 @@
   "workflowKeywordTriggerEnabled": false,
   "statusLine": {
     "type": "command",
-    "command": "bash /Users/jonasws/.claude/statusline-command.sh"
+    "command": "bash /Users/jonasws/.claude/statusline-command.sh",
+    "refreshInterval": 60
   },
   "enabledPlugins": {
     "playwright-skill@playwright-skill": true,
@@ -526,7 +527,7 @@
   "tui": "default",
   "timeFormat": "24-hour",
   "skipDangerousModePermissionPrompt": true,
-  "theme": "dark-ansi",
+  "theme": "custom:catppuccin-mocha",
   "editorMode": "vim",
   "idleCompaction": false,
   "remoteControlAtStartup": false,
