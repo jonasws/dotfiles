@@ -19,12 +19,15 @@ root=${TUIOS_WORKTREE_REPO_ROOT:-}
 mise=$(command -v mise) || mise=$HOME/.local/bin/mise
 [[ -x $mise ]] || exit 0
 
-# `mise trust --show` prints "FOLDER: trusted" or "FOLDER: untrusted" for a
-# folder with any mise config in it (mise.toml, mise.local.toml,
-# .config/mise.toml, .tool-versions, ...), and no such line for one without.
+# `mise trust --show`, run in a folder, prints "PATH: trusted" or
+# "PATH: untrusted" for that folder and for each ancestor with mise config (`~`
+# among them), with $HOME written as ~. Only the folder's own line counts; it
+# has none when the folder has no config of its own.
 trust_of() {
+  local real
+  real=$(cd "$1" && pwd -P) || return 0
   (cd "$1" && "$mise" trust --show 2>/dev/null) |
-    sed -n 's/.*: \(\(un\)\{0,1\}trusted\)$/\1/p' | head -1
+    awk -v want="${real/#$HOME/\~}" -F': ' '$1 == want { print $2; exit }'
 }
 
 cd "$dir" || exit 0

@@ -5,10 +5,10 @@ Configuration for [tuios](https://tuios.dev/docs/configuration), linked to
 apply` reloads it, and `tuios keybinds doctor` lists keys that something else
 has taken.
 
-**This config runs on tuios built from main.** `next_agent` and `prev_agent`
-shipped in 0.12.0, and the task board, Settled shelf, return notes and
-`after-new-worktree` hook it uses are 0.12.0 too; `edit_scrollback` may still be
-main only, so check it with `tuios keybinds doctor` before moving to a release.
+**This config runs on tuios built from main.** What it needs is in the 0.12.0
+release too: `next_agent`, `prev_agent` and `edit_scrollback`, the task board,
+Settled shelf, return notes, `[agents.approvals]`, `group_main` and the
+`after-new-worktree` hook.
 `mise run update:tuios-nightly` builds main into `~/.local/share/tuios-nightly`
 and links the binary as `~/.local/bin/tuios`, so `tuios` on PATH is the nightly
 build in every shell and script. Hooks run in the daemon's environment, so
@@ -113,8 +113,9 @@ keys.
 
 - **Approvals in the Inbox.** `[agents.approvals]` holds Claude Code's
   permission prompts and plans there, so they are answered from the agents
-  view or the phone. Run `tuios integration install claude-code` once after
-  enabling it: the hook that waits is a newer version. Risk rules on top of
+  view or the phone. The hook that waits is the PermissionRequest entry of
+  integration v3, already in `claude/settings.json`; `tuios integration
+  status claude-code` says whether it is current. Risk rules on top of
   the shipped ones mark `cdk deploy`/`destroy`/`import`, CloudFormation stack
   changes, `aws … delete-*` style calls and `aws s3 rm`/`rb`/`sync --delete`,
   with global options such as `--profile` before the subcommand too; allowing
@@ -125,8 +126,11 @@ keys.
   checkout on the rail. `scripts/new-worktree.sh`, the `after-new-worktree`
   hook, runs `mise install` in each new worktree before its first pane
   starts. It runs `mise trust` first only when the main checkout is trusted,
-  so a worktree of a repo I never trusted stays untrusted. `[hooks]` changes
-  need `tuios restart-server`.
+  so a worktree of a repo I never trusted stays untrusted. tuios gives the
+  hook one minute: past that it is stopped, and the session still starts
+  with the hook's error shown, so a first install of a large toolchain is
+  finished with `mise install` in the pane.
+  `[hooks]` changes need `tuios restart-server`.
 - **Push notifications.** `[notify]` lives in `config.d/notify.toml`,
   gitignored because the ntfy topic is a secret; copy
   `config.d/notify.toml.example`, then run `tuios config apply` and
@@ -146,6 +150,11 @@ say so in a popup:
 | --- | --- |
 | `prefix+ctrl+s` | `scripts/tsk-dispatch.sh here`: a card `T<n>: <title>`, then `tuios start-agent claude --task` in the repo's folder. The agent moves the tsk task itself. |
 | `prefix+S` | `scripts/tsk-dispatch.sh worktree`: a card, `tsk status T<n> start` on the main checkout, then `tuios fan 1 --task` on branch `tsk/t<n>-<slug>` with the task's notes in the prompt. |
+
+The board's own `ctrl+s` (no prefix) is tsk's start. On a task with an
+assignee it also runs `tsk dispatch`, which launches the agent through Herdr,
+and tuios panes set `HERDR_ENV`; leave tasks unassigned to keep that to the
+prefix keys.
 
 The card then moves through plan, verify, review and shipped on its own as the
 agent's plan, `fan verify` and pull request change (`b` in the agents view).
@@ -170,13 +179,8 @@ main. Nothing here has run on the Mac.
   command key that a tuios action holds shows up there as dead. `G` is held by
   both `goto_picker` (a default) and `toggle_scratch` (this config), which
   predates the Rex port.
-- **The task grant.** `tuios task add --json` prints the card with its `id`
-  (checked on the Mac). A command key runs with the focused pane's environment
-  beside its own variables, so if that counts as the pane calling, creating a
-  card may need the `task` grant. Without a card id the agent still starts,
-  with no card.
-- **The board popup's folder.** A command key gets `TUIOS_SESSION`,
-  `TUIOS_ACTIVE_PANE_ID` and `TUIOS_ACTIVE_PANE_CWD`
-  (`internal/app/command_keys.go`). The dispatch reads the repo from the
-  board popup's folder, which is known only once tuios has seen the popup's
-  `cd`; when it is not, the key reports that the folder is not a repository.
+- **The dispatch keys pressed for real.** `tsk-dispatch.sh` has run against a
+  scratch daemon with the variables a command key sets (`TUIOS_SESSION`,
+  `TUIOS_ACTIVE_PANE_ID`, `TUIOS_ACTIVE_PANE_CWD`), with `start-agent` and
+  `fan` stubbed, but not from the keys on an attached client, and the
+  failure popup needs one to show.

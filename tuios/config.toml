@@ -54,9 +54,10 @@ fold_working = true
 
 # Claude Code's permission prompts and plans wait in the Inbox, where they are
 # answered without going to the pane: a/1 allow, A/2 always, r/3 reject, R
-# reject with a reason. Needs `tuios integration install claude-code` again
-# after this is first set, so the hook is the version that waits. A command
-# that matches a risk rule takes a second press to allow.
+# reject with a reason. The waiting hook is the PermissionRequest entry of
+# integration v3 in claude/settings.json; `tuios integration status
+# claude-code` says whether it is current. A command that matches a risk rule
+# takes a second press to allow.
 [agents.approvals]
 enabled = ["claude-code"]
 hold_seconds = 120
