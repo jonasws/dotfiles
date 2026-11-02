@@ -63,9 +63,11 @@ enabled = ["claude-code"]
 hold_seconds = 120
 
 # The shipped rules cover terraform, kubectl, force pushes, rm -rf and the
-# rest; these add the CDK and AWS calls the *-infra repos make. RE2, matched
-# against each command of a shell call; `.*` lets global options such as
-# --profile sit before the subcommand.
+# rest; these add the CDK and AWS calls the *-infra repos make. In auto mode
+# only what claude/settings.json asks about reaches the Inbox: every `aws` and
+# `fnox exec` call does, so these pick out the destructive ones among them,
+# also when fnox exec wraps them. RE2, matched against each command of a shell
+# call; `.*` lets global options such as --profile sit before the subcommand.
 [agents.approvals.risk]
 builtin = true
 
@@ -85,9 +87,9 @@ tools = ["Bash"]
 pattern = '\baws\b.*\s(delete|remove|terminate|purge)-[a-z0-9-]+\b'
 
 [[agents.approvals.risk.rule]]
-name = "s3 rm"
+name = "s3 rm/rb/mv"
 tools = ["Bash"]
-pattern = '\baws\b.*\ss3\s+(rm|rb)\b|\baws\b.*\ss3\s+sync\b.*\s--delete\b'
+pattern = '\baws\b.*\ss3\s+(rm|rb|mv)\b|\baws\b.*\ss3\s+sync\b.*\s--delete\b'
 
 # herdr: prefix+c opens a tab in the focused pane's folder. A new workspace is
 # empty, and this opens its first pane in the folder of the pane you came from.
