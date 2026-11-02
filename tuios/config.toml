@@ -16,6 +16,10 @@ start_in_terminal_mode = true
 
 [appearance]
 theme = "mocha-surface"
+# On a light terminal, and when the host (Ghostty) switches to light.
+theme_light = "catppuccin_latte"
+# Ghostty and WezTerm both draw kitty unicode placeholders.
+kitty_placeholders = "on"
 # Catppuccin Mocha mauve, herdr's accent, and surface1.
 border_focused_color = "#cba6f7"
 border_unfocused_color = "#45475a"
