@@ -82,6 +82,7 @@
       "Read(~/.aws/credentials)",
       "Read(~/.config/fnox/age*.txt)",
       "Read(~/dotfiles/fnox/age*.txt)",
+      "Bash(aws-vault:*)",
       "Bash(gh:*)",
       "Bash(fnox get:*)",
       "Bash(op read:*)",
