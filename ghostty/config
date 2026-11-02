@@ -1,67 +1,60 @@
-# Ghostty configuration
-#
-# Clean slate: font/cell rendering left at ghostty defaults. Only family + size
-# are set — no adjust-cell-*, no font-thicken, no adjust-icon. Add rendering
-# tweaks back deliberately, one at a time, if needed.
+# Ghostty, set up to stand in for WezTerm (wezterm/dot-wezterm.lua) as the host
+# for tuios and herdr. Linked to ~/.config/ghostty by the ghostty dotfile group
+# in mise.toml. Check with `ghostty +validate-config`; super+shift+r reloads.
 
-# Appearance
+# ── Appearance ──────────────────────────────────────────────────────────────
+
 theme = Catppuccin Mocha
-# theme = catppuccin-mocha.conf
+
+# As in WezTerm: text from plain JetBrains Mono, icon and powerline glyphs from
+# the Nerd Font Mono build, which keeps every glyph inside one cell. Ghostty
+# also has Nerd Font symbols built in, after these.
+font-family = "JetBrains Mono"
 font-family = "JetBrainsMono Nerd Font Mono"
 font-size = 18
-# Rendering left at ghostty defaults — no font-thicken, no colorspace/contrast
-# overrides. Default blending is pixel-identical to Terminal.app = sharp baseline.
+# No adjust-cell-height: WezTerm runs line_height = 1.0.
 
-# Extra line height: global breathing room + vertical space for powerline prompt
-# pills. Percentage (not px) so the cell stays on whole pixels at any DPI —
-# avoids the fractional-cell blur that an absolute px value caused on 1×.
-adjust-cell-height = 15%
-
-# Window
-# Match wezterm: window_background_opacity 0.90 + macos_window_background_blur 10
 background-opacity = 0.9
 background-blur-radius = 10
-# window-decoration = true
-# Transparent titlebar: native bar but the terminal background shows through,
-# so it blends with the Catppuccin theme instead of the grey native bar. Keeps
-# the full top area draggable. Others: native, tabs, hidden.
-macos-titlebar-style = transparent
 
-# Terminal
+# WezTerm's window_decorations = 'RESIZE': no title bar. Native tabs still
+# appear once a window has more than one.
+macos-titlebar-style = hidden
+macos-non-native-fullscreen = false
+
+# ── Terminal ────────────────────────────────────────────────────────────────
+
 scrollback-limit = 100000
-# Match wezterm: selecting text copies it straight to the system clipboard.
 copy-on-select = clipboard
-
-# Shell integration
 shell-integration = fish
 
-# macOS: treat Option as Alt so Alt+hjkl reaches the running program (nvim
-# resize via smart-splits) instead of typing special characters.
+# Both Option keys send Alt, as WezTerm's send_composed_key_when_*_alt_is_pressed
+# = false do, so Alt chords reach nvim, tuios and herdr.
 macos-option-as-alt = true
 
-# ── Keybindings ─────────────────────────────────────────────────────────────
+# ── Keys ────────────────────────────────────────────────────────────────────
+# Ctrl+hjkl and Ctrl+Shift+hjkl are left to the pane: tuios and herdr move and
+# resize their panes with them (herdr-splits), and Neovim its windows. Ghostty
+# cannot see what runs in a split, so it takes no chord they use; its own
+# splits move on Cmd+L then hjkl, WezTerm's leader.
 
-# Reload config (super+shift+, default is easy to mishit near the font-zoom keys)
 keybind = super+shift+r=reload_config
-
-# Disable ghostty's default alt+enter
 keybind = alt+enter=unbind
 
-# Shift+Enter sends a literal newline (Claude Code multiline input)
-keybind = shift+enter=text:\n
+# Shift+Enter is Alt+Enter (ESC CR), a newline in Claude Code. A bare LF is
+# ctrl+j, which tuios and herdr bind to pane movement.
+keybind = shift+enter=text:\x1b\r
 
-# CMD+D / CMD+R: ghostty-native splits (wezterm muscle memory)
+# Cmd+K opens the pane navigator in tuios (choose_tree) and herdr: both bind
+# ctrl+alt+k, sent here as CSI u as WezTerm does.
+keybind = super+k=csi:107;7u
+
 keybind = super+d=new_split:down
 keybind = super+r=new_split:right
-
-# Seamless Ctrl+hjkl across ghostty splits AND neovim splits. `performable:`
-# only consumes the key if a ghostty split exists that way; otherwise it falls
-# through to neovim, whose own Ctrl+hjkl (smart-splits.nvim) moves between
-# windows. One keymap, both layers, no multiplexer.
-keybind = performable:ctrl+h=goto_split:left
-keybind = performable:ctrl+j=goto_split:bottom
-keybind = performable:ctrl+k=goto_split:top
-keybind = performable:ctrl+l=goto_split:right
-
-# Keep a zoomed split zoomed while navigating
+keybind = super+l>h=goto_split:left
+keybind = super+l>j=goto_split:down
+keybind = super+l>k=goto_split:up
+keybind = super+l>l=goto_split:right
 split-preserve-zoom = navigation
+
+keybind = super+p=toggle_command_palette
