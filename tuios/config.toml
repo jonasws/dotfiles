@@ -121,6 +121,13 @@ width = 34
 # A repo's main checkout and its worktree sessions sit under one group.
 group_main = true
 
+# The shipped row with the context left in place of its context token, which
+# counts what is used and draws only from 80%. Fed by Claude Code's status line
+# (claude/statusline-command.sh). The model and the cost stay off the row, so
+# `now` keeps the room: the Inbox and the peek still show the model.
+[appearance.sidebar.agent_row]
+tokens = ["session", "need", "harness", "name", "progress", "elapsed", "$context", "subagents", "pr", "meta", "now", "message"]
+
 [keybindings]
 # Option is the us-altgr-intl compose layer, so the characters it types go to
 # the pane and never run an alt+ binding.
