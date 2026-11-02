@@ -91,6 +91,11 @@ name = "s3 rm/rb/mv"
 tools = ["Bash"]
 pattern = '\baws\b.*\ss3\s+(rm|rb|mv)\b|\baws\b.*\ss3\s+sync\b.*\s--delete\b'
 
+# The navigator opens as one row per pane, ready to type, like the tv picker.
+[panes]
+navigator_layout = "flat"
+navigator_search = true
+
 # herdr: prefix+c opens a tab in the focused pane's folder. A new workspace is
 # empty, and this opens its first pane in the folder of the pane you came from.
 [workspaces]
@@ -122,6 +127,10 @@ option_glyphs = "type"
 [keybindings.global]
 command_palette = []
 launcher = []
+# Cmd+K (WezTerm sends ctrl+alt+k) opens tuios's own pane navigator: every
+# pane in every session, searched by name, folder, command and the last 40
+# screen lines, with a live preview. No tv process to start.
+choose_tree = ["ctrl+alt+k"]
 
 [keybindings.prefix_mode]
 # herdr: prefix+v splits right and prefix+c opens a tab (a tuios workspace).
@@ -294,17 +303,11 @@ type = "plugin_action"
 command = "herdr-splits.resize-right"
 
 # Popups and pickers, opened by scripts/toggle-popup.sh in the directory of the
-# pane the key was pressed in. ctrl+alt+k is what WezTerm sends for Cmd+K.
+# pane the key was pressed in. The tv pane picker stays on prefix+f for its
+# attention order, scopes and scrollback/recap/log previews.
 [[keybindings.command]]
 key = "prefix+f"
 name = "pane-picker"
-type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh pane-picker 90% 80% -- ~/.config/tuios/scripts/close-on-leave.sh tv tuios-sessions"
-description = "Pane picker"
-
-[[keybindings.command]]
-key = "ctrl+alt+k"
-name = "pane-picker-cmd-k"
 type = "shell"
 command = "~/.config/tuios/scripts/toggle-popup.sh pane-picker 90% 80% -- ~/.config/tuios/scripts/close-on-leave.sh tv tuios-sessions"
 description = "Pane picker"

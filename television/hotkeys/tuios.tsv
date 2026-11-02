@@ -37,7 +37,8 @@ rail	r / v	On an agent row: reply / review
 rail	space	Quick look at a file, or open subagent rows
 rail	i	Mailbox of the pane under the cursor
 rail	f / o	Agents: this session or all / sort
-pickers	prefix+f / cmd+k	Pane picker, attention first (tv tuios-sessions)	★
+pickers	prefix+f	Pane picker, attention first (tv tuios-sessions)	★
+pickers	cmd+k	Pane navigator, flat and searching (tuios choose_tree)	★
 pickers	prefix+g / prefix+/	Pane navigator, every session	★
 pickers	prefix+r	Git repo picker, Enter opens a session	★
 pickers	prefix+w	Session switcher	★

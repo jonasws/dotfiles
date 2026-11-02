@@ -63,7 +63,8 @@ scrollbar = true
 
 [keybindings]
 shortcut = "f4"
-# Cmd+K toggles the picker; inside it the chord closes the picker too.
+# Cmd+K closes the picker where Cmd+K opens it. tuios binds Cmd+K to its own
+# pane navigator and takes the chord before tv sees it.
 ctrl-alt-k = "quit"
 # Enter focuses one pane, so multi-select has no use and Tab cycles scopes.
 enter = "actions:focus"
