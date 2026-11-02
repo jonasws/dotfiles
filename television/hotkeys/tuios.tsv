@@ -1,0 +1,90 @@
+# section	key	description	custom
+# Prefix is ctrl+b. Mine (★) come from tuios/config.toml; the rest are tuios's defaults.
+agents	prefix+i	Agents view: Inbox (Needs you), review, working, idle, settled
+agents	prefix+o	Oldest item that needs you (o again: next)
+agents	prefix+ctrl+k	Newest finished turn not seen (again: next older)	★
+agents	prefix+a / prefix+shift+a	Next/previous agent, across sessions (also J/K)	★
+agents	prefix+shift+m	Mail for me (m there: whole mailbox)
+agents	prefix+ctrl+v	Review the focused pane's changes	★
+agents	prefix+j	Jump to the pane of the newest message
+agents	prefix+ctrl+y	Show the last message in full	★
+agents	prefix+shift+u	New worktree of this repo, and a session in it
+agents	prefix+shift+i	Session return note
+agents	prefix+shift+z	Calm mode: no motion, quiet dock
+inbox	j / k	Next/previous row
+inbox	space	Peek the prompt and answer it (1-9, a, A, d)
+inbox	a / shift+a	Allow once / always (held approval or plan)
+inbox	r / shift+r	Reply, or reject / reject with a reason
+inbox	tab	Write to the selected agent
+inbox	n	New agent sheet (task, agent, worktree, attempts)
+inbox	b	Task board: cards by stage (t takes, n starts an agent)
+inbox	v	Review the agent's changes
+inbox	shift+d	Settle the agent until it needs me
+inbox	d / z	Dismiss / snooze (1 15m, 2 1h, 3 tomorrow, 4 until it changes)
+inbox	x / *	Mark one / every agent for a bulk answer
+inbox	y	Resume the conversation (marked ones: all)
+inbox	/	Filter by selector (harness:claude-code needs:you)
+inbox	f / shift+f	Filter kinds / fold the group
+inbox	[ / ]	Tab: thread, changes, artifacts, checkpoints, pane
+inbox	ctrl+]	Zoom the agent's pane (prefix+i comes back)
+inbox	u	Undo dismiss, snooze or settle (10 s)
+review	j / k	Next/previous line
+review	s	Old and new side by side
+review	a / d	Stage / unstage the hunk (shift: whole file, z undo)
+review	shift+s	Send the notes to the agent
+rail	prefix+shift+e	Move the keyboard to the rail, or back	★
+rail	r / v	On an agent row: reply / review
+rail	space	Quick look at a file, or open subagent rows
+rail	i	Mailbox of the pane under the cursor
+rail	f / o	Agents: this session or all / sort
+pickers	prefix+f / cmd+k	Pane picker, attention first (tv tuios-sessions)	★
+pickers	prefix+g / prefix+/	Pane navigator, every session	★
+pickers	prefix+r	Git repo picker, Enter opens a session	★
+pickers	prefix+w	Session switcher	★
+pickers	prefix+ctrl+g	Workspace switcher	★
+pickers	prefix+shift+o	AWS profile picker	★
+pickers	prefix+shift+h	Hotkeys cheat sheet (tv hotkeys)	★
+pickers	prefix+shift+f	F1 dashboard (herdr-f1 plugin)	★
+pickers	prefix+shift+p	Command palette
+pickers	prefix+.	Path picker at the cursor (also alt+;)
+popups	prefix+l / prefix+shift+l	lazygit status / log	★
+popups	prefix+y / prefix+shift+y	yazi / pick files into the pane	★
+popups	prefix+t	Toggle tsk board	★
+popups	prefix+ctrl+t	tsk quick capture	★
+popups	prefix+ctrl+e	Edit tsk notes in nvim	★
+popups	prefix+ctrl+s	tsk task under the cursor → new agent here	★
+popups	prefix+shift+s	tsk task under the cursor → new agent in a worktree	★
+popups	prefix+shift+g	Scratch terminal	★
+panes	ctrl+h/j/k/l	Move across panes and nvim windows	★
+panes	ctrl+shift+h/j/k/l	Resize pane / nvim window	★
+panes	prefix+v / prefix+minus	Split right / down	★
+panes	prefix+tab / prefix+shift+tab	Next/previous pane	★
+panes	prefix+x	Close pane
+panes	prefix+z	Zoom pane
+panes	prefix+ctrl+r	Rename pane	★
+panes	prefix+e	Scrollback in $EDITOR	★
+panes	prefix+s	Scrollback browser
+panes	prefix+[	Copy mode
+panes	prefix+ctrl+u	Hints: label text to copy	★
+panes	prefix+shift+q	Pane labels: focus by label
+panes	prefix+ctrl+l	Clear scrollback	★
+panes	prefix+enter	Nest: every key to the pane until F12
+workspaces	prefix+c	New workspace (herdr tab)	★
+workspaces	prefix+n / prefix+p	Next/previous workspace	★
+workspaces	prefix+1..9	Switch to workspace N	★
+workspaces	prefix+shift+t	Rename workspace	★
+workspaces	prefix+shift+x	Close workspace	★
+sessions	prefix+shift+n	New session	★
+sessions	prefix+ctrl+n / prefix+ctrl+p	Next/previous session (also ) and ()	★
+sessions	prefix+shift+w	Rename session	★
+sessions	prefix+shift+d	Close session	★
+sessions	prefix+d / prefix+q	Detach	★
+app	prefix+?	Help
+app	prefix+,	Settings
+app	prefix+k	Keybind manager
+app	prefix+b	Toggle rail
+app	prefix+ctrl+o	Layout prefix	★
+app	prefix+ctrl+x	Window prefix	★
+app	prefix+ctrl+d	Debug prefix	★
+app	prefix+ctrl+a	App launcher	★
+app	prefix+shift+c	Screenshot

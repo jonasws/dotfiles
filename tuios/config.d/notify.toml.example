@@ -1,0 +1,19 @@
+# Copy to notify.toml (gitignored) and set the topic. tuios reads every *.toml
+# in config.d; a new address waits for `tuios config apply` from a terminal
+# outside tuios, then `tuios notify test` sends one to the phone.
+# https://tuios.dev/docs/push-notifications
+
+[notify]
+# Hold a notification while I typed at a client in the last two minutes.
+quiet_active_seconds = 120
+
+# The kinds that wait for me. mail, errored and finished stay off.
+[notify.triggers]
+approval = true
+plan = true
+question = true
+ask = true
+
+[notify.ntfy]
+url = "https://ntfy.sh/REPLACE-WITH-A-LONG-RANDOM-TOPIC"
+priority = 4

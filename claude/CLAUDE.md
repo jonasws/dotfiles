@@ -185,6 +185,22 @@ tuios send-agent-message --select 'session:dotfiles harness:claude-code' --confi
   token, which belongs to exactly that set of panes. Check that the set is
   the one agent you meant before you send.
 
+Inside tuios (`TUIOS_ENV=1`):
+
+- **Decisions with fixed answers go to the Inbox.** Before a step I must
+  approve outside your own permission prompt (a `cdk deploy`, a stack delete, a
+  push to a shared branch), ask with `tuios ask-human 'QUESTION' -o yes -o no`
+  and act on the answer it prints, instead of asking in the conversation. It
+  reaches my phone when I am away. Exit 2 means it timed out: stop and say so.
+- **Leave a return note when you stop with work left.** When a turn ends with a
+  next step for me or a later session, set it as one line on the session:
+  `tuios note set 'NEXT STEP'`. Clear it (`tuios note clear`) when the work it
+  names is done. Keep it under 60 characters; it shows on the rail.
+- **A tuios task card is not the tsk board.** A card titled `T<n>: ...` follows
+  one run of tsk task T<n> (from `prefix+ctrl+s` / `prefix+S` on the board).
+  If you hold one, `tuios task block ID REASON` when you are stuck, and leave
+  `done` to me, as on tsk.
+
 ## Task board
 
 Work that outlives one session goes on the tsk board (`tsk`, installed by mise
@@ -204,7 +220,10 @@ start: look at it only when I ask for it or the work at hand involves it.
 - Only the main agent writes to the board. Subagents report back.
 - A git worktree is its own tsk project, the same as on the herdr board. Use
   tsk's default scope there; do not pass `-p` to reach the main checkout.
-- In herdr, `prefix+t` opens the board and `prefix+ctrl+t` quick capture.
+- In herdr and tuios, `prefix+t` opens the board and `prefix+ctrl+t` quick
+  capture. In tuios, `prefix+ctrl+s` on the board starts an agent on the task
+  under the cursor in this folder, and `prefix+S` in a worktree of its own;
+  that worktree agent gets the notes in its prompt and does not touch tsk.
 
 ## Commit messages
 
