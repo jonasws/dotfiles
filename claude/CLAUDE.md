@@ -208,6 +208,12 @@ tuios send-agent-message --select 'session:dotfiles harness:claude-code' --confi
 
 Inside tuios (`TUIOS_ENV=1`):
 
+- **Check a key before you name it.** My config moves many of tuios's default
+  keys, so the docs and `tuios --skill` are wrong for them. Before telling me
+  to press a key sequence, look it up live:
+  `tuios keybinds list --json | jq -r '.[] | select(.action == "ACTION") | .keys[]'`
+  for an action, or `tuios keybinds explain KEY` for a key. If the lookup
+  fails, name the action instead of a key.
 - **Decisions with fixed answers go to the Inbox.** Before a step I must
   approve outside your own permission prompt (a `cdk deploy`, a stack delete, a
   push to a shared branch), ask with `tuios ask-human 'QUESTION' -o yes -o no`
