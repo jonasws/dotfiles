@@ -212,6 +212,29 @@ launchctl bootout "gui/$(id -u)" "$plist" 2>/dev/null || true
 launchctl bootstrap "gui/$(id -u)" "$plist"
 """
 
+[tasks."keychron:apply"]
+description = "Load keychron/q1-max.vil into the Keychron Q1 Max (Vial firmware) with vitaly"
+# The keyboard must be unlocked first: `vitaly -i 2064 lock -u` while holding
+# Esc and Enter. Save changes made in Pipette back with keychron:save.
+# The .vil file holds no lighting, so the backlight is set here: Direct
+# Control with only Esc (LED 0) lit in purple. The effect persists on the
+# keyboard; the per-LED colours may not, so keychron:light reapplies them.
+run = [
+  "vitaly -i 2064 load -f {{config_root}}/keychron/q1-max.vil",
+  { task = "keychron:light" },
+]
+
+[tasks."keychron:light"]
+description = "Backlight off on the Keychron Q1 Max except Esc, in purple"
+run = [
+  "vitaly -i 2064 rgb -e 1 -b 255 -p",
+  "vitaly -i 2064 rgb -d '0=#6a00ff;1-80=#000000'",
+]
+
+[tasks."keychron:save"]
+description = "Save the Keychron Q1 Max's current Vial config to keychron/q1-max.vil"
+run = "vitaly -i 2064 save -f {{config_root}}/keychron/q1-max.vil"
+
 [tasks."sync:karabiner"]
 description = "Generate karabiner.json from karabiner-ts and copy it to ~/.config/karabiner"
 dir = "{{config_root}}/karabiner-ts"

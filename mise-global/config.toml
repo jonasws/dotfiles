@@ -87,6 +87,8 @@ sqlite = "latest"
 glow = "latest"
 pandoc = "latest"
 "cargo:mdcat" = "latest"
+# Vial keyboard config over USB (keychron/q1-max.vil, mise run keychron:apply)
+"cargo:vitaly" = "latest"
 herdr = "latest"
 "github:yazeed/proc-cli" = "latest"
 "github:agavra/tuicr" = "latest"
