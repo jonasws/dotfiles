@@ -9,7 +9,8 @@ has taken.
 release too: `next_agent`, `prev_agent` and `edit_scrollback`, the task board,
 Settled shelf, return notes, `[agents.approvals]`, `group_main` and the
 `after-new-worktree` hook.
-`mise run update:tuios-nightly` builds main into `~/.local/share/tuios-nightly`
+`mise run update:tuios-nightly` builds main with the libghostty-vt emulator
+(the `ghostty` backend, zig 0.16 from mise) into `~/.local/share/tuios-nightly`
 and links the binary as `~/.local/bin/tuios`, so `tuios` on PATH is the nightly
 build in every shell and script. Hooks run in the daemon's environment, so
 `scripts/auto-name.sh` falls back to the nightly path when `tuios` is not on its

@@ -121,8 +121,10 @@ description = "Build tuios from main and link it as tuios in ~/.local/bin"
 # starts the newer of the binary you ran and the one on PATH, and judges a dev
 # build older than any release, so a mise-managed release on PATH would win.
 # --keep-server leaves a running daemon on the previous build; `tuios
-# kill-server` switches over when the panes can be spared.
-tools = { go = "latest" }
+# kill-server` switches over when the panes can be spared. The ghostty backend
+# links libghostty-vt, which needs the zig series ghostty pins (ZIG_SERIES in
+# scripts/ghostty-lib.sh); the library is built once and cached in the checkout.
+tools = { go = "latest", zig = "0.16" }
 run = """
 set -euo pipefail
 root="$HOME/.local/share/tuios-nightly"
@@ -132,7 +134,7 @@ if [ -d "$src/.git" ]; then
   git -C "$src" fetch --depth 1 origin main
   git -C "$src" reset --hard FETCH_HEAD
   if [ -x "$root/bin/tuios" ] && [ "$built" = "$(git -C "$src" rev-parse HEAD)" ] \
-    && [ "$(cat "$root/built-commit" 2>/dev/null)" = "$built" ]; then
+    && [ "$(cat "$root/built-commit" 2>/dev/null)" = "$built ghostty" ]; then
     echo "tuios is already at ${built:0:7}"
     exit 0
   fi
@@ -140,8 +142,8 @@ else
   mkdir -p "$root"
   git clone --depth 1 https://github.com/Gaurav-Gosain/tuios.git "$src"
 fi
-"$src/scripts/install.sh" pure --prefix "$root/bin" --keep-server
-git -C "$src" rev-parse HEAD > "$root/built-commit"
+"$src/scripts/install.sh" ghostty --prefix "$root/bin" --keep-server
+echo "$(git -C "$src" rev-parse HEAD) ghostty" > "$root/built-commit"
 ln -sfn "$root/bin/tuios" "$HOME/.local/bin/tuios"
 """
 
