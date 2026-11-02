@@ -5,16 +5,17 @@ Configuration for [tuios](https://tuios.dev/docs/configuration), linked to
 apply` reloads it, and `tuios keybinds doctor` lists keys that something else
 has taken.
 
-**This config targets tuios built from main, not the 0.11.1 release.** It uses
-`next_agent`, `prev_agent` and `edit_scrollback`, which main has and the
-releases through 0.11.1 do not. Expect config warnings for them on 0.11.1; the
-rest of the config does not depend on them. `mise run update:tuios-nightly`
-builds main into `~/.local/share/tuios-nightly`, and the `tuios` shell alias
-(`mise-global/config.toml`) points at that build. An alias only reaches an
-interactive shell, so nothing here calls `tuios` from a script. The task leaves a
-running daemon on its old build (`--keep-server`); `tuios kill-server` switches
-it over when the panes can be spared, and until then the daemon does not know
-the new actions.
+**This config runs on tuios built from main.** `next_agent` and `prev_agent`
+shipped in 0.12.0, and the task board, Settled shelf, return notes and
+`after-new-worktree` hook it uses are 0.12.0 too; `edit_scrollback` may still be
+main only, so check it with `tuios keybinds doctor` before moving to a release.
+`mise run update:tuios-nightly` builds main into `~/.local/share/tuios-nightly`
+and links the binary as `~/.local/bin/tuios`, so `tuios` on PATH is the nightly
+build in every shell and script. Hooks run in the daemon's environment, so
+`scripts/auto-name.sh` falls back to the nightly path when `tuios` is not on its
+PATH. The task leaves a running daemon on its old build (`--keep-server`);
+`tuios kill-server` switches it over when the panes can be spared, and until
+then the daemon does not know the new actions.
 
 The command keys and scripts here use tuios's own commands (`tuios --skill`,
 `tuios <cmd> --help`); the herdr scripts in `herdr/scripts` stay herdr's. tuios
@@ -34,14 +35,14 @@ built-ins:
 | ------ | -------- |
 | `rex/herdr/` socket server, bridge and LaunchAgent | Built in. The daemon serves the herdr socket and starts when a session does. |
 | `fish/conf.d/45-rex-herdr.fish` | tuios sets `HERDR_SOCKET_PATH`, `HERDR_PANE_ID` and `HERDR_ENV` in its panes. |
-| `herdr.lua` command keys | `[[keybindings.command]]` entries: popups through `scripts/toggle-popup.sh`, the tsk board on `prefix+t` among them. herdr's subagent viewer key (`prefix+S`) is not ported: the rail already shows a row per subagent under its pane. |
+| `herdr.lua` command keys | `[[keybindings.command]]` entries: popups through `scripts/toggle-popup.sh`, the tsk board on `prefix+t` among them. herdr's subagent viewer key is not ported: the rail already shows a row per subagent under its pane, and `prefix+S` starts a tsk task in a worktree instead. |
 | Ctrl+hjkl that unzooms and wraps | The `herdr-splits` plugin, enabled in `[plugins]`. |
 | Neovim marker file for Ctrl+hjkl | Not needed. Panes have `HERDR_ENV=1`, so `herdr-splits.nvim` loads. |
 | Prefix chords for tabs, panes and sessions | `[keybindings.prefix_mode]`. |
 | `ctrl+b e`, scrollback in `$EDITOR` | The `edit_scrollback` action, on `prefix+e`. |
 | `ctrl+b a` / `shift+a` | The `next_agent` and `prev_agent` actions. |
 | Git repo picker opens a session | Enter and `ctrl-w` both run `television/scripts/tuios-session.sh`, which opens or switches to a session named after the repo. |
-| Hotkeys sheet | `herdr.tsv`, `prefix+shift+h`: the keys follow herdr's, and the differences are listed below. |
+| Hotkeys sheet | `television/hotkeys/tuios.tsv`, first in `prefix+shift+h`: tuios's own keys and these. `herdr.tsv` stays for herdr. |
 | `herdr_f1`, the F1 dashboard | The `herdr-f1` plugin from herdr's registry, enabled in `[plugins]`, on `prefix+F`. |
 | Pickers in floating layers | Popups. The `tv` pickers run through `scripts/close-on-leave.sh`, which closes the popup when focus, the workspace or the session moves away from it. |
 | Cmd+D / Cmd+R, `ctrl+cmd+]` / `[`, font keys, theme import | The host terminal's job (WezTerm, `wezterm/dot-wezterm.lua`). Rex's prefix-free agent chords are not ported. |
@@ -70,19 +71,23 @@ keeps tuios's `o`, and `ctrl+k` takes the newest finished turn from `A`, since
 `O` opens the AWS profiles.
 
 `prefix+F` opens the F1 dashboard, as in herdr. tuios leaves a plugin herdr
-installed off until it is listed in `[plugins]`, and four are: `herdr-splits`,
-`herdr-f1`, and `dan.pane-topic-sync` with `herdr-automatic-rename`, which name
-agent panes after their topic and workspaces after the pane running in them
-(settings in `~/.config/herdr/plugins/config/`). `scripts/auto-name.sh` also
-names agent panes, from the `after-agent-state` hook. `herdr-tsk` is off: the
-tsk board and quick capture are popups on `prefix+t` and `prefix+ctrl+t`. The
-other installed plugins, `herdr-bar` among them, are off.
+installed off until it is listed in `[plugins]`, and three are: `herdr-splits`,
+`herdr-f1`, and `herdr-automatic-rename`, which names workspaces after the pane
+running in them (settings in `~/.config/herdr/plugins/config/`). Agent panes are
+named by `scripts/auto-name.sh` alone, from the `after-agent-state` hook;
+`dan.pane-topic-sync` is off here so two namers do not fight over one label.
+Since 0.12.1 tuios also shows a name the agent set itself (`claude -n`,
+`/rename`), and a name set by the script or by hand comes before it.
+`herdr-tsk` is off: the tsk board and quick capture are popups on `prefix+t`
+and `prefix+ctrl+t`. The other installed plugins, `herdr-bar` among them, are
+off.
 
 Where tuios's keys differ from `herdr.tsv`: `o` goes to the oldest item that
 needs you, `ctrl+k` to the newest finished turn, `J` / `K` also step through
 agents, `prefix+g` and `prefix+/` both open the pane navigator, and
-`prefix+shift+s` (subagent viewers) is not bound, since the rail lists each
-pane's subagents.
+`prefix+shift+s` starts the selected tsk task in a worktree (see Agents below)
+instead of opening subagent viewers, since the rail lists each pane's
+subagents.
 
 `prefix+e` opens the pane's screen and scrollback as plain text in the File
 editor setting, else `$EDITOR`, else `$VISUAL`, else `vi`. vi, vim and nvim open
@@ -100,6 +105,47 @@ The session is named after the repo's directory, so `-s <repo>`, `tuios attach
 <repo>` and the `session:<repo>` selector reach it. A session tuios named
 `session-<hex>` is renamed on the way, and a name another repo already holds
 gets the parent directory in front (`CNOPS-<repo>`).
+
+## Agents
+
+The agents view (`prefix+i`) is the place to work from; `tuios.tsv` has its
+keys.
+
+- **Approvals in the Inbox.** `[agents.approvals]` holds Claude Code's
+  permission prompts and plans there, so they are answered from the agents
+  view or the phone. Run `tuios integration install claude-code` once after
+  enabling it: the hook that waits is a newer version. Risk rules on top of
+  the shipped ones mark `cdk deploy`/`destroy`/`import`, CloudFormation stack
+  changes, `aws … delete-*` style calls and `aws s3 rm`/`rb`/`sync --delete`;
+  allowing one takes a second press. They are a speed bump, not a sandbox.
+- **Working folded.** `[agents] fold_working` keeps the Working group closed
+  until it is opened, so Needs you and Ready for review lead.
+- **Worktrees.** `group_main` puts a repo's worktree sessions under its main
+  checkout on the rail. `scripts/new-worktree.sh`, the `after-new-worktree`
+  hook, runs `mise trust` and `mise install` in each new worktree before its
+  first pane starts. `[hooks]` changes need `tuios restart-server`.
+- **Push notifications.** `[notify]` lives in `config.d/notify.toml`,
+  gitignored because the ntfy topic is a secret; copy
+  `config.d/notify.toml.example`, then run `tuios config apply` and
+  `tuios notify test` from a terminal outside tuios.
+- **Return notes and ask-human.** `claude/CLAUDE.md` asks Claude to leave
+  `tuios note set` on the session when it stops with work left, and to ask
+  `tuios ask-human` before a deploy or other step that needs a yes.
+
+### tsk and tuios task cards
+
+tsk stays the backlog: notes, steps, the desk across repos, and only I set
+`done`. tuios task cards follow one run. On the tsk board popup:
+
+| Key | Does |
+| --- | --- |
+| `prefix+ctrl+s` | `scripts/tsk-dispatch.sh here`: a card `T<n>: <title>`, then `tuios start-agent claude --task` in the repo's folder. The agent moves the tsk task itself. |
+| `prefix+S` | `scripts/tsk-dispatch.sh worktree`: a card, `tsk status T<n> start` on the main checkout, then `tuios fan 1 --task` on branch `tsk/t<n>-<slug>` with the task's notes in the prompt. |
+
+The card then moves through plan, verify, review and shipped on its own as the
+agent's plan, `fan verify` and pull request change (`b` in the agents view).
+`scripts/tsk-board.sh` reads the task under the board's cursor off the screen,
+for this and for `tsk-notes.sh`.
 
 ## Not yet checked
 
@@ -119,3 +165,12 @@ main. Nothing here has run on the Mac.
   command key that a tuios action holds shows up there as dead. `G` is held by
   both `goto_picker` (a default) and `toggle_scratch` (this config), which
   predates the Rex port.
+- **`tuios task add` output.** `tsk-dispatch.sh` asks for `--json`, which the
+  CLI reference does not list, and otherwise takes the first word with a digit
+  in it as the card id. Without an id the agent starts with no card. A command
+  key that counts as running in a pane may also need the `task` grant.
+- **The dispatch environment.** A command key's shell is assumed to get
+  `TUIOS_SESSION` and the pressed pane as `TUIOS_ACTIVE_PANE_ID` or
+  `TUIOS_PANE_ID`, as `toggle-popup.sh` assumes.
+- **Risk rule patterns.** Written from the docs' example; `tuios config apply`
+  reports a pattern it cannot compile.

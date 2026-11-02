@@ -41,9 +41,50 @@ style = "plain"
 right = ["transfers", "copy-help", "cpu", "ram", "clock", "session-controls"]
 
 # herdr resumes agent conversations on its own after a restart. The default,
-# "ask", leaves a Resume row in the Inbox for each pane instead.
+# "ask", leaves a Resume row in the Inbox for each pane instead. Since 0.12 an
+# agent started with a flag that turns approvals off is not resumed by "auto";
+# its Resume row waits for y in the agents view.
 [daemon]
 resume_agents = "auto"
+
+# Fold the Working group in the agents view (prefix+i) until it is opened, so
+# the view leads with what needs me. F folds or opens any group.
+[agents]
+fold_working = true
+
+# Claude Code's permission prompts and plans wait in the Inbox, where they are
+# answered without going to the pane: a/1 allow, A/2 always, r/3 reject, R
+# reject with a reason. Needs `tuios integration install claude-code` again
+# after this is first set, so the hook is the version that waits. A command
+# that matches a risk rule takes a second press to allow.
+[agents.approvals]
+enabled = ["claude-code"]
+hold_seconds = 120
+
+# The shipped rules cover terraform, kubectl, force pushes, rm -rf and the
+# rest; these add the CDK and AWS calls the *-infra repos make.
+[agents.approvals.risk]
+builtin = true
+
+[[agents.approvals.risk.rule]]
+name = "cdk deploy/destroy"
+tools = ["Bash"]
+pattern = '\bcdk\s+(deploy|destroy|import)\b'
+
+[[agents.approvals.risk.rule]]
+name = "cloudformation change"
+tools = ["Bash"]
+pattern = '\baws\s+cloudformation\s+(delete-stack|deploy|execute-change-set)\b'
+
+[[agents.approvals.risk.rule]]
+name = "aws delete"
+tools = ["Bash"]
+pattern = '\baws\s+\S+\s+(delete|remove|terminate|purge)-\S+'
+
+[[agents.approvals.risk.rule]]
+name = "s3 rm"
+tools = ["Bash"]
+pattern = '\baws\s+s3\s+(rm|rb)\b|\baws\s+s3\s+sync\b.*--delete\b'
 
 # herdr: prefix+c opens a tab in the focused pane's folder. A new workspace is
 # empty, and this opens its first pane in the folder of the pane you came from.
@@ -55,11 +96,16 @@ new_window_when_empty = true
 # so `tuios restart-server` picks a change up.
 [hooks]
 after-agent-state = "~/.config/tuios/scripts/auto-name.sh"
+# A worktree from prefix+U, `tuios worktree new`, `fan` or the New agent sheet
+# gets mise trusted and its tools installed before the first pane starts.
+after-new-worktree = "~/.config/tuios/scripts/new-worktree.sh"
 
 # herdr's sidebar sits on the left.
 [appearance.sidebar]
 position = "left"
 width = 34
+# A repo's main checkout and its worktree sessions sit under one group.
+group_main = true
 
 [keybindings]
 # Option is the us-altgr-intl compose layer, so the characters it types go to
@@ -320,6 +366,22 @@ type = "shell"
 command = "~/.config/tuios/scripts/toggle-popup.sh tsk-notes 80% 60% -- ~/.config/tuios/scripts/tsk-notes.sh"
 description = "Edit tsk notes in nvim"
 
+# Hand the tsk task under the board cursor to a new Claude agent, through a
+# tuios task card: here in the repo's folder, or in a worktree of its own.
+# tsk keeps the plan and the notes; the card follows the run (plan, verify,
+# PR) on the agents view's board (prefix+i, then b).
+[[keybindings.command]]
+key = "prefix+ctrl+s"
+type = "shell"
+command = "~/.config/tuios/scripts/tsk-dispatch.sh here"
+description = "tsk: start agent on task (here)"
+
+[[keybindings.command]]
+key = "prefix+S"
+type = "shell"
+command = "~/.config/tuios/scripts/tsk-dispatch.sh worktree"
+description = "tsk: start agent on task (worktree)"
+
 # F1 dashboard, through the herdr-f1 plugin (`herdr plugin install
 # hmu332233/herdr-f1`; tuios reads herdr's registry and leaves it off until it is
 # enabled below).
@@ -333,9 +395,13 @@ description = "Open F1 dashboard"
 enabled = [
   "herdr-splits",
   "dev.minung.herdr-f1",
-  # Name agent panes after their live topic and workspaces after the pane
-  # running in them, so panes stop reading "claude 1", "claude 2". Settings are
-  # in ~/.config/herdr/plugins/config/.
-  "dan.pane-topic-sync",
+  # Name workspaces after the pane running in them. Agent panes are named by
+  # scripts/auto-name.sh, so dan.pane-topic-sync stays off: two namers would
+  # fight over one label. Settings are in ~/.config/herdr/plugins/config/.
   "herdr-automatic-rename",
 ]
+
+# Push notifications ([notify]) live in config.d/notify.toml, which is
+# gitignored because an ntfy topic address is a secret. Copy
+# config.d/notify.toml.example and run `tuios config apply` and
+# `tuios notify test` from a terminal outside tuios.

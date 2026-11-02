@@ -30,3 +30,6 @@ karabiner-ts/node_modules/
 # herdr-splits.nvim regenerates on every setup().
 tuios/.reload-themes
 tuios/plugin-config/herdr-splits/
+
+# tuios push notifications: the ntfy topic is a secret.
+tuios/config.d/notify.toml
