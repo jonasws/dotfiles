@@ -412,8 +412,9 @@ enabled = [
   "herdr-splits",
   "dev.minung.herdr-f1",
   # Name workspaces after the pane running in them. Agent panes are named by
-  # scripts/auto-name.sh, so dan.pane-topic-sync stays off: two namers would
-  # fight over one label. Settings are in ~/.config/herdr/plugins/config/.
+  # scripts/auto-name.sh from the after-agent-state hook, so dan.pane-topic-sync
+  # stays off here (herdr still runs it): two namers would fight over one
+  # label. Settings are in ~/.config/herdr/plugins/config/.
   "herdr-automatic-rename",
 ]
 

@@ -75,12 +75,12 @@ installed off until it is listed in `[plugins]`, and three are: `herdr-splits`,
 `herdr-f1`, and `herdr-automatic-rename`, which names workspaces after the pane
 running in them (settings in `~/.config/herdr/plugins/config/`). Agent panes are
 named by `scripts/auto-name.sh` alone, from the `after-agent-state` hook;
-`dan.pane-topic-sync` is off here so two namers do not fight over one label.
-Since 0.12.1 tuios also shows a name the agent set itself (`claude -n`,
-`/rename`), and a name set by the script or by hand comes before it.
-`herdr-tsk` is off: the tsk board and quick capture are popups on `prefix+t`
-and `prefix+ctrl+t`. The other installed plugins, `herdr-bar` among them, are
-off.
+`dan.pane-topic-sync` is off here so two namers do not fight over one label, and
+herdr still runs it. Since 0.12.1 tuios also shows a name the agent set itself
+(`claude -n`, `/rename`), and a name set by the script or by hand comes before
+it. `herdr-tsk` is off: the tsk board and quick capture are popups on
+`prefix+t` and `prefix+ctrl+t`. The other installed plugins, `herdr-bar` among
+them, are off.
 
 Where tuios's keys differ from `herdr.tsv`: `o` goes to the oldest item that
 needs you, `ctrl+k` to the newest finished turn, `J` / `K` also step through
