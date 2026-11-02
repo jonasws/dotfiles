@@ -176,10 +176,19 @@ _.path = ["~/.local/bin/wrapped"]
 # works offline. Sync writes a `sync` entry beside each secret and leaves the
 # `op://` reference in place, so this is a cache, not a migration — a rotated
 # 1Password value keeps serving stale until the task runs again.
+#
+# The cache lives in ~/.config/fnox/config.toml, an untracked file that only
+# imports the tracked secrets.toml. Sync copies each secret whole into it, and
+# that copy shadows the tracked definition, so the file is rebuilt from scratch
+# on every run: edits and removals in secrets.toml take effect here.
 [tasks.sync-secrets]
 description = "Cache all fnox secrets into the local age provider"
 run = '''
 set -euo pipefail
+cfg=~/.config/fnox/config.toml
+# A leftover symlink into the repo would make the redirect below write there.
+[[ -L $cfg ]] && rm "$cfg"
+printf 'import = ["./secrets.toml"]\n' > "$cfg"
 # One run re-encrypts every top-level secret under one shared key, which is
 # what lets fnox-secret's single batch decrypt them all behind one Touch ID.
 # Profile secrets (`gcalcli`) stay pure 1Password references: it is
