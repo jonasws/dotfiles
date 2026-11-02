@@ -62,29 +62,31 @@ enabled = ["claude-code"]
 hold_seconds = 120
 
 # The shipped rules cover terraform, kubectl, force pushes, rm -rf and the
-# rest; these add the CDK and AWS calls the *-infra repos make.
+# rest; these add the CDK and AWS calls the *-infra repos make. RE2, matched
+# against each command of a shell call; `.*` lets global options such as
+# --profile sit before the subcommand.
 [agents.approvals.risk]
 builtin = true
 
 [[agents.approvals.risk.rule]]
 name = "cdk deploy/destroy"
 tools = ["Bash"]
-pattern = '\bcdk\s+(deploy|destroy|import)\b'
+pattern = '\bcdk\b.*\s(deploy|destroy|import)\b'
 
 [[agents.approvals.risk.rule]]
 name = "cloudformation change"
 tools = ["Bash"]
-pattern = '\baws\s+cloudformation\s+(delete-stack|deploy|execute-change-set)\b'
+pattern = '\baws\b.*\scloudformation\b.*\s(delete-stack|deploy|execute-change-set)\b'
 
 [[agents.approvals.risk.rule]]
 name = "aws delete"
 tools = ["Bash"]
-pattern = '\baws\s+\S+\s+(delete|remove|terminate|purge)-\S+'
+pattern = '\baws\b.*\s(delete|remove|terminate|purge)-[a-z0-9-]+\b'
 
 [[agents.approvals.risk.rule]]
 name = "s3 rm"
 tools = ["Bash"]
-pattern = '\baws\s+s3\s+(rm|rb)\b|\baws\s+s3\s+sync\b.*--delete\b'
+pattern = '\baws\b.*\ss3\s+(rm|rb)\b|\baws\b.*\ss3\s+sync\b.*\s--delete\b'
 
 # herdr: prefix+c opens a tab in the focused pane's folder. A new workspace is
 # empty, and this opens its first pane in the folder of the pane you came from.

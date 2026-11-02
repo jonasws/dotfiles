@@ -116,14 +116,17 @@ keys.
   view or the phone. Run `tuios integration install claude-code` once after
   enabling it: the hook that waits is a newer version. Risk rules on top of
   the shipped ones mark `cdk deploy`/`destroy`/`import`, CloudFormation stack
-  changes, `aws … delete-*` style calls and `aws s3 rm`/`rb`/`sync --delete`;
-  allowing one takes a second press. They are a speed bump, not a sandbox.
+  changes, `aws … delete-*` style calls and `aws s3 rm`/`rb`/`sync --delete`,
+  with global options such as `--profile` before the subcommand too; allowing
+  one takes a second press. They are a speed bump, not a sandbox.
 - **Working folded.** `[agents] fold_working` keeps the Working group closed
   until it is opened, so Needs you and Ready for review lead.
 - **Worktrees.** `group_main` puts a repo's worktree sessions under its main
   checkout on the rail. `scripts/new-worktree.sh`, the `after-new-worktree`
-  hook, runs `mise trust` and `mise install` in each new worktree before its
-  first pane starts. `[hooks]` changes need `tuios restart-server`.
+  hook, runs `mise install` in each new worktree before its first pane
+  starts. It runs `mise trust` first only when the main checkout is trusted,
+  so a worktree of a repo I never trusted stays untrusted. `[hooks]` changes
+  need `tuios restart-server`.
 - **Push notifications.** `[notify]` lives in `config.d/notify.toml`,
   gitignored because the ntfy topic is a secret; copy
   `config.d/notify.toml.example`, then run `tuios config apply` and
@@ -135,7 +138,9 @@ keys.
 ### tsk and tuios task cards
 
 tsk stays the backlog: notes, steps, the desk across repos, and only I set
-`done`. tuios task cards follow one run. On the tsk board popup:
+`done`. tuios task cards follow one run. These keys act only when pressed on a
+tsk board (the `prefix+t` popup or a pane running `tsk`); anywhere else they
+say so in a popup:
 
 | Key | Does |
 | --- | --- |
@@ -165,12 +170,13 @@ main. Nothing here has run on the Mac.
   command key that a tuios action holds shows up there as dead. `G` is held by
   both `goto_picker` (a default) and `toggle_scratch` (this config), which
   predates the Rex port.
-- **`tuios task add` output.** `tsk-dispatch.sh` asks for `--json`, which the
-  CLI reference does not list, and otherwise takes the first word with a digit
-  in it as the card id. Without an id the agent starts with no card. A command
-  key that counts as running in a pane may also need the `task` grant.
-- **The dispatch environment.** A command key's shell is assumed to get
-  `TUIOS_SESSION` and the pressed pane as `TUIOS_ACTIVE_PANE_ID` or
-  `TUIOS_PANE_ID`, as `toggle-popup.sh` assumes.
-- **Risk rule patterns.** Written from the docs' example; `tuios config apply`
-  reports a pattern it cannot compile.
+- **The task grant.** `tuios task add --json` prints the card with its `id`
+  (checked on the Mac). A command key runs with the focused pane's environment
+  beside its own variables, so if that counts as the pane calling, creating a
+  card may need the `task` grant. Without a card id the agent still starts,
+  with no card.
+- **The board popup's folder.** A command key gets `TUIOS_SESSION`,
+  `TUIOS_ACTIVE_PANE_ID` and `TUIOS_ACTIVE_PANE_CWD`
+  (`internal/app/command_keys.go`). The dispatch reads the repo from the
+  board popup's folder, which is known only once tuios has seen the popup's
+  `cd`; when it is not, the key reports that the folder is not a repository.
