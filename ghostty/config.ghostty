@@ -4,8 +4,8 @@
 
 # ── Appearance ──────────────────────────────────────────────────────────────
 
-# Follows macOS light and dark. tuios follows the same switch (theme_light).
-theme = light:Catppuccin Latte,dark:Catppuccin Mocha
+# Always dark, whatever macOS is set to: no light:/dark: pair.
+theme = Catppuccin Mocha
 
 # As in WezTerm: text from plain JetBrains Mono, icon and powerline glyphs from
 # the Nerd Font Mono build, which keeps every glyph inside one cell. Ghostty
