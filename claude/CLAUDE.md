@@ -26,12 +26,19 @@ Non-default tools; reach for them deliberately. Match tool to question shape, no
   `multi_grep` for N identifiers in one call.
 - `sd` over `sed` for find & replace: global by default, no BSD `-i ''` quirk.
   Literal `$` is `$$`. Fall back to `sed`/`awk` only for line-addressed ops.
-- `rip` over `rm`, both for removals you run and for commands you suggest to
-  me (`! rip <path>`). It moves files to `/tmp/graveyard-$USER`, where
-  `rip -s` lists what left the current folder and `rip -u` restores the last
-  removal. It takes no flags: directories go without `-r`, and there is no
-  `-f`, so check a path exists first where `rm -f` would have ignored it.
-  `Bash(rm:*)` is denied in `settings.json`; permanent deletion is mine to run.
+- Never `rm`, whether you run the removal or suggest it to me: both safe
+  removers below are from mise, and `Bash(rm:*)` is denied in `settings.json`.
+  Permanent deletion is mine to run.
+  - `rip` (the rip2 fork) is the default: `rip <path>...`, directories
+    included, no `-r`. It moves them to `$RIP_GRAVEYARD`
+    (`~/.local/share/graveyard`). `rip -s` lists what left the current
+    folder, `rip -u` restores the last removal, `rip -su` all of them, and
+    `rip -u <graveyard path>` one; it cannot restore by the original name.
+    A missing path is an error; `-f` only skips prompts.
+  - `gomi <path>...` when I may want the file back later by name: it goes to
+    the XDG trash (`~/.local/share/Trash`), and `gomi -b` restores it from a
+    searchable list. `-r` is accepted and does nothing; `-f` ignores
+    missing paths, as with `rm -f`. Leave its TUI's permanent delete alone.
 
 ## Shell for the Bash tool
 
@@ -124,6 +131,14 @@ semble, fff, ast-grep and LSP read the working tree, not a ref. Use them on a cl
 only when `git status -sb` shows the default branch, clean, and not behind
 `origin`; otherwise use `git grep` on `origin/HEAD`. When the question is about the
 checked-out branch itself, search the working tree and say which branch it was.
+
+## Jira remote links to GitHub
+
+`twg jira workitem link commit|pr|branch|repo` labels the link as Bitbucket
+(`com.atlassian.bitbucket`) unless told otherwise, and Jira titles the section
+after it. For a GitHub URL, always pass
+`--application-name GitHub --application-type com.github`. Re-running with the
+same `--target` updates an existing link in place.
 
 ## Looking things up
 
