@@ -102,10 +102,11 @@ split-preserve-zoom = navigation
 keybind = super+p=toggle_command_palette
 
 # ── Quick Terminal ──────────────────────────────────────────────────────────
-# Ctrl+` from any app drops a Ghostty panel from the top, which attaches to the
-# most recent tuios session (fish/conf.d/55-ghostty-quick-terminal.fish). Needs
-# Accessibility permission for Ghostty. It hides again when it loses focus.
-keybind = global:ctrl+grave_accent=toggle_quick_terminal
+# A double tap of Hyper (right Option, karabiner-ts/karabiner.config.ts sends
+# F19) drops a Ghostty panel from the top from any app. It attaches to the
+# most recent tuios session (fish/conf.d/55-ghostty-quick-terminal.fish) and
+# hides again when it loses focus. global: needs Accessibility permission.
+keybind = global:f19=toggle_quick_terminal
 quick-terminal-position = top
 quick-terminal-size = 60%
 quick-terminal-space-behavior = move

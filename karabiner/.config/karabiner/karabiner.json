@@ -161,12 +161,43 @@
                 },
                 "to": [
                   {
+                    "key_code": "f19"
+                  }
+                ],
+                "conditions": [
+                  {
+                    "type": "variable_if",
+                    "name": "double-tap-right_option-any",
+                    "value": 1
+                  }
+                ],
+                "description": "__support__manipulator"
+              },
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "right_option",
+                  "modifiers": {
+                    "optional": [
+                      "any"
+                    ]
+                  }
+                },
+                "to": [
+                  {
+                    "set_variable": {
+                      "name": "double-tap-right_option-any",
+                      "value": 1
+                    }
+                  },
+                  {
                     "key_code": "left_shift",
                     "modifiers": [
                       "left_command",
                       "left_control",
                       "left_option"
-                    ]
+                    ],
+                    "lazy": true
                   }
                 ],
                 "conditions": [
@@ -183,8 +214,53 @@
                     "bundle_identifiers": [
                       "^com\\.github\\.wez\\.wezterm$"
                     ]
+                  },
+                  {
+                    "type": "variable_unless",
+                    "name": "double-tap-right_option-any",
+                    "value": 1
                   }
-                ]
+                ],
+                "to_delayed_action": {
+                  "to_if_invoked": [
+                    {
+                      "key_code": "left_shift",
+                      "modifiers": [
+                        "left_command",
+                        "left_control",
+                        "left_option"
+                      ]
+                    },
+                    {
+                      "set_variable": {
+                        "name": "double-tap-right_option-any",
+                        "value": 0
+                      }
+                    }
+                  ],
+                  "to_if_canceled": [
+                    {
+                      "set_variable": {
+                        "name": "double-tap-right_option-any",
+                        "value": 0
+                      }
+                    }
+                  ]
+                },
+                "to_if_held_down": [
+                  {
+                    "key_code": "left_shift",
+                    "modifiers": [
+                      "left_command",
+                      "left_control",
+                      "left_option"
+                    ]
+                  }
+                ],
+                "parameters": {
+                  "basic.to_if_held_down_threshold_milliseconds": 200,
+                  "basic.to_delayed_action_delay_milliseconds": 200
+                }
               }
             ]
           },

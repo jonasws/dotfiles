@@ -4,7 +4,14 @@
 //
 //   bun karabiner.config.ts            write the repo copy
 //   bun karabiner.config.ts --dry-run  print the rules instead
-import { ifApp, ifDevice, map, rule, writeToProfile } from 'karabiner.ts'
+import {
+  ifApp,
+  ifDevice,
+  map,
+  mapDoubleTap,
+  rule,
+  writeToProfile,
+} from 'karabiner.ts'
 
 const target = {
   name: 'Default profile',
@@ -64,8 +71,14 @@ writeToProfile(
     rule(
       'Right Option Key → Hyper Key (⌃⌥⇧⌘, built-in keyboard only, except WezTerm where right_option stays Meta for M- keybinds)',
     ).manipulators([
-      map('right_option', null, 'any')
-        .to('left_shift', ['left_command', 'left_control', 'left_option'])
+      // Held, it is Hyper. Tapped twice, it sends F19, which Ghostty binds
+      // globally to its Quick Terminal (ghostty/config.ghostty).
+      mapDoubleTap('right_option', null, 'any')
+        .to('f19')
+        .singleTap({
+          key_code: 'left_shift',
+          modifiers: ['left_command', 'left_control', 'left_option'],
+        })
         .condition(ifDevice({ is_built_in_keyboard: true }))
         .condition(ifApp(wezterm).unless()),
     ]),
