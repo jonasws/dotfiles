@@ -107,11 +107,13 @@
       "Bash(*security dump-keychain*)"
     ],
     "ask": [
+      "Bash(aws *)",
       "Bash(docker * --network host*)",
       "Bash(docker * --network=host*)",
       "Bash(docker * --pid=host*)",
       "Bash(docker * --privileged*)",
       "Bash(docker * docker.sock*)",
+      "Bash(fnox exec *)",
       "Bash(git clean -f*)",
       "Bash(git push --delete*)",
       "Bash(git push --force*)",

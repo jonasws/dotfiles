@@ -115,11 +115,15 @@ keys.
   permission prompts and plans there, so they are answered from the agents
   view or the phone. The hook that waits is the PermissionRequest entry of
   integration v3, already in `claude/settings.json`; `tuios integration
-  status claude-code` says whether it is current. Risk rules on top of
-  the shipped ones mark `cdk deploy`/`destroy`/`import`, CloudFormation stack
-  changes, `aws … delete-*` style calls and `aws s3 rm`/`rb`/`sync --delete`,
-  with global options such as `--profile` before the subcommand too; allowing
-  one takes a second press. They are a speed bump, not a sandbox.
+  status claude-code` says whether it is current. In auto mode the Inbox
+  only sees calls that still prompt: the `ask` rules in
+  `claude/settings.json`, which take every `aws` and `fnox exec` call so that
+  Claude reaches for the AWS MCP server first. Risk rules on top of the
+  shipped ones mark the destructive ones among them: `cdk
+  deploy`/`destroy`/`import`, CloudFormation stack changes, `aws … delete-*`
+  style calls and `aws s3 rm`/`rb`/`mv`/`sync --delete`, also behind global
+  options such as `--profile` or inside `fnox exec`; allowing one takes a
+  second press. They are a speed bump, not a sandbox.
 - **Working folded.** `[agents] fold_working` keeps the Working group closed
   until it is opened, so Needs you and Ready for review lead.
 - **Worktrees.** `group_main` puts a repo's worktree sessions under its main
