@@ -197,6 +197,9 @@ close_workspace = ["X"]
 rename_workspace = ["T"]
 new_session = ["N"]
 prefix_close_session = ["D"]
+# prefix+x is the close-pane command key below, which also ends a session it
+# leaves empty.
+prefix_close_window = []
 rename_session = ["W"]
 prefix_debug = ["ctrl+d"]
 prefix_window = ["ctrl+x"]
@@ -329,6 +332,14 @@ key = "prefix+Y"
 type = "shell"
 command = "~/.config/tuios/scripts/toggle-popup.sh yazi 80% 60% -- ~/.config/tuios/scripts/yazi-popup.sh pick"
 description = "yazi: pick files into pane"
+
+# Close the pane. On a session's last pane, close the session too and show the
+# next one, rather than leave the session empty on its splash screen.
+[[keybindings.command]]
+key = "prefix+x"
+type = "shell"
+command = "~/.config/tuios/scripts/close-pane.sh"
+description = "Close pane, and the session with its last one"
 
 # Enter opens or focuses a session for the repo.
 [[keybindings.command]]
