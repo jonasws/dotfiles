@@ -50,14 +50,14 @@ url_api = "https://api.github.com/repos/FiloSottile/age/releases/assets/53554189
 provenance = "github-attestations"
 
 [[tools."aqua:anthropics/claude-code"]]
-version = "2.1.312"
+version = "2.1.316"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
 [tools."aqua:anthropics/claude-code"."platforms.macos-arm64"]
-checksum = "sha256:b5ff41139e79b6ffdabe4df93c09ee628b1306a78be6459139fd7c7f175c85ac"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.312/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/682510790"
+checksum = "sha256:e8956064b1c5055c1c79945aa7714faef98b29060a065c6930e8956953d0bace"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.316/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/693882159"
 
 [[tools."aqua:asciinema/asciinema"]]
 version = "3.2.1"
@@ -130,34 +130,34 @@ url = "https://github.com/ast-grep/ast-grep/releases/download/0.51.0/app-aarch64
 url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/644256001"
 
 [[tools.atuin]]
-version = "18.24.2"
+version = "18.24.4"
 backend = "aqua:atuinsh/atuin"
 specifiers = ["latest"]
 
 [tools.atuin."platforms.macos-arm64"]
-checksum = "sha256:ba155cb61385e424c972ba5cadab68add2c6ad0d4f842365fc958d7a5f5917d5"
-url = "https://github.com/atuinsh/atuin/releases/download/v18.24.2/atuin-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/665441742"
+checksum = "sha256:edd06294377599bf4d85ca3337abc802256a991262260bdd980d1b649583553d"
+url = "https://github.com/atuinsh/atuin/releases/download/v18.24.4/atuin-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/690584610"
 provenance = "github-attestations"
 
 [[tools.aws-cli]]
-version = "2.38.6"
+version = "2.39.3"
 backend = "aqua:aws/aws-cli"
 specifiers = ["latest"]
 
 [tools.aws-cli."platforms.macos-arm64"]
-checksum = "blake3:87abcc0310d8945638dfbdcad2322ce17f13167cafc7813d60973cc958816c45"
-url = "https://awscli.amazonaws.com/AWSCLIV2-2.38.6.pkg"
+checksum = "blake3:4da9432fd5ae020838f871167d61ea4a339b7857d0e7c22d7fe01239a544ee99"
+url = "https://awscli.amazonaws.com/AWSCLIV2-2.39.3.pkg"
 
 [[tools.aws-vault]]
-version = "7.17.2"
+version = "7.17.3"
 backend = "aqua:ByteNess/aws-vault"
 specifiers = ["latest"]
 
 [tools.aws-vault."platforms.macos-arm64"]
-checksum = "sha256:2e6bd8968bf695f0282b3388665453811fb7f871a483f2c51a8fe0e642cebf6e"
-url = "https://github.com/ByteNess/aws-vault/releases/download/v7.17.2/aws-vault-darwin-arm64"
-url_api = "https://api.github.com/repos/ByteNess/aws-vault/releases/assets/668411963"
+checksum = "sha256:04c162682ab19ca5ca461eee2ecd29a693311c14e7e69ae462ea34fe5ccc8f5b"
+url = "https://github.com/ByteNess/aws-vault/releases/download/v7.17.3/aws-vault-darwin-arm64"
+url_api = "https://api.github.com/repos/ByteNess/aws-vault/releases/assets/688370830"
 
 [[tools.bun]]
 version = "1.4.4"
@@ -226,13 +226,13 @@ checksum = "blake3:d10419d5ff12642d628f3cca6661628071b36c73e9f4a452b026f73b4959b
 url = "https://download.docker.com/mac/static/stable/aarch64/docker-29.9.2.tgz"
 
 [[tools.fnox]]
-version = "1.43.0"
+version = "1.45.0"
 backend = "packslip:github.com/jdx/fnox"
 specifiers = ["latest"]
 
 [tools.fnox."platforms.macos-arm64"]
-checksum = "sha256:34e69cd24a7605c00ee0e9edce39d8f32b6e68c857c05ad4bb376716c598e66d"
-url = "https://github.com/jdx/fnox/releases/download/v1.43.0/fnox-aarch64-apple-darwin.tar.gz"
+checksum = "sha256:e851212b2f7319ab88ab7784e008bfb091ccee91f2696a328684fc8ce80e4263"
+url = "https://github.com/jdx/fnox/releases/download/v1.45.0/fnox-aarch64-apple-darwin.tar.gz"
 signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 
 [[tools.fzf]]
@@ -266,6 +266,16 @@ checksum = "sha256:4284325e09e3e2bd62eea76e803701d81750619f951956e5698d208c37c9b
 url = "https://github.com/BurntSushi/bttf/releases/download/0.1.4/bttf-0.1.4-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/BurntSushi/bttf/releases/assets/432196770"
 
+[[tools."github:MilesCranmer/rip2"]]
+version = "0.9.7"
+backend = "github:MilesCranmer/rip2"
+specifiers = ["latest"]
+
+[tools."github:MilesCranmer/rip2"."platforms.macos-arm64"]
+checksum = "sha256:ff9e28a8b0b8c7c4ee26473e6f93258ab63f9a15c577f490fb31ebc152add4f9"
+url = "https://github.com/MilesCranmer/rip2/releases/download/v0.9.7/rip-macOS-Darwin-aarch64.tar.gz"
+url_api = "https://api.github.com/repos/MilesCranmer/rip2/releases/assets/610861006"
+
 [[tools."github:RivoLink/leaf"]]
 version = "1.29.2"
 backend = "github:RivoLink/leaf"
@@ -297,14 +307,14 @@ url = "https://github.com/agavra/tuicr/releases/download/v0.28.0/tuicr-0.28.0-aa
 url_api = "https://api.github.com/repos/agavra/tuicr/releases/assets/677485838"
 
 [[tools."github:always-further/nono"]]
-version = "0.80.0"
+version = "0.81.0"
 backend = "github:always-further/nono"
 specifiers = ["latest"]
 
 [tools."github:always-further/nono"."platforms.macos-arm64"]
-checksum = "sha256:ae824167b3d90531b830429ba92b7781379b1c2d79f9b11fdd88b0fd267e4e32"
-url = "https://github.com/always-further/nono/releases/download/v0.80.0/nono-v0.80.0-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/always-further/nono/releases/assets/636393745"
+checksum = "sha256:728b1deefbf6390c9b74fc982efbded1e1c4b37b99dcdefa2e07266dfef4d9e9"
+url = "https://github.com/always-further/nono/releases/download/v0.81.0/nono-v0.81.0-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/always-further/nono/releases/assets/689330156"
 provenance = "github-attestations"
 
 [[tools."github:aws-cloudformation/rain"]]
@@ -316,6 +326,16 @@ specifiers = ["latest"]
 checksum = "sha256:d3bbd16f9d4957da3ddf79b29de019e8937d34e8d7efbc76d43368d1f165b348"
 url = "https://github.com/aws-cloudformation/rain/releases/download/v1.24.4/rain-v1.24.4_darwin-arm64.zip"
 url_api = "https://api.github.com/repos/aws-cloudformation/rain/releases/assets/403585995"
+
+[[tools."github:babarot/gomi"]]
+version = "1.10.1"
+backend = "github:babarot/gomi"
+specifiers = ["latest"]
+
+[tools."github:babarot/gomi"."platforms.macos-arm64"]
+checksum = "sha256:924b3bc72e86a582730ad0e7d035e9c206f13fb21285818acde7f6306453f189"
+url = "https://github.com/babarot/gomi/releases/download/v1.10.1/gomi_Darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/babarot/gomi/releases/assets/678796319"
 
 [[tools."github:control-theory/gonzo"]]
 version = "0.4.3"
@@ -445,14 +465,14 @@ url = "https://github.com/pb33f/printing-press/releases/download/v0.0.28/printin
 url_api = "https://api.github.com/repos/pb33f/printing-press/releases/assets/525089821"
 
 [[tools."github:pb33f/wiretap"]]
-version = "0.7.6"
+version = "0.7.7"
 backend = "github:pb33f/wiretap"
 specifiers = ["latest"]
 
 [tools."github:pb33f/wiretap"."platforms.macos-arm64"]
-checksum = "sha256:f00cdfc187fa5cc5c792f4949ae51cba927cf3af8cf0e0c43444ed37b7927d4c"
-url = "https://github.com/pb33f/wiretap/releases/download/v0.7.6/wiretap_0.7.6_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/pb33f/wiretap/releases/assets/667077916"
+checksum = "sha256:7fedfbea18363e4e2130edcb67419380a54861f9a7eafa8ea0370ff73ec1b1bd"
+url = "https://github.com/pb33f/wiretap/releases/download/v0.7.7/wiretap_0.7.7_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/pb33f/wiretap/releases/assets/693683470"
 
 [[tools."github:riii111/sabiql"]]
 version = "3.0.2"
@@ -486,35 +506,35 @@ url_api = "https://api.github.com/repos/thiagokokada/gh-gfm-preview/releases/ass
 provenance = "github-attestations"
 
 [[tools."github:walles/moor"]]
-version = "2.19.5"
+version = "2.19.6"
 backend = "github:walles/moor"
 specifiers = ["latest"]
 
 [tools."github:walles/moor"."platforms.macos-arm64"]
-checksum = "sha256:f538960fdbfc5a5ea6effd59b0874e0ad87277a69b731ff2e4487689466a7581"
-url = "https://github.com/walles/moor/releases/download/v2.19.5/moor-v2.19.5-darwin-arm64"
-url_api = "https://api.github.com/repos/walles/moor/releases/assets/647837788"
+checksum = "sha256:586b45c580e0ed4c8fca3ddaccab2ae63976f2fbf2aee51841162867588e2b76"
+url = "https://github.com/walles/moor/releases/download/v2.19.6/moor-v2.19.6-darwin-arm64"
+url_api = "https://api.github.com/repos/walles/moor/releases/assets/689521703"
 
 [[tools."github:yazeed/proc-cli"]]
-version = "1.14.5"
+version = "2.1.1"
 backend = "github:yazeed/proc-cli"
 specifiers = ["latest"]
 
 [tools."github:yazeed/proc-cli"."platforms.macos-arm64"]
-checksum = "sha256:c0c58f9786267ad3ea034a01cda6086b831f462cf3be7a64d90913193f60e976"
-url = "https://github.com/yazeed/proc-cli/releases/download/v1.14.5/proc-darwin-aarch64.tar.gz"
-url_api = "https://api.github.com/repos/yazeed/proc-cli/releases/assets/676745436"
+checksum = "sha256:a6057454cea5afda3dd532e8a5da06cad5bb623b33f4db89d7a8f9dce9419d41"
+url = "https://github.com/yazeed/proc-cli/releases/download/v2.1.1/proc-darwin-aarch64.tar.gz"
+url_api = "https://api.github.com/repos/yazeed/proc-cli/releases/assets/694138080"
 provenance = "github-attestations"
 
 [[tools.gitu]]
-version = "0.43.0"
+version = "0.44.0"
 backend = "aqua:altsem/gitu"
 specifiers = ["latest"]
 
 [tools.gitu."platforms.macos-arm64"]
-checksum = "sha256:19fa3fbaf79736f07eefc1fd9b163a47f40111ba4f6fe256796006cc62cdd70f"
-url = "https://github.com/altsem/gitu/releases/download/v0.43.0/gitu-v0.43.0-aarch64-apple-darwin.zip"
-url_api = "https://api.github.com/repos/altsem/gitu/releases/assets/473693510"
+checksum = "sha256:34bd3845beab9f2471a224c27493b2bdf98c7ce3ef7afa3e54b8fcbd230fd593"
+url = "https://github.com/altsem/gitu/releases/download/v0.44.0/gitu-v0.44.0-aarch64-apple-darwin.zip"
+url_api = "https://api.github.com/repos/altsem/gitu/releases/assets/685761013"
 
 [[tools.glow]]
 version = "3.0.0"
@@ -593,13 +613,13 @@ url = "https://github.com/01mf02/jaq/releases/download/v3.1.2/jaq-aarch64-apple-
 url_api = "https://api.github.com/repos/01mf02/jaq/releases/assets/662248648"
 
 [[tools.java]]
-version = "zulu-25.38.107.0"
+version = "zulu-25.38.109.0"
 backend = "core:java"
 specifiers = ["zulu-25"]
 
 [tools.java."platforms.macos-arm64"]
-checksum = "sha256:80e23f202d1815e989c980102e9b9f34cbcd40df9a5c98ac8f0a0aa6f4a45776"
-url = "https://cdn.azul.com/zulu/bin/zulu25.38.107-ca-jdk25.0.5-macosx_aarch64.tar.gz"
+checksum = "sha256:fdeec963512a67082616d86df67ee326fe9f3d564ff83b7030c3f34a225a902a"
+url = "https://cdn.azul.com/zulu/bin/zulu25.38.109-ca-jdk25.0.5.0.3-macosx_aarch64.tar.gz"
 
 [[tools.jwt]]
 version = "6.2.0"
@@ -665,13 +685,13 @@ checksum = "sha256:1dbd148222b051ba6c307c4d17a318ed083df018a4f6a5a0ce46955ffc9ab
 url = "https://github.com/neovim/neovim/releases/download/v0.12.6/nvim-macos-arm64.tar.gz"
 
 [[tools.node]]
-version = "24.22.1"
+version = "24.22.2"
 backend = "core:node"
 specifiers = ["24"]
 
 [tools.node."platforms.macos-arm64"]
-checksum = "sha256:89c682593d76cd44233fa53b1563264e7de9cbb189cad169135c5b4fadfbc0a7"
-url = "https://nodejs.org/dist/v24.22.1/node-v24.22.1-darwin-arm64.tar.gz"
+checksum = "sha256:aa9549349e47dffaa42dcf95d6e06ade8c4bdafc980979883b88767670df385a"
+url = "https://nodejs.org/dist/v24.22.2/node-v24.22.2-darwin-arm64.tar.gz"
 
 [[tools."npm:@earendil-works/pi-coding-agent"]]
 version = "1.4.0"
@@ -694,7 +714,7 @@ backend = "npm:defuddle"
 specifiers = ["latest"]
 
 [[tools."npm:dotenv-cli"]]
-version = "11.0.0"
+version = "11.1.0"
 backend = "npm:dotenv-cli"
 specifiers = ["latest"]
 
@@ -704,7 +724,7 @@ backend = "npm:exa-mcp-server"
 specifiers = ["latest"]
 
 [[tools."npm:herdr-f1"]]
-version = "0.3.5"
+version = "0.3.6"
 backend = "npm:herdr-f1"
 specifiers = ["latest"]
 
@@ -849,13 +869,13 @@ url = "https://github.com/alexpasmantier/television/releases/download/0.15.9/tv-
 url_api = "https://api.github.com/repos/alexpasmantier/television/releases/assets/447568866"
 
 [[tools.twg]]
-version = "1.3.9"
+version = "1.4.2"
 backend = "http:twg"
 specifiers = ["latest"]
 
 [tools.twg."platforms.macos-arm64"]
-checksum = "blake3:0cfbab741218db73a4387cf3fd367645e186d210211e0be508c3769a62a25bc1"
-url = "https://teamwork-graph.atlassian.com/cli/twg-darwin-arm64-v1.3.9"
+checksum = "blake3:b5f2c1bc5beb592cfb910f1a5ca50455d92536a9138f9f027cbbb3433635a717"
+url = "https://teamwork-graph.atlassian.com/cli/twg-darwin-arm64-v1.4.2"
 
 [[tools.usage]]
 version = "6.9.0"

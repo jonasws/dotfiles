@@ -68,6 +68,10 @@ zellij = "latest"
 "github:pb33f/wiretap" = "latest"
 watchexec = "latest"
 "cargo:rgrc" = { version = "latest", features = "embed-configs" }
+# Safer rm: rip (the maintained rip2 fork) for everyday removals, gomi for its
+# searchable restore (`gomi -b`).
+"github:MilesCranmer/rip2" = "latest"
+"github:babarot/gomi" = "latest"
 # Pinned, and on github: rather than aqua:. The aqua registry entry carries
 # `rosetta2: true`, and mise's actual_arch() rewrites arm64 to amd64 whenever
 # that is set, without checking whether an arm64 asset exists — so aqua hands
@@ -165,6 +169,9 @@ credential_command = "~/.local/bin/wrapped/fnox-secret MISE_GITHUB_TOKEN"
 TSK_NO_UPDATE_CHECK = "1"
 # lazyjira defaults to ~/Library/Application Support on macOS.
 LAZYJIRA_CONFIG_DIR = "{{env.HOME}}/.config/lazyjira"
+# rip's default graveyard is under the temp dir, which macOS clears on reboot,
+# and Claude Code's sandbox points TMPDIR elsewhere, so pin one shared place.
+RIP_GRAVEYARD = "{{env.HOME}}/.local/share/graveyard"
 
 # Commands that must run under `fnox exec` to receive their credentials. mise
 # orders these ahead of tool directories, so the wrapper here wins over the

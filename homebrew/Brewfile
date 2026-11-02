@@ -126,10 +126,10 @@ brew "postgresql@18", link: true
 brew "pv"
 # Search tool like grep and The Silver Searcher
 brew "ripgrep"
-# Command-line deletion tool focused on safety, ergonomics, and performance
-brew "rm-improved"
 # Intuitive find & replace CLI
 brew "sd"
+# Prints a steam locomotive if you type sl instead of ls
+brew "sl"
 # TUI to view and query tabular files (CSV,TSV, Parquet, etc.)
 brew "tabiew"
 # User interface to the TELNET protocol

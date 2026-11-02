@@ -7,7 +7,8 @@
     "CLAUDE_CODE_SHELL": "/opt/homebrew/bin/bash",
     "CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "3",
     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "2",
-    "RIPGREP_CONFIG_PATH": "/Users/jonasws/dotfiles/ripgrep/dot-ripgreprc",
+    "RIP_GRAVEYARD": "/Users/jonasws/.local/share/graveyard",
+    "RIPGREP_CONFIG_PATH":"/Users/jonasws/dotfiles/ripgrep/dot-ripgreprc",
     "GIT_CONFIG_COUNT": "2",
     "GIT_CONFIG_KEY_0": "commit.gpgsign",
     "GIT_CONFIG_VALUE_0": "false",
@@ -452,8 +453,8 @@
         "~/.m2/repository",
         "~/Library/Application Support/kotlin",
         "~/.tsk",
-        "/tmp/graveyard-jonasws",
-        "/private/tmp/graveyard-jonasws"
+        "~/.local/share/graveyard",
+        "~/.local/share/Trash"
       ],
       "denyWrite": [
         "~/dotfiles/claude",
