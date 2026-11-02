@@ -4,7 +4,8 @@
 
 # ── Appearance ──────────────────────────────────────────────────────────────
 
-theme = Catppuccin Mocha
+# Follows macOS light and dark. tuios follows the same switch (theme_light).
+theme = light:Catppuccin Latte,dark:Catppuccin Mocha
 
 # As in WezTerm: text from plain JetBrains Mono, icon and powerline glyphs from
 # the Nerd Font Mono build, which keeps every glyph inside one cell. Ghostty
@@ -12,10 +13,17 @@ theme = Catppuccin Mocha
 font-family = "JetBrains Mono"
 font-family = "JetBrainsMono Nerd Font Mono"
 font-size = 18
+# Ligatures (calt) stay on, as Ghostty's default. On top: a zero with a slash,
+# and the single-storey g.
+font-feature = zero
+font-feature = cv03
 # No adjust-cell-height: WezTerm runs line_height = 1.0.
 
 background-opacity = 0.9
 background-blur-radius = 10
+# The padding takes the colour of the cells at the edge, so tuios's rail and
+# dock run to the window's border with no seam.
+window-padding-color = extend
 
 # WezTerm's window_decorations = 'RESIZE': no title bar. Native tabs still
 # appear once a window has more than one.
@@ -27,6 +35,12 @@ macos-non-native-fullscreen = false
 scrollback-limit = 100000
 copy-on-select = clipboard
 shell-integration = fish
+
+# Reopen windows where they were. tuios restores the sessions inside them.
+window-save-state = always
+# Homebrew installs and updates Ghostty (homebrew/Brewfile), so its own
+# updater stays off.
+auto-update = off
 
 # Both Option keys send Alt, as WezTerm's send_composed_key_when_*_alt_is_pressed
 # = false do, so Alt chords reach nvim, tuios and herdr.
