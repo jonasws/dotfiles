@@ -147,7 +147,7 @@
             ]
           },
           {
-            "description": "Right Option Key → Hyper Key (⌃⌥⇧⌘, built-in keyboard only, except WezTerm where right_option stays Meta for M- keybinds)",
+            "description": "Right Option Key → Hyper Key (⌃⌥⇧⌘, built-in keyboard only, except in WezTerm and Ghostty where right_option stays Meta for M- keybinds)",
             "manipulators": [
               {
                 "type": "basic",
@@ -212,7 +212,8 @@
                   {
                     "type": "frontmost_application_unless",
                     "bundle_identifiers": [
-                      "^com\\.github\\.wez\\.wezterm$"
+                      "^com\\.github\\.wez\\.wezterm$",
+                      "^com\\.mitchellh\\.ghostty$"
                     ]
                   },
                   {
@@ -255,6 +256,105 @@
                       "left_control",
                       "left_option"
                     ]
+                  }
+                ],
+                "parameters": {
+                  "basic.to_if_held_down_threshold_milliseconds": 200,
+                  "basic.to_delayed_action_delay_milliseconds": 200
+                }
+              },
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "right_option",
+                  "modifiers": {
+                    "optional": [
+                      "any"
+                    ]
+                  }
+                },
+                "to": [
+                  {
+                    "key_code": "f19"
+                  }
+                ],
+                "conditions": [
+                  {
+                    "type": "variable_if",
+                    "name": "double-tap-right_option-any",
+                    "value": 1
+                  }
+                ],
+                "description": "__support__manipulator"
+              },
+              {
+                "type": "basic",
+                "from": {
+                  "key_code": "right_option",
+                  "modifiers": {
+                    "optional": [
+                      "any"
+                    ]
+                  }
+                },
+                "to": [
+                  {
+                    "set_variable": {
+                      "name": "double-tap-right_option-any",
+                      "value": 1
+                    }
+                  },
+                  {
+                    "key_code": "right_option",
+                    "lazy": true
+                  }
+                ],
+                "conditions": [
+                  {
+                    "type": "device_if",
+                    "identifiers": [
+                      {
+                        "is_built_in_keyboard": true
+                      }
+                    ]
+                  },
+                  {
+                    "type": "frontmost_application_if",
+                    "bundle_identifiers": [
+                      "^com\\.github\\.wez\\.wezterm$",
+                      "^com\\.mitchellh\\.ghostty$"
+                    ]
+                  },
+                  {
+                    "type": "variable_unless",
+                    "name": "double-tap-right_option-any",
+                    "value": 1
+                  }
+                ],
+                "to_delayed_action": {
+                  "to_if_invoked": [
+                    {
+                      "key_code": "right_option"
+                    },
+                    {
+                      "set_variable": {
+                        "name": "double-tap-right_option-any",
+                        "value": 0
+                      }
+                    }
+                  ],
+                  "to_if_canceled": [
+                    {
+                      "set_variable": {
+                        "name": "double-tap-right_option-any",
+                        "value": 0
+                      }
+                    }
+                  ]
+                },
+                "to_if_held_down": [
+                  {
+                    "key_code": "right_option"
                   }
                 ],
                 "parameters": {

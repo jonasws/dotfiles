@@ -32,7 +32,13 @@ const ownsCtrlHjkl = [
   /^dev\.raycast\.macos$/,
 ]
 
-const wezterm = /^com\.github\.wez\.wezterm$/
+// Terminals where Option is Alt (Meta), right Option included, for M- keys in
+// Neovim, tuios and herdr: WezTerm's send_composed_key_when_*_alt_is_pressed =
+// false, Ghostty's macos-option-as-alt = true.
+const optionIsMeta = [
+  /^com\.github\.wez\.wezterm$/,
+  /^com\.mitchellh\.ghostty$/,
+]
 
 const arrows = [
   ['h', 'left_arrow'],
@@ -69,7 +75,7 @@ writeToProfile(
     ]),
 
     rule(
-      'Right Option Key → Hyper Key (⌃⌥⇧⌘, built-in keyboard only, except WezTerm where right_option stays Meta for M- keybinds)',
+      'Right Option Key → Hyper Key (⌃⌥⇧⌘, built-in keyboard only, except in WezTerm and Ghostty where right_option stays Meta for M- keybinds)',
     ).manipulators([
       // Held, it is Hyper. Tapped twice, it sends F19, which Ghostty binds
       // globally to its Quick Terminal (ghostty/config.ghostty).
@@ -80,7 +86,13 @@ writeToProfile(
           modifiers: ['left_command', 'left_control', 'left_option'],
         })
         .condition(ifDevice({ is_built_in_keyboard: true }))
-        .condition(ifApp(wezterm).unless()),
+        .condition(ifApp(optionIsMeta).unless()),
+      // In those terminals a held right Option stays Option, and a double tap
+      // still sends F19, so the Quick Terminal also hides from Ghostty itself.
+      mapDoubleTap('right_option', null, 'any')
+        .to('f19')
+        .condition(ifDevice({ is_built_in_keyboard: true }))
+        .condition(ifApp(optionIsMeta)),
     ]),
 
     rule('Hyper + b → Control + b (herdr prefix)').manipulators([
