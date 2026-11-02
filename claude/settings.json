@@ -84,6 +84,7 @@
       "Read(~/dotfiles/fnox/age*.txt)",
       "Bash(aws-vault:*)",
       "Bash(gh:*)",
+      "Bash(rm:*)",
       "Bash(fnox get:*)",
       "Bash(op read:*)",
       "Bash(op item get:*)",
@@ -450,7 +451,9 @@
         "~/Library/Caches/mise",
         "~/.m2/repository",
         "~/Library/Application Support/kotlin",
-        "~/.tsk"
+        "~/.tsk",
+        "/tmp/graveyard-jonasws",
+        "/private/tmp/graveyard-jonasws"
       ],
       "denyWrite": [
         "~/dotfiles/claude",
