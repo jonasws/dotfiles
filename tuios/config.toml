@@ -127,10 +127,24 @@ option_glyphs = "type"
 [keybindings.global]
 command_palette = []
 launcher = []
-# Cmd+K (WezTerm sends ctrl+alt+k) opens tuios's own pane navigator: every
-# pane in every session, searched by name, folder, command and the last 40
-# screen lines, with a live preview. No tv process to start.
-choose_tree = ["ctrl+alt+k"]
+# Cmd+K opens tuios's own pane navigator: every pane in every session,
+# searched by name, folder, command and the last 40 screen lines, with a live
+# preview. Ghostty sends Cmd+K as super+k once it unbinds it; WezTerm sends
+# ctrl+alt+k.
+choose_tree = ["super+k", "ctrl+alt+k"]
+# Ghostty hands these Cmd chords to tuios (ghostty/config.ghostty unbinds
+# them): Cmd+T opens a workspace and Cmd+1..9 picks one, like a tab bar's.
+# Cmd+W closes the pane, a command key below.
+new_workspace = ["super+t"]
+switch_workspace_1 = ["super+1"]
+switch_workspace_2 = ["super+2"]
+switch_workspace_3 = ["super+3"]
+switch_workspace_4 = ["super+4"]
+switch_workspace_5 = ["super+5"]
+switch_workspace_6 = ["super+6"]
+switch_workspace_7 = ["super+7"]
+switch_workspace_8 = ["super+8"]
+switch_workspace_9 = ["super+9"]
 
 [keybindings.prefix_mode]
 # herdr: prefix+v splits right and prefix+c opens a tab (a tuios workspace).
@@ -340,6 +354,13 @@ description = "yazi: pick files into pane"
 # next one, rather than leave the session empty on its splash screen.
 [[keybindings.command]]
 key = "prefix+x"
+type = "shell"
+command = "~/.config/tuios/scripts/close-pane.sh"
+description = "Close pane, and the session with its last one"
+
+[[keybindings.command]]
+key = "super+w"
+name = "close-pane-cmd-w"
 type = "shell"
 command = "~/.config/tuios/scripts/close-pane.sh"
 description = "Close pane, and the session with its last one"
