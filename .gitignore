@@ -33,3 +33,6 @@ tuios/plugin-config/herdr-splits/
 
 # tuios push notifications: the ntfy topic is a secret.
 tuios/config.d/notify.toml
+# Stamps tuios writes in its config folder to signal running clients.
+tuios/.apply-config
+tuios/.reload-themes
