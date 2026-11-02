@@ -33,23 +33,18 @@ fail() {
   exit 1
 }
 
-# The card id. `task add` prints JSON where it can; otherwise the first word
-# of its output with a digit in it is taken as the id. An empty id still
-# starts the agent, without a card.
+# The card id (`t1`). An empty id still starts the agent, without a card.
 add_card() {
-  local out id=
-  if out=$(tuios task add ${session:+-s "$session"} --json -p - "$1" <<<"$2" 2>/dev/null); then
-    id=$(jq -r '.id // .task.id // empty' <<<"$out" 2>/dev/null || true)
-  elif out=$(tuios task add ${session:+-s "$session"} -p - "$1" <<<"$2" 2>/dev/null); then
-    id=$(grep -oE '\b[[:alnum:]_-]*[0-9][[:alnum:]_-]*\b' <<<"$out" | head -1 || true)
-  fi
-  printf '%s' "$id"
+  tuios task add ${session:+-s "$session"} --json -p - "$1" <<<"$2" 2>/dev/null |
+    jq -r '.id // empty' 2>/dev/null || true
 }
 
 dispatch() {
   local task json title notes repo slug prompt card
 
-  task=$(tsk_find_task)
+  # The keys are global, so they act only when pressed on a board: a board
+  # open elsewhere in the session must not send its selection off unseen.
+  task=$(tsk_focused_task) || fail "press it on the tsk board (prefix+t)"
   [[ -n $task ]] || fail "no task selected on the tsk board"
 
   repo=$(git -C "$cwd" rev-parse --show-toplevel 2>/dev/null) ||

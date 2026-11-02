@@ -11,7 +11,12 @@ fail() {
 
 . "$(dirname "${BASH_SOURCE[0]}")/tsk-board.sh"
 
-task=${1:-$(tsk_find_task)}
+task=${1:-}
+if [[ -z $task ]]; then
+  rc=0
+  task=$(tsk_find_task) || rc=$?
+  ((rc != 2)) || fail "no tsk board pane in this session"
+fi
 [[ -n $task ]] || fail "no task selected on the board"
 
 dir=$(mktemp -d)
