@@ -39,6 +39,10 @@ window-colorspace = display-p3
 # the dim text in Claude Code's dark-ansi diffs, is 2.46:1 on base; 3 is the
 # docs' mark for text that is hard to read.
 minimum-contrast = 3
+# Faint text (SGR 2) at half opacity is about 3.9:1 on base; Claude Code draws
+# its vim "-- INSERT --" that way, with no theme token to change it. 0.75 gives
+# about 7:1.
+faint-opacity = 0.75
 
 background-opacity = 0.9
 background-blur-radius = 10
