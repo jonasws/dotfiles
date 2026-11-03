@@ -18,6 +18,15 @@ font-size = 18
 font-feature = zero
 font-feature = cv03
 # No adjust-cell-height: WezTerm runs line_height = 1.0.
+# JetBrains Mono sits a pixel low in its cell on the 1x office ultrawide, so
+# powerline pills show more room above the text than below. One pixel up
+# centres it there and is barely visible on the Retina panel.
+adjust-font-baseline = 1
+
+# Read theme colours as Display P3, more saturated than sRGB, which looked
+# washed out on the office ultrawide. Its panel covers about 85-92% of P3, so
+# the XDR panel still shows more of it.
+window-colorspace = display-p3
 
 background-opacity = 0.9
 background-blur-radius = 10
