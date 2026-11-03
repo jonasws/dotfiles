@@ -15,7 +15,7 @@ layout = "bsp"
 start_in_terminal_mode = true
 
 [appearance]
-theme = "mocha-surface"
+theme = "catppuccin_mocha"
 # On a light terminal, and when the host (Ghostty) switches to light.
 theme_light = "catppuccin_latte"
 # Ghostty and WezTerm both draw kitty unicode placeholders.
