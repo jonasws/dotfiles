@@ -455,6 +455,23 @@ type = "shell"
 command = "~/.config/tuios/scripts/tsk-dispatch.sh worktree"
 description = "tsk: start agent on task (worktree)"
 
+# Subagent viewers for the Claude pane the key is pressed in, through
+# scripts/subagents.sh and claude/hooks/subagent-viewer.sh. prefix+h peeks at
+# them in a popup, one tagged stream for all; prefix+ctrl+j opens a workspace
+# with a pane per subagent, focuses it, or closes it from inside. The rail's
+# subagent rows say what each one runs now; these show the whole stream.
+[[keybindings.command]]
+key = "prefix+h"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh subagents 90% 80% -- ~/.config/tuios/scripts/subagents.sh stream"
+description = "Subagents: popup stream"
+
+[[keybindings.command]]
+key = "prefix+ctrl+j"
+type = "shell"
+command = "~/.config/tuios/scripts/subagents.sh toggle"
+description = "Subagents: viewer workspace"
+
 # F1 dashboard, through the herdr-f1 plugin (`herdr plugin install
 # hmu332233/herdr-f1`; tuios reads herdr's registry and leaves it off until it is
 # enabled below).

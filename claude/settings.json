@@ -372,6 +372,16 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash '/Users/jonasws/.claude/hooks/subagent-viewer.sh' stop",
+            "timeout": 10,
+            "async": true
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
             "command": "tuios agent-hook claude-code --integration 3",
             "timeout": 5
           }

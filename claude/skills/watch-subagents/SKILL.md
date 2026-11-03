@@ -51,6 +51,12 @@ A denial is reported as `denied (user-rejected)` rather than as the paragraph of
 boilerplate its tool result carries. An agent stopped at a permission prompt
 otherwise looks exactly like an idle one.
 
+The pane title carries the running totals — tool calls, the context the last
+turn read, output tokens — so they cost the stream no lines. Viewers opened by
+`claude/hooks/subagent-viewer.sh` also get `--stop-file`: when the agent ends,
+the stream closes with a `✓ finished` footer and its final message, and
+reopens if the agent is resumed.
+
 Deliberately dropped: tool *result* bodies, which are the bulk of the transcript
 and unreadable at speed, and every non-assistant bookkeeping record.
 
