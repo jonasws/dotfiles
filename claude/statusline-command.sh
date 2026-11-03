@@ -61,78 +61,46 @@ now=$(date +%s)
 ESC=$'\033'
 RESET="${ESC}[0m"
 fg() { printf '%s[38;2;%d;%d;%dm' "$ESC" "0x${1:0:2}" "0x${1:2:2}" "0x${1:4:2}"; }
-bg() { printf '%s[48;2;%d;%d;%dm' "$ESC" "0x${1:0:2}" "0x${1:2:2}" "0x${1:4:2}"; }
-PEACH=fab387 GREEN=a6e3a1 MAUVE=cba6f7 RED=f38ba8 YELLOW=f9e2af
-SAPPHIRE=74c7ec BLUE=89b4fa SURFACE1=45475a MANTLE=181825
+GREEN=a6e3a1 RED=f38ba8 YELLOW=f9e2af
+SAPPHIRE=74c7ec BLUE=89b4fa SURFACE1=45475a
 DIM=$(fg 7f849c)
-SEP_RIGHT=$''
-CAP_LEFT=$''
-CAP_RIGHT=$''
 
 # shellcheck disable=SC1003 # the backslashes are the ST of OSC 8
 link() { printf '%s]8;;%s%s\\%s%s]8;;%s\\' "$ESC" "$1" "$ESC" "$2" "$ESC" "$ESC"; }
 
-# Powerline row: each segment is "colour|text"; arrows take the colour of the
-# segment on each side, as starship's format does.
-segments=()
-add() { [ -n "$2" ] && segments+=("$1|$2"); }
-
-if [ -n "$cwd" ]; then
-  short="$cwd"
-  # shellcheck disable=SC2088 # a literal ~ is the point
-  case "$short" in
-    "$HOME") short="~" ;;
-    "$HOME"/*) short="~/${short#"$HOME"/}" ;;
+# Row one is starship's own render of starship/claude.toml, so the directory and
+# git tokens match the shell prompt. The model and the worktree/PR links arrive
+# as env vars for the two segments that starship cannot compute itself.
+git_extra=""
+[ -n "$worktree" ] && git_extra+=$'\U000f0645'" $worktree"
+if [ -n "$pr_number" ]; then
+  case "$pr_state" in
+    approved) pr_mark="✓" ;;
+    changes_requested) pr_mark="±" ;;
+    draft) pr_mark="◌" ;;
+    *) pr_mark="" ;;
   esac
-  IFS=/ read -ra segs <<<"${short#/}"
-  if [ "${#segs[@]}" -gt 3 ]; then
-    printf -v short '%s/' "${segs[@]: -3}"
-    short="…/${short%/}"
-  fi
-  add "$PEACH" "$short"
+  pr_text=$''" #$pr_number$pr_mark"
+  [ -n "$pr_url" ] && pr_text=$(link "$pr_url" "$pr_text")
+  git_extra+="${git_extra:+  }$pr_text"
 fi
 
-if [ -n "$cwd" ]; then
-  branch=$(GIT_OPTIONAL_LOCKS=0 git -C "$cwd" symbolic-ref --short HEAD 2>/dev/null)
-  if [ -n "$branch" ]; then
-    git_text=$''" $branch"
-    [ -n "$repo_url" ] && git_text=$(link "$repo_url/tree/$branch" "$git_text")
-    [ -n "$worktree" ] && git_text+=" "$'\U000f0645'" $worktree"
-    if [ -n "$pr_number" ]; then
-      case "$pr_state" in
-        approved) pr_mark="✓" ;;
-        changes_requested) pr_mark="±" ;;
-        draft) pr_mark="◌" ;;
-        *) pr_mark="" ;;
-      esac
-      pr_text=$''" #$pr_number$pr_mark"
-      [ -n "$pr_url" ] && pr_text=$(link "$pr_url" "$pr_text")
-      git_text+="  $pr_text"
-    fi
-    add "$GREEN" "$git_text"
-  fi
-fi
-
+model_text=""
 if [ -n "$model" ]; then
   model_text=$'\U000f06a9'" ${model#Claude }"
   [ -n "$effort" ] && [ "$cols" -ge 90 ] && model_text+=" · $effort"
-  add "$MAUVE" "$model_text"
 fi
 
 row1=""
-prev=""
-for seg in "${segments[@]}"; do
-  colour=${seg%%|*}
-  text=${seg#*|}
-  if [ -z "$prev" ]; then
-    row1+="$(fg "$colour")${CAP_LEFT}"
-  else
-    row1+="$(fg "$prev")$(bg "$colour")${SEP_RIGHT}"
-  fi
-  row1+="$(bg "$colour")$(fg "$MANTLE") ${text} "
-  prev=$colour
-done
-[ -n "$prev" ] && row1+="${RESET}$(fg "$prev")${CAP_RIGHT}${RESET}"
+if [ -n "$cwd" ] && command -v starship >/dev/null; then
+  row1=$(
+    cd "$cwd" 2>/dev/null &&
+      env GIT_OPTIONAL_LOCKS=0 STARSHIP_SHELL=sh \
+        STARSHIP_CONFIG="${STARSHIP_CLAUDE_CONFIG:-$HOME/dotfiles/starship/claude.toml}" \
+        CLAUDE_MODEL_TEXT="$model_text" ${git_extra:+"CLAUDE_GIT_EXTRA=$git_extra"} \
+        starship prompt --path "$cwd" --terminal-width "$cols" 2>/dev/null | tr -d '\n'
+  )
+fi
 
 # Second row: context left as a bar, then the 5-hour limit and the cache.
 level_colour() { # value, warn at, alarm at, colour below warn

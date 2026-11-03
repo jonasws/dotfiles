@@ -1,0 +1,70 @@
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Row one of the Claude Code status line (claude/statusline-command.sh). It
+# mirrors the powerline segments of starship.toml, so the git tokens match the
+# shell prompt. The script exports CLAUDE_MODEL_TEXT and CLAUDE_GIT_EXTRA
+# (worktree, PR link) for the two env-driven segments.
+
+format = """
+[](fg:peach)\
+$directory\
+([](fg:peach bg:green)\
+$git_branch\
+$git_commit\
+$git_state\
+$git_status\
+${env_var.CLAUDE_GIT_EXTRA})\
+${custom.model_git}\
+${custom.model_nogit}"""
+
+add_newline = false
+command_timeout = 1000
+palette = 'catppuccin_mocha'
+
+[palettes.catppuccin_mocha]
+green = "#a6e3a1"
+peach = "#fab387"
+mauve = "#cba6f7"
+base = "#1e1e2e"
+mantle = "#181825"
+
+[directory]
+style = "fg:mantle bg:peach"
+format = "[ $path ]($style)"
+truncation_length = 3
+truncation_symbol = "…/"
+
+[git_branch]
+symbol = ""
+style = "bg:green"
+format = '[[ $symbol $branch ](fg:base bg:green)]($style)'
+truncation_length = 32
+
+[git_commit]
+style = "bg:green"
+format = '[[ $hash$tag ](fg:base bg:green)]($style)'
+
+[git_state]
+style = "bg:green"
+format = '[[ $state( $progress_current/$progress_total) ](fg:base bg:green)]($style)'
+
+[git_status]
+style = "bg:green"
+format = '[[($all_status$ahead_behind )](fg:base bg:green)]($style)'
+
+[env_var.CLAUDE_GIT_EXTRA]
+variable = "CLAUDE_GIT_EXTRA"
+style = "bg:green"
+format = '[[ $env_value ](fg:base bg:green)]($style)'
+
+[custom.model_git]
+command = 'printf %s "$CLAUDE_MODEL_TEXT"'
+when = 'test -n "$CLAUDE_MODEL_TEXT" && git rev-parse --git-dir'
+format = '[](fg:green bg:mauve)[ $output ](fg:base bg:mauve)[](fg:mauve)'
+shell = ['sh']
+
+[custom.model_nogit]
+command = 'printf %s "$CLAUDE_MODEL_TEXT"'
+when = 'test -n "$CLAUDE_MODEL_TEXT" && ! git rev-parse --git-dir'
+format = '[](fg:peach bg:mauve)[ $output ](fg:base bg:mauve)[](fg:mauve)'
+shell = ['sh']
