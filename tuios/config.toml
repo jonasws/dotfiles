@@ -20,9 +20,10 @@ theme = "catppuccin_mocha"
 theme_light = "catppuccin_latte"
 # Ghostty and WezTerm both draw kitty unicode placeholders.
 kitty_placeholders = "on"
-# Catppuccin Mocha mauve, herdr's accent, and surface1.
+# Catppuccin Mocha mauve, herdr's accent. Unfocused borders are the dividers
+# between panes: surface0, catppuccin/ghostty's split-divider-color.
 border_focused_color = "#cba6f7"
-border_unfocused_color = "#45475a"
+border_unfocused_color = "#313244"
 # Split across the longer side, so a new pane on a wide screen goes right and
 # on a tall one goes down, close to picking herdr's split direction by hand.
 tiling_scheme = "longest_side"
@@ -114,6 +115,15 @@ after-agent-state = "~/.config/tuios/scripts/auto-name.sh"
 # gets mise trusted and its tools installed before the first pane starts.
 after-new-worktree = "~/.config/tuios/scripts/new-worktree.sh"
 
+# Selection in rosewater with base text, as ghostty/config.ghostty sets it, so
+# a selection looks the same in a tuios pane and in Ghostty. The copy-mode
+# cursor is rosewater too, with crust text, as Ghostty's cursor.
+[appearance.selection]
+bg = "#f5e0dc"
+fg = "#1e1e2e"
+cursor_bg = "#f5e0dc"
+cursor_fg = "#11111b"
+
 # herdr's sidebar sits on the left.
 [appearance.sidebar]
 position = "left"
@@ -156,6 +166,9 @@ switch_workspace_6 = ["super+6"]
 switch_workspace_7 = ["super+7"]
 switch_workspace_8 = ["super+8"]
 switch_workspace_9 = ["super+9"]
+# Cmd+. labels the URLs, paths and hashes in the pane (hints mode). Ctrl and
+# a label opens a URL in the browser, as WezTerm's Cmd+O did.
+hints = ["super+."]
 
 [keybindings.prefix_mode]
 # herdr: prefix+v splits right and prefix+c opens a tab (a tuios workspace).
@@ -221,6 +234,9 @@ prefix_explore = ["E"]
 # herdr: prefix+F opens the F1 dashboard, a command key below. The text hints
 # that had F move to ctrl+u.
 hints = ["ctrl+u"]
+# Labels on every pane of the workspace, not just the focused one: alt and
+# the single-pane key. Y is the yazi file picker's, ctrl+y the last message.
+hints_all_panes = ["alt+u"]
 
 # herdr's capital letters: prefix+shift+x closes a tab and shift+t renames it,
 # shift+n makes a workspace (here a session), shift+d closes it and shift+w
@@ -441,6 +457,11 @@ key = "prefix+F"
 type = "plugin_action"
 command = "dev.minung.herdr-f1.open"
 description = "Open F1 dashboard"
+
+[hints]
+# The home row without g: with g a label letter, Ctrl+G opens label g instead
+# of closing hints mode.
+alphabet = "asdfhjkl"
 
 [plugins]
 enabled = [
