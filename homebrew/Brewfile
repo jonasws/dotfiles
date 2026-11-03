@@ -94,6 +94,8 @@ brew "pango"
 brew "librsvg"
 # Curses-based tool for viewing and analyzing log files
 brew "lnav"
+# Control external displays over DDC/CI on Apple silicon
+brew "m1ddc"
 # Polyglot runtime manager (asdf rust clone)
 brew "mise"
 # Collection of tools that nobody wrote when UNIX was young
@@ -168,6 +170,8 @@ cask "google-chrome"
 cask "karabiner-elements"
 # Utility to extend trackpad functionality
 cask "middleclick"
+# Brightness, contrast and volume keys for external displays over DDC
+cask "monitorcontrol"
 # VPN client for secure internet access and private browsing
 cask "nordvpn"
 # Knowledge base that works on top of a local folder of plain text Markdown files
