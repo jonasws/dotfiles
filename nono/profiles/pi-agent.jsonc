@@ -1,0 +1,400 @@
+// The sandbox every pi runs in. fnox/wrapped/pi (first on PATH) execs
+// `nono run --profile pi-agent` for each pi it starts, so a pi launched by
+// `herdr agent start --kind pi` in a fresh pane, by herdr's session restore, or
+// by the user gets this profile. A `pi -p` started from inside a sandbox
+// inherits its parent's. pi/README.md has the threat model; this file is
+// the policy.
+//
+// Built from nono 0.80's profile format (crates/nono-cli/data/
+// profile-authoring-guide.md upstream). Paths in raw Seatbelt rules and
+// `executable` are not variable-expanded, hence /Users/jonasws there.
+{
+  "$schema": "https://raw.githubusercontent.com/always-further/nono/refs/heads/main/crates/nono-cli/data/nono-profile.schema.json",
+  "meta": {
+    "name": "pi-agent",
+    "version": "1",
+    "description": "pi coding agent: work dirs writable, secrets proxied, herdr mediated",
+    "author": "jonasws"
+  },
+
+  // No `extends`: every user profile still gets the built-in default groups
+  // (credential, keychain, browser, shell-config and history denies, system
+  // reads, Homebrew). Those three are dropped because as soon as
+  // command_policies is non-empty nono turns them into deny-only shims, and a
+  // coding agent without rm, mv, cp, chmod, kill, xargs and npm is no use.
+  "groups": {
+    "include": ["mise_manager", "node_runtime", "java_runtime", "git_config"],
+    "exclude": ["dangerous_commands", "dangerous_commands_macos", "dangerous_commands_linux"]
+  },
+
+  // The directory pi starts in is writable, as Claude Code's cwd is. nono
+  // refuses $HOME and its parents outright.
+  "workdir": { "access": "readwrite" },
+
+  "filesystem": {
+    // Same work dirs as claude/settings.json sandbox.filesystem.allowWrite.
+    "allow": [
+      "$HOME/CX",
+      "$HOME/CNOPS",
+      "$HOME/CN-TERMINAL",
+      "$HOME/dotfiles",
+      "$HOME/.herdr/worktrees",
+      "$HOME/herdr-splits.nvim",
+      "$HOME/.tsk",
+      "$HOME/.m2/repository",
+      "$HOME/Library/Caches/mise",
+      "$HOME/Library/Application Support/kotlin",
+      // Sessions, trust.json, mcp.log, the model catalog cache and lock files.
+      // The config pi loads from here is write-denied below.
+      "$HOME/.pi/agent"
+    ],
+    "read": [
+      "$HOME/.local/bin",
+      "$HOME/.local/state/mise",
+      "$HOME/.config/tuicr",
+      "$HOME/.config/hunk",
+      "$HOME/.config/colima",
+      "$HOME/.agents/skills",
+      "$HOME/.m2",
+      "$HOME/.cargo/bin",
+      "$HOME/.cargo/registry",
+      "$HOME/.cargo/git",
+      "$HOME/.rustup",
+      "$HOME/.cdk",
+      "$HOME/.docker/contexts"
+    ],
+    "read_file": [
+      "$HOME/catppuccin/delta/catppuccin.gitconfig",
+      "$HOME/.gitignore",
+      "$HOME/.rgignore",
+      "$HOME/.ripgreprc",
+      "$HOME/.docker/config.json",
+      "$HOME/.testcontainers.properties",
+      "$HOME/.docker-java.properties"
+    ],
+    // deny_credentials covers all of ~/.docker; the CLI needs its context.
+    "bypass_protection": ["$HOME/.docker/config.json", "$HOME/.docker/contexts"],
+    // colima's VM mounts only ~/CX and ~/CNOPS, both already writable here,
+    // so a container adds no filesystem reach. It does add an unproxied
+    // network path; see the README. Testcontainers needs the socket itself,
+    // so it cannot be mediated as a command. herdr.sock is deliberately not
+    // here (command_policies below), and neither is the 1Password SSH agent:
+    // with the network proxy-only there is no SSH to use it for.
+    "unix_socket": ["$HOME/.config/colima/default/docker.sock"],
+    "deny": [
+      // The age identities fnox unlocks with the Secure Enclave. Reading one
+      // would let a sandboxed `fnox` raise a Touch ID prompt the user might
+      // approve without thinking.
+      "$HOME/dotfiles/fnox/age*.txt",
+      "$HOME/.m2/settings-security*.xml*",
+      "$HOME/.cargo/credentials*",
+      "$HOME/.config/twg"
+    ]
+  },
+
+  // Raw Seatbelt, emitted after every grant above, and Seatbelt's last
+  // matching rule wins. nono's own `deny` blocks reads as well, so this is
+  // the only way to get claude/settings.json's denyWrite: readable, not
+  // writable.
+  "unsafe_macos_seatbelt_rules": [
+    // The containment itself, and repo files that run unsandboxed without a
+    // review step: shell startup, git config and hooksPath, mise's global
+    // config (postinstall hooks, credential_command, _.path) and the
+    // dotfiles maintenance tasks the daily update runs.
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/claude\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/fish\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/fnox\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/herdr\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/nono\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/pi\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/git\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/dotfiles/mise-global\"))",
+    "(deny file-write* (literal \"/Users/jonasws/dotfiles/mise.toml\"))",
+
+    // What pi loads at startup. Sessions and trust.json stay writable. The
+    // linked files resolve into ~/dotfiles/pi; the literals also stop the
+    // links themselves being replaced.
+    "(deny file-write* (subpath \"/Users/jonasws/.pi/agent/extensions\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/.pi/agent/prompts\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/.pi/agent/skills\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/.pi/agent/themes\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/.pi/agent/npm\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/.pi/agent/git\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.pi/agent/settings.json\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.pi/agent/AGENTS.md\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.pi/agent/AGENTS.override.md\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.pi/agent/CLAUDE.md\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.pi/agent/SYSTEM.md\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.pi/agent/APPEND_SYSTEM.md\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.pi/agent/models.json\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.pi/agent/mcp.json\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.pi/agent/keybindings.json\"))",
+    "(deny file-write* (literal \"/Users/jonasws/.pi/agent/auth.json\"))",
+
+    // Only reachable when pi is started inside one of these: they hold what
+    // the user's unsandboxed shell runs next.
+    "(deny file-write* (subpath \"/Users/jonasws/.config\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/.local/bin\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/.local/share/mise\"))",
+    "(deny file-write* (subpath \"/Users/jonasws/Library/LaunchAgents\"))",
+
+    // Every repo's hooks and config run with the user's rights on their next
+    // git command (core.hooksPath, core.fsmonitor, aliases). Claude Code's
+    // sandbox denies these writes too.
+    "(deny file-write* (regex #\"/\\.git/hooks$\"))",
+    "(deny file-write* (regex #\"/\\.git/hooks/\"))",
+    "(deny file-write* (regex #\"/\\.git/config$\"))",
+
+    // claude/settings.json permissions.deny Read(//**/*.env), .env, .env.*,
+    // *.env.* and *-env, as path regexes so they cost nothing at startup
+    // where a ** glob would walk all of ~/CX.
+    "(deny file-read* file-write* (regex #\"\\.env$\"))",
+    "(deny file-read* file-write* (regex #\"\\.env\\.[^/]*$\"))",
+    "(deny file-read* file-write* (regex #\"-env$\"))",
+
+    // From nono's built-in java-dev profile: the JVM sets this on startup.
+    "(allow sysctl-write (sysctl-name \"kern.grade_cputype\"))"
+  ],
+
+  "environment": {
+    // Whatever the launching shell carries. The proxy credentials below are
+    // injected by nono and bypass this filter.
+    "deny_vars": [
+      "ANTHROPIC_AUTH_TOKEN",
+      "ANTHROPIC_OAUTH_TOKEN",
+      "GH_TOKEN",
+      "GITHUB_TOKEN",
+      "GITHUB_PERSONAL_ACCESS_TOKEN",
+      "OP_*",
+      "AWS_ACCESS_KEY_ID",
+      "AWS_SECRET_ACCESS_KEY",
+      "AWS_SESSION_TOKEN",
+      "SSH_AUTH_SOCK",
+      // herdr's own pi integration keys off this; without it the extension
+      // stays inert instead of failing to connect on every state change.
+      "HERDR_SOCKET_PATH"
+    ],
+    "set_vars": {
+      // The marker fnox/wrapped/* check, like $TMPDIR for Claude Code.
+      "AGENT_SANDBOX": "nono",
+      "PI_TELEMETRY": "0",
+      "PI_SKIP_VERSION_CHECK": "1",
+      // Commit signing goes through 1Password's op-ssh-sign, which is not
+      // reachable here; same trick as claude/settings.json env.
+      "GIT_CONFIG_COUNT": "2",
+      "GIT_CONFIG_KEY_0": "commit.gpgsign",
+      "GIT_CONFIG_VALUE_0": "false",
+      "GIT_CONFIG_KEY_1": "tag.gpgsign",
+      "GIT_CONFIG_VALUE_1": "false"
+    }
+  },
+
+  "network": {
+    // With a domain list and credential routes, nono runs in ProxyOnly mode:
+    // Seatbelt denies every outbound connection except to its own proxy, and
+    // every unix socket not listed above. Raw TCP (ssh to github.com, a
+    // database) is not possible; git push happens from the user's shell
+    // anyway, after `resign-commits`.
+    "network_profile": "developer",
+    "allow_domain": ["pi.dev", "herdr.dev"],
+    // macOS-only form: localhost:* outbound and any bind, for dev servers and
+    // tests (claude/settings.json allowLocalBinding).
+    "open_port": [0],
+
+    // The real key never enters the sandbox. pi gets ANTHROPIC_API_KEY set to
+    // a per-session phantom and ANTHROPIC_BASE_URL pointing at the proxy
+    // (pi/extensions/proxy-routes.ts makes pi use it); the proxy checks the
+    // phantom and swaps in the key, which credential_capture fetches outside
+    // the sandbox on first use. This is why pi/auth.json has no `!command`
+    // key: that command would run inside, where 1Password is unreachable.
+    "credentials": ["anthropic", "exa", "github_mcp"],
+    "custom_credentials": {
+      "anthropic": {
+        "upstream": "https://api.anthropic.com",
+        "credential_key": "cmd://anthropic",
+        "env_var": "ANTHROPIC_API_KEY",
+        "inject_header": "x-api-key",
+        "credential_format": "{}",
+        // `**` here needs at least one segment, so each base path is listed
+        // as well.
+        "endpoint_rules": [
+          { "method": "POST", "path": "/v1/messages" },
+          { "method": "POST", "path": "/v1/messages/**" },
+          { "method": "GET", "path": "/v1/models" },
+          { "method": "GET", "path": "/v1/models/**" }
+        ]
+      },
+      // Exa's hosted server, so no stdio server needs a key in the sandbox.
+      "exa": {
+        "upstream": "https://mcp.exa.ai",
+        "credential_key": "cmd://exa",
+        "env_var": "EXA_API_KEY",
+        "inject_header": "x-api-key",
+        "credential_format": "{}",
+        "endpoint_rules": [
+          { "method": "*", "path": "/mcp" },
+          { "method": "*", "path": "/mcp/**" }
+        ]
+      },
+      // GitHub's remote MCP server with the public-read-only token, as
+      // fnox/wrapped/github-mcp-server gives the stdio one.
+      "github_mcp": {
+        "upstream": "https://api.githubcopilot.com",
+        "credential_key": "cmd://github_mcp",
+        "env_var": "GITHUB_MCP_TOKEN",
+        "inject_header": "Authorization",
+        "credential_format": "Bearer {}",
+        "endpoint_rules": [
+          { "method": "*", "path": "/mcp" },
+          { "method": "*", "path": "/mcp/" },
+          { "method": "*", "path": "/mcp/**" }
+        ]
+      }
+    }
+  },
+
+  // Run by the supervisor, outside the sandbox, once per session and route
+  // (cached for the hour). 60s covers the Touch ID on a cold fnox daemon.
+  // pi/bin/pi-credential explains why it is not fnox-secret directly.
+  "credential_capture": {
+    "anthropic": {
+      "command": ["$HOME/dotfiles/pi/bin/pi-credential", "ANTHROPIC_API_KEY"],
+      "timeout_secs": 60,
+      "cache_ttl_secs": 3600
+    },
+    "exa": {
+      "command": ["$HOME/dotfiles/pi/bin/pi-credential", "EXA_API_KEY"],
+      "timeout_secs": 60,
+      "cache_ttl_secs": 3600
+    },
+    "github_mcp": {
+      "command": ["$HOME/dotfiles/pi/bin/pi-credential", "MISE_GITHUB_TOKEN"],
+      "timeout_secs": 60,
+      "cache_ttl_secs": 3600
+    }
+  },
+
+  // herdr is the one way out of the sandbox, so the session never gets
+  // herdr.sock. A command listed here is reached only through nono's shim on
+  // PATH (its real binary is exec- and read-denied to the session), and the
+  // supervisor starts it in a separate sandbox that holds the socket, after
+  // checking argv. argv matching is exact-token, which is why mutating
+  // commands go through pi-herdr instead of argv rules: `--kind pi --kind
+  // claude` starts claude (herdr keeps the last --kind), and
+  // `--env=HERDR_EXEC_CMD=...` on a split runs anything unsandboxed via
+  // fish/conf.d/50-herdr-exec.fish.
+  "command_policies": {
+    "credentials": {
+      "herdr_socket": {
+        "type": "local-socket",
+        "path": "$HOME/.config/herdr/herdr.sock",
+        "mode": "connect",
+        "env_var": "HERDR_SOCKET_PATH"
+      }
+    },
+    "commands": {
+      "herdr": {
+        "from": {
+          // The agent itself: reads, plus focus and zoom.
+          "session": {
+            "sandbox": {
+              "fs_read": ["$HOME/.config/herdr"],
+              "use_credentials": ["herdr_socket"],
+              "environment": {
+                "allow_vars": ["HOME", "PATH", "LANG", "LC_*", "TERM", "HERDR_ENV", "HERDR_PANE_ID", "HERDR_TAB_ID", "HERDR_WORKSPACE_ID"]
+              }
+            },
+            "invocation_policy": {
+              "default": "deny",
+              "deny": [
+                {
+                  "argv": { "contains": ["--"] },
+                  "reason": "no herdr command the agent may run takes trailing arguments; on pane report-agent they are a command herdr runs after a restart"
+                },
+                {
+                  "argv": { "contains": ["--machine"] },
+                  "reason": "remote machines are out of scope"
+                }
+              ],
+              "allow": [
+                { "argv": { "exact": ["--version"] } },
+                { "argv": { "exact": ["--help"] } },
+                { "argv": { "prefix": ["status"] } },
+                { "argv": { "prefix": ["api", "snapshot"] } },
+                { "argv": { "prefix": ["api", "schema"] } },
+                { "argv": { "prefix": ["notification", "show"] } },
+                { "argv": { "prefix": ["pane", "list"] } },
+                { "argv": { "prefix": ["pane", "current"] } },
+                { "argv": { "prefix": ["pane", "get"] } },
+                { "argv": { "prefix": ["pane", "layout"] } },
+                { "argv": { "prefix": ["pane", "process-info"] } },
+                { "argv": { "prefix": ["pane", "neighbor"] } },
+                { "argv": { "prefix": ["pane", "edges"] } },
+                { "argv": { "prefix": ["pane", "read"] } },
+                { "argv": { "prefix": ["pane", "wait-output"] } },
+                { "argv": { "prefix": ["pane", "focus"] } },
+                { "argv": { "prefix": ["pane", "zoom"] } },
+                { "argv": { "prefix": ["tab", "list"] } },
+                { "argv": { "prefix": ["tab", "get"] } },
+                { "argv": { "prefix": ["tab", "focus"] } },
+                { "argv": { "prefix": ["workspace", "list"] } },
+                { "argv": { "prefix": ["workspace", "get"] } },
+                { "argv": { "prefix": ["workspace", "focus"] } },
+                { "argv": { "prefix": ["worktree", "list"] } },
+                { "argv": { "prefix": ["agent", "list"] } },
+                { "argv": { "prefix": ["agent", "get"] } },
+                { "argv": { "prefix": ["agent", "read"] } },
+                { "argv": { "prefix": ["agent", "wait"] } },
+                { "argv": { "prefix": ["agent", "explain"] } },
+                { "argv": { "prefix": ["agent", "focus"] } }
+              ]
+            }
+          },
+          // pi-herdr builds these argv itself; the list only bounds a bug.
+          "pi-herdr": {
+            "sandbox": {
+              "fs_read": ["$HOME/.config/herdr"],
+              "use_credentials": ["herdr_socket"],
+              "environment": {
+                "allow_vars": ["HOME", "PATH", "LANG", "LC_*", "TERM", "HERDR_ENV", "HERDR_PANE_ID", "HERDR_TAB_ID", "HERDR_WORKSPACE_ID"]
+              }
+            },
+            "invocation_policy": {
+              "default": "deny",
+              "allow": [
+                { "argv": { "prefix": ["pane", "split", "--current"] } },
+                { "argv": { "prefix": ["pane", "wait-output"] } },
+                { "argv": { "prefix": ["pane", "close"] } },
+                { "argv": { "prefix": ["agent", "get"] } },
+                { "argv": { "prefix": ["agent", "start"] } },
+                { "argv": { "prefix": ["agent", "prompt"] } },
+                { "argv": { "prefix": ["agent", "send-keys"] } }
+              ]
+            }
+          }
+        }
+      },
+      // Spawns, prompts and stops contained pi children. It lives under
+      // ~/dotfiles, which this profile grants writable, so nono's own
+      // writable-executable check would refuse it; the raw Seatbelt deny on
+      // ~/dotfiles/pi is what actually keeps it unmodifiable.
+      "pi-herdr": {
+        "executable": "/Users/jonasws/dotfiles/pi/bin/pi-herdr",
+        "allow_writable_executable": true,
+        "can_use": ["herdr"],
+        "sandbox": {
+          "environment": {
+            "allow_vars": ["HOME", "PWD", "PATH", "LANG", "LC_*", "TERM", "HERDR_ENV", "HERDR_PANE_ID", "HERDR_TAB_ID", "HERDR_WORKSPACE_ID"]
+          }
+        }
+      },
+      // claude/settings.json permissions.deny. None of them could reach a
+      // credential from in here anyway; denying them turns a hang or a
+      // confusing error into a clear refusal.
+      "gh": { "from": { "session": "deny" } },
+      "op": { "from": { "session": "deny" } },
+      "fnox": { "from": { "session": "deny" } },
+      "twg": { "from": { "session": "deny" } }
+    }
+  }
+}

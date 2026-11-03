@@ -212,6 +212,14 @@ claude = [
     "workspace",
   ],
 ]
+# pi reports no context figure, and `agent` would only ever read "pi". pi
+# titles the terminal "π - <session name> - <dir>", and pi-herdr names each
+# child's session after its agent, so the title tells fleet children apart;
+# `tab` finds the pane they were split into.
+pi = [
+  ["state_icon", "terminal_title_stripped"],
+  ["workspace", "tab"],
+]
 
 # OSC 9 through WezTerm; clicking the toast does nothing.
 [ui.toast]
