@@ -4,8 +4,16 @@
 
 # ── Appearance ──────────────────────────────────────────────────────────────
 
-# Always dark, whatever macOS is set to: no light:/dark: pair.
+# Always dark, whatever macOS is set to: no light:/dark: pair. Ghostty's
+# bundled "Catppuccin Mocha", on trial against catppuccin/ghostty's own file in
+# themes/ (commented out): the bundled one has lighter brights and swaps ANSI 7
+# and 15.
+# theme = catppuccin-mocha.conf
 theme = Catppuccin Mocha
+# Rosewater selection whichever Mocha file is in use (the official one selects
+# in a quiet #353749), matched by [appearance.selection] in tuios/config.toml.
+selection-background = #f5e0dc
+selection-foreground = #1e1e2e
 
 # As in WezTerm: text from plain JetBrains Mono, icon and powerline glyphs from
 # the Nerd Font Mono build, which keeps every glyph inside one cell. Ghostty
@@ -27,6 +35,10 @@ adjust-font-baseline = 1
 # washed out on the office ultrawide. Its panel covers about 85-92% of P3, so
 # the XDR panel still shows more of it.
 window-colorspace = display-p3
+# Lift text that sits too close to its background. Mocha's ANSI 8 (#585b70),
+# the dim text in Claude Code's dark-ansi diffs, is 2.46:1 on base; 3 is the
+# docs' mark for text that is hard to read.
+minimum-contrast = 3
 
 background-opacity = 0.9
 background-blur-radius = 10
