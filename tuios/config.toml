@@ -15,7 +15,9 @@ layout = "bsp"
 start_in_terminal_mode = true
 
 [appearance]
-theme = "catppuccin_mocha"
+# Ghostty's bundled Catppuccin Mocha, sixteen for sixteen (themes/): tuios's
+# own catppuccin_mocha keeps the brights equal to the normals.
+theme = "mocha-ghostty"
 # On a light terminal, and when the host (Ghostty) switches to light.
 theme_light = "catppuccin_latte"
 # Ghostty and WezTerm both draw kitty unicode placeholders.
@@ -115,8 +117,8 @@ after-agent-state = "~/.config/tuios/scripts/auto-name.sh"
 # gets mise trusted and its tools installed before the first pane starts.
 after-new-worktree = "~/.config/tuios/scripts/new-worktree.sh"
 
-# Selection in rosewater with base text, as ghostty/config.ghostty sets it, so
-# a selection looks the same in a tuios pane and in Ghostty. The copy-mode
+# Selection in rosewater with base text, as Ghostty's bundled Mocha draws it,
+# so a selection looks the same in a tuios pane and in Ghostty. The copy-mode
 # cursor is rosewater too, with crust text, as Ghostty's cursor.
 [appearance.selection]
 bg = "#f5e0dc"
@@ -478,3 +480,6 @@ enabled = [
 # gitignored because an ntfy topic address is a secret. Copy
 # config.d/notify.toml.example and run `tuios config apply` and
 # `tuios notify test` from a terminal outside tuios.
+
+[spotlight]
+enabled = false
