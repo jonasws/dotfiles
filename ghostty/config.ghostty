@@ -5,15 +5,10 @@
 # ── Appearance ──────────────────────────────────────────────────────────────
 
 # Always dark, whatever macOS is set to: no light:/dark: pair. Ghostty's
-# bundled "Catppuccin Mocha", on trial against catppuccin/ghostty's own file in
-# themes/ (commented out): the bundled one has lighter brights and swaps ANSI 7
-# and 15.
-# theme = catppuccin-mocha.conf
+# bundled Mocha over catppuccin/ghostty's file in themes/: its brights are
+# lighter tints, so bold and bright text stand out, and it selects in
+# rosewater. tuios (themes/mocha-ghostty.json) and Claude Code follow it.
 theme = Catppuccin Mocha
-# Rosewater selection whichever Mocha file is in use (the official one selects
-# in a quiet #353749), matched by [appearance.selection] in tuios/config.toml.
-selection-background = #f5e0dc
-selection-foreground = #1e1e2e
 
 # As in WezTerm: text from plain JetBrains Mono, icon and powerline glyphs from
 # the Nerd Font Mono build, which keeps every glyph inside one cell. Ghostty
