@@ -157,8 +157,11 @@ launcher = []
 choose_tree = ["super+k", "ctrl+alt+k"]
 # Ghostty hands these Cmd chords to tuios (ghostty/config.ghostty unbinds
 # them): Cmd+T opens a workspace and Cmd+1..9 picks one, like a tab bar's.
-# Cmd+W closes the pane, a command key below.
+# Cmd+W closes the pane, a command key below. Cmd+R and Cmd+D split right and
+# down, as Ghostty's own splits did.
 new_workspace = ["super+t"]
+split_vertical = ["super+r"]
+split_horizontal = ["super+d"]
 switch_workspace_1 = ["super+1"]
 switch_workspace_2 = ["super+2"]
 switch_workspace_3 = ["super+3"]
@@ -168,9 +171,10 @@ switch_workspace_6 = ["super+6"]
 switch_workspace_7 = ["super+7"]
 switch_workspace_8 = ["super+8"]
 switch_workspace_9 = ["super+9"]
-# Cmd+. labels the URLs, paths and hashes in the pane (hints mode). Ctrl and
-# a label opens a URL in the browser, as WezTerm's Cmd+O did.
-hints = ["super+."]
+# Cmd+. labels the panes and focuses the one whose label you type.
+display_panes = ["super+."]
+# Ctrl+Shift+Space labels the text on every pane of the workspace.
+hints_all_panes = ["ctrl+shift+space"]
 
 [keybindings.prefix_mode]
 # herdr: prefix+v splits right and prefix+c opens a tab (a tuios workspace).
