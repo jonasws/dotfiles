@@ -2,11 +2,11 @@
   "name": "Catppuccin Mocha",
   "base": "dark-ansi",
   "overrides": {
-    "diffAdded": "#1e3a26",
-    "diffRemoved": "#3e1e2e",
-    "diffAddedDimmed": "#172a1d",
-    "diffRemovedDimmed": "#2c1620",
-    "diffAddedWord": "#3d6b48",
-    "diffRemovedWord": "#7a2d44"
+    "diffRemoved": "#493447",
+    "diffAdded": "#394545",
+    "diffRemovedWord": "#694559",
+    "diffAddedWord": "#4e6356",
+    "diffRemovedDimmed": "#33293a",
+    "diffAddedDimmed": "#2c323a"
   }
 }

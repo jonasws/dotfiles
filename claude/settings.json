@@ -514,6 +514,7 @@
     }
   },
   "spinnerTipsEnabled": false,
+  "syntaxHighlightingDisabled": true,
   "effortLevel": "high",
   "modelSettings": {
     "claude-sonnet-5-5": {
