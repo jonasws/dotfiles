@@ -1,0 +1,46 @@
+<tml version="1" title="CloudFormation deployment">
+  <state>{"stack": "-", "account": "-", "status": "LOADING", "statusLabel": "Finding the latest stack operation", "statusState": "working", "statusRole": "warning", "operation": "-", "reason": "", "rootCause": "", "started": "-", "finished": "-", "elapsed": "-", "updated": "-", "inProgress": 0, "complete": 0, "failed": 0, "touched": 0, "resources": [], "events": []}</state>
+  <col pad="1" gap="1">
+    <row gap="2">
+      <status label="{state.statusLabel}" state="{state.statusState}"/>
+      <spacer/>
+      <text role="dim">updated {state.updated}</text>
+    </row>
+    <text><b>{state.stack}</b> <c role="dim">in {state.account}</c></text>
+    <grid cols="4" gap="2">
+      <stat label="In progress" value="{state.inProgress}" role="warning"/>
+      <stat label="Complete" value="{state.complete}" role="success"/>
+      <stat label="Failed" value="{state.failed}" role="error"/>
+      <stat label="Elapsed" value="{state.elapsed}"/>
+    </grid>
+    <text if="state.rootCause != ''" role="error" wrap="word">First failure: {state.rootCause}</text>
+    <kv>
+      <item k="Status" v="{state.status}" role="{state.statusRole}"/>
+      <item k="Operation" v="{state.operation}"/>
+      <item k="Started" v="{state.started}"/>
+      <item k="Finished" v="{state.finished}"/>
+      <item k="Reason" v="{state.reason}"/>
+    </kv>
+    <tabs>
+      <tab id="resources" title="Resources ({state.touched})">
+        <row gap="2"><text w="42" role="dim">STATUS</text><text w="40" role="dim">LOGICAL ID</text><text w="26" role="dim">TYPE</text><text w="8" role="dim">TIME</text><text role="dim">REASON</text></row>
+        <scroll h="fill">
+          <list items="state.resources" as="r">
+            <row gap="2"><badge w="42" role="{r.role}">{r.status}</badge><text w="40" wrap="none">{r.id}</text><text w="26" role="dim" wrap="none">{r.type}</text><text w="8" role="dim">{r.time}</text><text role="dim" wrap="none">{r.reason}</text></row>
+          </list>
+        </scroll>
+      </tab>
+      <tab id="events" title="Events">
+        <row gap="2"><text w="8" role="dim">TIME</text><text w="42" role="dim">STATUS</text><text w="40" role="dim">LOGICAL ID</text><text role="dim">REASON</text></row>
+        <scroll h="fill">
+          <list items="state.events" as="e">
+            <row gap="2"><text w="8" role="dim">{e.time}</text><badge w="42" role="{e.role}">{e.status}</badge><text w="40" wrap="none">{e.id}</text><text role="dim" wrap="none">{e.reason}</text></row>
+          </list>
+        </scroll>
+      </tab>
+    </tabs>
+    <row gap="2">
+      <button key="ctrl+c" on-press="close(null)">close</button>
+    </row>
+  </col>
+</tml>

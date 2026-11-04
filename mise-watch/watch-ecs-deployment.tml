@@ -1,0 +1,39 @@
+<tml version="1" title="ECS deployment">
+  <state>{"service": "-", "cluster": "-", "status": "LOADING", "statusLabel": "Finding the latest deployment", "statusState": "working", "reason": "", "started": "-", "finished": "-", "elapsed": "-", "updated": "-", "running": 0, "pending": 0, "requested": 0, "oldRunning": 0, "oldRequested": 0, "breaker": "-", "breakerFailures": 0, "breakerThreshold": 0, "rollback": "", "alarms": "-", "taskDef": "-", "images": "-", "deploymentId": "-", "history": [], "events": []}</state>
+  <col pad="1" gap="1">
+    <row gap="2">
+      <status label="{state.statusLabel}" state="{state.statusState}"/>
+      <spacer/>
+      <text role="dim">updated {state.updated}</text>
+    </row>
+    <text><b>{state.service}</b> <c role="dim">on {state.cluster}</c></text>
+    <grid cols="4" gap="2">
+      <stat label="Status" value="{state.status}"/>
+      <stat label="New tasks" value="{state.running} / {state.requested}" role="success"/>
+      <stat label="Old tasks" value="{state.oldRunning} / {state.oldRequested}" role="info"/>
+      <stat label="Failed / limit" value="{state.breakerFailures} / {state.breakerThreshold}" role="error"/>
+    </grid>
+    <text if="state.rollback != ''" role="error">Rollback: {state.rollback}</text>
+    <kv>
+      <item k="Started" v="{state.started}"/>
+      <item k="Finished" v="{state.finished}"/>
+      <item k="Elapsed" v="{state.elapsed}"/>
+      <item k="Reason" v="{state.reason}"/>
+      <item k="Circuit breaker" v="{state.breaker}"/>
+      <item k="Alarms" v="{state.alarms}"/>
+      <item k="Task definition" v="{state.taskDef}"/>
+      <item k="Images" v="{state.images}"/>
+      <item k="Deployment" v="{state.deploymentId}"/>
+    </kv>
+    <sparkline title="New tasks running" values="state.history" role="series1" h="3"/>
+    <card title="Service events since the deployment started, newest first" h="fill">
+      <table rows="state.events" key="id">
+        <column field="time" title="Time" w="10"/>
+        <column field="message" title="Message"/>
+      </table>
+    </card>
+    <row gap="2">
+      <button key="ctrl+c" on-press="close(null)">close</button>
+    </row>
+  </col>
+</tml>
