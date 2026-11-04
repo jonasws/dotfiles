@@ -27,10 +27,11 @@ kitty_placeholders = "on"
 border_focused_color = "accent"
 # Split across the longer side, so a new pane on a wide screen goes right and
 # on a tall one goes down, close to picking herdr's split direction by hand.
-tiling_scheme = "longest_side"
+tiling_scheme = "smart_split"
 # Window slides and the copy sweep stay; overlay fades and the working-agent
 # shimmer go.
 motion = "basic"
+border_style = "glyphs"
 # The default cap of 12 cells cuts "dotfiles › topic" workspace names to
 # "dotfiles › …". The full name still shows on hover.
 dock_workspace_label_max = 28
@@ -148,7 +149,20 @@ group_main = true
 # (claude/statusline-command.sh). The model and the cost stay off the row, so
 # `now` keeps the room: the Inbox and the peek still show the model.
 [appearance.sidebar.agent_row]
-tokens = ["session", "need", "harness", "name", "progress", "elapsed", "$context", "subagents", "pr", "meta", "now", "message"]
+tokens = [
+  "session",
+  "need",
+  "harness",
+  "name",
+  "progress",
+  "elapsed",
+  "$context",
+  "subagents",
+  "pr",
+  "meta",
+  "now",
+  "message",
+]
 
 [keybindings]
 # Option is the us-altgr-intl compose layer, so the characters it types go to
@@ -480,15 +494,7 @@ description = "Open F1 dashboard"
 alphabet = "asdfhjkl"
 
 [plugins]
-enabled = [
-  "herdr-splits",
-  "dev.minung.herdr-f1",
-  # Name workspaces after the pane running in them. Agent panes are named by
-  # scripts/auto-name.sh from the after-agent-state hook, so dan.pane-topic-sync
-  # stays off here (herdr still runs it): two namers would fight over one
-  # label. Settings are in ~/.config/herdr/plugins/config/.
-  "herdr-automatic-rename",
-]
+enabled = ["herdr-splits", "dev.minung.herdr-f1", "herdr-automatic-rename"]
 
 # Push notifications ([notify]) live in config.d/notify.toml, which is
 # gitignored because an ntfy topic address is a secret. Copy
