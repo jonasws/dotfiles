@@ -117,6 +117,13 @@ after-agent-state = "~/.config/tuios/scripts/auto-name.sh"
 # gets mise trusted and its tools installed before the first pane starts.
 after-new-worktree = "~/.config/tuios/scripts/new-worktree.sh"
 
+# Worktrees sit beside their repo, in a hidden .worktrees folder of the repo's
+# parent, so a session in one still loads the CLAUDE.md of ~/CX, ~/CNOPS or
+# ~/CN-TERMINAL above it. Outside the repo, so the main checkout never lists it
+# as untracked. The daemon rereads this when the file changes.
+[worktree]
+path = "../.worktrees/{{ repo }}/{{ branch | slug }}"
+
 # Selection in rosewater with base text, as Ghostty's bundled Mocha draws it,
 # so a selection looks the same in a tuios pane and in Ghostty. The copy-mode
 # cursor is rosewater too, with crust text, as Ghostty's cursor.
