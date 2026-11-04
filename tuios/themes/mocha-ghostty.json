@@ -20,5 +20,11 @@
   "bright_blue": "#aeccfc",
   "bright_purple": "#f398da",
   "bright_cyan": "#b1eae1",
-  "bright_white": "#a6adc8"
+  "bright_white": "#a6adc8",
+  "chrome": {
+    "accent": "#cba6f7",
+    "canvas": "#11111b",
+    "surface": "#181825",
+    "border": { "unfocused": "#313244" }
+  }
 }

@@ -22,10 +22,9 @@ theme = "mocha-ghostty"
 theme_light = "catppuccin_latte"
 # Ghostty and WezTerm both draw kitty unicode placeholders.
 kitty_placeholders = "on"
-# Catppuccin Mocha mauve, herdr's accent. Unfocused borders are the dividers
-# between panes: surface0, catppuccin/ghostty's split-divider-color.
-border_focused_color = "#cba6f7"
-border_unfocused_color = "#313244"
+# Mauve, the theme's accent. The theme has no role for the focused border: it
+# takes the success green in terminal mode. Unfocused borders are in the theme.
+border_focused_color = "accent"
 # Split across the longer side, so a new pane on a wide screen goes right and
 # on a tall one goes down, close to picking herdr's split direction by hand.
 tiling_scheme = "longest_side"
@@ -35,6 +34,9 @@ motion = "basic"
 # The default cap of 12 cells cuts "dotfiles › topic" workspace names to
 # "dotfiles › …". The full name still shows on hover.
 dock_workspace_label_max = 28
+# Frame the larger panels (agents view, palette) like the dialogs, so Cmd+K's
+# navigator and the agents view read as one family. Colours are the theme's.
+frame_panels = true
 
 # Dock messages show the icon and text, without the side bar and countdown line.
 [notifications]
@@ -126,7 +128,8 @@ path = "../.worktrees/{{ repo }}/{{ branch | slug }}"
 
 # Selection in rosewater with base text, as Ghostty's bundled Mocha draws it,
 # so a selection looks the same in a tuios pane and in Ghostty. The copy-mode
-# cursor is rosewater too, with crust text, as Ghostty's cursor.
+# cursor is rosewater too, with crust text, as Ghostty's cursor. The theme's
+# selection_bg does not reach tuios's own selection, so it stays here.
 [appearance.selection]
 bg = "#f5e0dc"
 fg = "#1e1e2e"
