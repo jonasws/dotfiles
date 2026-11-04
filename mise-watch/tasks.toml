@@ -18,7 +18,7 @@ flag "--no-focus" help="Leave the focus on this pane instead of the watcher pane
 flag "--poll <seconds>" default="10"
 '''
 run = '''
-bash "{{ env.HOME }}/dotfiles/mise-watch/watch-ecs-deployment.sh" ${usage_service:+"$usage_service"} --poll "${usage_poll?}" $([ "${usage_no_focus:-false}" = true ] && echo --no-focus)
+python3 -I "{{ env.HOME }}/dotfiles/mise-watch/watch-ecs-deployment.py" ${usage_service:+"$usage_service"} --poll "${usage_poll?}" $([ "${usage_no_focus:-false}" = true ] && echo --no-focus)
 '''
 
 # Uses the AWS credentials in the environment, so wrap it in the account's
