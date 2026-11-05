@@ -25,9 +25,6 @@ kitty_placeholders = "on"
 # Mauve, the theme's accent. The theme has no role for the focused border: it
 # takes the success green in terminal mode. Unfocused borders are in the theme.
 border_focused_color = "accent"
-# Split across the longer side, so a new pane on a wide screen goes right and
-# on a tall one goes down, close to picking herdr's split direction by hand.
-tiling_scheme = "smart_split"
 # Window slides and the copy sweep stay; overlay fades and the working-agent
 # shimmer go.
 motion = "basic"
@@ -250,6 +247,9 @@ prefix_next_attention = ["o"]
 launcher = ["ctrl+a"]
 prefix_next_finished = ["ctrl+k"]
 prefix_agents_settings = []
+# No nest mode on prefix+enter: it was only ever hit by accident, and its way
+# out is F12. The palette still has it for a nested tmux or tuios.
+nest = []
 clear_scrollback = ["ctrl+l"]
 # Freed for the command keys below, which a tuios action would otherwise win.
 prefix_layout = ["ctrl+o"]
@@ -285,6 +285,14 @@ prefix_debug = ["ctrl+d"]
 prefix_window = ["ctrl+x"]
 prefix_last_message = ["ctrl+y"]
 prefix_workspace_switcher = ["ctrl+g"]
+
+# Layout prefix (prefix+ctrl+o): space steps BSP, master-stack, scrolling, and
+# t steps the BSP split scheme (spiral, longest side, alternate, smart split).
+# The layout is the session's and the scheme the workspace's; neither is saved
+# to this file, so trying them out changes nothing for new sessions.
+[keybindings.layout_prefix]
+cycle_layout = ["space"]
+cycle_tiling_scheme = ["t"]
 
 # Like herdr, nothing but the prefix and the command keys below is taken from
 # the pane. Focus moves on ctrl+hjkl, windows and tabs on the prefix.
