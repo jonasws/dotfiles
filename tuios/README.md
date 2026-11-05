@@ -47,7 +47,7 @@ built-ins:
 | `herdr_f1`, the F1 dashboard | The `herdr-f1` plugin from herdr's registry, enabled in `[plugins]`, on `prefix+F`. |
 | Pickers in floating layers | Popups. The `tv` pickers run through `scripts/close-on-leave.sh`, which closes the popup when focus, the workspace or the session moves away from it. |
 | Cmd+D / Cmd+R, `ctrl+cmd+]` / `[`, font keys, theme import | The host terminal's job (WezTerm, `wezterm/dot-wezterm.lua`). Rex's prefix-free agent chords are not ported. |
-| LaunchAgent that keeps the server up | Not needed. On macOS, `tuios daemon-app install --login` runs the daemon as an app so panes keep local network access. |
+| LaunchAgent that keeps the server up | Not used. The first `tuios` in Ghostty starts the daemon, which then counts as Ghostty for macOS privacy grants: `op` reads 1Password's shared data and panes reach the local network while Ghostty runs. `tuios daemon-app install --login` would run it as its own app instead, which needs both grants given to TUIOS Daemon. |
 
 ### Keys
 
