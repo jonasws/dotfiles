@@ -164,11 +164,13 @@ prefix. Pane movement stays on `init.lua`'s Cmd chords and Ctrl+hjkl.
 | --- | ---- | ---- |
 | `ctrl+b f`, `cmd+k` | pane picker, attention first | `tv herdr-sessions` |
 | `ctrl+b shift+f` | herdr-f1 in the browser | its herdr plugin, else the `herdr-f1` CLI |
-| `ctrl+b l` / `shift+l` | lazygit status / log | `herdr/scripts/lazygit-popup.sh` |
-| `ctrl+b y` / `shift+y` | yazi; or pick files into the pane | `herdr/scripts/yazi-popup.sh` |
+| `ctrl+b l` / `shift+l` | lazygit status / log (a floater) | `herdr/scripts/lazygit-popup.sh` |
+| `ctrl+b y` / `shift+y` | yazi; or pick files into the pane (a floater) | `herdr/scripts/yazi-popup.sh` |
 | `ctrl+b r` | git repos; Enter opens or focuses a tab | `tv git-repos`, its `rex` action |
 | `ctrl+b shift+h` / `shift+o` | hotkeys / AWS profiles | `tv hotkeys` / `tv aws-profiles` |
-| `ctrl+b t` / `ctrl+t` / `ctrl+e` | tsk board / quick capture / edit notes | `tsk-toggle.sh`, the herdr-tsk plugin, `tsk-notes.sh` |
+| `ctrl+b t` / `ctrl+t` / `ctrl+e` | tsk board / quick capture / edit notes (a floater) | `tsk-toggle.sh`, the herdr-tsk plugin, `tsk-notes.sh` |
+| `ctrl+b s` / `j` / `b` | scratch shell / lazyjira / btop floaters | `floaters/commands.lua` |
+| `cmd+shift+y`, `ctrl+b [` | Pluck: copy a hinted token from the tab | rex-floaters |
 | `ctrl+b shift+s` | subagent viewers | `claude/hooks/subagent-viewer.sh` |
 | `ctrl+b e` | scrollback in `$EDITOR`, in a floating layer | `edit_scrollback` in `init.lua` |
 | `ctrl+b a` / `shift+a` | next / previous agent, across sessions | `next_agent` / `previous_agent` |
@@ -179,11 +181,8 @@ prefix. Pane movement stays on `init.lua`'s Cmd chords and Ctrl+hjkl.
 | `ctrl+b shift+n` / `shift+d` / `shift+w` | new / close / rename session | `session.*` |
 | `ctrl+b ctrl+n` / `ctrl+p` | next / previous session | `session.next` / `previous` |
 
-herdr's popup and pane keys open a zoomed split that closes with its command.
-Floating layers didn't draw full-screen programs until Rex fixed that on
-2026-10-27 ("Floating layers: no backdrop, and alternate-screen programs
-aren't drawn", Rex Beta feedback); `edit_scrollback` already uses one, and
-the popups can move to layers next. A key's command gets what
+herdr's popup keys open floaters (below) when rex-floaters is installed,
+and otherwise a zoomed split that closes with its command. A key's command gets what
 herdr hands its command keys: `HERDR_ENV`, the socket, and
 `HERDR_ACTIVE_PANE_ID`, `_TAB_ID` and `_PANE_CWD` for the pane the key was
 pressed in. It runs through `$SHELL -l -c`, so PATH has mise's tools.
@@ -210,3 +209,39 @@ one open, the server tries the likeliest first and falls back
 - **Switching the app to another session:** the client action
   `session.switch` with a `session_id` argument. From outside the app it
   needs Remote Control turned on.
+
+## Floaters
+
+[rex-floaters](https://github.com/enkelm/rex-floaters) runs a command in a
+floating layer, one per entry per tab. Its key shows the floater, the same key
+hides it with the program still running, and quitting the program closes it.
+That suits lazygit, yazi and a scratch shell better than herdr's popups, which
+start over each time.
+
+| File | Role |
+| ---- | ---- |
+| `floaters/commands.lua` | Our floaters: name, key, command, and an optional collector. |
+| `floaters/run.lua` | The executor for all of them: runs the command through the login shell with `HERDR_ENV` and the `HERDR_ACTIVE_*` variables for the pane the key was pressed in, so `herdr/scripts` work unchanged. |
+| `floaters/init.lua` | Registers them with rex-floaters, plus its bundled Pluck and Rex tab picker. Loaded after `herdr.lua`, so the floater keys replace the herdr popups on the same chords. |
+| `plugins.lock.json` | The plugin commits. Not linked into `~/.config/rex`. |
+
+Add a floater by appending to `commands.lua` and running `rex config
+reload`. The lazygit entries reuse rex-floaters' bundled collector, so outside
+a checkout they offer an fzf pick of the repositories below the pane's
+directory. Each entry also gets `floaters_<name>_toggle` and `_close` actions
+in the palette and for `rex do`.
+
+The checkout lives outside the config directory, in
+`~/.local/share/rex/plugins/rex-floaters`, and `floaters/init.lua` adds it to
+`package.path`. `mise -C ~/dotfiles run sync:rex-plugins` clones it at the
+locked commit; `update:rex-plugins` (part of `update`) moves it to `main` and
+rewrites the lock. Without the checkout the herdr popups keep their keys and
+`rex config check` logs a warning.
+
+rex-floaters needs a server with API revision 9 (`session.set_layer_state`);
+`rex version` and `rex server status` show both sides. Its fzf and tv pickers
+and its `rex` launcher are found on the server's PATH, not the login shell's,
+so check those first if the repo picker or tab picker fails. Floating layers
+still have open Rex Beta bugs: focus can land on the wrong pane when a
+floater's program exits, and `pane.send_key` (so Ctrl+B Ctrl+B) does nothing
+while a floater has focus.

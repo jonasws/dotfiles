@@ -201,6 +201,46 @@ chmod 600 "$tmp"
 mv "$tmp" "$target"
 """
 
+[tasks."sync:rex-plugins"]
+description = "Clone Rex plugins at the commits in rex/plugins.lock.json"
+# Rex has no plugin manager: a plugin is a Lua module on package.path, which
+# rex/floaters/init.lua points at ~/.local/share/rex/plugins. Each checkout
+# sits detached at its locked commit, so a fresh machine gets what was tested.
+run = """
+set -euo pipefail
+root="${XDG_DATA_HOME:-$HOME/.local/share}/rex/plugins"
+mkdir -p "$root"
+jq -r '.[] | "\\(.id) \\(.source) \\(.commit)"' {{config_root}}/rex/plugins.lock.json |
+while read -r id source commit; do
+  dir="$root/$id"
+  [ -d "$dir/.git" ] || git clone --quiet "https://github.com/$source.git" "$dir"
+  git -C "$dir" fetch --quiet origin "$commit"
+  git -C "$dir" -c advice.detachedHead=false checkout --quiet "$commit"
+  echo "$id at ${commit:0:7}"
+done
+"""
+
+[tasks."update:rex-plugins"]
+description = "Upgrade Rex plugins to their default branch and record the commits"
+# Rewrites rex/plugins.lock.json, so an upgraded plugin shows up in the
+# `update` task's closing git status, as herdr/plugins.lock.json does. Run
+# `rex config reload` afterwards; open floaters keep the old code until closed.
+depends = ["sync:rex-plugins"]
+run = """
+set -euo pipefail
+root="${XDG_DATA_HOME:-$HOME/.local/share}/rex/plugins"
+lock={{config_root}}/rex/plugins.lock.json
+for id in $(jq -r '.[].id' "$lock"); do
+  dir="$root/$id"
+  git -C "$dir" fetch --quiet origin HEAD
+  git -C "$dir" -c advice.detachedHead=false checkout --quiet FETCH_HEAD
+  commit=$(git -C "$dir" rev-parse HEAD)
+  jq --arg id "$id" --arg commit "$commit" 'map(if .id == $id then .commit = $commit else . end)' "$lock" >"$lock.tmp"
+  mv "$lock.tmp" "$lock"
+  echo "$id at ${commit:0:7}"
+done
+"""
+
 [tasks."sync:rex-herdr"]
 description = "(Re)load the herdr socket server's LaunchAgent"
 # bootout fails when the agent is not loaded yet, which is fine.
@@ -267,7 +307,7 @@ echo "karabiner.json synced"
 
 [tasks.update]
 description = "Daily upgrade, then show what changed"
-depends = ["update:brew", "update:mise", "update:skills", "update:herdr-plugins", "update:yazi", "update:nvim"]
+depends = ["update:brew", "update:mise", "update:skills", "update:herdr-plugins", "update:rex-plugins", "update:yazi", "update:nvim"]
 run = "git status --short"
 
 [tasks."update:weekly"]
@@ -451,7 +491,7 @@ mode = "symlink"
 [dotfile_groups.rex]
 root = "rex"
 target = "~/.config/rex"
-exclude = ["README.md", "herdr/test", "launchd"]
+exclude = ["README.md", "herdr/test", "launchd", "plugins.lock.json"]
 
 # The herdr socket server's LaunchAgent; see rex/herdr/serve.
 [dotfile_groups.rex-launchd]

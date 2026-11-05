@@ -52,9 +52,8 @@ local function argv(command, env)
 end
 
 -- herdr's `type = "popup"` and `type = "pane"`: a zoomed split that closes
--- when its command exits. Rex's floating layers don't draw full-screen
--- programs yet (Rex Beta feedback "Floating layers: no backdrop, and
--- alternate-screen programs aren't drawn").
+-- when its command exits. The fallback for the popup keys: floaters/init.lua
+-- rebinds them to toggleable floating layers when rex-floaters is installed.
 function M.popup(ctx, command)
   local split, err = rex.session.new_split{
     direction = "horizontal", side = "after", focus = true,

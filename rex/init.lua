@@ -209,3 +209,9 @@ rex.bind("ctrl+b>e", "edit_scrollback")
 -- shift+f for herdr-f1, f or Cmd+K for the pane picker. The table is
 -- television/hotkeys/rex.tsv.
 require("herdr").bind()
+
+-- Floating terminals that the same key shows and hides per tab, keeping the
+-- program running: lazygit, yazi, tsk notes, a scratch shell and more, plus
+-- Pluck on Cmd+Shift+Y. Loaded after herdr so its keys replace the herdr
+-- popups on the same chords. See floaters/init.lua.
+require("floaters").setup()
