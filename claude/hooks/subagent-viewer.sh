@@ -5,11 +5,16 @@
 #
 #   (no argument)  SubagentStart: record the subagent, and add a viewer for it
 #                  when the session's tab is open
+#   stop           SubagentStop: hand the subagent's last message to its
+#                  viewer, which closes the stream with a footer
 #   resume         SessionStart on resume: record the session's new pane
 #   end            SessionEnd: close the session's tab
-#   toggle         herdr key (prefix+shift+s): inside a viewer tab, close it;
+#   toggle         herdr key (prefix+shift+s), tuios key through
+#                  tuios/scripts/subagents.sh: inside a viewer tab, close it;
 #                  in a Claude pane, focus its tab or open one with a viewer
 #                  for each of the session's most recent subagents
+#   stream         the same subagents in this terminal, one tagged line
+#                  stream, for a popup; agents that start later join it
 #
 # The viewer command reaches the new pane through HERDR_EXEC_CMD (see
 # fish/conf.d/50-herdr-exec.fish) rather than `herdr pane run`, which races the
@@ -30,6 +35,9 @@ root="${XDG_STATE_HOME:-$HOME/.local/state}/claude-subagent-viewer"
 # How many viewers the toggle opens, newest first.
 REVIVE_MAX=6
 
+# In a tuios pane HERDR_BIN_PATH is tuios's herdr link, so no herdr install is
+# needed there.
+herdr() { command "${HERDR_BIN_PATH:-herdr}" "$@"; }
 herdr_json() { herdr "$@" 2>/dev/null; }
 tab_alive() { [ -n "$1" ] && herdr_json tab get "$1" | jq -e '.result' >/dev/null; }
 notify() { herdr notification show "$1" --sound none >/dev/null 2>&1; }
@@ -46,11 +54,11 @@ tab_label() {
 
 # Hooks name the session on stdin; the toggle finds it from the pane it was
 # pressed in, through what the hooks recorded.
-if [ "$mode" = toggle ]; then
+if [ "$mode" = toggle ] || [ "$mode" = stream ]; then
   active_pane=${HERDR_ACTIVE_PANE_ID:-$(herdr_json pane list | jq -r '.result.panes[] | select(.focused) | .pane_id' | head -n1)}
   active_tab=${HERDR_ACTIVE_TAB_ID:-$(herdr_json pane get "$active_pane" | jq -r '.result.pane.tab_id // empty')}
   viewer_of=$(grep -lxF -- "$active_tab" "$root"/*/tab 2>/dev/null | head -n1)
-  if [ -n "$viewer_of" ]; then
+  if [ "$mode" = toggle ] && [ -n "$viewer_of" ]; then
     herdr tab close "$active_tab" >/dev/null 2>&1
     rm -f "$viewer_of" "${viewer_of%/tab}/shown"
     exit 0
@@ -64,6 +72,15 @@ else
   session=$(field session_id)
   [ -n "$session" ] && [ -n "${HERDR_WORKSPACE_ID:-}" ] || exit 0
   state="$root/$session"
+
+  if [ "$mode" = stop ]; then
+    agent=$(field agent_id)
+    [ -n "$agent" ] && [ -d "$state" ] || exit 0
+    mkdir -p "$state/stopped"
+    jq -r '.last_assistant_message // ""' <<<"$input" >"$state/stopped/$agent.tmp" &&
+      mv "$state/stopped/$agent.tmp" "$state/stopped/$agent"
+    exit 0
+  fi
 
   if [ "$mode" = end ]; then
     tab=$(cat "$state/tab" 2>/dev/null)
@@ -88,6 +105,25 @@ pane=$(cat "$state/pane" 2>/dev/null)
 workspace=$(cat "$state/workspace" 2>/dev/null)
 cwd=$(cat "$state/cwd" 2>/dev/null)
 main_transcript=$(cat "$state/transcript" 2>/dev/null)
+watcher="$HOME/.claude/skills/watch-subagents/watch-agent.sh"
+colours=(36 35 33 32 34)
+transcript_of() { echo "${main_transcript%.jsonl}/subagents/agent-$1.jsonl"; }
+
+if [ "$mode" = stream ]; then
+  [ -s "$state/agents" ] || { echo "No subagents in this session yet"; sleep 2; exit 0; }
+  trap 'kill 0' EXIT
+  started=" " n=0
+  while :; do
+    while IFS=$'\t' read -r agent type; do
+      case $started in *" $agent "*) continue ;; esac
+      started="$started$agent "
+      bash "$watcher" "$(transcript_of "$agent")" "$type" "${colours[$((n % ${#colours[@]}))]}" \
+        --tag "${type:0:12}" --stop-file "$state/stopped/$agent" &
+      n=$((n + 1))
+    done < <(tail -n "$REVIVE_MAX" "$state/agents")
+    sleep 2
+  done
+fi
 
 # Parallel subagents start their hooks together; without the lock two of them
 # can both find no tab and create one each.
@@ -95,8 +131,6 @@ lock="$state/lock"
 for _ in $(seq 100); do mkdir "$lock" 2>/dev/null && break; sleep 0.1; done
 trap 'rmdir "$lock" 2>/dev/null' EXIT
 
-watcher="$HOME/.claude/skills/watch-subagents/watch-agent.sh"
-colours=(36 35 33 32 34)
 tab=$(cat "$state/tab" 2>/dev/null)
 tab_alive "$tab" || { tab=""; rm -f "$state/tab" "$state/shown"; }
 opened=0
@@ -105,7 +139,7 @@ opened=0
 open_viewer() {
   local agent=$1 label=${2//\'/} colour exec_cmd created last direction new_pane
   colour=${colours[$((opened % ${#colours[@]}))]}
-  exec_cmd="clear; bash '$watcher' '${main_transcript%.jsonl}/subagents/agent-${agent}.jsonl' '$label' $colour"
+  exec_cmd="clear; bash '$watcher' '$(transcript_of "$agent")' '$label' $colour --stop-file '$state/stopped/$agent'"
   if [ -z "$tab" ]; then
     created=$(herdr_json tab create --workspace "$workspace" --cwd "$cwd" \
       --label "$(tab_label "$(pane_title)")" --no-focus --env "HERDR_EXEC_CMD=$exec_cmd")
@@ -140,6 +174,8 @@ fi
 
 agent=$(field agent_id)
 [ -n "$agent" ] || exit 0
+# A resumed agent starts again: its viewer reopens the stream.
+rm -f "$state/stopped/$agent"
 grep -q "^$agent	" "$state/agents" 2>/dev/null || printf '%s\t%s\n' "$agent" "$(field agent_type)" >>"$state/agents"
 [ -n "$tab" ] || exit 0
 herdr tab rename "$tab" "$(tab_label "$(pane_title)")" >/dev/null 2>&1

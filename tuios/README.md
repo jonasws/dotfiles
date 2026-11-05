@@ -36,7 +36,7 @@ built-ins:
 | ------ | -------- |
 | `rex/herdr/` socket server, bridge and LaunchAgent | Built in. The daemon serves the herdr socket and starts when a session does. |
 | `fish/conf.d/45-rex-herdr.fish` | tuios sets `HERDR_SOCKET_PATH`, `HERDR_PANE_ID` and `HERDR_ENV` in its panes. |
-| `herdr.lua` command keys | `[[keybindings.command]]` entries: popups through `scripts/toggle-popup.sh`, the tsk board on `prefix+t` among them. herdr's subagent viewer key is not ported: the rail already shows a row per subagent under its pane, and `prefix+S` starts a tsk task in a worktree instead. |
+| `herdr.lua` command keys | `[[keybindings.command]]` entries: popups through `scripts/toggle-popup.sh`, the tsk board on `prefix+t` among them. herdr's subagent viewer key moved, since `prefix+S` starts a tsk task in a worktree here: `prefix+ctrl+j` opens the viewer workspace, and `prefix+h` a popup with all subagents in one stream (`scripts/subagents.sh`). |
 | Ctrl+hjkl that unzooms and wraps | The `herdr-splits` plugin, enabled in `[plugins]`. |
 | Neovim marker file for Ctrl+hjkl | Not needed. Panes have `HERDR_ENV=1`, so `herdr-splits.nvim` loads. |
 | Prefix chords for tabs, panes and sessions | `[keybindings.prefix_mode]`. |
