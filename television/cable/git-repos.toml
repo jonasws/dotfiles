@@ -29,7 +29,7 @@ ctrl-w = "actions:workspace"
 ctrl-y = "actions:copy_path"
 
 [actions.open]
-description = "Open as a Rex session, tuios session or Herdr workspace, or cd in a plain shell"
+description = "Open as a Rex session, tuios session (picking a checkout when it has worktrees) or Herdr workspace, or cd in a plain shell"
 command = "~/.config/television/scripts/open-repo.sh '{}'"
 shell = "bash"
 mode = "execute"
