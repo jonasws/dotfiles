@@ -162,7 +162,7 @@ prefix. Pane movement stays on `init.lua`'s Cmd chords and Ctrl+hjkl.
 
 | Key | Does | Runs |
 | --- | ---- | ---- |
-| `ctrl+b f`, `cmd+k` | pane picker, attention first | `tv herdr-sessions` |
+| `ctrl+b f` | pane picker, attention first | `tv herdr-sessions` |
 | `ctrl+b shift+f` | herdr-f1 in the browser | its herdr plugin, else the `herdr-f1` CLI |
 | `ctrl+b l` / `shift+l` | lazygit status / log | `herdr/scripts/lazygit-popup.sh` |
 | `ctrl+b y` / `shift+y` | yazi; or pick files into the pane | `herdr/scripts/yazi-popup.sh` |

@@ -1,6 +1,6 @@
 # section	key	description	custom
 # Prefix is ctrl+b, as in herdr. Mine (★) come from rex/init.lua and rex/herdr.lua.
-pickers	prefix+f / cmd+k	Pane picker over Rex's herdr socket (tv herdr-sessions)	★
+pickers	prefix+f	Pane picker over Rex's herdr socket (tv herdr-sessions)	★
 pickers	prefix+r	Git repo picker, Enter opens or focuses a tab	★
 pickers	prefix+shift+h	Hotkeys cheat sheet (tv hotkeys)	★
 pickers	prefix+shift+o	AWS profile picker → console	★

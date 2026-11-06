@@ -204,7 +204,6 @@ rex.action{ name = "previous_agent", title = "herdr: Previous Agent", category =
 -- movement stays on init.lua's Cmd chords and Ctrl+hjkl.
 function M.bind()
   rex.bind("ctrl+b>f", "herdr_panes")
-  rex.bind("cmd+k", "herdr_panes")
   rex.bind("ctrl+b>shift+f", "herdr_f1")
   rex.bind("ctrl+b>l", "herdr_lazygit_status")
   rex.bind("ctrl+b>shift+l", "herdr_lazygit_log")
