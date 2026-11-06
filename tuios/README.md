@@ -119,6 +119,8 @@ linked worktree, creating it when missing and opening a pane when it has none,
 so the switch always lands on a focused pane. Ctrl-D removes the checkout and
 its session but keeps the branch. Run in a plain shell, `tv git-worktrees`
 lists the checkouts of the repo you are in.
+`prefix+R` opens the same picker for the focused pane's repo, replacing
+tuios's rotate-split there.
 
 ## Agents
 

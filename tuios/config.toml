@@ -278,6 +278,8 @@ hints_all_panes = ["alt+u"]
 # ctrl+d, the window prefix to ctrl+x, the last message to ctrl+y and the
 # workspace switcher to ctrl+g.
 close_workspace = ["X"]
+# prefix+R is the worktree picker, a command key below.
+prefix_rotate_split = []
 rename_workspace = ["T"]
 new_session = ["N"]
 # prefix+D is the close-session command key below, which goes on to the next
@@ -450,6 +452,14 @@ key = "prefix+r"
 type = "shell"
 command = "~/.config/tuios/scripts/toggle-popup.sh repo-picker 90% 60% -- ~/.config/tuios/scripts/close-on-leave.sh tv git-repos"
 description = "Git repo picker"
+
+# The checkouts of the focused pane's repository (tv git-worktrees). Enter
+# goes to the checkout's session, creating it when missing.
+[[keybindings.command]]
+key = "prefix+R"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh worktree-picker 90% 60% -- ~/.config/tuios/scripts/worktree-picker.sh"
+description = "Worktree picker for this repo"
 
 [[keybindings.command]]
 key = "prefix+H"

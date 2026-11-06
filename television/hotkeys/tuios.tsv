@@ -41,6 +41,7 @@ pickers	prefix+f	Pane picker, attention first (tv tuios-sessions)	★
 pickers	cmd+k	Pane navigator, flat and searching (tuios choose_tree)	★
 pickers	prefix+g / prefix+/	Pane navigator, every session	★
 pickers	prefix+r	Git repo picker, Enter opens a session	★
+pickers	prefix+shift+r	Worktree picker for this repo, Enter opens its session	★
 pickers	prefix+w	Session switcher	★
 pickers	prefix+ctrl+g	Workspace switcher	★
 pickers	prefix+shift+o	AWS profile picker	★
