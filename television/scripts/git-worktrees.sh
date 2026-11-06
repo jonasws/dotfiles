@@ -1,22 +1,31 @@
 #!/usr/bin/env bash
-# The tuios-worktrees television channel: the checkouts of one repository, the
-# main one first, each with the tuios session open in it.
+# The git-worktrees television channel: the checkouts of one repository, the
+# main one first. In tuios each row also shows the session open in it.
 #
-# Usage: tuios-worktrees.sh count|list|path|preview|open|rm [TOKEN]
+# Usage: git-worktrees.sh count|list|path|preview|open|rm [TOKEN]
 #
-# The repository is $TV_WORKTREE_REPO, which open-repo.sh sets before it starts
-# the channel. A row begins with its token, the branch (or @<sha> for a
-# detached HEAD), which git keeps free of spaces, so the channel reads it back
-# with {strip_ansi|split: :0}. Worktrees git marks prunable, whose folder is
-# gone, are left out.
+# The repository is $TV_WORKTREE_REPO, which git-repos sets for its Ctrl-W,
+# else the one the current directory is in. Either way the list starts from
+# the main checkout, so it is the same from inside a linked worktree. A row
+# begins with its token, the branch (or @<sha> for a detached HEAD), which git
+# keeps free of spaces, so the channel reads it back with
+# {strip_ansi|split: :0}. Worktrees git marks prunable, whose folder is gone,
+# are left out.
 #
 # macOS paths are case-insensitive and zoxide keeps whichever case was typed,
 # so paths compare case-folded, as in tuios-session.sh.
 set -euo pipefail
 
-repo=${TV_WORKTREE_REPO:?TV_WORKTREE_REPO names the repository}
-repo=${repo%/}
 scripts="$(dirname "$(realpath "$0")")"
+common=$(git -C "${TV_WORKTREE_REPO:-$PWD}" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) || {
+  echo "Not in a git repository: ${TV_WORKTREE_REPO:-$PWD}" >&2
+  exit 1
+}
+repo=${common%/.git}
+export TV_WORKTREE_REPO=$repo
+
+in_tuios() { [[ ${TUIOS_ENV:-} == 1 ]]; }
+show_picker() { exec tv git-worktrees --input-header "worktrees · ${repo##*/}"; }
 
 # path<TAB>token, one line per live checkout, the main one first.
 checkouts() {
@@ -35,6 +44,7 @@ path_of() {
 
 # The tuios worktree row for a path, as JSON, or nothing.
 session_row() {
+  in_tuios || return 0
   tuios worktree ls --json |
     jq -c --arg p "$1" 'map(select((.path | ascii_downcase) == ($p | ascii_downcase))) | first // empty'
 }
@@ -43,7 +53,8 @@ paint() { printf '\033[%sm%s\033[0m' "$1" "$2"; }
 
 list() {
   local sessions rows=() path token row session state changes ahead merged glyph color width=0
-  sessions=$(tuios worktree ls --json)
+  sessions='[]'
+  in_tuios && sessions=$(tuios worktree ls --json)
   while IFS=$'\t' read -r path token; do
     (( ${#token} > width )) && width=${#token}
     rows+=("$path"$'\t'"$token")
@@ -73,10 +84,11 @@ list() {
       *) glyph='●' color='96' ;;
     esac
 
-    printf '%s  %s %s' \
-      "$(paint 1 "$(printf "%-${width}s" "$token")")" \
-      "$(paint "$color" "$glyph")" \
-      "$(paint "$color" "$(printf '%-12s' "${state:-no session}")")"
+    printf '%s' "$(paint 1 "$(printf "%-${width}s" "$token")")"
+    if in_tuios; then
+      printf '  %s %s' "$(paint "$color" "$glyph")" \
+        "$(paint "$color" "$(printf '%-12s' "${state:-no session}")")"
+    fi
     [[ -n $session ]] && printf '  %s' "$(paint 94 "$session")"
     [[ $path == "$repo" ]] && printf '  %s' "$(paint 35 main)"
     (( changes > 0 )) && printf '  %s' "$(paint 33 "~$changes")"
@@ -101,11 +113,26 @@ preview() {
   git -C "$path" log -n 40 --graph --oneline --decorate --color
 }
 
+# Lands on the checkout with a pane focused: its tuios session or Herdr
+# workspace, created when there is none, or a shell there outside both.
 open() {
-  local path
+  local path session
   path=$(path_of "$1")
   [[ -n $path ]] || { echo "No checkout for $1" >&2; exit 1; }
-  exec "$scripts/tuios-session.sh" "$path"
+  if [[ -n ${REX_SESSION:-} ]]; then
+    exec "$scripts/rex-session.sh" "$path"
+  elif in_tuios; then
+    "$scripts/tuios-session.sh" "$path"
+    # A session whose last pane closed stays open with nothing to focus.
+    session=$(tuios ls --json | jq -r --arg p "$path" '
+      map(select((.worktree.path // "" | ascii_downcase) == ($p | ascii_downcase))) | first // empty
+      | select((.windows // []) | length == 0) | .name')
+    [[ -z $session ]] || tuios new-window -s "$session" --cwd "$path" >/dev/null
+  elif [[ ${HERDR_ENV:-} == 1 ]]; then
+    exec "$scripts/herdr-workspace.sh" "$path"
+  else
+    cd "$path" && exec "${SHELL:-/bin/sh}"
+  fi
 }
 
 # Removes the checkout and its session, never the branch. A dirty checkout is
@@ -117,7 +144,7 @@ rm_checkout() {
   if [[ $path == "$repo" ]]; then
     gum log --level warn "The main checkout stays."
     sleep 1
-    exec tv tuios-worktrees --input-header "worktrees · ${repo##*/}"
+    show_picker
   fi
 
   session=$(session_row "$path" | jq -r '.session // empty')
@@ -136,7 +163,7 @@ rm_checkout() {
       git -C "$repo" worktree remove --force "$path"
     fi
   fi
-  exec tv tuios-worktrees --input-header "worktrees · ${repo##*/}"
+  show_picker
 }
 
 case ${1:-} in
@@ -146,5 +173,5 @@ case ${1:-} in
   preview) preview "${2:?token}" ;;
   open) open "${2:?token}" ;;
   rm) rm_checkout "${2:?token}" ;;
-  *) echo "usage: tuios-worktrees.sh count|list|path|preview|open|rm [TOKEN]" >&2; exit 2 ;;
+  *) echo "usage: git-worktrees.sh count|list|path|preview|open|rm [TOKEN]" >&2; exit 2 ;;
 esac

@@ -25,11 +25,11 @@ command = "git -C {} log -n 200 --pretty=medium --all --graph --color"
 [keybindings]
 enter = "actions:open"
 ctrl-e = "actions:edit"
-ctrl-w = "actions:workspace"
+ctrl-w = "actions:worktrees"
 ctrl-y = "actions:copy_path"
 
 [actions.open]
-description = "Open as a Rex session, tuios session (picking a checkout when it has worktrees) or Herdr workspace, or cd in a plain shell"
+description = "Open the main checkout as a Rex session, tuios session or Herdr workspace, or cd in a plain shell"
 command = "~/.config/television/scripts/open-repo.sh '{}'"
 shell = "bash"
 mode = "execute"
@@ -46,14 +46,9 @@ command = "${EDITOR:-vim} '{}'"
 shell = "bash"
 mode = "execute"
 
-[actions.workspace]
-description = "Open as a tuios session or Herdr workspace, or focus it if already open"
-command = """
-if [[ ${TUIOS_ENV:-} == 1 ]]; then
-  exec ~/.config/television/scripts/tuios-session.sh '{}'
-fi
-exec ~/.config/television/scripts/herdr-workspace.sh '{}'
-"""
+[actions.worktrees]
+description = "Pick one of the repository's checkouts (git-worktrees)"
+command = """TV_WORKTREE_REPO='{}' exec tv git-worktrees --input-header "worktrees · $(basename '{}')""""
 shell = "bash"
 mode = "execute"
 

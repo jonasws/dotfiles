@@ -112,6 +112,14 @@ The session is named after the repo's directory, so `-s <repo>`, `tuios attach
 `session-<hex>` is renamed on the way, and a name another repo already holds
 gets the parent directory in front (`CNOPS-<repo>`).
 
+Enter always opens the main checkout. Ctrl-W opens `tv git-worktrees` on the
+repo instead: its checkouts, the main one first, each with its session's agent
+state. Enter there goes to the checkout's session, `<repo>-<branch>` for a
+linked worktree, creating it when missing and opening a pane when it has none,
+so the switch always lands on a focused pane. Ctrl-D removes the checkout and
+its session but keeps the branch. Run in a plain shell, `tv git-worktrees`
+lists the checkouts of the repo you are in.
+
 ## Agents
 
 The agents view (`prefix+i`) is the place to work from; `tuios.tsv` has its

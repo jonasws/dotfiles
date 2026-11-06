@@ -11,11 +11,6 @@ scripts="$(dirname "$(realpath "$0")")"
 if [[ -n ${REX_SESSION:-} ]]; then
   exec "$scripts/rex-session.sh" "$repo_path"
 elif [[ ${TUIOS_ENV:-} == 1 ]]; then
-  # A repo with worktrees opens the tuios-worktrees picker, to choose a checkout.
-  export TV_WORKTREE_REPO=$repo_path
-  if (( $("$scripts/tuios-worktrees.sh" count) > 1 )); then
-    exec tv tuios-worktrees --input-header "worktrees · ${repo_path##*/}"
-  fi
   exec "$scripts/tuios-session.sh" "$repo_path"
 elif [[ ${HERDR_ENV:-} == 1 ]]; then
   exec "$scripts/herdr-workspace.sh" "$repo_path"
