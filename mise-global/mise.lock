@@ -142,13 +142,13 @@ url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/707958967"
 provenance = "github-attestations"
 
 [[tools.aws-cli]]
-version = "2.39.3"
+version = "2.39.4"
 backend = "aqua:aws/aws-cli"
 specifiers = ["latest"]
 
 [tools.aws-cli."platforms.macos-arm64"]
-checksum = "blake3:4da9432fd5ae020838f871167d61ea4a339b7857d0e7c22d7fe01239a544ee99"
-url = "https://awscli.amazonaws.com/AWSCLIV2-2.39.3.pkg"
+checksum = "blake3:083eb6b04d4b4518d21db5dac372e24df092c40d7e72efe6ca38bdd279e9adac"
+url = "https://awscli.amazonaws.com/AWSCLIV2-2.39.4.pkg"
 
 [[tools.aws-vault]]
 version = "7.17.5"
@@ -170,15 +170,14 @@ checksum = "sha256:c240d7f0ccb90c263a849fcdb09b7ee62630d921348ed6aafda86b9d577bc
 url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.4/bun-darwin-aarch64.zip"
 
 [[tools.caddy]]
-version = "2.11.8"
+version = "2.11.9"
 backend = "aqua:caddyserver/caddy"
 specifiers = ["latest"]
 
 [tools.caddy."platforms.macos-arm64"]
-checksum = "sha256:efb5b0cb4e24091d9788075e57a4949a6c7905704b099c77ffb61a0b0a0422c8"
-checksum_source = "mise-versions"
-url = "https://github.com/caddyserver/caddy/releases/download/v2.11.8/caddy_2.11.8_mac_arm64.tar.gz"
-url_api = "https://api.github.com/repos/caddyserver/caddy/releases/assets/707697463"
+checksum = "sha256:d075afc620376679a77b453399bf7ada264cab3280b2833e4ed1372abc0c1c13"
+url = "https://github.com/caddyserver/caddy/releases/download/v2.11.9/caddy_2.11.9_mac_arm64.tar.gz"
+url_api = "https://api.github.com/repos/caddyserver/caddy/releases/assets/711595100"
 
 [[tools.carapace]]
 version = "1.8.2"

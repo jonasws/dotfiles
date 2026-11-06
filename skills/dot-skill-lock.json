@@ -43,9 +43,9 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/agavra/tuicr.git",
       "skillPath": "skills/tuicr/SKILL.md",
-      "skillFolderHash": "c90b285bc2291d70df0979811de87774a5049e88",
+      "skillFolderHash": "414f090105e2b4c58f82a764dea7e01cc0f039e2",
       "installedAt": "2026-10-19T10:12:17.770Z",
-      "updatedAt": "2026-11-02T07:01:44.195Z"
+      "updatedAt": "2026-11-06T08:17:33.605Z"
     },
     "proc-cli": {
       "source": "yazeed/proc-cli",
