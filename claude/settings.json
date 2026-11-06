@@ -518,7 +518,9 @@
       "allowUnixSockets": [
         "/Users/jonasws/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock",
         "~/.config/herdr/herdr.sock",
-        "~/.config/colima/default/docker.sock"
+        "~/.config/colima/default/docker.sock",
+        "/tmp/tuios-501/tuios.sock",
+        "/private/tmp/tuios-501/tuios.sock"
       ],
       "allowLocalBinding": true
     },
@@ -564,6 +566,7 @@
         "~/.local/bin",
         "~/.local/share/mise",
         "~/.local/state/mise",
+        "~/.local/share/tuios-nightly",
         "~/.config/mise",
         "~/.config/twg/skills",
         "~/.config/git",
