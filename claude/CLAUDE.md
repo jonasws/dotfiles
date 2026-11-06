@@ -239,18 +239,20 @@ start: look at it only when I ask for it or the work at hand involves it.
 - Add a task when work is deferred, split off, or found along the way, not for
   steps you will finish this session. Use steps (`tsk steps`) only when I want
   the order of work tracked on a task.
-- Picking up a task: `tsk status T<n> start`, tick its steps as they land, then
-  `review` with one line on what to look at. Only I set `done`.
+- Picking up a task: `tsk status T<n> started --no-dispatch`, tick its steps as
+  they land, then `review` with one line on what to look at. Only I set `done`.
 - Won't do: when we decide against something, record the decision instead of
   dropping it. Archive the task (`tsk archive`) with notes starting
   `Won't do: <reason>`, so a later session doesn't propose it again.
 - Only the main agent writes to the board. Subagents report back.
-- A git worktree is its own tsk project, the same as on the herdr board. Use
-  tsk's default scope there; do not pass `-p` to reach the main checkout.
+- A git worktree is its own tsk project. Use tsk's default scope there; do not
+  pass `-p` to reach the main checkout.
 - In herdr and tuios, `prefix+t` opens the board and `prefix+ctrl+t` quick
   capture. In tuios, `prefix+ctrl+s` on the board starts an agent on the task
   under the cursor in this folder, and `prefix+S` in a worktree of its own;
   that worktree agent gets the notes in its prompt and does not touch tsk.
+  tsk's own dispatch (`tsk dispatch`, or starting an assigned task without
+  `--no-dispatch`) targets Herdr workspaces; never use it from tuios.
 
 ## Commit messages
 
