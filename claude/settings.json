@@ -71,10 +71,12 @@
       "mcp__tuios__tuios_read_agent_messages",
       "mcp__tuios__tuios_send_agent_message",
       "mcp__tuios__tuios_set_agent_state",
-      "mcp__tuios__tuios_set_agent_meta"
+      "mcp__tuios__tuios_set_agent_meta",
+      "mcp__aws-knowledge"
     ],
     "deny": [
       "WebSearch",
+      "mcp__plugin_aws-core_aws-mcp",
       "Read(//**/*.env)",
       "Read(//**/.env)",
       "Read(//**/.env.*)",
@@ -108,10 +110,28 @@
       "Bash(*twg/tenant-contexts*)",
       "Bash(*Library/Caches/twg*)",
       "Bash(*security find-generic-password*)",
-      "Bash(*security dump-keychain*)"
+      "Bash(*security dump-keychain*)",
+      "Bash(aws *)",
+      "Bash(awslogs *)",
+      "Bash(fnox *secretsmanager get-secret-value*)",
+      "Bash(fnox *secretsmanager batch-get-secret-value*)"
     ],
     "ask": [
-      "Bash(aws *)",
+      "Bash(fnox * exec *)",
+      "Bash(fnox *ssm get-parameter*)",
+      "Bash(fnox *logs get-log-*)",
+      "Bash(fnox *logs filter-log-events*)",
+      "Bash(fnox *logs start-query*)",
+      "Bash(fnox *logs get-query-results*)",
+      "Bash(fnox *logs start-live-tail*)",
+      "Bash(fnox *logs tail*)",
+      "Bash(fnox *awslogs *)",
+      "Bash(fnox *s3 cp *)",
+      "Bash(fnox *s3 sync *)",
+      "Bash(fnox *s3 mv *)",
+      "Bash(fnox *s3 presign *)",
+      "Bash(fnox *s3api get-object*)",
+      "Bash(fnox *s3api select-object-content*)",
       "Bash(docker * --network host*)",
       "Bash(docker * --network=host*)",
       "Bash(docker * --pid=host*)",
@@ -458,7 +478,7 @@
     "skill-creator@claude-plugins-official": true,
     "pr-review-toolkit@claude-plugins-official": true,
     "claude-code-setup@claude-plugins-official": true,
-    "aws-core@agent-toolkit-for-aws": true,
+    "aws-core@agent-toolkit-for-aws": false,
     "kotlin-lsp@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true
   },
