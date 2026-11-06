@@ -169,7 +169,8 @@ option_glyphs = "type"
 # ctrl+p belongs to fish and Neovim, alt+space to text. The palette stays on
 # prefix+P.
 [keybindings.global]
-command_palette = []
+# Cmd+P toggles tuios's palette; Ghostty's own stays on Cmd+Shift+P.
+command_palette = ["super+p"]
 launcher = []
 # Cmd+K opens tuios's own pane navigator: every pane in every session,
 # searched by name, folder, command and the last 40 screen lines, with a live
@@ -177,10 +178,14 @@ launcher = []
 # ctrl+alt+k.
 choose_tree = ["super+k", "ctrl+alt+k"]
 # Ghostty hands these Cmd chords to tuios (ghostty/config.ghostty unbinds
-# them): Cmd+T opens a workspace and Cmd+1..9 picks one, like a tab bar's.
+# them): Cmd+T and Cmd+N go to a new workspace and Cmd+1..9 picks one, like a
+# tab bar's; Cmd+Shift+N stays Ghostty's new window.
 # Cmd+W closes the pane, a command key below. Cmd+R and Cmd+D split right and
 # down, as Ghostty's own splits did.
-new_workspace = ["super+t"]
+new_workspace = ["super+t", "super+n"]
+# Ctrl+Tab and Ctrl+Shift+Tab step through the session's workspaces, like tabs.
+next_workspace = ["ctrl+tab"]
+prev_workspace = ["ctrl+shift+tab"]
 split_vertical = ["super+r"]
 split_horizontal = ["super+d"]
 switch_workspace_1 = ["super+1"]

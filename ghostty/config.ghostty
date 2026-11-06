@@ -88,7 +88,7 @@ keybind = alt+right=unbind
 # kitty keyboard protocol, and tuios/config.toml binds them: Cmd+K the pane
 # navigator, Cmd+T a new workspace, Cmd+W close the pane, Cmd+1..9 a
 # workspace, Cmd+R and Cmd+D split the pane right and down. Digits need both
-# forms unbound. Ghostty's own windows and tabs keep Cmd+N and Cmd+Shift+W.
+# forms unbound. Ghostty's own windows keep Cmd+Shift+W.
 keybind = super+k=unbind
 keybind = super+t=unbind
 keybind = super+w=unbind
@@ -122,7 +122,14 @@ keybind = super+l>k=goto_split:up
 keybind = super+l>l=goto_split:right
 split-preserve-zoom = navigation
 
-keybind = super+p=toggle_command_palette
+# Cmd+P, Cmd+N and Ctrl+(Shift+)Tab go to tuios (palette, new workspace,
+# workspaces); Ghostty's palette moves to Cmd+Shift+P.
+keybind = super+shift+p=toggle_command_palette
+keybind = super+p=unbind
+keybind = super+n=unbind
+keybind = super+shift+n=new_window
+keybind = ctrl+tab=unbind
+keybind = ctrl+shift+tab=unbind
 
 # ── Quick Terminal ──────────────────────────────────────────────────────────
 # F19 drops a Ghostty panel from the top from any app: a double tap of right

@@ -71,10 +71,12 @@ panes	prefix+shift+q	Pane labels: focus by label
 panes	prefix+ctrl+l	Clear scrollback	★
 panes	prefix+enter	Nest: every key to the pane until F12
 workspaces	prefix+c	New workspace (herdr tab)	★
+workspaces	cmd+t / cmd+n	New workspace (Ghostty window: cmd+shift+n)	★
 workspaces	prefix+n / prefix+p	Next/previous workspace	★
 workspaces	prefix+1..9	Switch to workspace N	★
 workspaces	prefix+shift+t	Rename workspace	★
 workspaces	prefix+shift+x	Close workspace	★
+workspaces	ctrl+tab / ctrl+shift+tab	Next/previous workspace in the session	★
 sessions	prefix+shift+n	New session	★
 sessions	prefix+ctrl+n / prefix+ctrl+p	Next/previous session (also ) and ()	★
 sessions	prefix+shift+w	Rename session	★
@@ -89,3 +91,4 @@ app	prefix+ctrl+x	Window prefix	★
 app	prefix+ctrl+d	Debug prefix	★
 app	prefix+ctrl+a	App launcher	★
 app	prefix+shift+c	Screenshot
+app	cmd+p	Command palette (Ghostty's: cmd+shift+p)	★
