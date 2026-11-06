@@ -34,6 +34,7 @@ zoxide init nushell | save -f ~/.zoxide.nu
 # value, but set it here too so nushell run as a non-fish-child still works.
 $env.AWS_VAULT_KEYCHAIN_NAME = 'login'
 $env.AWS_SESSION_TOKEN_TTL = '12h'
+$env.AWS_VAULT_PARALLEL_SAFE = 'true'
 
 $env.CARAPACE_BRIDGES = 'zsh,fish,bash,inshellisense' # optional
 mkdir ~/.cache/carapace

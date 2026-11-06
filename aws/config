@@ -36,10 +36,16 @@ mfa_serial=arn:aws:iam::259731000386:mfa/jstr
 ; MFA'd STS session credentials. Without --no-session, aws-vault calls
 ; GetSessionToken (MFA-gated) and caches the result in Keychain so only
 ; one MFA prompt is needed per duration_seconds (12h below).
-; aws-vault will prompt interactively for the OTP code; supply it from
-; your 1Password app (copy from the item or hit Cmd+Shift+X autofill).
+; The OTP comes from the 1Password item "AWS - Capra Auth" (by ID, which
+; survives a rename), approved with Touch ID in the 1Password app. That works
+; for callers without a terminal (MCP servers, fnox, Claude Code's Bash tool).
+; If op fails, the macOS dialog (--prompt=osascript) is the fallback. The first
+; caller that needs a new session triggers it; --parallel-safe makes concurrent
+; callers wait for that session instead of each asking. --keychain is spelled
+; out because these callers may not inherit AWS_VAULT_KEYCHAIN_NAME.
+mfa_process=op item get oztoffvitqmpnfiwgue677fw5m --otp
 duration_seconds=43200
-credential_process=aws-vault export --format=json capra-auth
+credential_process=aws-vault --prompt=osascript --parallel-safe --keychain=login export --format=json capra-auth
 
 [profile cn-cx-build-admin]
 region=eu-west-1

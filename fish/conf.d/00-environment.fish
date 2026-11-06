@@ -31,3 +31,5 @@ set -x MANPAGER "sh -c 'col -bx | bat -l man -p'"
 set fish_key_bindings fish_vi_key_bindings
 
 set -x AWS_VAULT_KEYCHAIN_NAME login
+# Every concurrent aws-vault must take the locks, including the ones you run yourself.
+set -x AWS_VAULT_PARALLEL_SAFE true
