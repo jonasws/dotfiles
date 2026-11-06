@@ -78,7 +78,7 @@ workspaces	prefix+shift+x	Close workspace	★
 sessions	prefix+shift+n	New session	★
 sessions	prefix+ctrl+n / prefix+ctrl+p	Next/previous session (also ) and ()	★
 sessions	prefix+shift+w	Rename session	★
-sessions	prefix+shift+d	Close session	★
+sessions	prefix+shift+d	Close session (confirm), go to next	★
 sessions	prefix+d / prefix+q	Detach	★
 app	prefix+?	Help
 app	prefix+,	Settings

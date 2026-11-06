@@ -65,6 +65,11 @@ used those keys for other things, which moved:
 | Newest finished turn | `A` | `ctrl+k` |
 | Text hints | `F` | `ctrl+u` |
 
+`prefix+D` runs `scripts/close-session.sh` in a popup, which closes a session
+the way herdr closes a workspace: it asks first, then shows the next session
+(the previous one when it was last) and kills the old one. tuios's own
+`prefix_close_session` would quit the client with it.
+
 `a` and `A` step through the agents like herdr's `next_agent` and
 `previous_agent`, in the order of the rail's agents section, switching session
 as needed. tuios's own `J` and `K` keep doing the same. The attention queue
