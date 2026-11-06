@@ -319,6 +319,16 @@
         ]
       },
       {
+        "matcher": "^mcp__aws__aws___run_script$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/run-script-preview.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "hooks": [
           {
             "type": "command",
