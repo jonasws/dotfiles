@@ -1,0 +1,62 @@
+[metadata]
+name = "git-worktrees"
+description = """
+The checkouts of one repository, the main one first: uncommitted changes (~),
+commits ahead of the base (+) and whether the branch is merged. In tuios each
+row also shows the session open in it and its agent state.
+
+The repository is $TV_WORKTREE_REPO, which Ctrl-W in git-repos sets, else
+the one the current directory is in.
+
+Enter lands on the checkout with a pane focused: its tuios session or Herdr
+workspace, created when there is none (a shell there outside both). Ctrl-D
+removes the checkout, and in tuios its session, but keeps the branch, and asks
+before stashing or discarding uncommitted changes.
+"""
+requirements = ["git", "jq", "gum"]
+
+[source]
+# tv runs commands through $SHELL (fish here), which costs about 70ms a run.
+shell = "bash"
+command = "~/.config/television/scripts/git-worktrees.sh list"
+# ansi and display exclude each other, so the row leads with its token.
+ansi = true
+output = "{strip_ansi|split: :0}"
+no_sort = true
+frecency = false
+
+[preview]
+shell = "bash"
+command = "~/.config/television/scripts/git-worktrees.sh preview '{strip_ansi|split: :0}'"
+
+[ui]
+input_header = "worktrees"
+
+[ui.preview_panel]
+header = "{strip_ansi|split: :0}"
+
+[keybindings]
+ctrl-alt-k = "quit"
+enter = "actions:open"
+ctrl-d = "actions:remove"
+ctrl-y = "actions:copy_path"
+
+# `execute` replaces tv with the command, so the popup is gone by the time the
+# switch lands.
+[actions.open]
+shell = "bash"
+description = "Go to the checkout's session or workspace, creating it if missing"
+command = "~/.config/television/scripts/git-worktrees.sh open '{strip_ansi|split: :0}'"
+mode = "execute"
+
+[actions.remove]
+shell = "bash"
+description = "Remove the checkout (and its tuios session), keeping the branch"
+command = "~/.config/television/scripts/git-worktrees.sh rm '{strip_ansi|split: :0}'"
+mode = "execute"
+
+[actions.copy_path]
+shell = "bash"
+description = "Copy the checkout's path, with ~ for the home directory"
+command = """p=$(~/.config/television/scripts/git-worktrees.sh path '{strip_ansi|split: :0}'); printf '%s' "${p/#$HOME/\\~}" | pbcopy"""
+mode = "execute"

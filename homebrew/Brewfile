@@ -94,7 +94,7 @@ brew "pango"
 brew "librsvg"
 # Curses-based tool for viewing and analyzing log files
 brew "lnav"
-# Control external displays over DDC/CI on Apple silicon
+# Control external displays (USB-C/DisplayPort Alt Mode) using DDC/CI on M1 Macs
 brew "m1ddc"
 # Polyglot runtime manager (asdf rust clone)
 brew "mise"
@@ -162,15 +162,13 @@ cask "1password"
 cask "firefox"
 cask "font-cascadia-code"
 cask "font-jetbrains-mono"
-# Fast, native, feature-rich terminal emulator pushing modern features
+# Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty"
 # Web browser
 cask "google-chrome"
 # Keyboard customiser
 cask "karabiner-elements"
-# Utility to extend trackpad functionality
-cask "middleclick"
-# Brightness, contrast and volume keys for external displays over DDC
+# Tool to control external monitor brightness & volume
 cask "monitorcontrol"
 # VPN client for secure internet access and private browsing
 cask "nordvpn"

@@ -1,0 +1,61 @@
+# Live views of AWS deployments in a tuios TML pane. Included by the
+# mise.local.toml of ~/CX, ~/CNOPS and ~/CN-TERMINAL through [task_config].includes,
+# so they run from any directory below those trees. Each tree sets
+# WATCH_PIPELINE_PREFIX in its [env] (cn-cx, cnops, cn-terminal).
+#
+# The tasks run where mise was called from (dir = cwd), so fnox picks the
+# fnox.toml of the tree you are in and its profiles.
+
+# Uses the AWS credentials in the environment, so wrap it in the account's
+# profile: fnox exec -P staging -- mise run watch-ecs-deployment
+[watch-ecs-deployment]
+description = "Live view of an ECS service's latest deployment"
+interactive = true
+dir = "{{ cwd }}"
+usage = '''
+arg "[service]" help="ECS service name (default: choose one with gum)"
+flag "--no-focus" help="Leave the focus on this pane instead of the watcher pane"
+flag "--poll <seconds>" default="10"
+'''
+run = '''
+python3 -I "{{ env.HOME }}/dotfiles/mise-watch/watch-ecs-deployment.py" ${usage_service:+"$usage_service"} --poll "${usage_poll?}" $([ "${usage_no_focus:-false}" = true ] && echo --no-focus)
+'''
+
+# Uses the AWS credentials in the environment, so wrap it in the account's
+# profile: fnox exec -P staging -- mise run watch-cfn-deployment
+[watch-cfn-deployment]
+description = "Live view of a CloudFormation stack's latest operation"
+interactive = true
+dir = "{{ cwd }}"
+usage = '''
+arg "[stack]" help="Stack name (default: choose one with gum, latest first)"
+flag "--no-focus" help="Leave the focus on this pane instead of the watcher pane"
+flag "--poll <seconds>" default="5"
+'''
+run = '''
+python3 -I "{{ env.HOME }}/dotfiles/mise-watch/watch-cfn-deployment.py" ${usage_stack:+"$usage_stack"} --poll "${usage_poll?}" $([ "${usage_no_focus:-false}" = true ] && echo --no-focus)
+'''
+
+# Runs under the build profile itself. --surface patches an existing surface's
+# pipe_* keys instead, which only works from the pane that opened it. The gum
+# picker remembers its last selection per prefix and environment in
+# ~/.local/state/watch-pipelines-last.json.
+[watch-pipelines]
+description = "Live view of the build-account CodePipelines of this tree"
+interactive = true
+dir = "{{ cwd }}"
+shell = "fnox -P build exec -- bash -o errexit -c"
+usage = '''
+arg "[actions]" var=#true help="Stages/actions to show on their own rows, as Stage/Action, an action or a stage (default: choose with gum)"
+flag "--env <env>" default="prod" help="Watch PREFIX-core-ENV and PREFIX-apps-ENV" {
+  choices "dev" "prod"
+}
+flag "--no-focus" help="Leave the focus on this pane instead of the watcher pane"
+flag "--poll <seconds>" default="20"
+flag "--surface <id>" help="Patch this existing TML surface instead of opening one"
+complete "actions" run="fnox -P build exec -- python3 -I $HOME/dotfiles/mise-watch/watch-pipelines.py --list-actions"
+'''
+run = '''
+eval "actions=(${usage_actions:-})"
+python3 -I "{{ env.HOME }}/dotfiles/mise-watch/watch-pipelines.py" "${actions[@]}" --env "${usage_env?}" --poll "${usage_poll?}" ${usage_surface:+--surface "$usage_surface"} $([ "${usage_no_focus:-false}" = true ] && echo --no-focus)
+'''

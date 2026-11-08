@@ -22,19 +22,19 @@ theme = "mocha-ghostty"
 theme_light = "catppuccin_latte"
 # Ghostty and WezTerm both draw kitty unicode placeholders.
 kitty_placeholders = "on"
-# Catppuccin Mocha mauve, herdr's accent. Unfocused borders are the dividers
-# between panes: surface0, catppuccin/ghostty's split-divider-color.
-border_focused_color = "#cba6f7"
-border_unfocused_color = "#313244"
-# Split across the longer side, so a new pane on a wide screen goes right and
-# on a tall one goes down, close to picking herdr's split direction by hand.
-tiling_scheme = "longest_side"
+# Mauve, the theme's accent. The theme has no role for the focused border: it
+# takes the success green in terminal mode. Unfocused borders are in the theme.
+border_focused_color = "accent"
 # Window slides and the copy sweep stay; overlay fades and the working-agent
 # shimmer go.
 motion = "basic"
+border_style = "glyphs"
 # The default cap of 12 cells cuts "dotfiles › topic" workspace names to
 # "dotfiles › …". The full name still shows on hover.
 dock_workspace_label_max = 28
+# Frame the larger panels (agents view, palette) like the dialogs, so Cmd+K's
+# navigator and the agents view read as one family. Colours are the theme's.
+frame_panels = true
 
 # Dock messages show the icon and text, without the side bar and countdown line.
 [notifications]
@@ -117,9 +117,17 @@ after-agent-state = "~/.config/tuios/scripts/auto-name.sh"
 # gets mise trusted and its tools installed before the first pane starts.
 after-new-worktree = "~/.config/tuios/scripts/new-worktree.sh"
 
+# Worktrees sit beside their repo, in a hidden .worktrees folder of the repo's
+# parent, so a session in one still loads the CLAUDE.md of ~/CX, ~/CNOPS or
+# ~/CN-TERMINAL above it. Outside the repo, so the main checkout never lists it
+# as untracked. The daemon rereads this when the file changes.
+[worktree]
+path = "../.worktrees/{{ repo }}/{{ branch | slug }}"
+
 # Selection in rosewater with base text, as Ghostty's bundled Mocha draws it,
 # so a selection looks the same in a tuios pane and in Ghostty. The copy-mode
-# cursor is rosewater too, with crust text, as Ghostty's cursor.
+# cursor is rosewater too, with crust text, as Ghostty's cursor. The theme's
+# selection_bg does not reach tuios's own selection, so it stays here.
 [appearance.selection]
 bg = "#f5e0dc"
 fg = "#1e1e2e"
@@ -138,7 +146,20 @@ group_main = true
 # (claude/statusline-command.sh). The model and the cost stay off the row, so
 # `now` keeps the room: the Inbox and the peek still show the model.
 [appearance.sidebar.agent_row]
-tokens = ["session", "need", "harness", "name", "progress", "elapsed", "$context", "subagents", "pr", "meta", "now", "message"]
+tokens = [
+  "session",
+  "need",
+  "harness",
+  "name",
+  "progress",
+  "elapsed",
+  "$context",
+  "subagents",
+  "pr",
+  "meta",
+  "now",
+  "message",
+]
 
 [keybindings]
 # Option is the us-altgr-intl compose layer, so the characters it types go to
@@ -148,7 +169,8 @@ option_glyphs = "type"
 # ctrl+p belongs to fish and Neovim, alt+space to text. The palette stays on
 # prefix+P.
 [keybindings.global]
-command_palette = []
+# Cmd+P toggles tuios's palette; Ghostty's own stays on Cmd+Shift+P.
+command_palette = ["super+p"]
 launcher = []
 # Cmd+K opens tuios's own pane navigator: every pane in every session,
 # searched by name, folder, command and the last 40 screen lines, with a live
@@ -156,10 +178,14 @@ launcher = []
 # ctrl+alt+k.
 choose_tree = ["super+k", "ctrl+alt+k"]
 # Ghostty hands these Cmd chords to tuios (ghostty/config.ghostty unbinds
-# them): Cmd+T opens a workspace and Cmd+1..9 picks one, like a tab bar's.
+# them): Cmd+T and Cmd+N go to a new workspace and Cmd+1..9 picks one, like a
+# tab bar's; Cmd+Shift+N stays Ghostty's new window.
 # Cmd+W closes the pane, a command key below. Cmd+R and Cmd+D split right and
 # down, as Ghostty's own splits did.
-new_workspace = ["super+t"]
+new_workspace = ["super+t", "super+n"]
+# Ctrl+Tab and Ctrl+Shift+Tab step through the session's workspaces, like tabs.
+next_workspace = ["ctrl+tab"]
+prev_workspace = ["ctrl+shift+tab"]
 split_vertical = ["super+r"]
 split_horizontal = ["super+d"]
 switch_workspace_1 = ["super+1"]
@@ -208,7 +234,6 @@ prefix_next_window = ["tab"]
 prefix_prev_window = ["shift+tab"]
 # herdr: prefix+q detaches, prefix+g is Go To, prefix+w picks a workspace.
 prefix_detach = ["d", "q"]
-prefix_quit = []
 choose_tree = ["g", "/"]
 toggle_scratch = ["G"]
 prefix_session_switcher = ["w"]
@@ -226,6 +251,9 @@ prefix_next_attention = ["o"]
 launcher = ["ctrl+a"]
 prefix_next_finished = ["ctrl+k"]
 prefix_agents_settings = []
+# No nest mode on prefix+enter: it was only ever hit by accident, and its way
+# out is F12. The palette still has it for a nested tmux or tuios.
+nest = []
 clear_scrollback = ["ctrl+l"]
 # Freed for the command keys below, which a tuios action would otherwise win.
 prefix_layout = ["ctrl+o"]
@@ -250,9 +278,14 @@ hints_all_panes = ["alt+u"]
 # ctrl+d, the window prefix to ctrl+x, the last message to ctrl+y and the
 # workspace switcher to ctrl+g.
 close_workspace = ["X"]
+# prefix+R is the worktree picker, a command key below.
+prefix_rotate_split = []
 rename_workspace = ["T"]
 new_session = ["N"]
-prefix_close_session = ["D"]
+# prefix+D is the close-session command key below, which goes on to the next
+# session as herdr does. prefix_close_session would quit the client as well.
+prefix_close_session = []
+prefix_quit = []
 # prefix+x is the close-pane command key below, which also ends a session it
 # leaves empty.
 prefix_close_window = []
@@ -261,6 +294,14 @@ prefix_debug = ["ctrl+d"]
 prefix_window = ["ctrl+x"]
 prefix_last_message = ["ctrl+y"]
 prefix_workspace_switcher = ["ctrl+g"]
+
+# Layout prefix (prefix+ctrl+o): space steps BSP, master-stack, scrolling, and
+# t steps the BSP split scheme (spiral, longest side, alternate, smart split).
+# The layout is the session's and the scheme the workspace's; neither is saved
+# to this file, so trying them out changes nothing for new sessions.
+[keybindings.layout_prefix]
+cycle_layout = ["space"]
+cycle_tiling_scheme = ["t"]
 
 # Like herdr, nothing but the prefix and the command keys below is taken from
 # the pane. Focus moves on ctrl+hjkl, windows and tabs on the prefix.
@@ -391,6 +432,13 @@ type = "shell"
 command = "~/.config/tuios/scripts/close-pane.sh"
 description = "Close pane, and the session with its last one"
 
+# herdr's prefix+D: confirm, close the session, show the next one.
+[[keybindings.command]]
+key = "prefix+D"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh close-session 60 8 -- ~/.config/tuios/scripts/close-session.sh"
+description = "Close session, go to next"
+
 [[keybindings.command]]
 key = "super+w"
 name = "close-pane-cmd-w"
@@ -404,6 +452,14 @@ key = "prefix+r"
 type = "shell"
 command = "~/.config/tuios/scripts/toggle-popup.sh repo-picker 90% 60% -- ~/.config/tuios/scripts/close-on-leave.sh tv git-repos"
 description = "Git repo picker"
+
+# The checkouts of the focused pane's repository (tv git-worktrees). Enter
+# goes to the checkout's session, creating it when missing.
+[[keybindings.command]]
+key = "prefix+R"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh worktree-picker 90% 60% -- ~/.config/tuios/scripts/worktree-picker.sh"
+description = "Worktree picker for this repo"
 
 [[keybindings.command]]
 key = "prefix+H"
@@ -487,15 +543,7 @@ description = "Open F1 dashboard"
 alphabet = "asdfhjkl"
 
 [plugins]
-enabled = [
-  "herdr-splits",
-  "dev.minung.herdr-f1",
-  # Name workspaces after the pane running in them. Agent panes are named by
-  # scripts/auto-name.sh from the after-agent-state hook, so dan.pane-topic-sync
-  # stays off here (herdr still runs it): two namers would fight over one
-  # label. Settings are in ~/.config/herdr/plugins/config/.
-  "herdr-automatic-rename",
-]
+enabled = ["herdr-splits", "dev.minung.herdr-f1", "herdr-automatic-rename"]
 
 # Push notifications ([notify]) live in config.d/notify.toml, which is
 # gitignored because an ntfy topic address is a secret. Copy

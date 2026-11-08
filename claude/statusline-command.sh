@@ -16,11 +16,7 @@ input=$(cat)
   IFS= read -r five_reset
   IFS= read -r cache_warm
   IFS= read -r cache_expires
-  IFS= read -r pr_number
-  IFS= read -r pr_url
-  IFS= read -r pr_state
   IFS= read -r worktree
-  IFS= read -r repo_url
 } < <(jq -r '
   (.workspace.current_dir // .cwd // ""),
   (.model.display_name // ""),
@@ -30,13 +26,7 @@ input=$(cat)
   (.rate_limits.five_hour.resets_at // ""),
   (.prompt_cache.warm // ""),
   (.prompt_cache.expires_at // ""),
-  (.pr.number // ""),
-  (.pr.url // ""),
-  (.pr.review_state // ""),
-  (.workspace.git_worktree // .worktree.name // ""),
-  (if .workspace.repo.host and .workspace.repo.owner and .workspace.repo.name
-   then "https://\(.workspace.repo.host)/\(.workspace.repo.owner)/\(.workspace.repo.name)"
-   else "" end)
+  (.workspace.git_worktree // .worktree.name // "")
 ' <<<"$input")
 
 # Feed tuios's rail and Inbox the model and the context left. tuios's own
@@ -65,25 +55,11 @@ GREEN=a6e3a1 RED=f38ba8 YELLOW=f9e2af
 SAPPHIRE=74c7ec BLUE=89b4fa SURFACE1=45475a
 DIM=$(fg 7f849c)
 
-# shellcheck disable=SC1003 # the backslashes are the ST of OSC 8
-link() { printf '%s]8;;%s%s\\%s%s]8;;%s\\' "$ESC" "$1" "$ESC" "$2" "$ESC" "$ESC"; }
-
 # Row one is starship's own render of starship/claude.toml, so the directory and
-# git tokens match the shell prompt. The model and the worktree/PR links arrive
-# as env vars for the two segments that starship cannot compute itself.
+# git tokens match the shell prompt. The model and the worktree arrive as
+# env vars for the two segments that starship cannot compute itself.
 git_extra=""
 [ -n "$worktree" ] && git_extra+=$'\U000f0645'" $worktree"
-if [ -n "$pr_number" ]; then
-  case "$pr_state" in
-    approved) pr_mark="✓" ;;
-    changes_requested) pr_mark="±" ;;
-    draft) pr_mark="◌" ;;
-    *) pr_mark="" ;;
-  esac
-  pr_text=$''" #$pr_number$pr_mark"
-  [ -n "$pr_url" ] && pr_text=$(link "$pr_url" "$pr_text")
-  git_extra+="${git_extra:+  }$pr_text"
-fi
 
 model_text=""
 if [ -n "$model" ]; then

@@ -1,0 +1,24 @@
+lockfileVersion: '9.0'
+
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
+importers:
+
+  .:
+    dependencies:
+      herdr-f1:
+        specifier: 0.3.6
+        version: 0.3.6
+
+packages:
+
+  herdr-f1@0.3.6:
+    resolution: {integrity: sha512-nhmJz56x3TWmOBJuxpflUAeyHCssoYxUWNf8FpCJgVTNi+8LAmZB+aIbqngBUelYmwG4qrS9lfiv9PiBUQMbxg==}
+    engines: {node: '>=20'}
+    hasBin: true
+
+snapshots:
+
+  herdr-f1@0.3.6: {}

@@ -16,6 +16,15 @@ repo_path="${1:?usage: tuios-session.sh <repo_path>}"
 repo_path="${repo_path%/}"
 name="${repo_path##*/}"
 
+# A linked worktree gets the name tuios gives its own: <repo>-<branch>, every
+# slash in the branch turned into a hyphen.
+if common=$(git -C "$repo_path" rev-parse --path-format=absolute --git-common-dir 2>/dev/null) &&
+  [[ $common != "$(git -C "$repo_path" rev-parse --path-format=absolute --git-dir)" ]] &&
+  branch=$(git -C "$repo_path" branch --show-current) && [[ -n $branch ]]; then
+  main=${common%/.git}
+  name="${main##*/}-${branch//\//-}"
+fi
+
 sessions=$(tuios ls --json)
 
 session=$(

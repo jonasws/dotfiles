@@ -47,7 +47,7 @@ built-ins:
 | `herdr_f1`, the F1 dashboard | The `herdr-f1` plugin from herdr's registry, enabled in `[plugins]`, on `prefix+F`. |
 | Pickers in floating layers | Popups. The `tv` pickers run through `scripts/close-on-leave.sh`, which closes the popup when focus, the workspace or the session moves away from it. |
 | Cmd+D / Cmd+R, `ctrl+cmd+]` / `[`, font keys, theme import | The host terminal's job (WezTerm, `wezterm/dot-wezterm.lua`). Rex's prefix-free agent chords are not ported. |
-| LaunchAgent that keeps the server up | Not needed. On macOS, `tuios daemon-app install --login` runs the daemon as an app so panes keep local network access. |
+| LaunchAgent that keeps the server up | Not used. The first `tuios` in Ghostty starts the daemon, which then counts as Ghostty for macOS privacy grants: `op` reads 1Password's shared data and panes reach the local network while Ghostty runs. `tuios daemon-app install --login` would run it as its own app instead, which needs both grants given to TUIOS Daemon. |
 
 ### Keys
 
@@ -64,6 +64,11 @@ used those keys for other things, which moved:
 | Rail focus | `e` | `E` |
 | Newest finished turn | `A` | `ctrl+k` |
 | Text hints | `F` | `ctrl+u` |
+
+`prefix+D` runs `scripts/close-session.sh` in a popup, which closes a session
+the way herdr closes a workspace: it asks first, then shows the next session
+(the previous one when it was last) and kills the old one. tuios's own
+`prefix_close_session` would quit the client with it.
 
 `a` and `A` step through the agents like herdr's `next_agent` and
 `previous_agent`, in the order of the rail's agents section, switching session
@@ -106,6 +111,16 @@ The session is named after the repo's directory, so `-s <repo>`, `tuios attach
 <repo>` and the `session:<repo>` selector reach it. A session tuios named
 `session-<hex>` is renamed on the way, and a name another repo already holds
 gets the parent directory in front (`CNOPS-<repo>`).
+
+Enter always opens the main checkout. Ctrl-W opens `tv git-worktrees` on the
+repo instead: its checkouts, the main one first, each with its session's agent
+state. Enter there goes to the checkout's session, `<repo>-<branch>` for a
+linked worktree, creating it when missing and opening a pane when it has none,
+so the switch always lands on a focused pane. Ctrl-D removes the checkout and
+its session but keeps the branch. Run in a plain shell, `tv git-worktrees`
+lists the checkouts of the repo you are in.
+`prefix+R` opens the same picker for the focused pane's repo, replacing
+tuios's rotate-split there.
 
 ## Agents
 

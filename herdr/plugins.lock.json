@@ -21,7 +21,7 @@
     "id": "herdr-bar",
     "enabled": true,
     "source": "jeffarese/herdr-bar",
-    "commit": "d642f7964231b86e82e1ac7f3a390fd5baa03e98"
+    "commit": "d9cdd88cb734615e96b1c37ed17fc39be904f060"
   },
   {
     "id": "herdr-splits",

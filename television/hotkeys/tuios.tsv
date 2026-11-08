@@ -43,6 +43,7 @@ pickers	prefix+f	Pane picker, attention first (tv tuios-sessions)	★
 pickers	cmd+k	Pane navigator, flat and searching (tuios choose_tree)	★
 pickers	prefix+g / prefix+/	Pane navigator, every session	★
 pickers	prefix+r	Git repo picker, Enter opens a session	★
+pickers	prefix+shift+r	Worktree picker for this repo, Enter opens its session	★
 pickers	prefix+w	Session switcher	★
 pickers	prefix+ctrl+g	Workspace switcher	★
 pickers	prefix+shift+o	AWS profile picker	★
@@ -73,14 +74,16 @@ panes	prefix+shift+q	Pane labels: focus by label
 panes	prefix+ctrl+l	Clear scrollback	★
 panes	prefix+enter	Nest: every key to the pane until F12
 workspaces	prefix+c	New workspace (herdr tab)	★
+workspaces	cmd+t / cmd+n	New workspace (Ghostty window: cmd+shift+n)	★
 workspaces	prefix+n / prefix+p	Next/previous workspace	★
 workspaces	prefix+1..9	Switch to workspace N	★
 workspaces	prefix+shift+t	Rename workspace	★
 workspaces	prefix+shift+x	Close workspace	★
+workspaces	ctrl+tab / ctrl+shift+tab	Next/previous workspace in the session	★
 sessions	prefix+shift+n	New session	★
 sessions	prefix+ctrl+n / prefix+ctrl+p	Next/previous session (also ) and ()	★
 sessions	prefix+shift+w	Rename session	★
-sessions	prefix+shift+d	Close session	★
+sessions	prefix+shift+d	Close session (confirm), go to next	★
 sessions	prefix+d / prefix+q	Detach	★
 app	prefix+?	Help
 app	prefix+,	Settings
@@ -91,3 +94,4 @@ app	prefix+ctrl+x	Window prefix	★
 app	prefix+ctrl+d	Debug prefix	★
 app	prefix+ctrl+a	App launcher	★
 app	prefix+shift+c	Screenshot
+app	cmd+p	Command palette (Ghostty's: cmd+shift+p)	★

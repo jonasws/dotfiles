@@ -1,0 +1,26 @@
+version = 1
+revision = 5
+requires-python = ">=3.8"
+
+[options]
+exclude-newer = "2026-11-04T08:09:35.568928Z"
+
+[[package]]
+name = "mise-pypi-tool-environment"
+version = "0.0.0"
+source = { virtual = "." }
+dependencies = [
+    { name = "xmlformatter" },
+]
+
+[package.metadata]
+requires-dist = [{ name = "xmlformatter", specifier = "==0.2.9" }]
+
+[[package]]
+name = "xmlformatter"
+version = "0.2.9"
+source = { registry = "https://pypi.org/simple/" }
+sdist = { url = "https://files.pythonhosted.org/packages/8e/3c/c82fe32478256a1d6cfae4770eda5e4da629e56f7d5a2baace308819c910/xmlformatter-0.2.9.tar.gz", hash = "sha256:22266ce398950d7848df66d5edc1bee57ead6d1b2404184c335ac4d0892d2760", size = 20467, upload-time = "2026-05-06T16:46:15.987Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/8e/a6/e5eb2f8c443b3d59e70bef0603130a39dc4d10fa7416f08d275f1ccd07fb/xmlformatter-0.2.9-py3-none-any.whl", hash = "sha256:78b9121f95c745cf4e8edfe672c1911b48b67ce27a3d55a405b78892901bb8d1", size = 11880, upload-time = "2026-05-06T16:46:14.61Z" },
+]

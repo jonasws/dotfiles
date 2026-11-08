@@ -30,7 +30,6 @@ jwt = "latest"
 lua-language-server = "latest"
 maven = "3"
 node = "24"
-"npm:@mermaid-js/mermaid-cli" = "latest"
 "npm:@pb33f/openapi-changes" = "latest"
 "npm:exa-mcp-server" = "latest"
 "npm:defuddle" = "latest"
@@ -54,7 +53,6 @@ uv = "latest"
 "pipx:mcp2cli" = "latest"
 "npm:@earendil-works/pi-coding-agent" = "latest"
 mitmproxy = "latest"
-"github:mfontanini/presenterm" = "latest"
 "github:riii111/sabiql" = "latest"
 "npm:dotenv-cli" = "latest"
 # herdr-f1 for Rex too: rex/herdr/ctl dashboard points it at Rex's herdr socket.
@@ -159,7 +157,6 @@ minimum_release_age_excludes = [
   "github:control-theory/gonzo",
   "github:walles/moor",
   "github:pamburus/hl",
-  "github:mfontanini/presenterm",
 ]
 
 [settings.github]

@@ -3,7 +3,7 @@
 # Row one of the Claude Code status line (claude/statusline-command.sh). It
 # mirrors the powerline segments of starship.toml, so the git tokens match the
 # shell prompt. The script exports CLAUDE_MODEL_TEXT and CLAUDE_GIT_EXTRA
-# (worktree, PR link) for the two env-driven segments.
+# (worktree) for the two env-driven segments.
 
 format = """
 [](fg:peach)\

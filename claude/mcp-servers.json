@@ -46,5 +46,11 @@
   "superlogical": {
     "type": "http",
     "url": "https://www.superlogical.com/rex/community-mcp"
+  },
+  "tuios": {
+    "type": "stdio",
+    "command": "$HOME/.local/bin/tuios",
+    "args": ["mcp", "--write"],
+    "env": {}
   }
 }
