@@ -124,8 +124,8 @@ herdr sets `HERDR_ENV=1` in every pane, plugin and command it starts, and
 documents it as "`1` inside Herdr" ([Add Herdr support](https://herdr.dev/docs/add-herdr-support/)).
 Tools read it as "a herdr socket is here and I run in one of its panes": agent
 integrations report state only when it is set, herdr's agent skill requires it,
-and so do this repo's Claude hooks and skills (subagent viewers, markdown
-preview, the status line's context token). Rex panes answer herdr's API, so
+and so do this repo's Claude hooks and skills (markdown preview, the status
+line's context token). Rex panes answer herdr's API, so
 `fish/conf.d/45-rex-herdr.fish` sets it, as tuios does in its panes. Two
 consequences:
 
@@ -169,7 +169,6 @@ prefix. Pane movement stays on `init.lua`'s Cmd chords and Ctrl+hjkl.
 | `ctrl+b r` | git repos; Enter opens or focuses a tab | `tv git-repos`, its `rex` action |
 | `ctrl+b shift+h` / `shift+o` | hotkeys / AWS profiles | `tv hotkeys` / `tv aws-profiles` |
 | `ctrl+b t` / `ctrl+t` / `ctrl+e` | tsk board / quick capture / edit notes | `tsk-toggle.sh`, the herdr-tsk plugin, `tsk-notes.sh` |
-| `ctrl+b shift+s` | subagent viewers | `claude/hooks/subagent-viewer.sh` |
 | `ctrl+b e` | scrollback in `$EDITOR`, in a floating layer | `edit_scrollback` in `init.lua` |
 | `ctrl+b a` / `shift+a` | next / previous agent, across sessions | `next_agent` / `previous_agent` |
 | `ctrl+b c` / `shift+x` / `shift+t` | new / close / rename tab | `client.tab.*` |

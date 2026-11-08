@@ -227,17 +227,6 @@
         ]
       },
       {
-        "matcher": "^resume$",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash '/Users/jonasws/.claude/hooks/subagent-viewer.sh' resume",
-            "timeout": 10,
-            "async": true
-          }
-        ]
-      },
-      {
         "hooks": [
           {
             "type": "command",
@@ -261,16 +250,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash '/Users/jonasws/.claude/hooks/subagent-viewer.sh'",
-            "timeout": 30,
-            "async": true
-          }
-        ]
-      },
-      {
-        "hooks": [
-          {
-            "type": "command",
             "command": "tuios agent-hook claude-code --integration 3",
             "timeout": 5
           }
@@ -278,15 +257,6 @@
       }
     ],
     "SessionEnd": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash '/Users/jonasws/.claude/hooks/subagent-viewer.sh' end",
-            "timeout": 5
-          }
-        ]
-      },
       {
         "hooks": [
           {
@@ -478,6 +448,10 @@
     "type": "command",
     "command": "bash /Users/jonasws/.claude/statusline-command.sh",
     "refreshInterval": 60
+  },
+  "subagentStatusLine": {
+    "type": "command",
+    "command": "sh /Users/jonasws/.claude/subagent-statusline.sh"
   },
   "enabledPlugins": {
     "playwright-skill@playwright-skill": true,

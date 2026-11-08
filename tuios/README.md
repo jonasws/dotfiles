@@ -36,7 +36,7 @@ built-ins:
 | ------ | -------- |
 | `rex/herdr/` socket server, bridge and LaunchAgent | Built in. The daemon serves the herdr socket and starts when a session does. |
 | `fish/conf.d/45-rex-herdr.fish` | tuios sets `HERDR_SOCKET_PATH`, `HERDR_PANE_ID` and `HERDR_ENV` in its panes. |
-| `herdr.lua` command keys | `[[keybindings.command]]` entries: popups through `scripts/toggle-popup.sh`, the tsk board on `prefix+t` among them. herdr's subagent viewer key is not ported: the rail already shows a row per subagent under its pane, and `prefix+S` starts a tsk task in a worktree instead. |
+| `herdr.lua` command keys | `[[keybindings.command]]` entries: popups through `scripts/toggle-popup.sh`, the tsk board on `prefix+t` among them. Subagents need no key: the rail shows a row per subagent under its pane, and Claude Code's own subagent panel opens each one's transcript. |
 | Ctrl+hjkl that unzooms and wraps | The `herdr-splits` plugin, enabled in `[plugins]`. |
 | Neovim marker file for Ctrl+hjkl | Not needed. Panes have `HERDR_ENV=1`, so `herdr-splits.nvim` loads. |
 | Prefix chords for tabs, panes and sessions | `[keybindings.prefix_mode]`. |
@@ -91,9 +91,7 @@ them, are off.
 Where tuios's keys differ from `herdr.tsv`: `o` goes to the oldest item that
 needs you, `ctrl+k` to the newest finished turn, `J` / `K` also step through
 agents, `prefix+g` and `prefix+/` both open the pane navigator, and
-`prefix+shift+s` starts the selected tsk task in a worktree (see Agents below)
-instead of opening subagent viewers, since the rail lists each pane's
-subagents.
+`prefix+shift+s` starts the selected tsk task in a worktree (see Agents below).
 
 `prefix+e` opens the pane's screen and scrollback as plain text in the File
 editor setting, else `$EDITOR`, else `$VISUAL`, else `vi`. vi, vim and nvim open

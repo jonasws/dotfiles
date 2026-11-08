@@ -123,7 +123,6 @@ command_key("herdr_aws", "herdr: AWS Profiles", "float", "tv aws-profiles", { 0.
 command_key("herdr_tsk", "herdr: Toggle tsk Board", "shell", "~/.config/herdr/scripts/tsk-toggle.sh")
 command_key("herdr_tsk_capture", "herdr: tsk Quick Capture", "plugin_action", "herdr-tsk.quick-capture")
 command_key("herdr_tsk_notes", "herdr: Edit tsk Notes", "popup", "~/.config/herdr/scripts/tsk-notes.sh")
-command_key("herdr_subagents", "herdr: Toggle Subagent Viewers", "shell", "bash ~/.claude/hooks/subagent-viewer.sh toggle")
 
 rex.action{
   name = "herdr_plugin_action",
@@ -215,7 +214,6 @@ function M.bind()
   rex.bind("ctrl+b>t", "herdr_tsk")
   rex.bind("ctrl+b>ctrl+t", "herdr_tsk_capture")
   rex.bind("ctrl+b>ctrl+e", "herdr_tsk_notes")
-  rex.bind("ctrl+b>shift+s", "herdr_subagents")
   rex.bind("ctrl+b>a", "next_agent")
   rex.bind("ctrl+b>shift+a", "previous_agent")
 end

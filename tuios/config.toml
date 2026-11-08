@@ -109,8 +109,10 @@ navigator_search = true
 new_window_when_empty = true
 
 # Name agent panes after their topic, which the rail otherwise hides behind the
-# running command ("claude 1", "claude 2"). The daemon reads [hooks] at start,
-# so `tuios restart-server` picks a change up.
+# running command ("claude 1", "claude 2"). `tuios config apply`, run from a
+# terminal outside tuios, loads a new or changed hook (tuios main since
+# 2026-11-08); an older daemon reads [hooks] only at start, and needs
+# `tuios restart-server`.
 [hooks]
 after-agent-state = "~/.config/tuios/scripts/auto-name.sh"
 # A worktree from prefix+U, `tuios worktree new`, `fan` or the New agent sheet
