@@ -325,7 +325,10 @@ while :; do
   tailpid=""
   wait "$renderpid" 2>/dev/null
 
-  # SubagentStart removes the stop file when the same agent is resumed.
-  while [ -e "$stopfile" ]; do sleep 2; done
+  # SubagentStart removes the stop file when the same agent is resumed. A
+  # transcript that grows again counts too: Claude Code before 2.1.311 fired
+  # SubagentStop about twice a minute while a subagent still ran.
+  while [ -e "$stopfile" ] && [ "$(size)" -le "$offset" ]; do sleep 2; done
+  rm -f "$stopfile"
   printf '\n\033[%sm↻ resumed\033[0m\n\n' "$colour"
 done
