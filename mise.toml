@@ -328,7 +328,6 @@ exclude = ["mcp-servers.json"]
 "~/.claude/skills/slide-show" = { mode = "symlink" }
 "~/.claude/skills/systematic-debugging" = { mode = "symlink" }
 "~/.claude/skills/test-driven-development" = { mode = "symlink" }
-"~/.claude/skills/watch-subagents" = { mode = "symlink" }
 
 [dotfile_groups.colima]
 root = "colima"

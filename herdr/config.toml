@@ -181,13 +181,6 @@ description = "edit tsk notes in nvim"
 width = "80%"
 height = "80%"
 
-# Script: claude/hooks/subagent-viewer.sh
-[[keys.command]]
-key = "prefix+shift+s"
-type = "shell"
-command = "bash ~/.claude/hooks/subagent-viewer.sh toggle"
-description = "toggle subagent viewers"
-
 [ui]
 # fish/functions/herdr.fish rewrites this line for wide terminals.
 sidebar_width = 34

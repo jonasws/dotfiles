@@ -11,8 +11,6 @@ agents	prefix+ctrl+y	Show the last message in full	★
 agents	prefix+shift+u	New worktree of this repo, and a session in it
 agents	prefix+shift+i	Session return note
 agents	prefix+shift+z	Calm mode: no motion, quiet dock
-agents	prefix+h	Subagents: all in one stream, in a popup	★
-agents	prefix+ctrl+j	Subagents: viewer workspace, a pane each (again inside: close)	★
 inbox	j / k	Next/previous row
 inbox	space	Peek the prompt and answer it (1-9, a, A, d)
 inbox	a / shift+a	Allow once / always (held approval or plan)
