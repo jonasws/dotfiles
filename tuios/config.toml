@@ -464,6 +464,12 @@ command = "~/.config/tuios/scripts/toggle-popup.sh worktree-picker 90% 60% -- ~/
 description = "Worktree picker for this repo"
 
 [[keybindings.command]]
+key = "prefix+p"
+type = "shell"
+command = "~/.config/tuios/scripts/toggle-popup.sh run-script-preview 90% 85% -- ~/.config/tuios/scripts/run-script-preview.sh"
+description = "Preview the AWS run_script awaiting permission"
+
+[[keybindings.command]]
 key = "prefix+H"
 type = "shell"
 command = "~/.config/tuios/scripts/toggle-popup.sh hotkeys 90% 60% -- ~/.config/tuios/scripts/close-on-leave.sh tv hotkeys"

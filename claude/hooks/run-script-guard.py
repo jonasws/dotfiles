@@ -27,7 +27,8 @@ It asks when a script:
 
 It guards against an agent reading or changing more than the user meant, not
 against a script written to slip past it. A parse error or a crash asks.
-When it asks inside tuios, the script opens read-only in nvim in a popup.
+When it asks, it saves the script to ~/.cache/claude/run-script/<pane>.py,
+which prefix+p in tuios opens read-only in nvim in a popup.
 
 `python3 run-script-guard.py --self-test` checks the cases at the bottom.
 """
@@ -37,10 +38,7 @@ import itertools
 import json
 import os
 import re
-import shutil
-import subprocess
 import sys
-import tempfile
 
 READ_VERBS = (
     "describe", "list", "get", "batchget", "head", "lookup", "search",
@@ -458,26 +456,18 @@ def decide(code):
     return "allow", f"run_script only reads control-plane metadata: {calls}"
 
 
-def preview(code):
-    """Show the script read-only in a tuios popup; returns at once."""
-    if os.environ.get("TUIOS_ENV") != "1" or not (shutil.which("tuios") and shutil.which("nvim")):
-        return
+PREVIEW_DIR = os.path.join(
+    os.environ.get("XDG_CACHE_HOME") or os.path.expanduser("~/.cache"), "claude", "run-script")
+
+
+def save_for_preview(code):
+    """Keep the script where tuios's run-script-preview key finds it, one file per pane."""
+    pane = os.environ.get("TUIOS_PANE_ID") or "no-pane"
     try:
-        folder = tempfile.mkdtemp(prefix="claude-run-script.")
-        path = os.path.join(folder, "run_script.py")
-        with open(path, "w") as f:
+        os.makedirs(PREVIEW_DIR, exist_ok=True)
+        with open(os.path.join(PREVIEW_DIR, f"{pane}.py"), "w") as f:
             f.write(code + "\n")
-        subprocess.run(
-            ["tuios", "popup", "--width", "90%", "--height", "85%", "--",
-             "nvim", "-M",
-             "-c", "set filetype=python number",
-             "-c", "lua vim.diagnostic.enable(false)",
-             "-c", f"autocmd VimLeave * call delete('{path}') | call delete('{folder}', 'd')",
-             path],
-            stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
-            timeout=3,
-        )
-    except (OSError, subprocess.SubprocessError):
+    except OSError:
         pass
 
 
@@ -515,7 +505,7 @@ def main():
     tool_input = data.get("tool_input") or {}
     decision, why = decide_tool(data.get("tool_name", ""), tool_input)
     if decision == "ask" and isinstance(tool_input.get("code"), str):
-        preview(tool_input["code"])
+        save_for_preview(tool_input["code"])
     print(json.dumps({"hookSpecificOutput": {
         "hookEventName": "PreToolUse",
         "permissionDecision": decision,
