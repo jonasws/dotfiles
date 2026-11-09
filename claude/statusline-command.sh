@@ -93,7 +93,10 @@ if [ -n "$remaining" ]; then
   bar=""
   for ((i = 0; i < width; i++)); do
     if [ "$i" -eq "$filled" ]; then bar+="$(fg "$SURFACE1")"; fi
-    bar+="━"
+    # Not a box-drawing dash: tuios reads a run of ━ or ─ as the prompt box's
+    # border, takes the statusline row above it for the box, and holds its
+    # message queue for a draft that is not there.
+    bar+="▬"
   done
   parts+=("$(fg "$colour")${bar}${RESET} ${DIM}ctx${RESET} $(fg "$colour")${left}%${RESET}")
 fi
