@@ -50,15 +50,14 @@ url_api = "https://api.github.com/repos/FiloSottile/age/releases/assets/53554189
 provenance = "github-attestations"
 
 [[tools."aqua:anthropics/claude-code"]]
-version = "2.1.318"
+version = "2.1.319"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
 [tools."aqua:anthropics/claude-code"."platforms.macos-arm64"]
-checksum = "sha256:cd7fa988d60e7aef7ed453847650255138440b229d081496b8ed0ab75836603b"
-checksum_source = "mise-versions"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.318/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/707216476"
+checksum = "sha256:7ae10919ce40346befabe3c18da4d5ccc860201b6785b3ae726d8961472d0e5d"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.319/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/715418856"
 
 [[tools."aqua:asciinema/asciinema"]]
 version = "3.2.1"
@@ -142,23 +141,23 @@ url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/707958967"
 provenance = "github-attestations"
 
 [[tools.aws-cli]]
-version = "2.39.4"
+version = "2.39.6"
 backend = "aqua:aws/aws-cli"
 specifiers = ["latest"]
 
 [tools.aws-cli."platforms.macos-arm64"]
-checksum = "blake3:083eb6b04d4b4518d21db5dac372e24df092c40d7e72efe6ca38bdd279e9adac"
-url = "https://awscli.amazonaws.com/AWSCLIV2-2.39.4.pkg"
+checksum = "blake3:b3b91871326cbbccb487130f318e1ae74f7a8ebdcd073cb34684382ab45009f2"
+url = "https://awscli.amazonaws.com/AWSCLIV2-2.39.6.pkg"
 
 [[tools.aws-vault]]
-version = "7.17.5"
+version = "7.17.7"
 backend = "aqua:ByteNess/aws-vault"
 specifiers = ["latest"]
 
 [tools.aws-vault."platforms.macos-arm64"]
-checksum = "sha256:ab6bd63e16262963a802ed837ec62c79ad281480cd86e632185bd78cb13fb7ab"
-url = "https://github.com/ByteNess/aws-vault/releases/download/v7.17.5/aws-vault-darwin-arm64"
-url_api = "https://api.github.com/repos/ByteNess/aws-vault/releases/assets/699272996"
+checksum = "sha256:bd9b5abb790b1627d4a6ff5e1b5f8ce7cb56fa8faec1ffd99cf2682f798ac266"
+url = "https://github.com/ByteNess/aws-vault/releases/download/v7.17.7/aws-vault-darwin-arm64"
+url_api = "https://api.github.com/repos/ByteNess/aws-vault/releases/assets/714999462"
 
 [[tools.bun]]
 version = "1.4.4"
@@ -243,14 +242,14 @@ signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.ym
 repository_ids = { repository = "1078762196" }
 
 [[tools.fzf]]
-version = "0.74.5"
+version = "0.75.0"
 backend = "aqua:junegunn/fzf"
 specifiers = ["latest"]
 
 [tools.fzf."platforms.macos-arm64"]
-checksum = "sha256:ada808c7401b9949ce8842274ac16a6b6193fd32dcada396884a6a9a89e5985a"
-url = "https://github.com/junegunn/fzf/releases/download/v0.74.5/fzf-0.74.5-darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/629581702"
+checksum = "sha256:1e76698eb481436e42119bea6aa6e2bd9552ff090789d769c286e3c3a4e0ded6"
+url = "https://github.com/junegunn/fzf/releases/download/v0.75.0/fzf-0.75.0-darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/junegunn/fzf/releases/assets/720590797"
 
 [[tools.github-cli]]
 version = "2.103.3"
@@ -888,13 +887,13 @@ url = "https://github.com/alexpasmantier/television/releases/download/0.15.9/tv-
 url_api = "https://api.github.com/repos/alexpasmantier/television/releases/assets/447568866"
 
 [[tools.twg]]
-version = "1.4.3"
+version = "1.4.4"
 backend = "http:twg"
 specifiers = ["latest"]
 
 [tools.twg."platforms.macos-arm64"]
-checksum = "sha256:c5bddef0df90040de1c094fa54a36fff4c21e5fb5071eb1a9d458fb1922caf62"
-url = "https://teamwork-graph.atlassian.com/cli/twg-darwin-arm64-v1.4.3"
+checksum = "blake3:1dbcb33ee0b9ee5c4b0fe1dc1f6652546af5c2484556dd522fab46bb248e85c4"
+url = "https://teamwork-graph.atlassian.com/cli/twg-darwin-arm64-v1.4.4"
 
 [[tools.usage]]
 version = "6.9.0"
