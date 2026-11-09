@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # The after-new-worktree hook: tuios has made a worktree session and waits for
-# this before the first pane starts. Trust the worktree's mise config and
-# install its tools, so the pane's shell and the agent find them.
+# this before the first pane starts. Link the main checkout's local mise config
+# in, trust the worktree's mise config and install its tools, so the pane's
+# shell and the agent find them.
 #
 # Trust carries over from the main checkout only: a worktree of a repo whose
 # own config I have not trusted stays untrusted, so a branch cannot bring in
@@ -31,6 +32,13 @@ trust_of() {
 }
 
 cd "$dir" || exit 0
+
+# The main checkout's git-ignored local config (DOCKER_HOST, TESTCONTAINERS_*)
+# is not in the worktree. A link keeps one copy to edit.
+if [[ -f $root/.mise.local.toml && ! -e $dir/.mise.local.toml ]]; then
+  ln -s "$root/.mise.local.toml" "$dir/.mise.local.toml" 2>/dev/null || true
+fi
+
 case $(trust_of "$dir") in
   trusted) ;;
   untrusted)

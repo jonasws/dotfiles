@@ -212,8 +212,10 @@ Inside tuios (`TUIOS_ENV=1`):
   keys, so the docs and `tuios --skill` are wrong for them. Before telling me
   to press a key sequence, look it up live:
   `tuios keybinds list --json | jq -r '.[] | select(.action == "ACTION") | .keys[]'`
-  for an action, or `tuios keybinds explain KEY` for a key. If the lookup
-  fails, name the action instead of a key.
+  for an action, or `tuios keybinds explain KEY` for a key. Neither reports
+  `[[keybindings.command]]` entries (they show such a key as free), so grep
+  `~/dotfiles/tuios/config.toml` for those. If the lookup fails, name the
+  action instead of a key.
 - **Decisions with fixed answers go to the Inbox.** Before a step I must
   approve outside your own permission prompt (a `cdk deploy`, a stack delete, a
   push to a shared branch), ask with `tuios ask-human 'QUESTION' -o yes -o no`
@@ -223,10 +225,13 @@ Inside tuios (`TUIOS_ENV=1`):
   next step for me or a later session, set it as one line on the session:
   `tuios note set 'NEXT STEP'`. Clear it (`tuios note clear`) when the work it
   names is done. Keep it under 60 characters; it shows on the rail.
-- **A tuios task card is not the tsk board.** A card titled `T<n>: ...` follows
-  one run of tsk task T<n> (from `prefix+ctrl+s` / `prefix+S` on the board).
-  If you hold one, `tuios task block ID REASON` when you are stuck, and leave
-  `done` to me, as on tsk.
+- **tuios runs the work.** For an agent in a pane of its own, a worktree or
+  parallel attempts, use tuios (`start-agent`, `worktree new`, `fan`,
+  `delegate`), not Claude Code's `EnterWorktree`, `--worktree` or
+  `isolation: worktree`, and not `tsk dispatch`. Subagents inside this
+  conversation (`implementer`, `researcher`) stay on the Agent tool, without
+  isolation. The `tasks` skill routes between them and lists the pitfalls;
+  load it before starting or isolating work.
 
 ## Task board
 
@@ -245,14 +250,9 @@ start: look at it only when I ask for it or the work at hand involves it.
   dropping it. Archive the task (`tsk archive`) with notes starting
   `Won't do: <reason>`, so a later session doesn't propose it again.
 - Only the main agent writes to the board. Subagents report back.
-- A git worktree is its own tsk project. Use tsk's default scope there; do not
-  pass `-p` to reach the main checkout.
-- In herdr and tuios, `prefix+t` opens the board and `prefix+ctrl+t` quick
-  capture. In tuios, `prefix+ctrl+s` on the board starts an agent on the task
-  under the cursor in this folder, and `prefix+S` in a worktree of its own;
-  that worktree agent gets the notes in its prompt and does not touch tsk.
-  tsk's own dispatch (`tsk dispatch`, or starting an assigned task without
-  `--no-dispatch`) targets Herdr workspaces; never use it from tuios.
+- tsk records the work; tuios runs it. Starting a task in another agent or a
+  worktree, tuios task cards, and where each tool puts its worktrees are in
+  the `tasks` skill.
 
 ## Commit messages
 
