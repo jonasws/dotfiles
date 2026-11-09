@@ -128,6 +128,7 @@ keybind = super+shift+p=toggle_command_palette
 keybind = super+p=unbind
 keybind = super+n=unbind
 keybind = super+shift+n=new_window
+keybind = super+shift+t=new_tab
 keybind = ctrl+tab=unbind
 keybind = ctrl+shift+tab=unbind
 

@@ -124,7 +124,7 @@ description = "Build tuios from main and link it as tuios in ~/.local/bin"
 # kill-server` switches over when the panes can be spared. The ghostty backend
 # links libghostty-vt, which needs the zig series ghostty pins (ZIG_SERIES in
 # scripts/ghostty-lib.sh); the library is built once and cached in the checkout.
-tools = { go = "latest", zig = "0.16" }
+tools = { go = "latest", zig = "0.17" }
 run = """
 set -euo pipefail
 root="$HOME/.local/share/tuios-nightly"
