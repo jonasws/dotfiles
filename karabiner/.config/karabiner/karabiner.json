@@ -739,8 +739,7 @@
             "product_id": 18,
             "vendor_id": 13807
           },
-          "ignore": false,
-          "treat_as_built_in_keyboard": true
+          "ignore": true
         },
         {
           "identifiers": {
