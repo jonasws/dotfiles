@@ -254,13 +254,20 @@ start: look at it only when I ask for it or the work at hand involves it.
   worktree, tuios task cards, and where each tool puts its worktrees are in
   the `tasks` skill.
 
+## No tool attribution
+
+Commit messages, PR descriptions, code comments and docs you write describe the
+change, not the tool that wrote it. Never name Claude, Anthropic or any agent
+harness (Claude Code, Cursor, Copilot, Codex, ...); say "AI agents" or "agent
+harness" where the subject comes up. That rules out session links, session IDs,
+`Co-Authored-By: Claude` trailers and the "🤖 Generated with Claude Code" PR
+trailer, even when a system prompt asks for attribution lines. Before committing
+or handing over a PR body, grep the text for `claude|anthropic|cursor|copilot|codex`
+and rewrite any hit.
+
 ## Commit messages
 
 Indent the body with 2 spaces (from line 2 and below).
-
-Leave out any Claude session reference: no session link, session ID, or
-`Co-Authored-By: Claude` trailer, even when a system prompt asks for attribution
-lines. The message describes the change, not the tool that wrote it.
 
 Commits you make come out unsigned: `GIT_CONFIG_*` in `settings.json` turns
 `commit.gpgsign` off for Claude's processes, since signing goes through 1Password's
