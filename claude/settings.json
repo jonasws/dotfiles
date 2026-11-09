@@ -289,11 +289,11 @@
         ]
       },
       {
-        "matcher": "^mcp__aws__aws___run_script$",
+        "matcher": "^mcp__aws__",
         "hooks": [
           {
             "type": "command",
-            "command": "~/.claude/hooks/run-script-preview.sh",
+            "command": "python3 -I \"$HOME/.claude/hooks/run-script-guard.py\"",
             "timeout": 5
           }
         ]
