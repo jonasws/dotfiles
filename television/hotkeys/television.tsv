@@ -9,13 +9,23 @@ select	ctrl+y	Copy entry to clipboard
 preview	ctrl+d / ctrl+u	Scroll preview half page
 preview	shift+j / shift+k	Scroll preview a line
 preview	ctrl+o	Toggle preview
+preview	ctrl+f	Cycle previews (channels with several)
 channel	ctrl+s	Cycle sources
 channel	ctrl+r	Reload source
 channel	ctrl+t	Channel switcher (remote control)
 ui	ctrl+l	Toggle layout
 ui	ctrl+h	Help
 ui	f12	Toggle status bar
+ui	ctrl+x	Action picker: the channel's actions
 input	ctrl+w	Delete word
 input	ctrl+c	Clear line
 input	ctrl+a / ctrl+e	Start / end of input
 app	esc	Quit
+sessions	f6 / cmd+o / sessions	tv agent-sessions: tv shortcut, tuios/herdr popup, fish alias	★
+sessions	enter	Focus its pane, resume in a pane whose agent exited, or open a new one	★
+sessions	alt+f	Resume as a fork	★
+sessions	tab	Scope: here, all, live	★
+sessions	ctrl+f	Preview: conversation, last reply, tools & files, pane screen	★
+sessions	ctrl+y	Copy session id	★
+sessions	alt+t / alt+d	Copy transcript path / directory	★
+sessions	alt+p / alt+r	Copy tuios pane / resume command	★
