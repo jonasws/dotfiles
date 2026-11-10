@@ -15,7 +15,10 @@
 
 # General settings
 # ----------------------------------------------------------------------------
-tick_rate = 50
+# Ticks per second. tv redraws on its own every 25 ticks when idle (the
+# layout toggle, watch reloads), so 100 caps that wait at 0.25s; input and
+# arriving previews redraw at once whatever the rate. Default 50.
+tick_rate = 100
 default_channel = "files"
 # History settings
 # ---------------
