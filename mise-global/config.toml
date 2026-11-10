@@ -30,6 +30,12 @@ jwt = "latest"
 lua-language-server = "latest"
 maven = "3"
 node = "24"
+# Pinned: 11.16.0 and later resolve puppeteer-core >= 25.13, which pins
+# chromium-bidi@157.0.8090-0. That release has no npm provenance where earlier
+# ones did, so aube refuses it (trustPolicy=no-downgrade). Unpin once
+# chromium-bidi publishes with provenance again, or presenterm ships a mermaid
+# renderer that doesn't need mmdc (mfontanini/presenterm#909).
+"npm:@mermaid-js/mermaid-cli" = "11.15.0"
 "npm:@pb33f/openapi-changes" = "latest"
 "npm:exa-mcp-server" = "latest"
 "npm:defuddle" = "latest"
@@ -53,6 +59,7 @@ uv = "latest"
 "pipx:mcp2cli" = "latest"
 "npm:@earendil-works/pi-coding-agent" = "latest"
 mitmproxy = "latest"
+"github:mfontanini/presenterm" = "latest"
 "github:riii111/sabiql" = "latest"
 "npm:dotenv-cli" = "latest"
 # herdr-f1 for Rex too: rex/herdr/ctl dashboard points it at Rex's herdr socket.

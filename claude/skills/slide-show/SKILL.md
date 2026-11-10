@@ -1,6 +1,6 @@
 ---
 name: slide-show
-description: Turn a topic into a terminal slide deck with presenterm, a few summary slides with diagrams, and show it in a pane beside the conversation (herdr, tuios or Rex). Use whenever the user asks for slides, a deck, a presentation, a talk, a walkthrough or "present this", or wants a topic, design, incident, PR, architecture or comparison summarized visually in the terminal, even if they don't name presenterm. presenterm is not installed globally; this skill runs it through `mise exec`.
+description: Turn a topic into a terminal slide deck with presenterm, a few summary slides with diagrams, and show it in a pane beside the conversation (herdr, tuios or Rex). Use whenever the user asks for slides, a deck, a presentation, a talk, a walkthrough or "present this", or wants a topic, design, incident, PR, architecture or comparison summarized visually in the terminal, even if they don't name presenterm.
 argument-hint: "<topic or file to present>"
 ---
 
@@ -31,7 +31,7 @@ summary would otherwise be a wall of text.
 
 Put the deck in a folder of its own: the scratchpad for a throwaway, or a
 path the user names. presenterm resolves image paths relative to the deck,
-so diagrams go in `diagrams/` next to it.
+so any images go next to it.
 
 ```markdown
 ---
@@ -42,7 +42,10 @@ sub_title: Why partner bookings fail before they reach validation
 The flow today
 ===
 
-![image:width:80%](diagrams/flow.png)
+```mermaid +render +width:80%
+flowchart LR
+  partner --> facade --> service
+```
 
 <!-- end_slide -->
 
@@ -78,56 +81,30 @@ dotfiles) sets the `catppuccin-mocha` theme, so don't pass `--theme`.
 
 ## 3. Draw the diagrams
 
-**Write diagrams as mermaid and pre-render them to PNG with `sketch`.**
-
-```bash
-sketch diagrams/flow.mmd -o diagrams/flow.png -theme catppuccin-mocha
-```
-
-- One `.mmd` file per diagram, kept next to its PNG so a later edit only
-  needs a re-render.
-- sketch draws flowchart, sequence, class, state, ER, gantt, pie, mindmap
-  and gitGraph, in about 0.05 s each and with no browser. `-scale` (default
-  2) raises the resolution; size it on the slide with `image:width`.
-- Open the PNG with the Read tool once to check it reads well before it
-  goes on a slide. That is cheaper than finding a cramped diagram mid-deck.
-
-Do not use `` ```mermaid +render `` blocks. presenterm renders those by
-calling `mmdc` (mermaid-cli, which drives a headless Chrome through
-puppeteer), and mermaid-cli was removed from this machine on purpose: its
-puppeteer dependency fails mise's npm trust check. A `+render` mermaid block
-errors on the slide.
-
-When the user wants diagrams that presenterm renders itself, use d2 instead
-and add it to the same `mise exec`:
+**Write diagrams as `mermaid +render` blocks in the deck.** presenterm
+renders each one to an image when it loads the deck, by calling `mmdc`
+(mermaid-cli, which drives a headless Chrome through puppeteer):
 
 ````markdown
-```d2 +render +width:70%
-booking -> facade: POST /bookings
-facade -> service: validate
+```mermaid +render +width:70%
+sequenceDiagram
+  partner->>facade: POST /bookings
+  facade->>service: validate
 ```
 ````
 
-d2 is slower (about a second per diagram) and uses d2's syntax, so prefer
-sketch unless the user asks for d2 or for diagrams kept inline in the deck.
+- `+width:N%` sizes the image on the slide.
+- The first render of a block takes a second or two while Chrome starts.
+  presenterm caches the result, so reloads stay fast until the block changes.
+- A block with a syntax error shows the error on the slide. Fix it in the
+  deck and the open pane re-renders it.
 
-## 4. Run presenterm through mise exec
+mermaid-cli is pinned to 11.15.0 in the global mise config; the comment
+there says why. Don't upgrade it or override its trust check to get a newer
+Mermaid.
 
-presenterm is not in the global mise config, so it is not on PATH. Run it
-through `mise exec`, which fetches the tool into mise's install cache and
-runs it without adding it to any config:
+## 4. Check the deck
 
-```bash
-mise exec aqua:mfontanini/presenterm@latest -- presenterm deck.md
-mise exec aqua:mfontanini/presenterm@latest d2 -- presenterm deck.md   # with d2 +render
-```
-
-- The first run downloads it; later runs start at once. `mise prune` may
-  delete the cached copy, since no config references it. That costs one
-  more download, nothing else.
-- Don't "fix" this by adding presenterm to the global config, the project's
-  `mise.toml` or with `mise use -g`. Keeping presenterm and its diagram
-  tools out of the global scope is the point.
 - `presenterm --validate-overflows deck.md` reports slides that don't fit
   the terminal. Use it in the pane the deck will be shown in, since the
   result depends on that pane's size.
@@ -148,9 +125,9 @@ Check which multiplexer you are in, in this order:
 
 | Check | Where | Open the deck |
 |---|---|---|
-| `TUIOS_ENV=1` | tuios | `tuios new-window -s "$TUIOS_SESSION" slides --cwd "$DECK_DIR" --no-focus -- mise exec aqua:mfontanini/presenterm@latest -- presenterm deck.md` |
-| `REX_SESSION` set | Rex | Load the `rex` skill and open a pane beside yours running the same `mise exec … -- presenterm deck.md`, in the deck's folder. |
-| `HERDR_ENV=1` | herdr | `herdr pane split --current --direction right --cwd "$DECK_DIR" --no-focus`, then `herdr pane run <pane> "mise exec aqua:mfontanini/presenterm@latest -- presenterm deck.md"` with the pane id it returns. |
+| `TUIOS_ENV=1` | tuios | `tuios new-window -s "$TUIOS_SESSION" slides --cwd "$DECK_DIR" --no-focus -- presenterm deck.md` |
+| `REX_SESSION` set | Rex | Load the `rex` skill and open a pane beside yours running `presenterm deck.md` in the deck's folder. |
+| `HERDR_ENV=1` | herdr | `herdr pane split --current --direction right --cwd "$DECK_DIR" --no-focus`, then `herdr pane run <pane> "presenterm deck.md"` with the pane id it returns. |
 | none of these | plain terminal | Give the user the command to run, with `!` in front if they want it in this session's terminal. |
 
 Every one of these commands asks the user for approval: the
@@ -170,6 +147,6 @@ telling the user the deck looks right in a plain Ghostty tab.
 
 ## 6. Iterate
 
-presenterm reloads the deck when the file changes, so edit `deck.md` (and
-re-render a changed diagram) in place; the open pane picks it up. Don't open
+presenterm reloads the deck when the file changes, so edit `deck.md` in
+place; the open pane picks it up. Don't open
 a second pane for the same deck. Close only panes you opened.

@@ -420,6 +420,17 @@ checksum = "sha256:b095d11839def114ebb86db784f2e9d5ddfab5cff919b48af5986898d2629
 url = "https://github.com/huseyinbabal/taws/releases/download/v1.3.0-rc.8/taws-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/huseyinbabal/taws/releases/assets/407258769"
 
+[[tools."github:mfontanini/presenterm"]]
+version = "0.16.1"
+backend = "github:mfontanini/presenterm"
+specifiers = ["latest"]
+
+[tools."github:mfontanini/presenterm"."platforms.macos-arm64"]
+checksum = "sha256:56f8b25c24f9c37b06ac4b3004a2c70a2c03d81ddf7a8aa8766ae8997eeb4573"
+checksum_source = "mise-versions"
+url = "https://github.com/mfontanini/presenterm/releases/download/v0.16.1/presenterm-0.16.1-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/mfontanini/presenterm/releases/assets/358918054"
+
 [[tools."github:ouch-org/ouch"]]
 version = "0.8.2"
 backend = "github:ouch-org/ouch"
@@ -700,6 +711,15 @@ specifiers = ["latest"]
 
 [tools."npm:@earendil-works/pi-coding-agent".provenance]
 repository = "github.com/earendil-works/pi"
+
+[[tools."npm:@mermaid-js/mermaid-cli"]]
+version = "11.15.0"
+aube = { path = ".mise/locks/npm-mermaid-js-mermaid-cli/11.15.0", digest = "sha256:12eb9cbf4a17d2e9ac7e2f52d090e640d6c631f1e27b781fc5cf2efba1552e51" }
+backend = "npm:@mermaid-js/mermaid-cli"
+specifiers = ["11.15.0"]
+
+[tools."npm:@mermaid-js/mermaid-cli".provenance]
+repository = "github.com/mermaid-js/mermaid-cli"
 
 [[tools."npm:@pb33f/openapi-changes"]]
 version = "0.4.1"
