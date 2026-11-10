@@ -77,3 +77,11 @@ shell = "bash"
 description = "Jump to the selected pane"
 command = "~/.config/television/scripts/tuios-focus.sh '{strip_ansi|split: :0}'"
 mode = "execute"
+
+# The session/id-prefix token is a pane address any `tuios -s S -w W` command,
+# or an agent told "in pane S/W", resolves exactly. `execute` closes the popup.
+[actions.copy]
+shell = "bash"
+description = "Copy the pane's session/id token"
+command = "printf %s '{strip_ansi|split: :0}' | pbcopy"
+mode = "execute"
