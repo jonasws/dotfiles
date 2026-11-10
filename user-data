@@ -1,0 +1,67 @@
+#cloud-config
+# Raspberry Pi OS (Trixie) first-boot provisioning for a headless Tailscale server.
+#
+# How to use:
+#   1. Flash Raspberry Pi OS Lite (64-bit) with Raspberry Pi Imager 2.x.
+#      In the customisation step set hostname, locale, user, SSH (public key) and,
+#      if needed, Wi-Fi. Imager writes user-data and network-config to the boot partition.
+#   2. Re-mount the SD card and replace (or merge into) /boot/firmware/user-data with this file.
+#      Keep Imager's network-config as-is.
+#   3. Create /boot/firmware/tailscale-authkey containing ONLY a single-use,
+#      pre-approved Tailscale auth key with a short expiry (admin console > Settings > Keys).
+#   4. Replace every "CHANGE_ME" below, eject, boot, wait a few minutes.
+#   5. Check: `tailscale status` on your laptop shows "pi"; then `ssh pi`.
+#      Logs: /boot/firmware/cloud-init-output.log (readable from any computer).
+
+hostname: pi                     # match the hostname in your pfSense DHCP static mapping
+manage_etc_hosts: true
+timezone: Europe/Oslo
+
+users:
+  - name: CHANGE_ME_USER
+    groups: users,adm,sudo,netdev,video
+    shell: /bin/bash
+    lock_passwd: true            # no password login at all, keys only
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    ssh_authorized_keys:
+      - CHANGE_ME_SSH_PUBLIC_KEY   # e.g. ssh-ed25519 AAAA... you@laptop
+
+enable_ssh: true                 # Raspberry Pi OS specific
+ssh_pwauth: false
+disable_root: true
+
+package_update: true
+package_upgrade: true
+packages:
+  - curl
+  - git
+
+write_files:
+  - path: /etc/ssh/sshd_config.d/10-hardening.conf
+    permissions: "0644"
+    content: |
+      PasswordAuthentication no
+      KbdInteractiveAuthentication no
+      PermitRootLogin no
+
+runcmd:
+  # The Pi has no hardware clock: wait for NTP so TLS downloads don't fail
+  - [ bash, -c, 'timedatectl set-ntp true; for i in $(seq 1 60); do timedatectl show -p NTPSynchronized --value | grep -q yes && break; sleep 1; done' ]
+
+  # SSH hardening takes effect
+  - [ systemctl, reload, ssh ]
+
+  # Tailscale: install, join with the auth key from the boot partition, then delete the key file
+  - [ sh, -c, 'curl -fsSL https://tailscale.com/install.sh | sh' ]
+  - [ tailscale, up, '--auth-key=file:/boot/firmware/tailscale-authkey', '--hostname=pi' ]
+  - [ shred, -u, /boot/firmware/tailscale-authkey ]
+
+  # herdr for your user (installs into the user's home)
+  - [ su, -, CHANGE_ME_USER, -c, 'curl -fsSL https://herdr.dev/install.sh | sh' ]
+
+  # Rex: install the Linux server per https://www.superlogical.com/rex/docs/linux/installation
+  # (not automated here; add its install command once you have it), then configure
+  # Tailscale Serve as described in the Rex Remote Access docs.
+
+# Write the full cloud-init log to the boot partition for easy debugging
+output: { all: "| tee -a /boot/firmware/cloud-init-output.log" }
