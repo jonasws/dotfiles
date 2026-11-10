@@ -54,7 +54,13 @@ when no pane runs it), which is what a Raycast extension or another tool reads.
    child, neither of which a resumed conversation wants. `resume-agent`
    cannot serve here, since storing an id on another pane
    (`set-agent-session -w`) needs the respond grant.
-4. Outside tuios: `cd` to the directory and exec the resume command.
+4. Inside herdr (`HERDR_ENV=1` and not tuios, whose panes set it too): live
+   panes come from `herdr agent list`, whose `agent_session.value` is the
+   conversation id, and Enter focuses one through `../herdr-focus.sh`.
+   Otherwise it opens a tab in the herdr workspace that has a pane in the
+   checkout (or a new workspace) and types the resume command into its
+   shell with `herdr pane run`, so the pane outlives the agent.
+5. Outside both: `cd` to the directory and exec the resume command.
 
 When the session's directory was removed, `open` first recreates it as a
 worktree of the session's branch (`git worktree add`), from the nearest

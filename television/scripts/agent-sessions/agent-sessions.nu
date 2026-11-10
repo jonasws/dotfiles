@@ -92,6 +92,7 @@ def parse-key [key: string]: nothing -> record {
 # Its harness_id is empty then, so panes are keyed by the id alone; a
 # conversation id is a UUID, unique across harnesses.
 def live []: nothing -> record {
+    if (in-herdr) { return (herdr-live) }
     if (which tuios | is-empty) { return {} }
     let r = (do -i { ^tuios list-agents --all-sessions --all --json } | complete)
     if $r.exit_code != 0 { return {} }
@@ -115,6 +116,29 @@ def live []: nothing -> record {
         if $have == null or ($have.dormant and not $dormant) {
             $acc | upsert $a.agent_session_id $pane
         } else { $acc }
+    }
+}
+
+# Agent panes by conversation id, from herdr. herdr reports the id its
+# integration (or a harness hook) gave it as agent_session.value.
+def herdr-live []: nothing -> record {
+    let r = (do -i { ^herdr agent list } | complete)
+    if $r.exit_code != 0 { return {} }
+    $r.stdout | from json | get -o result.agents | default []
+    | where {|a| ($a.agent_session?.value? | default "") != "" }
+    | reduce --fold {} {|a, acc|
+        $acc | upsert $a.agent_session.value {
+            herdr: true
+            session: $a.workspace_id
+            window_id: $a.pane_id
+            token: $a.pane_id
+            name: ($a.name? | default "")
+            state: $a.agent_status
+            dormant: false
+            needs_you: ($a.agent_status == "blocked")
+            finished_unread: false
+            now: ""
+        }
     }
 }
 
@@ -400,6 +424,10 @@ def session-on [root: string]: nothing -> any {
 }
 
 def focus [p: record] {
+    if ($p.herdr? | default false) {
+        ^($SCRIPTS | path join herdr-focus.sh) $p.window_id
+        return
+    }
     ^tuios focus-window -s $p.session $p.window_id | ignore
     if $p.session != ($env.TUIOS_SESSION? | default "") {
         ^tuios switch-session $p.session | ignore
@@ -413,6 +441,40 @@ def in-tuios []: nothing -> bool {
 # Focus the pane running the session; otherwise resume it in a new pane of the
 # tuios session for its checkout (tuios-session.sh opens or creates that one,
 # and names a worktree's session as tuios does), or in place outside tuios.
+# Inside herdr and not tuios. tuios panes set HERDR_ENV too, since tuios
+# answers herdr's API, so tuios is checked first.
+def in-herdr []: nothing -> bool {
+    ($env.HERDR_ENV? | default "") == "1" and not (in-tuios) and (which herdr | is-not-empty)
+}
+
+# The herdr workspace a pane of which sits in the checkout, if any.
+def herdr-workspace-on [root: string]: nothing -> any {
+    let r = (do -i { ^herdr pane list } | complete)
+    if $r.exit_code != 0 { return null }
+    let p = ($root | str lowercase)
+    $r.stdout | from json | get -o result.panes | default []
+    | where {|x| ([$x.cwd? $x.foreground_cwd?] | compact | each {|c| $c | str lowercase }) | any {|c| $c == $p } }
+    | get -o 0.workspace_id
+}
+
+# A new tab in the checkout's workspace, or a new workspace, whose shell runs
+# the resume command: the pane outlives the agent, as in tuios.
+def herdr-open [dir: string, title: string, argv: list<string>] {
+    let root = (git-root $dir)
+    let ws = (herdr-workspace-on $root)
+    let label = ($title | str substring 0..<40)
+    let created = if $ws == null {
+        ^herdr workspace create --cwd $dir --label ($root | path basename) --focus | from json
+    } else {
+        ^herdr tab create --workspace $ws --cwd $dir --label $label --focus | from json
+    }
+    let pane = ($created | get -o result.root_pane.pane_id)
+    if $pane == null { error make {msg: $"herdr gave no pane for ($dir | tilde)"} }
+    let workspace = ($ws | default ($created | get -o result.workspace.workspace_id))
+    if $workspace != null { ^herdr workspace focus $workspace | ignore }
+    ^herdr pane run $pane ($argv | each {|a| $a | sh-quote } | str join " ") | ignore
+}
+
 def open-session [s: record, fork: bool, dry: bool] {
     if $s.pane != null and not $fork {
         # A dormant pane gets its conversation back from tuios, which builds
@@ -431,11 +493,13 @@ def open-session [s: record, fork: bool, dry: bool] {
     if $argv == null { error make {msg: $"($s.harness) cannot fork a session"} }
     let plan = (cwd-plan $s)
     let tuios = (in-tuios)
+    let herdr = (in-herdr)
     if $dry {
         let root = if $plan.restore == null { git-root $plan.dir } else { $plan.dir }
         return ({
             action: (if $fork { "fork" } else { "resume" })
-            via: (if $tuios { "tuios new-window + fish -C" } else { "exec" })
+            via: (if $tuios { "tuios new-window + fish -C" } else if $herdr { "herdr tab + pane run" } else { "exec" })
+            herdr_workspace: (if $herdr { herdr-workspace-on $root | default $"new workspace for ($root | tilde)" } else { null })
             cwd: $plan.dir
             restore_worktree: $plan.restore
             tuios_session: (if $tuios { session-on $root | default $"new session for ($root | tilde)" } else { null })
@@ -455,6 +519,8 @@ def open-session [s: record, fork: bool, dry: bool] {
         # popup closes before the agent has started.
         let cmd = ($argv | each {|a| $a | sh-quote } | str join " ")
         ^tuios new-window $name -s $session --cwd $plan.dir -- fish -C $cmd | ignore
+    } else if $herdr {
+        herdr-open $plan.dir $s.title $argv
     } else {
         cd $plan.dir
         exec ($argv | first) ...($argv | skip 1)
