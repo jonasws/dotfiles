@@ -29,6 +29,8 @@ border_focused_color = "accent"
 # shimmer go.
 motion = "basic"
 border_style = "glyphs"
+# Fade the panes you are not in, so focus reads without the border.
+dim_unfocused = 12
 # The default cap of 12 cells cuts "dotfiles › topic" workspace names to
 # "dotfiles › …". The full name still shows on hover.
 dock_workspace_label_max = 28
@@ -136,9 +138,8 @@ fg = "#1e1e2e"
 cursor_bg = "#f5e0dc"
 cursor_fg = "#11111b"
 
-# herdr's sidebar sits on the left.
 [appearance.sidebar]
-position = "left"
+position = "right"
 width = 34
 # A repo's main checkout and its worktree sessions sit under one group.
 group_main = true

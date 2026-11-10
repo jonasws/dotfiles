@@ -23,8 +23,13 @@
   "bright_white": "#a6adc8",
   "chrome": {
     "accent": "#cba6f7",
+    "accent_bright": "#f5c2e7",
+    "success": "#a6e3a1",
+    "warning": "#fab387",
     "canvas": "#11111b",
     "surface": "#181825",
-    "border": { "unfocused": "#313244" }
+    "border": { "unfocused": "#313244" },
+    "dock": { "ground": "#11111b" },
+    "rail": { "ground": "#181825" }
   }
 }
