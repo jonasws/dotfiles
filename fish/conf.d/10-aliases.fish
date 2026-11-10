@@ -16,6 +16,7 @@ alias lgl "lazygit log"
 alias lgs "lazygit status"
 alias resume "tv claude-sessions"
 alias r "tv claude-sessions"
+alias sessions "tv agent-sessions"
 
 # Eza (better ls) aliases
 alias ll "eza --long --icons auto"

@@ -1,0 +1,123 @@
+[metadata]
+name = "agent-sessions"
+description = """
+Jump back into any coding-agent session, in every repository.
+
+Rows are newest first: the pane state (· not open, ◐ working, ◉ needs you,
+● finished unseen, √ idle, ○ a shell whose agent exited), when the session last moved, the harness, the
+repository, the title with its branch, the tuios pane it runs in, and the
+session key (harness:id).
+
+Enter jumps to the pane already running the session. A pane whose agent
+exited gets the conversation back in its shell (tuios resume-agent, with the
+flags it was started with). Otherwise Enter opens a fish pane that resumes it
+in the tuios session for its checkout, creating that session, and the
+worktree from the session's branch when it was removed. Outside tuios it
+resumes in place. alt-f resumes a fork instead.
+
+Tab cycles the scope: this repository and its worktrees, all, open in a pane.
+ctrl-f cycles the preview: conversation (the first prompt and the latest
+turns), last reply (rendered, with tuios's recap when a pane runs it), tools &
+files (what it ran and edited), and pane screen (the pane as drawn).
+ctrl-x lists every action, including the copy actions.
+
+Sessions come from the adapters in scripts/agent-sessions/adapters, one per
+harness; see the README there.
+"""
+requirements = ["nu", "bun"]
+
+[source]
+command = [
+  { name = "here", run = "~/.config/television/scripts/agent-sessions/agent-sessions.nu list here" },
+  { name = "all", run = "~/.config/television/scripts/agent-sessions/agent-sessions.nu list all" },
+  { name = "live", run = "~/.config/television/scripts/agent-sessions/agent-sessions.nu list live" },
+]
+# tv runs commands through $SHELL (fish here), which costs about 70ms a run.
+shell = "bash"
+# ansi and display exclude each other, so the key ends the row as visible text
+# and is split back off for the output.
+ansi = true
+output = "{strip_ansi|split: :-1}"
+# The script orders by last activity; frecency would reshuffle it.
+no_sort = true
+frecency = false
+
+[preview]
+shell = "bash"
+# The pane screen and the latest turns change while the picker is open, and a
+# cached preview would hide that. Each one takes about 0.2s.
+cached = false
+command = [
+  { name = "conversation", run = "~/.config/television/scripts/agent-sessions/agent-sessions.nu preview '{strip_ansi|split: :-1}' chat" },
+  { name = "last reply", run = "~/.config/television/scripts/agent-sessions/agent-sessions.nu preview '{strip_ansi|split: :-1}' reply" },
+  { name = "tools & files", run = "~/.config/television/scripts/agent-sessions/agent-sessions.nu preview '{strip_ansi|split: :-1}' activity" },
+  { name = "pane screen", run = "~/.config/television/scripts/agent-sessions/agent-sessions.nu preview '{strip_ansi|split: :-1}' pane" },
+]
+
+[ui]
+layout = "landscape"
+input_header = "Agent sessions"
+
+[ui.preview_panel]
+size = 60
+header = "{strip_ansi|split: :-1}"
+scrollbar = true
+
+[keybindings]
+shortcut = "f6"
+# Cmd+K closes the picker where tuios opens it.
+ctrl-alt-k = "quit"
+enter = "actions:open"
+tab = "cycle_sources"
+alt-f = "actions:fork"
+ctrl-y = "actions:copy-id"
+alt-t = "actions:copy-transcript"
+alt-d = "actions:copy-dir"
+alt-p = "actions:copy-pane"
+alt-r = "actions:copy-resume"
+
+# `execute` replaces tv, so the popup is gone by the time the focus lands, and
+# outside tuios quitting the agent lands in the shell rather than the picker.
+[actions.open]
+shell = "bash"
+description = "Jump to the session's pane, or resume it"
+command = "~/.config/television/scripts/agent-sessions/agent-sessions.nu open '{strip_ansi|split: :-1}'"
+mode = "execute"
+
+[actions.fork]
+shell = "bash"
+description = "Resume the session as a fork with a new id"
+command = "~/.config/television/scripts/agent-sessions/agent-sessions.nu open --fork '{strip_ansi|split: :-1}'"
+mode = "execute"
+
+[actions.copy-id]
+shell = "bash"
+description = "Copy the session id"
+command = "~/.config/television/scripts/agent-sessions/agent-sessions.nu copy '{strip_ansi|split: :-1}' id"
+mode = "execute"
+
+[actions.copy-transcript]
+shell = "bash"
+description = "Copy the path of the session's transcript"
+command = "~/.config/television/scripts/agent-sessions/agent-sessions.nu copy '{strip_ansi|split: :-1}' transcript"
+mode = "execute"
+
+[actions.copy-dir]
+shell = "bash"
+description = "Copy the directory the session runs in"
+command = "~/.config/television/scripts/agent-sessions/agent-sessions.nu copy '{strip_ansi|split: :-1}' cwd"
+mode = "execute"
+
+# A line any agent can act on: the full pane id that `tuios -w` and
+# TUIOS_PANE_ID use, its session and the pane's name.
+[actions.copy-pane]
+shell = "bash"
+description = "Copy the tuios pane running the session"
+command = "~/.config/television/scripts/agent-sessions/agent-sessions.nu copy '{strip_ansi|split: :-1}' pane"
+mode = "execute"
+
+[actions.copy-resume]
+shell = "bash"
+description = "Copy the command that resumes the session"
+command = "~/.config/television/scripts/agent-sessions/agent-sessions.nu copy '{strip_ansi|split: :-1}' resume"
+mode = "execute"
