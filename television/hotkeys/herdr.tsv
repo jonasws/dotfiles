@@ -1,6 +1,7 @@
 # section	key	description	custom
 # Prefix is ctrl+b. Mine (★) come from herdr/config.toml.
 pickers	prefix+f / cmd+k	Pane picker, attention first (tv herdr-sessions)	★
+pickers	cmd+o	Agent session picker, every repo (tv agent-sessions)	★
 pickers	prefix+r	Git repo picker, Enter opens a workspace	★
 pickers	prefix+g	Go to (then b: blocked agents only)
 pickers	prefix+w	Navigate mode: workspace list and panes

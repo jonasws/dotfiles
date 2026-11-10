@@ -402,6 +402,15 @@ type = "shell"
 command = "~/.config/tuios/scripts/toggle-popup.sh pane-picker 90% 80% -- ~/.config/tuios/scripts/close-on-leave.sh tv tuios-sessions"
 description = "Pane picker"
 
+# Every agent session in every repo (tv agent-sessions): Enter jumps to the
+# pane running it, or resumes it in its repository's session. O for open.
+[[keybindings.command]]
+key = "super+o"
+name = "agent-sessions"
+type = "shell"
+command = "~/.config/television/scripts/agent-sessions/popup.sh"
+description = "Agent session picker"
+
 [[keybindings.command]]
 key = "prefix+l"
 type = "shell"

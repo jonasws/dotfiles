@@ -48,6 +48,14 @@ command = "tv herdr-sessions"
 width = "90%"
 height = "80%"
 
+# Every agent session in every repo (tv agent-sessions). O for open.
+[[keys.command]]
+key = "super+o"
+type = "popup"
+command = "~/.config/television/scripts/agent-sessions/popup.sh"
+width = "90%"
+height = "80%"
+
 # Plugin: herdr plugin install hmu332233/herdr-f1
 [[keys.command]]
 key = "prefix+shift+f"

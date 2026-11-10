@@ -86,10 +86,12 @@ keybind = alt+right=unbind
 
 # Cmd chords for tuios. Unbound here, Ghostty sends them to tuios under the
 # kitty keyboard protocol, and tuios/config.toml binds them: Cmd+K the pane
-# navigator, Cmd+T a new workspace, Cmd+W close the pane, Cmd+1..9 a
-# workspace, Cmd+R and Cmd+D split the pane right and down. Digits need both
-# forms unbound. Ghostty's own windows keep Cmd+Shift+W.
+# navigator, Cmd+O the agent session picker, Cmd+T a new workspace, Cmd+W
+# close the pane, Cmd+1..9 a workspace, Cmd+R and Cmd+D split the pane right
+# and down. Digits need both forms unbound. Ghostty's own windows keep
+# Cmd+Shift+W.
 keybind = super+k=unbind
+keybind = super+o=unbind
 keybind = super+t=unbind
 keybind = super+w=unbind
 keybind = super+r=unbind
