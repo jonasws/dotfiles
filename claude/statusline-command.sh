@@ -18,7 +18,7 @@ input=$(cat)
   IFS= read -r cache_expires
   IFS= read -r worktree
 } < <(jq -r '
-  (.workspace.current_dir // .cwd // ""),
+  (.workspace.project_dir // .workspace.current_dir // .cwd // ""),
   (.model.display_name // ""),
   (.effort.level // ""),
   (.context_window.remaining_percentage // ""),
