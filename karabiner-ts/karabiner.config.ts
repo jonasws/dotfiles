@@ -9,6 +9,7 @@ import {
   ifDevice,
   map,
   mapDoubleTap,
+  mapPointingButton,
   rule,
   writeToProfile,
 } from 'karabiner.ts'
@@ -106,6 +107,18 @@ writeToProfile(
           .to('left_control', undefined, { lazy: true })
           .toIfAlone('escape'),
       ]),
+
+    // tuios binds Cmd+[ / Cmd+] to its pane jump list (tuios/config.toml).
+    // Ghostty cannot bind mouse buttons itself. Elsewhere the buttons keep
+    // their own back/forward.
+    rule('Mouse back/forward → Cmd+[ / Cmd+] in Ghostty (tuios jump list)').manipulators([
+      mapPointingButton('button4', null, 'any')
+        .to('open_bracket', 'left_command')
+        .condition(ifApp(/^com\.mitchellh\.ghostty$/)),
+      mapPointingButton('button5', null, 'any')
+        .to('close_bracket', 'left_command')
+        .condition(ifApp(/^com\.mitchellh\.ghostty$/)),
+    ]),
 
     rule('Change left_control+hjkl to arrow keys').manipulators(
       arrows.map(([key, arrow]) =>
