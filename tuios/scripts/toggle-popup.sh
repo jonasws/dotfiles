@@ -8,9 +8,11 @@
 # reaches the program in the popup when tuios does not take it first.
 #
 # The popup is found by NAME, which tuios accepts as a window target, so no
-# state is kept. COMMAND gets the pane the key was pressed in as
-# TUIOS_ACTIVE_PANE_ID and TUIOS_ACTIVE_PANE_CWD, because the popup's own
-# environment names the popup.
+# state is kept. COMMAND starts in the folder of the pane the key was pressed
+# in: the popup verb's cwd_from has the daemon read it from that pane's
+# process, which follows a `cd` that the shell never reported. The pane itself
+# reaches COMMAND as TUIOS_ACTIVE_PANE_ID, because the popup's own environment
+# names the popup.
 set -euo pipefail
 
 name=${1:?usage: toggle-popup.sh NAME [WIDTH HEIGHT] -- COMMAND...}
@@ -26,8 +28,16 @@ if tuios close-window "$name" >/dev/null 2>&1; then
   exit 0
 fi
 
-exec tuios popup --name "$name" --width "$width" --height "$height" -- \
-  env \
-    TUIOS_ACTIVE_PANE_ID="${TUIOS_ACTIVE_PANE_ID:-${TUIOS_PANE_ID:-}}" \
-    TUIOS_ACTIVE_PANE_CWD="${TUIOS_ACTIVE_PANE_CWD:-$PWD}" \
-    "$@"
+pane=${TUIOS_ACTIVE_PANE_ID:-${TUIOS_PANE_ID:-}}
+
+# `tuios popup` has no flag for cwd_from, so the verb is called directly.
+params=$(jq -n \
+  --arg session "${TUIOS_SESSION:-}" --arg name "$name" \
+  --arg width "$width" --arg height "$height" \
+  --arg pane "$pane" --arg cwd "${TUIOS_ACTIVE_PANE_CWD:-$PWD}" \
+  '{name: $name, width: $width, height: $height, cwd: $cwd,
+    command: (["env", "TUIOS_ACTIVE_PANE_ID=\($pane)"] + $ARGS.positional)}
+   + (if $session != "" then {session: $session} else {} end)
+   + (if $pane != "" then {cwd_from: $pane} else {} end)' \
+  --args -- "$@")
+tuios call popup "$params" >/dev/null

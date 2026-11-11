@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # git-worktrees for the repository of the pane prefix+R was pressed in, in the
-# popup toggle-popup.sh opens. The popup's own directory is not that pane's.
+# popup toggle-popup.sh opens in that pane's folder.
 set -euo pipefail
 
-dir=${TUIOS_ACTIVE_PANE_CWD:-$PWD}
+dir=$PWD
 if ! common=$(git -C "$dir" rev-parse --path-format=absolute --git-common-dir 2>/dev/null); then
   gum log --level warn "Not in a git repository: ${dir/#$HOME/\~}"
   sleep 1.5

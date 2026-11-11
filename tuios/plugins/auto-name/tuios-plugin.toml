@@ -1,0 +1,16 @@
+api = 1
+id = "jonasws.auto-name"
+name = "Auto name"
+version = "0.1.0"
+description = "Names agent panes after the topic their harness sets as the window title"
+platforms = ["macos", "linux"]
+
+# read follows window-retitled and reads the agent and the window; write
+# renames the pane with set-window.
+[permissions]
+grants = ["read", "write"]
+
+[[process]]
+id = "follow"
+run = "startup"
+command = ["/usr/bin/python3", "./auto_name.py"]

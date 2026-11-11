@@ -12,9 +12,9 @@ Settled shelf, return notes, `[agents.approvals]`, `group_main` and the
 `mise run update:tuios-nightly` builds main with the libghostty-vt emulator
 (the `ghostty` backend, zig 0.16 from mise) into `~/.local/share/tuios-nightly`
 and links the binary as `~/.local/bin/tuios`, so `tuios` on PATH is the nightly
-build in every shell and script. Hooks run in the daemon's environment, so
-`scripts/auto-name.sh` falls back to the nightly path when `tuios` is not on its
-PATH. The task leaves a running daemon on its old build (`--keep-server`);
+build in every shell and script. Hooks and command keys run in the daemon's
+environment, so the scripts fall back to the nightly path when `tuios` is not on
+their PATH. The task leaves a running daemon on its old build (`--keep-server`);
 `tuios kill-server` switches it over when the panes can be spared, and until
 then the daemon does not know the new actions.
 
@@ -80,7 +80,9 @@ keeps tuios's `o`, and `ctrl+k` takes the newest finished turn from `A`, since
 installed off until it is listed in `[plugins]`, and three are: `herdr-splits`,
 `herdr-f1`, and `herdr-automatic-rename`, which names workspaces after the pane
 running in them (settings in `~/.config/herdr/plugins/config/`). Agent panes are
-named by `scripts/auto-name.sh` alone, from the `after-agent-state` hook;
+named by the `jonasws.auto-name` plugin (`plugins/auto-name`) alone, which
+follows `window-retitled` events, since the `after-agent-state` hook fires only
+on alert transitions and never for the pane on screen;
 `dan.pane-topic-sync` is off here so two namers do not fight over one label, and
 herdr still runs it. Since 0.12.1 tuios also shows a name the agent set itself
 (`claude -n`, `/rename`), and a name set by the script or by hand comes before

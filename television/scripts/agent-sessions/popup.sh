@@ -7,15 +7,14 @@
 #   herdr: a "popup" command key runs this inside the popup it opened.
 #
 # Either way the picker starts in the directory of the pane the key was
-# pressed in, so its "here" scope is that pane's repository; a popup's own
-# directory is not that pane's.
+# pressed in, so its "here" scope is that pane's repository. toggle-popup.sh
+# starts the tuios popup there; herdr passes HERDR_ACTIVE_PANE_CWD.
 set -euo pipefail
 
 self=$(realpath "$0")
 tuios_scripts=~/.config/tuios/scripts
 
 if [[ ${1-} == --inside ]]; then
-  cd "${TUIOS_ACTIVE_PANE_CWD:-$PWD}"
   exec "$tuios_scripts/close-on-leave.sh" tv agent-sessions
 fi
 

@@ -110,13 +110,10 @@ navigator_search = true
 [workspaces]
 new_window_when_empty = true
 
-# Name agent panes after their topic, which the rail otherwise hides behind the
-# running command ("claude 1", "claude 2"). `tuios config apply`, run from a
-# terminal outside tuios, loads a new or changed hook (tuios main since
-# 2026-11-08); an older daemon reads [hooks] only at start, and needs
-# `tuios restart-server`.
+# `tuios config apply`, run from a terminal outside tuios, loads a new or
+# changed hook (tuios main since 2026-11-08); an older daemon reads [hooks] only
+# at start, and needs `tuios restart-server`.
 [hooks]
-after-agent-state = "~/.config/tuios/scripts/auto-name.sh"
 # A worktree from prefix+U, `tuios worktree new`, `fan` or the New agent sheet
 # gets mise trusted and its tools installed before the first pane starts.
 after-new-worktree = "~/.config/tuios/scripts/new-worktree.sh"
@@ -437,7 +434,7 @@ description = "yazi: browse"
 [[keybindings.command]]
 key = "prefix+Y"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh yazi 80% 60% -- ~/.config/tuios/scripts/yazi-popup.sh pick"
+command = "~/.config/tuios/scripts/yazi-popup.sh pick"
 description = "yazi: pick files into pane"
 
 # Close the pane. On a session's last pane, close the session too and show the
@@ -502,13 +499,13 @@ description = "AWS profiles"
 [[keybindings.command]]
 key = "prefix+t"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh tsk-board -- bash -c 'cd \"$TUIOS_ACTIVE_PANE_CWD\" && exec tsk'"
+command = "~/.config/tuios/scripts/toggle-popup.sh tsk-board -- tsk"
 description = "Toggle tsk board"
 
 [[keybindings.command]]
 key = "prefix+ctrl+t"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh tsk-capture 82 17 -- bash -c 'cd \"$TUIOS_ACTIVE_PANE_CWD\" && exec tsk capture'"
+command = "~/.config/tuios/scripts/toggle-popup.sh tsk-capture 82 17 -- tsk capture"
 description = "tsk quick capture"
 
 [[keybindings.command]]
@@ -565,9 +562,14 @@ description = "Open F1 dashboard"
 # of closing hints mode.
 alphabet = "asdfhjkl"
 
+# jonasws.auto-name (plugins/auto-name) names agent panes after their topic,
+# which the rail otherwise hides behind the running command ("claude 1").
 [plugins]
-dirs = ["/Users/jonasws/dotfiles/tuios/plugins/jumplist"]
-enabled = ["herdr-splits", "dev.minung.herdr-f1", "herdr-automatic-rename", "jonasws.jumplist"]
+dirs = [
+  "/Users/jonasws/dotfiles/tuios/plugins/jumplist",
+  "/Users/jonasws/dotfiles/tuios/plugins/auto-name",
+]
+enabled = ["herdr-splits", "dev.minung.herdr-f1", "herdr-automatic-rename", "jonasws.auto-name", "jonasws.jumplist"]
 
 # Push notifications ([notify]) live in config.d/notify.toml, which is
 # gitignored because an ntfy topic address is a secret. Copy
