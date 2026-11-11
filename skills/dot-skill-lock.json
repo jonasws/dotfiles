@@ -43,18 +43,18 @@
       "sourceType": "github",
       "sourceUrl": "https://github.com/agavra/tuicr.git",
       "skillPath": "skills/tuicr/SKILL.md",
-      "skillFolderHash": "414f090105e2b4c58f82a764dea7e01cc0f039e2",
+      "skillFolderHash": "575bb532c0631feb7d1833cb86795d76f3296aff",
       "installedAt": "2026-10-19T10:12:17.770Z",
-      "updatedAt": "2026-11-06T08:17:33.605Z"
+      "updatedAt": "2026-11-11T09:29:09.269Z"
     },
     "proc-cli": {
       "source": "yazeed/proc-cli",
       "sourceType": "github",
       "sourceUrl": "https://github.com/yazeed/proc-cli.git",
       "skillPath": "skills/proc-cli/SKILL.md",
-      "skillFolderHash": "1db65d531b4dc4cecea4bd1abef2c30f1f51658e",
+      "skillFolderHash": "1c92e873fd165aea6057b5912c520ee3eba0ce62",
       "installedAt": "2026-10-27T12:07:52.433Z",
-      "updatedAt": "2026-11-04T20:28:54.234Z"
+      "updatedAt": "2026-11-11T09:29:09.314Z"
     }
   },
   "dismissed": {

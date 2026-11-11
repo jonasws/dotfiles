@@ -50,14 +50,15 @@ url_api = "https://api.github.com/repos/FiloSottile/age/releases/assets/53554189
 provenance = "github-attestations"
 
 [[tools."aqua:anthropics/claude-code"]]
-version = "2.1.319"
+version = "2.1.322"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
 [tools."aqua:anthropics/claude-code"."platforms.macos-arm64"]
-checksum = "sha256:7ae10919ce40346befabe3c18da4d5ccc860201b6785b3ae726d8961472d0e5d"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.319/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/715418856"
+checksum = "sha256:0ff389f1a313f50778c2472c2f85882ca82c10156398c68cfc3c332004694646"
+checksum_source = "mise-versions"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.322/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/729756939"
 
 [[tools."aqua:asciinema/asciinema"]]
 version = "3.2.1"
@@ -130,24 +131,24 @@ url = "https://github.com/ast-grep/ast-grep/releases/download/0.51.1/app-aarch64
 url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/701845634"
 
 [[tools.atuin]]
-version = "18.24.5"
+version = "18.24.6"
 backend = "aqua:atuinsh/atuin"
 specifiers = ["latest"]
 
 [tools.atuin."platforms.macos-arm64"]
-checksum = "sha256:644e92d5667e2ebbc00758c71d5974bc907d238eaa6cdc32b24eb73dce7f9a5a"
-url = "https://github.com/atuinsh/atuin/releases/download/v18.24.5/atuin-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/707958967"
+checksum = "sha256:756b7d2f8cb919d29888ea52b2fb19aba92ed52ddbca456839088ccc63257f5b"
+url = "https://github.com/atuinsh/atuin/releases/download/v18.24.6/atuin-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/729825753"
 provenance = "github-attestations"
 
 [[tools.aws-cli]]
-version = "2.39.6"
+version = "2.39.7"
 backend = "aqua:aws/aws-cli"
 specifiers = ["latest"]
 
 [tools.aws-cli."platforms.macos-arm64"]
-checksum = "blake3:b3b91871326cbbccb487130f318e1ae74f7a8ebdcd073cb34684382ab45009f2"
-url = "https://awscli.amazonaws.com/AWSCLIV2-2.39.6.pkg"
+checksum = "sha256:a6d419ec5ce460101499246c9ee8a8a6020e43b7cf6355a388274f5127f2e99f"
+url = "https://awscli.amazonaws.com/AWSCLIV2-2.39.7.pkg"
 
 [[tools.aws-vault]]
 version = "7.17.7"
@@ -204,7 +205,7 @@ backend = "cargo:https://github.com/nushell/nufmt"
 specifiers = ["latest"]
 
 [[tools."cargo:mdcat"]]
-version = "2.19.0"
+version = "2.20.0"
 backend = "cargo:mdcat"
 specifiers = ["latest"]
 
@@ -231,13 +232,13 @@ checksum = "sha256:79145e169bca0b9571d02de8e1cd311a36e0e8fdb4599b6661a87b1bb3afb
 url = "https://download.docker.com/mac/static/stable/aarch64/docker-29.9.3.tgz"
 
 [[tools.fnox]]
-version = "1.47.0"
+version = "1.48.0"
 backend = "packslip:github.com/jdx/fnox"
 specifiers = ["latest"]
 
 [tools.fnox."platforms.macos-arm64"]
-checksum = "sha256:e1afc59116fe9bfee645f3e0d0353b0f7ff68ce4a76bc6c516da7aedd9a47179"
-url = "https://github.com/jdx/fnox/releases/download/v1.47.0/fnox-aarch64-apple-darwin.tar.gz"
+checksum = "sha256:1b81153805a485072ecbeb14b2b2aaa24a9bfeb467002a7d725cbfc01cbb1811"
+url = "https://github.com/jdx/fnox/releases/download/v1.48.0/fnox-aarch64-apple-darwin.tar.gz"
 signer = "sigstore-oidc:https://github.com/jdx/fnox/.github/workflows/release.yml"
 repository_ids = { repository = "1078762196" }
 
@@ -651,14 +652,15 @@ url = "https://github.com/jesseduffield/lazydocker/releases/download/v0.25.2/laz
 url_api = "https://api.github.com/repos/jesseduffield/lazydocker/releases/assets/399711580"
 
 [[tools.lazygit]]
-version = "0.66.2"
+version = "0.66.3"
 backend = "aqua:jesseduffield/lazygit"
 specifiers = ["latest"]
 
 [tools.lazygit."platforms.macos-arm64"]
-checksum = "sha256:fadda59ae7665ba556fcbaa704c7eade6e40d016d3f3b25d6327dd1f3f906a0c"
-url = "https://github.com/jesseduffield/lazygit/releases/download/v0.66.2/lazygit_0.66.2_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/jesseduffield/lazygit/releases/assets/646837816"
+checksum = "sha256:6873e6b7a538b521c4d7ff3f76ec49e6dcafa41e6053a6aae33c12f62663e163"
+checksum_source = "mise-versions"
+url = "https://github.com/jesseduffield/lazygit/releases/download/v0.66.3/lazygit_0.66.3_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/jesseduffield/lazygit/releases/assets/722268996"
 
 [[tools.lua-language-server]]
 version = "3.19.2"
@@ -704,13 +706,10 @@ checksum = "sha256:aa9549349e47dffaa42dcf95d6e06ade8c4bdafc980979883b88767670df3
 url = "https://nodejs.org/dist/v24.22.2/node-v24.22.2-darwin-arm64.tar.gz"
 
 [[tools."npm:@earendil-works/pi-coding-agent"]]
-version = "1.5.0"
-aube = { path = ".mise/locks/npm-earendil-works-pi-coding-agent/1.5.0", digest = "sha256:905e9068e3225e7c3051a744f0ff0a1f37d2ffb63d2ec98c645f8de6e6f68113" }
+version = "1.5.2"
+aube = { path = ".mise/locks/npm-earendil-works-pi-coding-agent/1.5.2", digest = "sha256:aac5a2ec7ec59f94ecf88cd02baa3ac544e3ec4b4a2651b0f7228ecc5bcaceae" }
 backend = "npm:@earendil-works/pi-coding-agent"
 specifiers = ["latest"]
-
-[tools."npm:@earendil-works/pi-coding-agent".provenance]
-repository = "github.com/earendil-works/pi"
 
 [[tools."npm:@mermaid-js/mermaid-cli"]]
 version = "11.15.0"
@@ -773,14 +772,15 @@ specifiers = ["latest"]
 repository = "github.com/typescript-language-server/typescript-language-server"
 
 [[tools.nu]]
-version = "0.116.1"
+version = "0.117.0"
 backend = "aqua:nushell/nushell"
 specifiers = ["latest"]
 
 [tools.nu."platforms.macos-arm64"]
-checksum = "sha256:302fb3dfc5d44e7fe0d5b8227be8e75b4c3956ca8d4804234e5c68fbdd3e4917"
-url = "https://github.com/nushell/nushell/releases/download/0.116.1/nu-0.116.1-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/nushell/nushell/releases/assets/610028991"
+checksum = "sha256:1d0e642ef3bff22113a82749a0fa24a0126f4fea0db46a5909e56e94a4b57527"
+checksum_source = "mise-versions"
+url = "https://github.com/nushell/nushell/releases/download/0.117.0/nu-0.117.0-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/nushell/nushell/releases/assets/729066896"
 
 [[tools.pandoc]]
 version = "3.13"
@@ -800,7 +800,7 @@ specifiers = ["latest"]
 uv = { path = ".mise/locks/pipx-awslogs/0.15.0", digest = "sha256:fd458ae071680a2fec337f5301db18594a8c39843a12089a2045f3a3ea4946a1" }
 
 [[tools."pipx:mcp2cli"]]
-version = "3.8.1"
+version = "3.9.0"
 backend = "pipx:mcp2cli"
 specifiers = ["latest"]
 

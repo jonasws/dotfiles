@@ -1,12 +1,12 @@
 [[plugin.deps]]
 use = "yazi-rs/plugins:piper"
-rev = "c0529fc"
+rev = "1ef5fe0"
 hash = "d1e0499cae5f3aeb628c267616d4b682"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:mime-ext"
-rev = "c0529fc"
-hash = "7d3b7f99e600fd7e77ebc5eb8423a897"
+rev = "1ef5fe0"
+hash = "b9b3ba0d1e0067fa0b729db184b85fdd"
 
 [[plugin.deps]]
 use = "aresler/path-from-root"
@@ -20,10 +20,10 @@ hash = "9776f378459072b6c2875eae5addc49d"
 
 [[plugin.deps]]
 use = "yazi-rs/plugins:git"
-rev = "c0529fc"
+rev = "1ef5fe0"
 hash = "347cc6b190eb0c2fd60513cc7ae37412"
 
 [[flavor.deps]]
 use = "yazi-rs/flavors:catppuccin-mocha"
-rev = "1183892"
-hash = "ce320f877fe709b189433941aba747c4"
+rev = "38c08d8"
+hash = "57d33c9c6107017bf8afc8df186356c5"
