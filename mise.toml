@@ -124,11 +124,27 @@ description = "Build tuios from main and link it as tuios in ~/.local/bin"
 # kill-server` switches over when the panes can be spared. The ghostty backend
 # links libghostty-vt, which needs the zig series ghostty pins (ZIG_SERIES in
 # scripts/ghostty-lib.sh); the library is built once and cached in the checkout.
+# Every host in tuios's [hosts] table gets the same commit, cross-built from
+# this clone; their daemons stay on the old build until
+# `tuios hosts sync NAME --restart`.
 tools = { go = "latest", zig = "0.17" }
 run = """
 set -euo pipefail
 root="$HOME/.local/share/tuios-nightly"
 src="$root/src"
+# An unreachable host (tailnet down, Pi asleep) only warns: the local build
+# still counts as done.
+sync_hosts() {
+  local out ok=0
+  out=$(tuios hosts sync --dev --src "$src" --json 2>/dev/null) && ok=1
+  jq -r '.hosts[] | select(.action != "failed")
+    | "\\(.host): \\(.action)", (.notes // [] | .[] | "  \\(.)")' <<<"$out" 2>/dev/null || true
+  [ "$ok" = 1 ] && return
+  jq -r '.hosts[] | select(.action == "failed")
+    | "warning: tuios not synced to \\(.host): \\(.error)"' <<<"$out" >&2 2>/dev/null ||
+    echo "warning: tuios host sync failed" >&2
+  echo "warning: rerun with: tuios hosts sync --dev --src $src" >&2
+}
 if [ -d "$src/.git" ]; then
   built=$(git -C "$src" rev-parse HEAD)
   git -C "$src" fetch --depth 1 origin main
@@ -136,6 +152,7 @@ if [ -d "$src/.git" ]; then
   if [ -x "$root/bin/tuios" ] && [ "$built" = "$(git -C "$src" rev-parse HEAD)" ] \
     && [ "$(cat "$root/built-commit" 2>/dev/null)" = "$built ghostty" ]; then
     echo "tuios is already at ${built:0:7}"
+    sync_hosts
     exit 0
   fi
 else
@@ -145,6 +162,7 @@ fi
 "$src/scripts/install.sh" ghostty --prefix "$root/bin" --keep-server
 echo "$(git -C "$src" rev-parse HEAD) ghostty" > "$root/built-commit"
 ln -sfn "$root/bin/tuios" "$HOME/.local/bin/tuios"
+sync_hosts
 """
 
 [tasks."update:herdr-nightly"]
