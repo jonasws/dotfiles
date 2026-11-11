@@ -553,3 +553,6 @@ enabled = ["herdr-splits", "dev.minung.herdr-f1", "herdr-automatic-rename"]
 
 [spotlight]
 enabled = false
+
+[hosts.pi]
+addr = "pocket-pi.taile3b28a.ts.net"
