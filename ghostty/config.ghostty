@@ -118,6 +118,11 @@ keybind = super+8=unbind
 keybind = super+digit_8=unbind
 keybind = super+9=unbind
 keybind = super+digit_9=unbind
+# Cmd+[ and Cmd+] step back and forward through the tuios jump list.
+keybind = super+[=unbind
+keybind = super+bracket_left=unbind
+keybind = super+]=unbind
+keybind = super+bracket_right=unbind
 
 keybind = super+l>h=goto_split:left
 keybind = super+l>j=goto_split:down

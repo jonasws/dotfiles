@@ -1,0 +1,16 @@
+api = 1
+id = "jonasws.jumplist"
+name = "Jump list"
+version = "0.1.0"
+description = "Records the workspaces you visit, across sessions, as a Vim-style jump list"
+platforms = ["macos", "linux"]
+
+# Reads the event stream of every session. The jumps themselves run from
+# command keys in config.toml with your own rights, so the plugin needs no more.
+[permissions]
+grants = ["read"]
+
+[[process]]
+id = "record"
+run = "startup"
+command = ["/usr/bin/python3", "./jumplist.py", "record"]

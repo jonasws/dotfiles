@@ -533,6 +533,24 @@ type = "shell"
 command = "~/.config/tuios/scripts/tsk-dispatch.sh worktree"
 description = "tsk: start agent on task (worktree)"
 
+# Jump list over workspaces, across sessions, as Vim's ctrl+o / ctrl+i. The
+# jonasws.jumplist plugin (plugins/jumplist) records the visits; these keys
+# jump with your own rights, which a plugin would need the admin grant for.
+# Cmd+[ / Cmd+] are macOS back/forward and never reach Neovim.
+# ghostty/config.ghostty unbinds them. The picker is `tv tuios-jumplist`, with
+# no key yet.
+[[keybindings.command]]
+key = "super+["
+type = "shell"
+command = "~/.config/tuios/plugins/jumplist/jumplist.py back"
+description = "Jump list: older workspace"
+
+[[keybindings.command]]
+key = "super+]"
+type = "shell"
+command = "~/.config/tuios/plugins/jumplist/jumplist.py forward"
+description = "Jump list: newer workspace"
+
 # F1 dashboard, through the herdr-f1 plugin (`herdr plugin install
 # hmu332233/herdr-f1`; tuios reads herdr's registry and leaves it off until it is
 # enabled below).
@@ -548,7 +566,8 @@ description = "Open F1 dashboard"
 alphabet = "asdfhjkl"
 
 [plugins]
-enabled = ["herdr-splits", "dev.minung.herdr-f1", "herdr-automatic-rename"]
+dirs = ["/Users/jonasws/dotfiles/tuios/plugins/jumplist"]
+enabled = ["herdr-splits", "dev.minung.herdr-f1", "herdr-automatic-rename", "jonasws.jumplist"]
 
 # Push notifications ([notify]) live in config.d/notify.toml, which is
 # gitignored because an ntfy topic address is a secret. Copy

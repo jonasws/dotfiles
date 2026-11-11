@@ -1,0 +1,45 @@
+[metadata]
+name = "tuios-jumplist"
+description = """
+The tuios jump list: the workspaces you visited, newest first, recorded by the
+jonasws.jumplist tuios plugin. ▶ marks where you are; the number after it is
+the offset that prefix+o (older) and prefix+i (newer) move by.
+
+Enter jumps to the workspace, on the pane last focused there, switching
+session when it is in another one. Jumping from here moves the list's cursor,
+as :jumps followed by a count does in Vim.
+"""
+requirements = ["tuios", "python3"]
+
+[source]
+command = "~/.config/tuios/plugins/jumplist/jumplist.py list"
+shell = "bash"
+ansi = true
+no_sort = true
+output = "{strip_ansi|split: :0}"
+frecency = false
+
+[preview]
+shell = "bash"
+command = [
+  "~/.config/television/scripts/tuios-preview.sh '{strip_ansi|split: :1}' screen",
+  "~/.config/television/scripts/tuios-preview.sh '{strip_ansi|split: :1}' scrollback",
+]
+
+[ui]
+layout = "portrait"
+input_header = "jump list"
+
+[ui.preview_panel]
+size = 62
+header = "{strip_ansi|split: :1}"
+scrollbar = true
+
+[keybindings]
+enter = "actions:jump"
+
+[actions.jump]
+shell = "bash"
+description = "Jump to the selected pane"
+command = "~/.config/tuios/plugins/jumplist/jumplist.py goto '{strip_ansi|split: :0}'"
+mode = "execute"
