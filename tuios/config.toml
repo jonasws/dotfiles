@@ -180,6 +180,10 @@ launcher = []
 # preview. Ghostty sends Cmd+K as super+k once it unbinds it; WezTerm sends
 # ctrl+alt+k.
 choose_tree = ["super+k", "ctrl+alt+k"]
+# Cmd+, opens the go-to picker (agents, sessions, workspaces, panes). Stock
+# tuios has it on prefix+G, which toggle_scratch takes here. Ghostty unbinds
+# its own Cmd+, (open config) so the chord reaches tuios.
+goto_picker = ["super+,"]
 # Ghostty hands these Cmd chords to tuios (ghostty/config.ghostty unbinds
 # them): Cmd+T and Cmd+N go to a new workspace and Cmd+1..9 picks one, like a
 # tab bar's; Cmd+Shift+N stays Ghostty's new window.

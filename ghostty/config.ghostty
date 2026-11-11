@@ -96,6 +96,7 @@ keybind = super+t=unbind
 keybind = super+w=unbind
 keybind = super+r=unbind
 keybind = super+d=unbind
+keybind = super+,=unbind
 # Unbinding is not enough for Cmd+.: AppKit turns it into cancelOperation and
 # it never reaches the pane. Send tuios its kitty-protocol encoding instead.
 keybind = super+period=csi:46;9u
