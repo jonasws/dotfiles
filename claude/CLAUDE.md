@@ -175,13 +175,12 @@ the review as a file, I run `pr-review <N> > file.md` (a fish function over
 
 ## Mermaid and TML in the terminal
 
-`sketch` (Mermaid to text, PNG, SVG) and `tml` (shows a TML document, or prints it
-once with `--print`) are standalone builds of tuios's renderers, in `~/.local/bin`.
-Use them in herdr and Rex panes; `sketch -h` and `tml -h` list the flags, and
-`tml --check` names the fix for each problem. Inside tuios (`TUIOS_ENV=1`) use
-`tuios mermaid` and `tuios tml`, and `tuios --skill tml` prints the TML format.
-Plain `tml` cannot return an answer, because redirected output prints instead of
-opening the UI; ask in the conversation or use `tuios tml show --wait`.
+Inside tuios (`TUIOS_ENV=1`) use `tuios mermaid` and `tuios tml`; `tuios mermaid -h`
+and `tuios --skill tml` have the details. In herdr and Rex panes, `tml` in
+`~/.local/bin` is a standalone build of the TML renderer (`tml -h`, and `tml --check`
+names the fix for each problem). Plain `tml` cannot return an answer, because
+redirected output prints instead of opening the UI; ask in the conversation or use
+`tuios tml show --wait`.
 
 ## tuios: one session per repository
 

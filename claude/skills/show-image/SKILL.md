@@ -1,6 +1,6 @@
 ---
 name: show-image
-description: Show an image file (PNG, JPG, GIF, WebP) as a real picture in a new tuios pane, using `kitten icat` run through `mise exec`. Use whenever the user asks to show, open, view, display or preview an image, screenshot, chart or rendered diagram "in a pane", "in the terminal" or "here", including a PNG you just rendered from Mermaid or a plotting script. Needs TUIOS_ENV=1; the terminal is Ghostty, which draws kitty graphics.
+description: Show an image file (PNG, JPG, GIF, WebP) as a real picture in a new tuios pane, using `kitten icat` run through `mise exec`. Use whenever the user asks to show, open, view, display or preview an image file, screenshot or chart "in a pane", "in the terminal" or "here", including a PNG from a plotting script. Needs TUIOS_ENV=1; the terminal is Ghostty, which draws kitty graphics.
 ---
 
 # Show an image in a tuios pane
@@ -44,15 +44,3 @@ If the pane shows an error instead:
 - icat says the terminal does not support graphics: no attached client answered
   tuios's kitty graphics query (for example a detached session, or a client in a
   terminal without graphics). Ask the user to attach from Ghostty and run it again.
-
-## Diagrams
-
-For a Mermaid diagram, render it to PNG first (`sketch file.mmd -o file.png -scale 3`)
-and show the PNG, so the user sees exactly the file they will share. When they want a
-live view that redraws on save instead, `tuios mermaid --watch --fit file.mmd` in a new
-window draws the diagram itself, with no image file.
-
-## Sharing
-
-For Slack, share the PNG. Slack does not render SVG inline, and sketch's SVG has no
-background, so it reads badly in dark mode.

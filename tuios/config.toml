@@ -31,6 +31,8 @@ motion = "basic"
 border_style = "glyphs"
 # Fade the panes you are not in, so focus reads without the border.
 dim_unfocused = 12
+# The wheel only scrolls the focused pane, so hovering a pane focuses it.
+focus_follows_mouse = true
 # The default cap of 12 cells cuts "dotfiles › topic" workspace names to
 # "dotfiles › …". The full name still shows on hover.
 dock_workspace_label_max = 28
