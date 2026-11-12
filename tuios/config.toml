@@ -39,6 +39,8 @@ dock_workspace_label_max = 28
 # Frame the larger panels (agents view, palette) like the dialogs, so Cmd+K's
 # navigator and the agents view read as one family. Colours are the theme's.
 frame_panels = true
+# New BSP workspaces cut each window along whichever split keeps panes most usable.
+tiling_scheme = "smart_split"
 
 # Dock messages show the icon and text, without the side bar and countdown line.
 [notifications]
