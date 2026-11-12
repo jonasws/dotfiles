@@ -11,7 +11,7 @@ The command text is searched for herdr/tuios invocations wherever they sit:
 after `&&` or `;`, behind a path, `env`, `xargs` or `mise exec --`, inside
 `bash -c '...'`, `$(...)` or a heredoc. Script files named on the command
 line (.sh, .py, ...) are searched too, one level deep, because a skill
-script such as markdown-preview's preview.sh runs `herdr pane split` itself.
+script can run `herdr pane split` or `tuios split-window` itself.
 
 It errs towards asking: a prompt costs one keypress, a miss costs a pane the
 user never approved. Not covered: a program that talks to the herdr or tuios

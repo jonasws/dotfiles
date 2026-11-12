@@ -1,3 +1,7 @@
 # Only what differs from leaf defaults; see the sample config.toml in RivoLink/leaf.
 theme = "catppuccin-mocha"
 file-history-length = 20
+
+# Ctrl+E edits in Neovim at the line on screen. Inside tuios leaf finds no
+# terminal it can open a tab in, so the editor runs in leaf's own pane.
+editor = 'nvim +{$line} +"normal! zz"'

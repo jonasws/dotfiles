@@ -7,8 +7,8 @@
 # HERDR_ENV=1 is herdr's "inside herdr" marker, which integrations check before
 # talking to the socket. Neovim tells Rex from herdr by REX_SESSION instead.
 #
-# Loaded before 50-herdr-exec.fish and 60-herdr-automatic-rename.fish, which
-# then work in Rex panes as they do in herdr's.
+# Loaded before 60-herdr-automatic-rename.fish, which then works in Rex panes
+# as it does in herdr's.
 set -q REX_SESSION; and set -q REX_BLOCK; or return
 
 function __rex_herdr_tail --argument-names id
