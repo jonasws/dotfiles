@@ -310,9 +310,11 @@ run = "git status --short"
 dotfiles.root = "~/dotfiles"
 dotfiles.relative_symlinks = true
 
+# Atuin reads ~/.atuin/config.toml whenever it exists, and then ignores
+# ~/.config/atuin. Its onboarding writes a default one there.
 [dotfile_groups.atuin]
 root = "atuin"
-target = "~/.config/atuin"
+target = "~/.atuin"
 
 [dotfile_groups.aws]
 root = "aws"

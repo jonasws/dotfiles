@@ -118,7 +118,12 @@ usage = "6.9.0"
 # a terminal, answering no to prefix+t, which herdr/scripts/tsk-toggle.sh owns:
 #   ~/.local/share/mise/installs/github-smarzban-tsk/latest/tsk setup herdr
 "github:smarzban/tsk" = { version = "latest", postinstall = "\"$MISE_TOOL_INSTALL_PATH/tsk\" setup claude || true" }
-atuin = "latest"
+# The daemon (threads capture, the MCP's threads tools) runs from the versioned
+# install directory, and so does the launchd agent it installs. An upgrade
+# followed by a prune leaves that agent pointing at a deleted binary, and
+# nothing starts the daemon again until a command needs it. Restarting from the
+# new install replaces the daemon and rewrites the agent with the new path.
+atuin = { version = "latest", postinstall = "for a in \"$MISE_TOOL_INSTALL_PATH\"/atuin-*/atuin; do \"$a\" daemon restart || true; done" }
 "aqua:textfuel/lazyjira" = "latest"
 "aqua:showwin/speedtest-go" = "latest"
 "github:RivoLink/leaf" = "latest"
