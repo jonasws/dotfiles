@@ -1,0 +1,6 @@
+# Lockfiles are written by the update:* mise tasks; GitHub hides them in diffs.
+*.lock                      linguist-generated=true
+*lock.json                  linguist-generated=true
+*.lock.json                 linguist-generated=true
+tuios/plugins.lock          linguist-generated=true
+mise-global/.mise/locks/**  linguist-generated=true
