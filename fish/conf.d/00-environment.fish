@@ -15,7 +15,11 @@ end
 
 # Added after brew so they sit in front of it: keg-only curl over macOS's, and
 # the terminals' CLIs. --move keeps the order without duplicating entries.
+# Homebrew's own bin dirs are moved too: a child login shell skips brew
+# shellenv, and fish's /etc/paths init has put /usr/bin and /bin back in front.
 fish_add_path --global --move --path \
+    /opt/homebrew/bin \
+    /opt/homebrew/sbin \
     /Applications/WezTerm.app/Contents/MacOS \
     /Applications/Ghostty.app/Contents/MacOS \
     /opt/homebrew/opt/curl/bin
