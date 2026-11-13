@@ -288,6 +288,25 @@ The Concise output style sets the voice. These add what it leaves open:
 - Give a time estimate only when I ask or when it changes a decision. Estimate your
   own run time and list my part (approvals, review, manual testing) separately.
 
+## Writing Norwegian
+
+When I ask for Norwegian, write the prose in Norwegian and leave domain terms as
+they are. Anything named in code, an API, a schema or a vendor spec stays verbatim:
+field names, enum values, status codes, endpoints, service names. Put them in
+backticks wherever the output format has inline code (Markdown, Jira, Confluence,
+KDoc); elsewhere write them plain, still untranslated.
+
+- `originStation`, not "opprinnelsesstasjon"; `transporterReference`, not
+  "transportørreferanse"; `departure_date`, not "avgangsdato" when the field is meant.
+- Established English jargon with no natural Norwegian use stays English too:
+  "consignment", "booking", "receipt", "sweep", "timeline". No coined compounds
+  such as "opprinnelses-PLC" or "stopp-tidslinje".
+- Translate only words a Norwegian colleague would say in Norwegian anyway. When
+  unsure, keep the English term.
+
+The house-language list in each workspace's CLAUDE.md (for example "journey", not
+"reise") applies on top of this.
+
 ## Code comments
 
 Do not add comments of these kinds — they are self-shaming, not useful to whoever
