@@ -33,8 +33,9 @@ border_style = "glyphs"
 dim_unfocused = 12
 # The wheel only scrolls the focused pane, so hovering a pane focuses it.
 focus_follows_mouse = true
-# The default cap of 12 cells cuts "dotfiles › topic" workspace names to
-# "dotfiles › …". The full name still shows on hover.
+# The default cap of 12 cells cuts the agent topics and repo@branch titles
+# that scripts/workspace-names.py names workspaces with. The full name still
+# shows on hover.
 dock_workspace_label_max = 28
 # Frame the larger panels (agents view, palette) like the dialogs, so Cmd+K's
 # navigator and the agents view read as one family. Colours are the theme's.
@@ -121,6 +122,18 @@ new_window_when_empty = true
 # A worktree from prefix+U, `tuios worktree new`, `fan` or the New agent sheet
 # gets mise trusted and its tools installed before the first pane starts.
 after-new-worktree = "~/.config/tuios/scripts/new-worktree.sh"
+# Name workspaces after an agent's topic, else the shell's title, keeping any
+# name given by hand (scripts/workspace-names.py). Daemon hooks run with my
+# rights; a plugin would need the admin grant for set-workspace-name. Focus and
+# pane changes pick the source pane; a finished command catches a shell's new
+# title once fish has redrawn it; agent-state fires only on the alerting
+# transitions, so a topic set mid-turn shows at the turn's end or on a focus.
+after-focus-change = "/usr/bin/python3 -I ~/.config/tuios/scripts/workspace-names.py"
+after-workspace-switch = "/usr/bin/python3 -I ~/.config/tuios/scripts/workspace-names.py"
+after-new-window = "/usr/bin/python3 -I ~/.config/tuios/scripts/workspace-names.py"
+after-close-window = "/usr/bin/python3 -I ~/.config/tuios/scripts/workspace-names.py"
+after-agent-state = "/usr/bin/python3 -I ~/.config/tuios/scripts/workspace-names.py"
+after-command-finished = "/usr/bin/python3 -I ~/.config/tuios/scripts/workspace-names.py --delay 0.2"
 
 # Worktrees sit beside their repo, in a hidden .worktrees folder of the repo's
 # parent, so a session in one still loads the CLAUDE.md of ~/CX, ~/CNOPS or

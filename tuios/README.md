@@ -59,10 +59,14 @@ LaunchAgent.
 - **Theme.** `mocha-ghostty` (`themes/`), the same sixteen colours as Ghostty,
   with `catppuccin_latte` when the host turns light. Selection and the
   copy-mode cursor are rosewater, as in Ghostty.
-- **Naming.** Nothing names workspaces automatically. A workspace without a
-  name shows its number until it's renamed (`prefix+T`). Panes do get names:
-  a shell pane shows the title fish sets (`fish/functions/fish_title.fish`),
-  and Claude Code names its own pane.
+- **Naming.** A shell pane shows the title fish sets
+  (`fish/functions/fish_title.fish`), and Claude Code names its own pane.
+  `scripts/workspace-names.py`, run by the `[hooks]` on focus, pane, command
+  and agent events, names each workspace after an agent's topic, else a shell
+  pane's title. A name given by hand (`prefix+T`, the CLI or MCP) marks the
+  workspace manual, and the script leaves it alone until the name is cleared
+  (`tuios set-workspace-name N` with no name). tuios itself has no automatic
+  workspace names: an unnamed one shows its number.
 - **Worktrees.** These go to `../.worktrees/<repo>/<branch>` beside the repo,
   so a worktree under `~/CX` still loads `~/CX/CLAUDE.md`. The
   `after-new-worktree` hook (`scripts/new-worktree.sh`) runs `mise install`
