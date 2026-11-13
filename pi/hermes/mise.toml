@@ -1,0 +1,67 @@
+# Global mise config for the `hermes` user on the Pi, installed by setup.sh as
+# ~hermes/.config/mise/config.toml. mise owns signal-cli and the Java it runs on,
+# and its tasks are how Hermes is installed, linked to Signal and upgraded:
+#
+#   sudo machinectl shell hermes@   # a shell with the user bus, then:
+#   mise run hermes:install         # Hermes, from its official installer
+#   mise run signal:link            # link signal-cli to your phone (QR)
+#   mise run upgrade                # everything, then restart both services
+#
+# Hermes itself is not a mise tool. Its only supported Linux install is its own
+# install.sh (git checkout + its pinned uv, Python, Node). PyPI installs are
+# unsupported and the PyPI package is stale:
+# https://hermes-agent.nousresearch.com/docs/getting-started/platform-support
+
+[tools]
+# signal-cli 0.14 needs Java 25 or newer.
+java = "temurin-25"
+# The JVM tarball, not -Linux-native (x86_64 only) or -Linux-client. The
+# postinstall adds the aarch64 libsignal the tarball doesn't ship.
+"github:AsamK/signal-cli" = { version = "latest", asset_pattern = "signal-cli-*[0-9].tar.gz", postinstall = "\"$HOME/.config/hermes-pi/libsignal-arm64.sh\" \"$MISE_TOOL_INSTALL_PATH\"" }
+
+[settings]
+# signal-cli releases older than three months may stop talking to Signal's
+# servers, so don't hold new ones back a day as well.
+minimum_release_age_excludes = ["github:AsamK/signal-cli"]
+
+[tasks."hermes:install"]
+description = "Install or repair Hermes from its official installer"
+# Downloaded to a file rather than piped, so a cut-off download can't run half
+# a script. No Chromium (the Pi's biggest memory cost; use a cloud browser) and
+# no computer-use driver. --non-interactive skips the setup wizard: Signal is
+# configured by setup.sh, and the model by `hermes model`.
+run = """
+set -eu
+tmp=$(mktemp)
+trap 'rm -f "$tmp"' EXIT
+curl -fsSL https://hermes-agent.nousresearch.com/install.sh -o "$tmp"
+bash "$tmp" --skip-browser --skip-computer-use --non-interactive
+"""
+
+[tasks."signal:link"]
+description = "Link signal-cli to your Signal account as a secondary device"
+# Draws the sgnl:// link as a QR code: on the phone, Signal → Settings → Linked
+# devices → Link new device. `link` exits once the phone has accepted; every
+# line is read to the end so the pipe never closes under it.
+run = """
+set -eu
+signal-cli link -n "hermes-$(hostname)" | while IFS= read -r line; do
+  case "$line" in
+    sgnl://*) printf '%s' "$line" | qrencode -t ansiutf8; echo "$line" ;;
+    *) echo "$line" ;;
+  esac
+done
+"""
+
+[tasks."signal:accounts"]
+description = "List the Signal accounts signal-cli is linked to"
+run = "signal-cli listAccounts"
+
+[tasks.upgrade]
+description = "Upgrade signal-cli, Java and Hermes, then restart both services"
+run = """
+set -eu
+mise upgrade
+hermes update
+systemctl --user restart signal-cli.service hermes-gateway.service
+"""

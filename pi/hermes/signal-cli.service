@@ -1,0 +1,26 @@
+# signal-cli's JSON-RPC/SSE daemon, which Hermes's Signal adapter talks to.
+# Installed by setup.sh as ~hermes/.config/systemd/user/signal-cli.service.
+#
+# Started through `mise exec`, so it runs the signal-cli and Java that mise has
+# installed now: a `mise upgrade` takes effect on the next restart.
+# SIGNAL_ACCOUNT and SIGNAL_HTTP_ADDR come from signal.env, written by setup.sh.
+# Keep SIGNAL_HTTP_ADDR on loopback: the API sends messages as you, with no
+# authentication.
+
+[Unit]
+Description=signal-cli daemon for Hermes
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+EnvironmentFile=%h/.config/hermes-pi/signal.env
+WorkingDirectory=%h
+# The JVM sizes its heap from the Pi's RAM; cap it so Hermes keeps room.
+Environment=SIGNAL_CLI_OPTS=-Xmx512m
+ExecStart=%h/.local/bin/mise exec -- signal-cli -a ${SIGNAL_ACCOUNT} daemon --http ${SIGNAL_HTTP_ADDR}
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target
