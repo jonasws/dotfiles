@@ -17,14 +17,8 @@ REGION = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION") or
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from tmlpane import Pane, print_rerun  # noqa: E402
 TML = pathlib.Path(__file__).with_name("watch-ecs-deployment.tml")
+STATE = pathlib.Path(__file__).with_name("watch-ecs-state.nu")
 
-LABELS = {
-    "PENDING": "Deployment pending", "IN_PROGRESS": "Rolling out",
-    "SUCCESSFUL": "Deployment succeeded", "STOPPED": "Deployment stopped",
-    "STOP_REQUESTED": "Stop requested", "ROLLBACK_REQUESTED": "Rollback requested",
-    "ROLLBACK_IN_PROGRESS": "Rolling back", "ROLLBACK_SUCCESSFUL": "Rolled back",
-    "ROLLBACK_FAILED": "Rollback failed",
-}
 FINAL = {"SUCCESSFUL", "STOPPED", "ROLLBACK_SUCCESSFUL", "ROLLBACK_FAILED"}
 
 
@@ -33,21 +27,12 @@ def aws(*args):
     return json.loads(out.stdout) if out.stdout.strip() else {}
 
 
-def ts(value):
-    return datetime.datetime.fromisoformat(value) if value else None
-
-
 def now():
     return datetime.datetime.now(datetime.timezone.utc)
 
 
 def clock(t):
     return t.astimezone().strftime("%H:%M:%S") if t else "-"
-
-
-def dur(seconds):
-    seconds = int(seconds)
-    return f"{seconds // 60}m {seconds % 60}s"
 
 
 def list_services():
@@ -72,68 +57,16 @@ def choose_service(services, account):
 class Watch:
     def __init__(self, service, cluster):
         self.service, self.cluster = service, cluster
-        self.revisions = {}
         self.history = []
 
-    def revision(self, arn):
-        if arn not in self.revisions:
-            rev = aws("ecs", "describe-service-revisions", "--service-revision-arns", arn)["serviceRevisions"][0]
-            self.revisions[arn] = {
-                "taskDef": rev["taskDefinition"].rsplit("/", 1)[-1],
-                "images": ", ".join(c["image"].rsplit("/", 1)[-1] for c in rev.get("containerImages", [])),
-            }
-        return self.revisions[arn]
-
     def state(self):
-        listed = aws("ecs", "list-service-deployments", "--cluster", self.cluster, "--service", self.service,
-                     "--max-results", "10")["serviceDeployments"]
-        if not listed:
-            return {"status": "NONE", "statusLabel": "No service deployments in the last 90 days",
-                    "statusState": "idle", "updated": clock(now())}
-        latest = max(listed, key=lambda d: d["createdAt"])["serviceDeploymentArn"]
-        d = aws("ecs", "describe-service-deployments", "--service-deployment-arns", latest)["serviceDeployments"][0]
-        target = d.get("targetServiceRevision", {})
-        rev = self.revision(target["arn"])
-        events = aws("ecs", "describe-services", "--cluster", self.cluster,
-                     "--services", self.service)["services"][0]["events"]
-
-        status = d["status"]
-        start = ts(d.get("startedAt") or d.get("createdAt"))
-        end = ts(d.get("finishedAt") or d.get("stoppedAt"))
-        sources = d.get("sourceServiceRevisions", [])
-        breaker = d.get("deploymentCircuitBreaker", {})
-        rollback = d.get("rollback")
-        self.history = (self.history + [target.get("runningTaskCount", 0)])[-60:]
-        since = start - datetime.timedelta(seconds=5)
-
-        return {
-            "service": self.service,
-            "cluster": self.cluster.rsplit("/", 1)[-1],
-            "status": status,
-            "statusLabel": LABELS.get(status, status),
-            "statusState": "done" if status == "SUCCESSFUL"
-            else "errored" if "ROLLBACK" in status or "STOP" in status else "working",
-            "reason": d.get("statusReason", ""),
-            "started": clock(start),
-            "finished": clock(end),
-            "elapsed": dur(((end or now()) - start).total_seconds()),
-            "updated": clock(now()),
-            "requested": target.get("requestedTaskCount", 0),
-            "running": target.get("runningTaskCount", 0),
-            "pending": target.get("pendingTaskCount", 0),
-            "oldRequested": sum(s.get("requestedTaskCount", 0) for s in sources),
-            "oldRunning": sum(s.get("runningTaskCount", 0) for s in sources),
-            "breaker": breaker.get("status", "-"),
-            "breakerFailures": breaker.get("failureCount", 0),
-            "breakerThreshold": breaker.get("threshold", 0),
-            "rollback": f"{rollback.get('reason', '')} (from {clock(ts(rollback.get('startedAt')))})" if rollback else "",
-            "alarms": d.get("alarms", {}).get("status", "-"),
-            **rev,
-            "deploymentId": d["serviceDeploymentArn"].rsplit("/", 1)[-1],
-            "history": self.history,
-            "events": [{"id": e["id"], "time": clock(ts(e["createdAt"])), "message": e["message"]}
-                       for e in events if ts(e["createdAt"]) >= since][:40],
-        }
+        out = subprocess.run(["nu", "--no-config-file", str(STATE), self.service, self.cluster],
+                             check=True, capture_output=True, text=True)
+        state = json.loads(out.stdout)
+        if state["status"] != "NONE":
+            self.history = (self.history + [state["running"]])[-60:]
+            state["history"] = self.history
+        return state
 
 
 def main():

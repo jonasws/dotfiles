@@ -11,7 +11,6 @@ import datetime
 import json
 import os
 import pathlib
-import re
 import subprocess
 import sys
 
@@ -19,11 +18,8 @@ REGION = os.environ.get("AWS_REGION") or os.environ.get("AWS_DEFAULT_REGION") or
 sys.path.insert(0, str(pathlib.Path(__file__).parent))
 from tmlpane import Pane, print_rerun  # noqa: E402
 TML = pathlib.Path(__file__).with_name("watch-cfn-deployment.tml")
+STATE = pathlib.Path(__file__).with_name("watch-cfn-state.nu")
 
-# Stack-level statuses that begin an operation; the latest one marks its start.
-START = {"CREATE_IN_PROGRESS", "UPDATE_IN_PROGRESS", "DELETE_IN_PROGRESS", "IMPORT_IN_PROGRESS"}
-# Failures CloudFormation reports as a consequence of another resource failing.
-KNOCK_ON = re.compile(r"cancelled|Resource update cancelled|resource\(s\) failed to", re.I)
 LISTED = ["CREATE_IN_PROGRESS", "CREATE_FAILED", "CREATE_COMPLETE", "ROLLBACK_IN_PROGRESS",
           "ROLLBACK_FAILED", "ROLLBACK_COMPLETE", "DELETE_IN_PROGRESS", "DELETE_FAILED",
           "UPDATE_IN_PROGRESS", "UPDATE_COMPLETE_CLEANUP_IN_PROGRESS", "UPDATE_COMPLETE",
@@ -38,35 +34,8 @@ def aws(*args):
     return json.loads(out.stdout) if out.stdout.strip() else {}
 
 
-def ts(value):
-    return datetime.datetime.fromisoformat(value) if value else None
-
-
 def clock(t):
     return t.astimezone().strftime("%H:%M:%S") if t else "-"
-
-
-def dur(seconds):
-    seconds = int(seconds)
-    return f"{seconds // 60}m {seconds % 60}s"
-
-
-def state_of(status):
-    if status.endswith("_IN_PROGRESS"):
-        return "working"
-    if "ROLLBACK" in status or status.endswith("_FAILED"):
-        return "errored"
-    return "done"
-
-
-def role_of(status):
-    if status.endswith("_FAILED") or ("ROLLBACK" in status and status.endswith("_COMPLETE")):
-        return "error"
-    if status.endswith("_IN_PROGRESS"):
-        return "warning"
-    if status.endswith("_COMPLETE"):
-        return "success"
-    return "mute"
 
 
 def choose_stack(account):
@@ -90,73 +59,10 @@ def choose_stack(account):
     return out.stdout.split()[0]
 
 
-def operation_events(stack):
-    """Events of the latest operation, newest first, read page by page until its start."""
-    events, token = [], None
-    while True:
-        page = aws("cloudformation", "describe-stack-events", "--stack-name", stack,
-                   "--max-items", "100", *(["--starting-token", token] if token else []))
-        for e in page.get("StackEvents", []):
-            events.append(e)
-            if (e["ResourceType"] == "AWS::CloudFormation::Stack" and e["LogicalResourceId"] == stack
-                    and e["ResourceStatus"] in START):
-                return events
-        token = page.get("NextToken")
-        if not token:
-            return events
-
-
 def build_state(stack, account):
-    summary = aws("cloudformation", "describe-stacks", "--stack-name", stack)["Stacks"][0]
-    status = summary["StackStatus"]
-    events = operation_events(stack)
-    start = ts(events[-1]["Timestamp"]) if events else None
-    end = ts(events[0]["Timestamp"]) if events and not status.endswith("_IN_PROGRESS") else None
-
-    latest = {}
-    for e in events:
-        if e["LogicalResourceId"] != stack:
-            latest.setdefault(e["LogicalResourceId"], e)
-
-    failures = [e for e in reversed(events) if e["ResourceStatus"].endswith("_FAILED")]
-    root = next((e for e in failures if not KNOCK_ON.search(e.get("ResourceStatusReason", ""))),
-                failures[0] if failures else None)
-
-    def order(e):
-        s = e["ResourceStatus"]
-        return (0 if s.endswith("_FAILED") else 1 if s.endswith("_IN_PROGRESS") else 2,
-                -ts(e["Timestamp"]).timestamp())
-
-    resources = [{"id": e["LogicalResourceId"], "type": e["ResourceType"].removeprefix("AWS::"),
-                  "status": e["ResourceStatus"], "role": role_of(e["ResourceStatus"]),
-                  "time": clock(ts(e["Timestamp"])),
-                  "reason": e.get("ResourceStatusReason", "")[:300]}
-                 for e in sorted(latest.values(), key=order)]
-    statuses = [r["status"] for r in resources]
-
-    return {
-        "stack": stack,
-        "account": account,
-        "status": status,
-        "statusLabel": status.replace("_", " ").capitalize(),
-        "statusState": state_of(status),
-        "statusRole": role_of(status),
-        "operation": events[-1]["ResourceStatus"].removesuffix("_IN_PROGRESS").lower() if events else "-",
-        "reason": summary.get("StackStatusReason", ""),
-        "rootCause": f"{root['LogicalResourceId']}: {root.get('ResourceStatusReason', '')}" if root else "",
-        "started": clock(start),
-        "finished": clock(end),
-        "elapsed": dur(((end or datetime.datetime.now(datetime.timezone.utc)) - start).total_seconds()) if start else "-",
-        "updated": clock(datetime.datetime.now(datetime.timezone.utc)),
-        "inProgress": sum(s.endswith("_IN_PROGRESS") for s in statuses),
-        "complete": sum(s.endswith("_COMPLETE") for s in statuses),
-        "failed": sum(s.endswith("_FAILED") for s in statuses),
-        "touched": len(resources),
-        "resources": resources,
-        "events": [{"key": e["EventId"], "time": clock(ts(e["Timestamp"])), "status": e["ResourceStatus"],
-                    "role": role_of(e["ResourceStatus"]), "id": e["LogicalResourceId"], "reason": e.get("ResourceStatusReason", "")[:300]}
-                   for e in events[:100]],
-    }
+    out = subprocess.run(["nu", "--no-config-file", str(STATE), stack, account],
+                         check=True, capture_output=True, text=True)
+    return json.loads(out.stdout)
 
 
 def tuios(*args):
