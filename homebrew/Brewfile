@@ -62,8 +62,6 @@ brew "ffmpeg"
 brew "fish"
 # Terminal JSON viewer
 brew "fx"
-# Command-line fuzzy finder written in Go
-brew "fzf"
 # Easily access your Google Calendar(s) from a command-line
 brew "gcalcli"
 # GNU compiler collection

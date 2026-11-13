@@ -23,7 +23,7 @@
 # event, with the last word on what `complete -c fnox` holds.
 
 function __fnox_install_completions --on-event fish_prompt \
-        --description "Keep fnox's completions ahead of the stub mise reinstalls"
+    --description "Keep fnox's completions ahead of the stub mise reinstalls"
     set -l rules (complete -c fnox)
 
     # Nothing to do only when ours are present and mise's stub is not: leaving

@@ -7,11 +7,4 @@ function fish_user_key_bindings --description "Custom key bindings"
     bind -M insert ctrl-n down-or-search
     # vi mode's insert bindings omit the emacs-style option+backspace word delete.
     bind -M insert alt-backspace backward-kill-word
-
-    # Here rather than in conf.d: fzf.fish's conf.d loads later and rebinds
-    # ctrl-r to its own history search.
-    if functions -q _atuin_search
-        bind ctrl-r _atuin_search
-        bind -M insert ctrl-r _atuin_search
-    end
 end

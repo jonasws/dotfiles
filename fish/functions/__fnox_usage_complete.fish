@@ -1,5 +1,5 @@
 function __fnox_usage_complete \
-        --description "fnox's own generated completion, loaded on first use"
+    --description "fnox's own generated completion, loaded on first use"
     if not functions -q __usage_complete_fnox
         # Drop the generated script's own `complete -c 'fnox' ...` line and keep
         # the function it defines. Registration belongs to

@@ -1,17 +1,7 @@
 # Interactive-only configurations
 if status is-interactive
-    # Homebrew setup
-    if test -x /opt/homebrew/bin/brew
-        /opt/homebrew/bin/brew shellenv fish | source
-    end
-
     if command -q mise
         mise activate fish | source
-    end
-
-    # FZF key bindings
-    if functions -q fzf_configure_bindings
-        fzf_configure_bindings --directory=\cf --git_status=\eg --git_log=\el
     end
 
     # Ctrl-O: open current prompt in nvim
@@ -25,10 +15,6 @@ if status is-interactive
     set -x OP_ACCOUNT capragroup.1password.eu
 
     # Initialize external tools
-    if command -q batman
-        batman --export-env | source
-    end
-
     if command -q starship
         # starship bakes the absolute path of the binary that ran init into the
         # prompt functions, and mise installs each version in its own directory,
@@ -116,11 +102,14 @@ if status is-interactive
         end
     end
 
-    # atuin records history and binds nothing: up, ctrl-p and k stay fish's own
-    # up-or-search. fish_user_key_bindings binds ctrl-r to _atuin_search.
+    # atuin binds nothing itself: up, ctrl-p and k stay fish's own
+    # up-or-search. ctrl-r is bound here, after `tv init`, which also claims it.
     if command -q atuin
         set -gx ATUIN_NOBIND true
         atuin init fish --disable-ai | source
+        for mode in default insert
+            bind --mode $mode ctrl-r _atuin_search
+        end
     end
 
     # 1Password plugins

@@ -1,5 +1,5 @@
 function __fnox_complete_passthrough \
-        --description "Complete the command after fnox's `--`"
+    --description "Complete the command after fnox's `--`"
     # Lazy `.*?`, so a `--` among the wrapped command's own arguments is left
     # alone: only fnox's separator, the first one, is stripped.
     set -l rest (string replace -r '^.*?\s--\s' '' -- (commandline -cp))
