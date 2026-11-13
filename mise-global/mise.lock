@@ -50,15 +50,14 @@ url_api = "https://api.github.com/repos/FiloSottile/age/releases/assets/53554189
 provenance = "github-attestations"
 
 [[tools."aqua:anthropics/claude-code"]]
-version = "2.1.322"
+version = "2.1.323"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
 [tools."aqua:anthropics/claude-code"."platforms.macos-arm64"]
-checksum = "sha256:0ff389f1a313f50778c2472c2f85882ca82c10156398c68cfc3c332004694646"
-checksum_source = "mise-versions"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.322/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/729756939"
+checksum = "sha256:89a467ec2efb5b34bd9bad1a99d9c29eda804de03de5e2f65d787b72b1502361"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.323/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/741010434"
 
 [[tools."aqua:asciinema/asciinema"]]
 version = "3.2.1"
@@ -121,14 +120,14 @@ url = "https://github.com/textfuel/lazyjira/releases/download/v2.19.2/lazyjira_d
 url_api = "https://api.github.com/repos/textfuel/lazyjira/releases/assets/469908542"
 
 [[tools.ast-grep]]
-version = "0.51.1"
+version = "0.51.2"
 backend = "aqua:ast-grep/ast-grep"
 specifiers = ["latest"]
 
 [tools.ast-grep."platforms.macos-arm64"]
-checksum = "sha256:a95772097b4d02bd9d45ed63b300c37041ae3c36632b3bf19250cc7c10187dc4"
-url = "https://github.com/ast-grep/ast-grep/releases/download/0.51.1/app-aarch64-apple-darwin.zip"
-url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/701845634"
+checksum = "sha256:ea4f4082d25e5f8e0450add6fd488dd008a373c90483cc2031759c8431f1dcfb"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.51.2/app-aarch64-apple-darwin.zip"
+url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/734229272"
 
 [[tools.atuin]]
 version = "18.24.6"
@@ -142,13 +141,13 @@ url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/729825753"
 provenance = "github-attestations"
 
 [[tools.aws-cli]]
-version = "2.39.7"
+version = "2.40.1"
 backend = "aqua:aws/aws-cli"
 specifiers = ["latest"]
 
 [tools.aws-cli."platforms.macos-arm64"]
-checksum = "sha256:a6d419ec5ce460101499246c9ee8a8a6020e43b7cf6355a388274f5127f2e99f"
-url = "https://awscli.amazonaws.com/AWSCLIV2-2.39.7.pkg"
+checksum = "blake3:c819b95f7deb1eaea3099bcd959adaf08421c24900a0b1fec7104f996f740762"
+url = "https://awscli.amazonaws.com/AWSCLIV2-2.40.1.pkg"
 
 [[tools.aws-vault]]
 version = "7.17.7"
@@ -294,14 +293,14 @@ url = "https://github.com/RivoLink/leaf/releases/download/1.29.2/leaf-macos-arm6
 url_api = "https://api.github.com/repos/RivoLink/leaf/releases/assets/675966700"
 
 [[tools."github:achristmascarl/rainfrog"]]
-version = "0.4.6"
+version = "0.4.7"
 backend = "github:achristmascarl/rainfrog"
 specifiers = ["latest"]
 
 [tools."github:achristmascarl/rainfrog"."platforms.macos-arm64"]
-checksum = "sha256:60d8c5c5fb89f8b0b5bd27af44f324e95a0612248d973e4dfc38867cb009a583"
-url = "https://github.com/achristmascarl/rainfrog/releases/download/v0.4.6/rainfrog-v0.4.6-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/achristmascarl/rainfrog/releases/assets/586344632"
+checksum = "sha256:09ceaa811d99eafb449d7d4aac4d21a50403c275138add1a8259215f73be6352"
+url = "https://github.com/achristmascarl/rainfrog/releases/download/v0.4.7/rainfrog-v0.4.7-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/achristmascarl/rainfrog/releases/assets/736763253"
 
 [[tools."github:agavra/tuicr"]]
 version = "0.28.0"
@@ -368,26 +367,24 @@ url = "https://github.com/dmtrKovalenko/fff/releases/download/v0.11.0/fff-mcp-aa
 url_api = "https://api.github.com/repos/dmtrKovalenko/fff/releases/assets/578309710"
 
 [[tools."github:docker/buildx"]]
-version = "0.38.2"
+version = "0.39.0"
 backend = "github:docker/buildx"
 specifiers = ["latest"]
 
 [tools."github:docker/buildx"."platforms.macos-arm64"]
-checksum = "sha256:81702e18713cfd495bfe594943fa57f470eda16c0653ae3de15cd411df273c41"
-checksum_source = "mise-versions"
-url = "https://github.com/docker/buildx/releases/download/v0.38.2/buildx-v0.38.2.darwin-arm64"
-url_api = "https://api.github.com/repos/docker/buildx/releases/assets/706014790"
+checksum = "sha256:0190e4b9c85510974290f9a597e86c4d8200be782aeaa3df7d756ab4423d6b2d"
+url = "https://github.com/docker/buildx/releases/download/v0.39.0/buildx-v0.39.0.darwin-arm64"
+url_api = "https://api.github.com/repos/docker/buildx/releases/assets/737261062"
 
 [[tools."github:docker/compose"]]
-version = "5.7.0"
+version = "5.7.1"
 backend = "github:docker/compose"
 specifiers = ["latest"]
 
 [tools."github:docker/compose"."platforms.macos-arm64"]
-checksum = "sha256:54495ff81dd8cae11861455f0308a293a530149beba8f1d90ff3f295b11cf035"
-checksum_source = "mise-versions"
-url = "https://github.com/docker/compose/releases/download/v5.7.0/docker-compose-darwin-aarch64"
-url_api = "https://api.github.com/repos/docker/compose/releases/assets/702117350"
+checksum = "sha256:5a9aa8b5fb5b1e3cd83f39c80e570ae30aafd74cd9b47264fbe4ff7e6e6251ca"
+url = "https://github.com/docker/compose/releases/download/v5.7.1/docker-compose-darwin-aarch64"
+url_api = "https://api.github.com/repos/docker/compose/releases/assets/734662223"
 
 [[tools."github:fioncat/otree"]]
 version = "0.7.1"
@@ -475,24 +472,24 @@ url = "https://github.com/pb33f/printing-press/releases/download/v0.0.28/printin
 url_api = "https://api.github.com/repos/pb33f/printing-press/releases/assets/525089821"
 
 [[tools."github:pb33f/wiretap"]]
-version = "0.7.7"
+version = "0.7.8"
 backend = "github:pb33f/wiretap"
 specifiers = ["latest"]
 
 [tools."github:pb33f/wiretap"."platforms.macos-arm64"]
-checksum = "sha256:7fedfbea18363e4e2130edcb67419380a54861f9a7eafa8ea0370ff73ec1b1bd"
-url = "https://github.com/pb33f/wiretap/releases/download/v0.7.7/wiretap_0.7.7_darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/pb33f/wiretap/releases/assets/693683470"
+checksum = "sha256:230a012bb9ddbde769036069137013dd74c3927b30ca347bbf147c0a1dc37dd5"
+url = "https://github.com/pb33f/wiretap/releases/download/v0.7.8/wiretap_0.7.8_darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/pb33f/wiretap/releases/assets/739884806"
 
 [[tools."github:riii111/sabiql"]]
-version = "3.0.2"
+version = "3.0.3"
 backend = "github:riii111/sabiql"
 specifiers = ["latest"]
 
 [tools."github:riii111/sabiql"."platforms.macos-arm64"]
-checksum = "sha256:3c9ff0e8770fd9257c70643a2606a85581fdce29074376ecb4921c8d7595682f"
-url = "https://github.com/riii111/sabiql/releases/download/v3.0.2/sabiql-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/riii111/sabiql/releases/assets/662691365"
+checksum = "sha256:aca05fee709eef39da2490a858851299065e2bee10d7fff6459e2012c4167106"
+url = "https://github.com/riii111/sabiql/releases/download/v3.0.3/sabiql-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/riii111/sabiql/releases/assets/737339580"
 
 [[tools."github:smarzban/tsk"]]
 version = "0.13.0"
@@ -526,14 +523,14 @@ url = "https://github.com/walles/moor/releases/download/v2.19.6/moor-v2.19.6-dar
 url_api = "https://api.github.com/repos/walles/moor/releases/assets/689521703"
 
 [[tools."github:yazeed/proc-cli"]]
-version = "2.3.0"
+version = "2.4.0"
 backend = "github:yazeed/proc-cli"
 specifiers = ["latest"]
 
 [tools."github:yazeed/proc-cli"."platforms.macos-arm64"]
-checksum = "sha256:a969ab2e6513d3af0507d8c29ba83e2c6522ac88bd166b0f235a8122ab9d3304"
-url = "https://github.com/yazeed/proc-cli/releases/download/v2.3.0/proc-darwin-aarch64.tar.gz"
-url_api = "https://api.github.com/repos/yazeed/proc-cli/releases/assets/708174059"
+checksum = "sha256:b666f9397e249000bb7cba0e184fcbffd629b6330a4e3222f7baedf7fdd43955"
+url = "https://github.com/yazeed/proc-cli/releases/download/v2.4.0/proc-darwin-aarch64.tar.gz"
+url_api = "https://api.github.com/repos/yazeed/proc-cli/releases/assets/734703991"
 provenance = "github-attestations"
 
 [[tools.gitu]]
@@ -558,13 +555,13 @@ url_api = "https://api.github.com/repos/charmbracelet/glow/releases/assets/51046
 provenance = "cosign"
 
 [[tools.go]]
-version = "1.27.3"
+version = "1.27.4"
 backend = "core:go"
 specifiers = ["latest"]
 
 [tools.go."platforms.macos-arm64"]
-checksum = "sha256:dd3908cf20959d798c1e06ebe5b72213f0505ce01373b40ce3110975a6cd99c2"
-url = "https://dl.google.com/go/go1.27.3.darwin-arm64.tar.gz"
+checksum = "sha256:91a44a2b8a716600ad94a4f143e156116620db8828086a6e3602291be9bd0bb4"
+url = "https://dl.google.com/go/go1.27.4.darwin-arm64.tar.gz"
 
 [[tools."go:github.com/isaacphi/mcp-language-server"]]
 version = "0.1.1"
@@ -593,14 +590,14 @@ url = "https://github.com/herdrdev/herdr/releases/download/v0.9.5/herdr-macos-aa
 url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/640898230"
 
 [[tools.hunk]]
-version = "0.24.1"
+version = "0.25.0"
 backend = "aqua:modem-dev/hunk"
 specifiers = ["latest"]
 
 [tools.hunk."platforms.macos-arm64"]
-checksum = "sha256:5f9afd41d825e2f87958b0702e779e52d38207c0b42d5316efe54218f35b4d7d"
-url = "https://github.com/modem-dev/hunk/releases/download/v0.24.1/hunkdiff-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/modem-dev/hunk/releases/assets/673741225"
+checksum = "sha256:2a577909b478242bc75982be30bc2c5ebf9a0044fc38aad94b111ab7e9a992e0"
+url = "https://github.com/modem-dev/hunk/releases/download/v0.25.0/hunkdiff-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/modem-dev/hunk/releases/assets/736456199"
 
 [[tools.hwatch]]
 version = "0.4.2"
@@ -697,13 +694,13 @@ checksum = "sha256:1dbd148222b051ba6c307c4d17a318ed083df018a4f6a5a0ce46955ffc9ab
 url = "https://github.com/neovim/neovim/releases/download/v0.12.6/nvim-macos-arm64.tar.gz"
 
 [[tools.node]]
-version = "24.22.2"
+version = "24.22.3"
 backend = "core:node"
 specifiers = ["24"]
 
 [tools.node."platforms.macos-arm64"]
-checksum = "sha256:aa9549349e47dffaa42dcf95d6e06ade8c4bdafc980979883b88767670df385a"
-url = "https://nodejs.org/dist/v24.22.2/node-v24.22.2-darwin-arm64.tar.gz"
+checksum = "sha256:ff6e17d4874b76d272212b908cc020d6e815fba5a6c7eaaa06add725840307fd"
+url = "https://nodejs.org/dist/v24.22.3/node-v24.22.3-darwin-arm64.tar.gz"
 
 [[tools."npm:@earendil-works/pi-coding-agent"]]
 version = "1.5.2"
@@ -783,14 +780,14 @@ url = "https://github.com/nushell/nushell/releases/download/0.117.0/nu-0.117.0-a
 url_api = "https://api.github.com/repos/nushell/nushell/releases/assets/729066896"
 
 [[tools.pandoc]]
-version = "3.13"
+version = "3.14"
 backend = "github:jgm/pandoc"
 specifiers = ["latest"]
 
 [tools.pandoc."platforms.macos-arm64"]
-checksum = "sha256:f436d18bebbfb3ddd326597686dacab9fac5dc23bd060495020f35a28a43a7c3"
-url = "https://github.com/jgm/pandoc/releases/download/3.13/pandoc-3.13-arm64-macOS.zip"
-url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/679543143"
+checksum = "sha256:58d6593884fec9d4424b641b92503c316d9c36decb2891ff8d73ae74dd3b6304"
+url = "https://github.com/jgm/pandoc/releases/download/3.14/pandoc-3.14-arm64-macOS.zip"
+url_api = "https://api.github.com/repos/jgm/pandoc/releases/assets/738063061"
 provenance = "github-attestations"
 
 [[tools."pipx:awslogs"]]
@@ -958,11 +955,11 @@ url = "https://github.com/watchexec/watchexec/releases/download/v2.8.0/watchexec
 url_api = "https://api.github.com/repos/watchexec/watchexec/releases/assets/616138836"
 
 [[tools.zellij]]
-version = "0.45.1"
+version = "0.46.0"
 backend = "aqua:zellij-org/zellij"
 specifiers = ["latest"]
 
 [tools.zellij."platforms.macos-arm64"]
-checksum = "sha256:c029ba4fe1927b79ad9f0cdd59155c4dff80777863c85857d4d09b88b56f9891"
-url = "https://github.com/zellij-org/zellij/releases/download/v0.45.1/zellij-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/zellij-org/zellij/releases/assets/533540212"
+checksum = "sha256:716a1c7887be83cc813900012a156a4d8e0ee1468ac56c58a299c9d8898cdc90"
+url = "https://github.com/zellij-org/zellij/releases/download/v0.46.0/zellij-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/zellij-org/zellij/releases/assets/734814747"
