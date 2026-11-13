@@ -228,8 +228,8 @@ Inside tuios (`TUIOS_ENV=1`):
 - **tuios runs the work.** For an agent in a pane of its own, a worktree or
   parallel attempts, use tuios (`start-agent`, `worktree new`, `fan`,
   `delegate`), not Claude Code's `EnterWorktree`, `--worktree` or
-  `isolation: worktree`, and not `tsk dispatch`. Subagents inside this
-  conversation (`implementer`, `researcher`) stay on the Agent tool, without
+  `isolation: worktree`, and not `tsk dispatch`. Native subagents (the Agent
+  tool: `implementer`, `researcher`) stay inside this conversation, without
   isolation. The `tasks` skill routes between them and lists the pitfalls;
   load it before starting or isolating work.
 
