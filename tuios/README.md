@@ -77,16 +77,12 @@ keeps tuios's `o`, and `ctrl+k` takes the newest finished turn from `A`, since
 `O` opens the AWS profiles.
 
 `prefix+F` opens the F1 dashboard, as in herdr. tuios leaves a plugin herdr
-installed off until it is listed in `[plugins]`, and three are: `herdr-splits`,
-`herdr-f1`, and `herdr-automatic-rename`, which names workspaces after the pane
-running in them (settings in `~/.config/herdr/plugins/config/`). Agent panes are
-named by the `jonasws.auto-name` plugin (`plugins/auto-name`) alone, which
-follows `window-retitled` events, since the `after-agent-state` hook fires only
-on alert transitions and never for the pane on screen;
-`dan.pane-topic-sync` is off here so two namers do not fight over one label, and
-herdr still runs it. Since 0.12.1 tuios also shows a name the agent set itself
-(`claude -n`, `/rename`), and a name set by the script or by hand comes before
-it. `herdr-tsk` is off: the tsk board and quick capture are popups on
+installed off until it is listed in `[plugins]`, and two are: `herdr-splits`
+and `herdr-f1`. Nothing renames panes or workspaces from outside: a shell pane
+takes the title fish sets (`fish/functions/fish_title.fish`), an agent names its
+own pane from tuios's `agents.name_hint`, and a workspace with no name follows
+its active pane. `herdr-automatic-rename` and `dan.pane-topic-sync` are off, and
+herdr still runs the latter. `herdr-tsk` is off: the tsk board and quick capture are popups on
 `prefix+t` and `prefix+ctrl+t`. The other installed plugins, `herdr-bar` among
 them, are off.
 

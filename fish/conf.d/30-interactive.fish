@@ -41,6 +41,9 @@ if status is-interactive
             starship module character $argv
         end
         enable_transience
+        # The terminal title (the tuios pane name) is functions/fish_title.fish,
+        # not starship: it runs on every prompt draw, and a starship call costs
+        # 5-14 ms where builtins cost 0.3 ms.
     end
 
     if command -q zoxide

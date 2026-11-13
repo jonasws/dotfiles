@@ -566,14 +566,11 @@ description = "Open F1 dashboard"
 # of closing hints mode.
 alphabet = "asdfhjkl"
 
-# jonasws.auto-name (plugins/auto-name) names agent panes after their topic,
-# which the rail otherwise hides behind the running command ("claude 1").
 [plugins]
 dirs = [
   "/Users/jonasws/dotfiles/tuios/plugins/jumplist",
-  "/Users/jonasws/dotfiles/tuios/plugins/auto-name",
 ]
-enabled = ["herdr-splits", "dev.minung.herdr-f1", "herdr-automatic-rename", "jonasws.auto-name", "jonasws.jumplist"]
+enabled = ["herdr-splits", "dev.minung.herdr-f1", "jonasws.jumplist"]
 
 # Push notifications ([notify]) live in config.d/notify.toml, which is
 # gitignored because an ntfy topic address is a secret. Copy

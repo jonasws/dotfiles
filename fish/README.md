@@ -8,6 +8,8 @@ This fish configuration is deployed by the `fish` dotfile group in `mise.toml`.
 fish/                    # deployed to ~/.config/fish/
 ├── config.fish          # Main config
 ├── functions/           # Custom functions (auto-loaded on demand)
+│   ├── fish_title.fish  # Overrides fish's default terminal title (repo@branch)
+│   └── fish_user_key_bindings.fish  # Overrides fish's default key bindings
 ├── conf.d/              # Configuration files (auto-loaded at startup)
 │   ├── 00-environment.fish
 │   ├── 10-aliases.fish
