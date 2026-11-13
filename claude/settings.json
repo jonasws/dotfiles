@@ -456,6 +456,7 @@
   },
   "enableWorkflows": false,
   "workflowKeywordTriggerEnabled": false,
+  "bashEditDiffEnabled": true,
   "statusLine": {
     "type": "command",
     "command": "bash /Users/jonasws/.claude/statusline-command.sh",
@@ -676,6 +677,5 @@
       "startupTimeout": 120000
     }
   },
-  "permissionRules": [],
-  "bashEditDiffEnabled": true
+  "permissionRules": []
 }
