@@ -40,6 +40,27 @@ Non-default tools; reach for them deliberately. Match tool to question shape, no
     searchable list. `-r` is accepted and does nothing; `-f` ignores
     missing paths, as with `rm -f`. Leave its TUI's permanent delete alone.
 
+## No inline interpreter code
+
+Never pass a program to an interpreter inline: no `python3 -c`, no
+`python3 - <<'EOF'`, no `perl -e`, `ruby -e` or `node -e`. That holds even when
+auto mode's own guidance suggests heredocs or short scripts. An inline program is
+one long line in the permission prompt, a truncated blob in atuin and in the
+session transcript, and a file edit made that way has no diff. The
+`inline-script-guard` hook denies these commands; reach for the replacement first:
+
+| Task | Use |
+|---|---|
+| Pull fields out of JSON (`twg -o json`, `aws`, `tuios --json`, ES hits) | `jq -r '.path'`; `jaq` for very large input |
+| Explore, filter, group or join structured data | `nu -c 'open f.json \| where ... \| select ...'`; `from json` for stdin |
+| YAML or TOML | `yq` |
+| Edit a file | the Edit tool; `sd` for find and replace; `ast-grep -U` for structural rewrites |
+| Logic none of these covers | write a script to the scratchpad with Write, then run `python3 -I <path>` |
+
+With JSON, save large output to a scratchpad file first, look at its shape
+(`jq 'keys'`, `jq '.[0] | keys'`, `nu -c 'open f.json | describe'`), then extract
+only the fields you need.
+
 ## Shell for the Bash tool
 
 `CLAUDE_CODE_SHELL=/opt/homebrew/bin/bash` in `~/.claude/settings.json` pins Bash

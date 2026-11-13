@@ -72,7 +72,9 @@
       "mcp__tuios__tuios_send_agent_message",
       "mcp__tuios__tuios_set_agent_state",
       "mcp__tuios__tuios_set_agent_meta",
-      "mcp__aws-knowledge"
+      "mcp__aws-knowledge",
+      "Bash(jq *)",
+      "Bash(jaq *)"
     ],
     "deny": [
       "WebSearch",
@@ -289,6 +291,16 @@
         ]
       },
       {
+        "matcher": "^Bash$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I \"$HOME/.claude/hooks/inline-script-guard.py\"",
+            "timeout": 5
+          }
+        ]
+      },
+      {
         "matcher": "^mcp__aws__",
         "hooks": [
           {
@@ -464,7 +476,8 @@
     "claude-code-setup@claude-plugins-official": true,
     "aws-core@agent-toolkit-for-aws": false,
     "kotlin-lsp@claude-plugins-official": true,
-    "lua-lsp@claude-plugins-official": true
+    "lua-lsp@claude-plugins-official": true,
+    "cc-plugin-easel@builtin": false
   },
   "extraKnownMarketplaces": {
     "playwright-skill": {
@@ -614,7 +627,8 @@
       "herdr pane run of anything that is not an allowed viewer command as written in the allow rule",
       "herdr agent start or agent prompt: they launch or drive agents outside the sandbox",
       "Closing herdr workspaces, or tabs and panes other than ones holding a viewer Claude started",
-      "docker run, create or compose that uses --privileged, --pid=host, --network host, --cap-add, --security-opt (e.g. seccomp=unconfined), --device, --userns=host, or bind mounts (-v or --mount type=bind) outside the current repo"
+      "docker run, create or compose that uses --privileged, --pid=host, --network host, --cap-add, --security-opt (e.g. seccomp=unconfined), --device, --userns=host, or bind mounts (-v or --mount type=bind) outside the current repo",
+      "Running interpreter code written inline in the command, such as python3 -c, python3 - <<EOF, perl -e, ruby -e or node -e, instead of jq, nu, sd, the Edit tool, or a script file run by path. Running a script file or python3 -m <module> is not this rule"
     ],
     "hard_deny": [
       "$defaults",
@@ -662,5 +676,6 @@
       "startupTimeout": 120000
     }
   },
-  "permissionRules": []
+  "permissionRules": [],
+  "bashEditDiffEnabled": true
 }
