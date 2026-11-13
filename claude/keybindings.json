@@ -1,0 +1,49 @@
+{
+  "$schema": "https://www.schemastore.org/claude-code-keybindings.json",
+  "bindings": [
+    {
+      "context": "Chat",
+      "bindings": {
+        "enter": "chat:newline",
+        "meta+enter": "chat:newline",
+        "ctrl+enter": "chat:submit",
+        "ctrl+x ctrl+s": "chat:submit",
+        "ctrl+x t": "command:tasks",
+        "ctrl+x r": "command:resume",
+        "ctrl+x f": "command:fork",
+        "ctrl+x g": "command:bg",
+        "ctrl+x c": "command:compact",
+        "ctrl+x d": "command:diff"
+      }
+    },
+    {
+      "context": "Autocomplete",
+      "bindings": { "enter": "autocomplete:accept" }
+    },
+    {
+      "context": "ModelPicker",
+      "bindings": { "enter": "modelPicker:thisSessionOnly" }
+    },
+    {
+      "context": "Select",
+      "bindings": { "ctrl+q": "select:cancel" }
+    },
+    {
+      "context": "Confirmation",
+      "bindings": { "j": "confirm:next", "k": "confirm:previous" }
+    },
+    {
+      "context": "Footer",
+      "bindings": {
+        "j": "footer:down",
+        "k": "footer:up",
+        "h": "footer:previous",
+        "l": "footer:next"
+      }
+    },
+    {
+      "context": "Tabs",
+      "bindings": { "h": "tabs:previous", "l": "tabs:next" }
+    }
+  ]
+}
