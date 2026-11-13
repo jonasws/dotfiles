@@ -14,7 +14,10 @@ fish/                    # deployed to ~/.config/fish/
 │   ├── 00-environment.fish
 │   ├── 10-aliases.fish
 │   ├── 20-abbreviations.fish
-│   └── 30-interactive.fish
+│   ├── 30-interactive.fish          # mise activate, prompt, tool init
+│   ├── 40-fnox-completion.fish
+│   ├── 45-rex-herdr.fish            # Rex only; inert elsewhere
+│   └── 55-ghostty-quick-terminal.fish  # F19 panel opens tuios's "quick" session
 └── completions/         # Custom completions
 ```
 
