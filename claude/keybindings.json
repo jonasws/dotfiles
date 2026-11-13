@@ -4,9 +4,7 @@
     {
       "context": "Chat",
       "bindings": {
-        "enter": "chat:newline",
         "meta+enter": "chat:newline",
-        "ctrl+enter": "chat:submit",
         "ctrl+x ctrl+s": "chat:submit",
         "ctrl+x t": "command:tasks",
         "ctrl+x r": "command:resume",
