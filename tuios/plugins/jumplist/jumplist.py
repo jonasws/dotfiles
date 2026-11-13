@@ -1,19 +1,25 @@
 #!/usr/bin/env python3
 """A Vim-style jump list over tuios workspaces.
 
-An entry is one workspace of one session. It remembers the pane last focused
-there, so a jump lands on it; moving between panes side by side in one
-workspace is not a jump.
+An entry is one workspace of one session. A jump lands on the pane last
+focused there, which tuios remembers per workspace; moving between panes side
+by side in one workspace is not a jump.
 
-  jumplist.py record        follow the event stream and keep the list (the plugin's startup process)
+  jumplist.py event         record where you are now (the plugin's event hooks)
   jumplist.py back [N]      jump N entries older, like Vim's ctrl+o
   jumplist.py forward [N]   jump N entries newer, like Vim's ctrl+i
   jumplist.py goto INDEX    jump to one entry (the tuios-jumplist tv channel's Enter)
   jumplist.py list          print the list for tv, newest first
 
-Only `record` runs inside the plugin, which holds the read grant. The jumps run
+Only `event` runs inside the plugin, which holds the read grant. The jumps run
 from `shell` command keys and the tv popup with the person's own rights, since
-focus-window and switch-session need the admin grant from a plugin.
+select-workspace and switch-session need the admin grant from a plugin.
+
+The recorder is event hooks rather than a startup process: tuios refuses a
+live upgrade (tuios daemon upgrade) while any plugin command is running, so a
+process that never exits would block every upgrade. A hook that loses its
+place to a dropped event catches up on the next one, since each run records
+where the person is now rather than what the event says.
 
 Runs on the macOS system python3 (3.9), so no newer syntax.
 """
@@ -35,7 +41,6 @@ PENDING_TTL = 2.0
 DWELL = 1.0
 # Popups this setup opens by name; focusing one is not a visit.
 SKIP_NAMES = {"jumplist"}
-TYPES = "window-focused,workspace-switched,client-session-changed,window-closed,session-closed"
 
 TUIOS = os.environ.get("TUIOS_BIN") or shutil.which("tuios") or "tuios"
 
@@ -54,7 +59,7 @@ LOCK = os.path.join(state_dir(), "jumplist.lock")
 
 
 def empty_state():
-    return {"entries": [], "cursor": -1, "pending": None, "seq": 0, "boot_id": ""}
+    return {"entries": [], "cursor": -1, "pending": None}
 
 
 @contextmanager
@@ -128,25 +133,8 @@ def drop_where(st, pred):
     st["cursor"] = min(max(cursor, 0 if kept else -1), len(kept) - 1)
 
 
-def normalize(st):
-    """Keep the newest entry of each workspace. A list written when entries
-    were panes holds several per workspace."""
-    entries, cursor = st["entries"], st["cursor"]
-    current = key(entries[cursor]) if 0 <= cursor < len(entries) else None
-    seen, kept = set(), []
-    for e in reversed(entries):
-        if key(e) not in seen:
-            seen.add(key(e))
-            kept.append(e)
-    kept.reverse()
-    st["entries"] = kept
-    st["cursor"] = next((i for i, e in enumerate(kept) if key(e) == current), len(kept) - 1)
-
-
-def visit(st, session, window):
-    windows, _ = session_windows(session)
-    win = windows.get(window)
-    if win is None or skipped(win):
+def visit(st, session, win):
+    if skipped(win):
         return
     entry = describe(session, win)
     entries = st["entries"]
@@ -181,81 +169,38 @@ def visit(st, session, window):
     st["cursor"] = len(st["entries"]) - 1
 
 
-def read_clients(shown):
-    """Fill shown (client id -> the session it shows) from the daemon."""
-    shown.clear()
+def shown_sessions():
+    """The sessions attached clients show."""
     try:
-        for c in tuios_json("list-clients"):
-            if c.get("session"):
-                shown[c["client_id"]] = c["session"]
+        return {c["session"] for c in tuios_json("list-clients") if c.get("session")}
     except (RuntimeError, ValueError):
-        pass
+        return set()
 
 
-def resync(st, shown):
-    """After a gap: closes and session switches may be among the lost events."""
-    read_clients(shown)
+def prune(st):
     alive = alive_in(st["entries"])
     drop_where(st, lambda e: not alive(e))
-    st["pending"] = None
 
 
-def record():
-    shown = {}  # client id -> the session it shows
-    read_clients(shown)
+def on_event():
+    """One event hook: a workspace or session was focused, or one closed."""
+    event = os.environ.get("TUIOS_PLUGIN_EVENT", "")
+    session = os.environ.get("TUIOS_PLUGIN_SESSION", "")
     with locked_state() as st:
-        normalize(st)
-
-    while True:
-        with locked_state(write=False) as st:
-            seq, boot = st.get("seq") or 0, st.get("boot_id") or ""
-        args = [TUIOS, "subscribe", "--types", TYPES]
-        if seq and boot:
-            args += ["--after-seq", str(seq), "--boot-id", boot]
-        proc = subprocess.Popen(args, stdout=subprocess.PIPE, text=True, bufsize=1)
-        for line in proc.stdout:
-            try:
-                ev = json.loads(line)
-            except ValueError:
-                continue
-            handle(ev, shown)
-        proc.wait()
-        time.sleep(2)
-
-
-def handle(ev, shown):
-    typ = ev.get("type")
-    session, window = ev.get("session") or "", ev.get("window") or ""
-    with locked_state() as st:
-        if ev.get("seq") and ev.get("boot_id"):
-            st["seq"], st["boot_id"] = ev["seq"], ev["boot_id"]
-        if typ == "gap":
-            resync(st, shown)
-        elif typ == "client-session-changed":
-            cid = ev.get("client_id") or ""
-            if ev.get("attached"):
-                shown[cid] = session
-                _, focused = session_windows(session)
-                if focused:
-                    visit(st, session, focused)
-            elif shown.get(cid) == session:
-                shown.pop(cid, None)
-        elif typ == "window-focused":
-            # A pane focused in a session no client shows is not where you are.
-            if not shown or session in shown.values():
-                visit(st, session, window)
-        elif typ == "workspace-switched":
-            if not shown or session in shown.values():
-                _, focused = session_windows(session)
-                if focused:
-                    visit(st, session, focused)
-        elif typ == "window-closed":
-            # The workspace may live on; a jump to it then shows it as it is.
-            for e in st["entries"]:
-                if e["window"] == window:
-                    e["window"] = ""
-        elif typ == "session-closed":
-            drop_where(st, lambda e: e["session"] == session)
+        if event.endswith(".closed"):
+            prune(st)
+            return
+        if not session:
+            return
+        # A workspace shown in a session no client shows is not where you are.
+        shown = shown_sessions()
+        if shown and session not in shown:
+            return
+        # Hooks run concurrently and may land out of order, so read where the
+        # session is now instead of trusting the event.
+        windows, focused = session_windows(session)
+        if focused in windows:
+            visit(st, session, windows[focused])
 
 
 def alive_in(entries):
@@ -268,12 +213,8 @@ def alive_in(entries):
 
 
 def show_workspace(entry):
-    windows, _ = session_windows(entry["session"])
-    win = windows.get(entry["window"])
-    if win is not None and (win.get("workspace") or 0) == entry["workspace"]:
-        tuios("focus-window", "-s", entry["session"], entry["window"])
-    else:
-        tuios("select-workspace", "-s", entry["session"], str(entry["workspace"]))
+    # tuios lands on the pane last focused in the workspace.
+    tuios("select-workspace", "-s", entry["session"], str(entry["workspace"]))
 
 
 def go(entry):
@@ -356,8 +297,8 @@ def list_rows():
 def main(argv):
     cmd = argv[1] if len(argv) > 1 else ""
     arg = argv[2] if len(argv) > 2 else ""
-    if cmd == "record":
-        record()
+    if cmd == "event":
+        on_event()
     elif cmd in ("back", "forward"):
         n = int(arg) if arg.isdigit() else 1
         step(-n if cmd == "back" else n)

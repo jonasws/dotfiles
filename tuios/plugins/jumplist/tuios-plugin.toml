@@ -10,7 +10,11 @@ platforms = ["macos", "linux"]
 [permissions]
 grants = ["read"]
 
+# Event hooks, not a startup process: tuios refuses a live upgrade while a
+# plugin command runs, and a startup process never stops running.
+# tab is a tuios workspace and workspace a tuios session, in herdr's names.
 [[process]]
 id = "record"
-run = "startup"
-command = ["/usr/bin/python3", "./jumplist.py", "record"]
+run = "event"
+on = ["tab.focused", "workspace.focused", "tab.closed", "workspace.closed"]
+command = ["/usr/bin/python3", "./jumplist.py", "event"]
