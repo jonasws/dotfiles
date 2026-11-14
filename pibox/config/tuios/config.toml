@@ -1,0 +1,7 @@
+# tuios on the Raspberry Pi, linked to ~/.config/tuios by the tuios dotfile group.
+# The Mac's tuios/config.toml is tuned for Ghostty and macOS chords, so the Pi
+# starts from tuios's defaults.
+
+[agents]
+# One Rex status record per agent pane, instead of one per tuios session.
+host_program_status = "panes"

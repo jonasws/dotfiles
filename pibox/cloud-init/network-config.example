@@ -1,0 +1,17 @@
+# DRAFT. Copy to the boot partition as `network-config`. Ethernet needs nothing;
+# fill in Wi-Fi only if used.
+network:
+  version: 2
+  ethernets:
+    eth0:
+      dhcp4: true
+      optional: true
+  wifis:
+    renderer: NetworkManager
+    wlan0:
+      dhcp4: true
+      regulatory-domain: "NO"
+      access-points:
+        "SSID":
+          password: "..."
+      optional: true

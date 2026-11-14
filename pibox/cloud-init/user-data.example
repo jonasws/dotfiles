@@ -1,0 +1,37 @@
+#cloud-config
+# DRAFT. Copy to the boot partition as `user-data` after flashing Raspberry Pi
+# OS Lite 64-bit (trixie). Holds the two secrets: never commit the filled copy.
+hostname: pibox
+manage_etc_hosts: true
+timezone: Europe/Oslo
+
+users:
+  - name: jonas
+    groups: users,adm,sudo,video
+    shell: /bin/bash
+    lock_passwd: true
+    sudo: ALL=(ALL) NOPASSWD:ALL     # unattended apt from the sync timer
+    ssh_authorized_keys:
+      - ssh-ed25519 AAAA...          # TODO
+
+enable_ssh: true
+ssh_pwauth: false
+
+write_files:
+  - path: /etc/pibox/tailscale-authkey
+    permissions: "0600"
+    owner: jonas:jonas
+    content: tskey-auth-...           # TODO: one-off or tagged key
+  - path: /home/jonas/.config/anthropic/key
+    permissions: "0600"
+    owner: jonas:jonas
+    defer: true                       # after the user exists
+    content: sk-ant-...               # TODO
+
+runcmd:
+  - install -d -m 0755 /etc/apt/keyrings
+  - curl -fsSL https://mise.jdx.dev/gpg-key.pub | gpg --dearmor -o /etc/apt/keyrings/mise-archive-keyring.gpg
+  - echo "deb [signed-by=/etc/apt/keyrings/mise-archive-keyring.gpg] https://mise.jdx.dev/deb stable main" > /etc/apt/sources.list.d/mise.list
+  - apt-get update && apt-get install -y mise
+  - loginctl enable-linger jonas
+  - runuser -l jonas -c 'mise bootstrap --from https://github.com/jonasws/pibox --yes'

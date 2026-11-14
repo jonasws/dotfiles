@@ -1,0 +1,96 @@
+# DRAFT: the whole Raspberry Pi 4B setup as one mise bootstrap config.
+# Meant to become the root mise.toml of its own repo (jonasws/pibox); see
+# PLAN.md. Applied with:
+#
+#   mise bootstrap --from https://github.com/jonasws/pibox --yes
+#
+# Not yet run on a Pi. Validate with `mise bootstrap --dry-run` first.
+
+[settings]
+dotfiles.root = "{{ config_root }}"   # the repo checkout (checked with --dry-run)
+
+# ── apt sources (keys fetched and fingerprints checked 2026-11-14) ──────────
+[bootstrap.apt.sources.tailscale]
+uris = "https://pkgs.tailscale.com/stable/debian"
+key = "https://pkgs.tailscale.com/stable/debian/trixie.noarmor.gpg"
+fingerprint = "2596A99EAAB33821893C0A79458CA832957F5868"
+
+# stable has no apt release yet; preview and snapshot serve amd64 + arm64.
+[bootstrap.apt.sources.rex]
+uris = "https://pkgs.superlogical.com/rex/apt"
+suites = "preview"
+key = "https://pkgs.superlogical.com/rex/keys/rex.asc"
+fingerprint = "E28636AC71905C6DDE40C1EDFAA6B80F641307A7"
+
+# mise itself; cloud-init adds the same repo for the first run.
+[bootstrap.apt.sources.mise]
+uris = "https://mise.jdx.dev/deb"
+suites = "stable"
+key = "https://mise.jdx.dev/gpg-key.pub"
+fingerprint = "24853EC9F655CE80B48E6C3A8B81C9D17413A06D"
+
+[bootstrap.packages]
+"apt:mise" = "latest"
+"apt:tailscale" = "latest"
+"apt:mosh" = "latest"
+"apt:rex" = "latest"
+
+[bootstrap.services.tailscaled]
+state = "running"
+enabled = true
+
+# ── Tools: prebuilt arm64, nothing compiled on the Pi ───────────────────────
+[tools]
+node = "24"                                          # pi needs >= 22.19
+"npm:@earendil-works/pi-coding-agent" = "latest"     # plain JS
+# The release also ships sketch/tml/tplot archives; pin tuios's own.
+"github:Gaurav-Gosain/tuios" = { version = "latest", asset_pattern = "tuios_*_Linux_arm64.tar.gz" }  # resolves to tuios_<v>_Linux_arm64.tar.gz (checked with mise lock)
+
+# ── Dotfiles ────────────────────────────────────────────────────────────────
+[dotfile_groups.pi]
+root = "config/pi-agent"
+target = "~/.pi/agent"
+
+# Holds a command, not the key; pi runs it through its shell when needed.
+[dotfile_groups.pi.entries."~/.pi/agent/auth.json"]
+content = '{"anthropic":{"type":"api_key","key":"!cat \"$HOME/.config/anthropic/key\""}}'
+create_if_missing = true
+permissions = "0600"
+
+[dotfile_groups.tuios]
+root = "config/tuios"
+target = "~/.config/tuios"
+mode = "symlink"
+
+[dotfile_groups.rex]
+root = "config/rex"
+target = "~/.config/rex"
+
+# ── GitOps loop: pull and re-apply every 15 minutes ─────────────────────────
+# Needs linger (cloud-init enables it) and passwordless sudo for apt.
+[bootstrap.linux.systemd.units.pibox-sync]
+description = "Re-apply pibox from git"
+type = "oneshot"
+exec_start = "/usr/bin/mise bootstrap --from https://github.com/jonasws/pibox --update --yes"
+start = false
+wanted_by = []
+
+[bootstrap.linux.systemd.units.pibox-sync-timer]
+on_boot_sec = "5min"
+on_unit_inactive_sec = "15min"
+randomized_delay_sec = "1min"
+unit = "pibox-sync"
+
+# ── One-off wiring; runs every bootstrap, so each step is guarded ───────────
+[tasks.bootstrap]
+run = '''
+set -eu
+ts_key=/etc/pibox/tailscale-authkey
+if ! tailscale status >/dev/null 2>&1 && [ -s "$ts_key" ]; then
+  sudo tailscale up --ssh --auth-key "file:$ts_key"
+fi
+rex ls >/dev/null 2>&1 || rex server install
+rex skill status | grep -q 'Pi.*current' || rex skill setup --agent pi   # TODO: check status output format
+tuios integration status pi  >/dev/null 2>&1 || tuios integration install pi
+tuios integration status rex >/dev/null 2>&1 || tuios integration install rex
+'''
