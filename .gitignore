@@ -38,3 +38,11 @@ tuios/config.d/notify.toml
 tuios/.apply-config
 tuios/.reload-themes
 __pycache__/
+
+# Raspberry Pi (rpi/): files tuios writes into its linked config folder, and
+# what `tuios integration install rex` writes if it follows the init.lua link.
+rpi/tuios/.apply-config
+rpi/tuios/.reload-themes
+rpi/tuios/plugins.lock
+rpi/rex/tuios.lua
+rpi/rex/*.tuios.bak

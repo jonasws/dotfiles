@@ -1,0 +1,12 @@
+# Global mise config for the Raspberry Pi, linked to ~/.config/mise/config.toml
+# by the rpi-mise group (mise.rpi.toml). The Mac's mise-global/ is not used
+# here: most of its ~100 tools are macOS-only or not needed on the Pi.
+#
+# Install with `mise install`. rpi/setup.sh only checks that these exist.
+
+[tools]
+# pi needs Node 22.19 or newer.
+node = "24"
+"npm:@earendil-works/pi-coding-agent" = "latest"
+# Upstream release binaries; linux-arm64 is published for every release.
+"github:Gaurav-Gosain/tuios" = "latest"
