@@ -1,0 +1,8 @@
+{
+  "$schema": "https://pi.dev/schemas/settings.schema.json",
+  "defaultProvider": "anthropic",
+  "defaultModel": "claude-sonnet-5-5",
+  "defaultThinkingLevel": "medium",
+  "cacheWarming": "streaming",
+  "enableInstallTelemetry": false
+}

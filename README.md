@@ -8,6 +8,7 @@ fnox keeps credentials out of the shell.
 - [Daily stack](#daily-stack)
 - [mise: tools, links and updates](#mise-tools-links-and-updates)
 - [Credentials: fnox, 1Password and aws-vault](#credentials-fnox-1password-and-aws-vault)
+- [Raspberry Pi](#raspberry-pi)
 - [Kept, but not in daily use](#kept-but-not-in-daily-use)
 
 ## Daily stack
@@ -109,6 +110,14 @@ account is in [fnox/README.md](fnox/README.md); in short:
 - Claude Code asks before every `aws` and `fnox exec` call
   (`claude/settings.json`), and tuios marks the destructive ones
   ([tuios/README.md](tuios/README.md#agents)).
+
+## Raspberry Pi
+
+[`rpi/`](rpi/) sets up a Raspberry Pi to run pi agents in tuios behind a Rex
+server, with Anthropic as the provider. Its dotfile groups live in
+[`mise.rpi.toml`](mise.rpi.toml), which loads only with `MISE_ENV=rpi`, so
+nothing above deploys there and nothing there deploys here. Setup is in
+[rpi/README.md](rpi/README.md).
 
 ## Kept, but not in daily use
 

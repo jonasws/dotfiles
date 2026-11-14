@@ -1,0 +1,47 @@
+# Raspberry Pi dotfile groups. Loaded on top of mise.toml only when
+# MISE_ENV=rpi, so the Mac never sees them:
+#
+#   MISE_ENV=rpi mise -C ~/dotfiles dot apply
+#
+# rpi/setup.sh runs that after checking the binaries are installed.
+
+# Only the rpi-* groups deploy on the Pi; the Mac groups in mise.toml stay
+# declared but unselected.
+[bootstrap]
+dotfile_groups = ["rpi-mise", "rpi-pi", "rpi-tuios", "rpi-rex"]
+
+[dotfile_groups.rpi-mise]
+root = "rpi/mise"
+target = "~/.config/mise"
+
+# ~/.pi/agent also holds sessions and pi's own state, so files are linked one
+# by one rather than the whole directory.
+[dotfile_groups.rpi-pi]
+root = "rpi/pi-agent"
+target = "~/.pi/agent"
+
+# auth.json is created once and never tracked. It holds no key: pi runs the
+# command when it first needs one, so the key works however pi is started
+# (a tuios pane, `tuios start-agent`, a Rex action).
+[dotfile_groups.rpi-pi.entries."~/.pi/agent/auth.json"]
+content = '{"anthropic":{"type":"api_key","key":"!cat \"$HOME/.config/anthropic/key\""}}'
+create_if_missing = true
+permissions = "0600"
+
+# The whole directory, as on the Mac: tuios rewrites config.toml in place.
+[dotfile_groups.rpi-tuios]
+root = "rpi/tuios"
+target = "~/.config/tuios"
+mode = "symlink"
+
+# File by file, so tuios.lua from `tuios integration install rex` lands in
+# ~/.config/rex rather than in the repo.
+[dotfile_groups.rpi-rex]
+root = "rpi/rex"
+target = "~/.config/rex"
+
+# [dotfiles] entries in mise.toml apply whatever groups are selected. These are
+# Mac-only (fnox wrappers, herdr), so turn them off on the Pi.
+[dotfiles]
+"~/.local/bin/wrapped" = { enabled = false }
+"~/.config/herdr-automatic-rename" = { enabled = false }
