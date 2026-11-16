@@ -25,9 +25,8 @@ kitty_placeholders = "on"
 # Mauve, the theme's accent. The theme has no role for the focused border: it
 # takes the success green in terminal mode. Unfocused borders are in the theme.
 border_focused_color = "accent"
-# Window slides and the copy sweep stay; overlay fades and the working-agent
-# shimmer go.
-motion = "basic"
+# Full keeps the working-agent shimmer; [motion] below switches off the rest.
+motion = "full"
 border_style = "glyphs"
 # Fade the panes you are not in, so focus reads without the border.
 dim_unfocused = 12
@@ -141,6 +140,18 @@ after-command-finished = "/usr/bin/python3 -I ~/.config/tuios/scripts/workspace-
 # as untracked. The daemon rereads this when the file changes.
 [worktree]
 path = "../.worktrees/{{ repo }}/{{ branch | slug }}"
+
+# Which motions run. Workspace switches, pane layout and zoom are cuts; the
+# working-agent shimmer, overlay fades, scrolling slide and copy sweep stay.
+[motion]
+workspace = "none"
+layout = "off"
+zoom = "off"
+scroll = "on"
+overlays = "on"
+sidebar = "on"
+copy = "on"
+confetti = "off"
 
 # Selection in rosewater with base text, as Ghostty's bundled Mocha draws it,
 # so a selection looks the same in a tuios pane and in Ghostty. The copy-mode
