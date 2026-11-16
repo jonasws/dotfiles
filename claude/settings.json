@@ -1,6 +1,7 @@
 {
   "env": {
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
+    "CLAUDE_CODE_EXPERIMENTAL_CODE_MODE": "1",
     "DISABLE_AUTOUPDATER": "1",
     "DISABLE_UPDATES": "1",
     "ENABLE_TOOL_SEARCH": "auto",
@@ -297,6 +298,16 @@
             "type": "command",
             "command": "python3 -I \"$HOME/.claude/hooks/inline-script-guard.py\"",
             "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "^REPL$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$HOME/.claude/hooks/repl-lint.sh\"",
+            "timeout": 10
           }
         ]
       },

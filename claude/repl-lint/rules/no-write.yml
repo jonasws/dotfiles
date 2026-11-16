@@ -1,0 +1,6 @@
+id: no-write
+language: javascript
+severity: error
+message: "Use Edit for existing files; Write is not allowed in REPL scripts"
+rule:
+  pattern: Write($$$)

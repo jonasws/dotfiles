@@ -1,0 +1,12 @@
+id: no-unbounded-loop
+language: javascript
+severity: error
+message: "Loops need an explicit bound"
+rule:
+  any:
+    - pattern: while (true) $BODY
+    - pattern: for (;;) $BODY
+    - kind: do_statement
+      has:
+        field: condition
+        regex: '^\(\s*true\s*\)$'

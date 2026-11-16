@@ -1,0 +1,10 @@
+id: no-empty-catch
+language: javascript
+severity: error
+message: "Do not swallow tool errors; handle or rethrow them"
+rule:
+  kind: catch_clause
+  has:
+    field: body
+    kind: statement_block
+    regex: '^\{\s*\}$'

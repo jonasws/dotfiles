@@ -1,0 +1,16 @@
+id: no-dynamic-code
+language: javascript
+severity: error
+message: "Script rejected by policy"
+rule:
+  any:
+    - pattern: eval($$$)
+    - pattern: Function($$$)
+    - pattern: new Function($$$)
+    - pattern: $A.constructor
+    - pattern: $A.__proto__
+    - pattern: Object.getPrototypeOf($$$)
+    - pattern: Reflect.$M
+    - pattern: new Proxy($$$)
+    - pattern: globalThis[$K]
+    - pattern: this[$K]

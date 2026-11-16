@@ -1,0 +1,52 @@
+id: no-write
+valid:
+  - "await Edit({ file_path: 'a', old_string: 'x', new_string: 'y' })"
+invalid:
+  - "await Write({ file_path: 'a', content: 'x' })"
+---
+id: no-unbounded-loop
+valid:
+  - "for (let i = 0; i < 10; i++) { await Bash({ command: 'ls' }) }"
+invalid:
+  - "while (true) { await Bash({ command: 'ls' }) }"
+  - "for (;;) { await Bash({ command: 'ls' }) }"
+  - "do { await Bash({ command: 'ls' }) } while (true)"
+---
+id: no-dynamic-code
+valid:
+  - "const x = obj.name"
+invalid:
+  - "eval('1')"
+  - "new Function('return 1')"
+  - "const F = x.constructor"
+  - "Reflect.apply(f, null, [])"
+  - "globalThis[k]"
+  - "new Proxy({}, {})"
+---
+id: no-tool-alias
+valid:
+  - "await Read({ file_path: 'a' })"
+  - "await mcp__slack__slack_send_message({ text: 'hi' })"
+invalid:
+  - "const w = Write"
+  - "[Bash].map(f => f({ command: 'ls' }))"
+---
+id: no-empty-catch
+valid:
+  - "try { await Read({ file_path: 'a' }) } catch (e) { throw e }"
+invalid:
+  - "try { await Read({ file_path: 'a' }) } catch (e) {}"
+---
+id: no-mcp-write-in-loop
+valid:
+  - "await mcp__slack__slack_send_message({ text: 'one' })"
+  - "for (const f of fs) await mcp__slack__slack_read_channel({ id: f })"
+invalid:
+  - "for (const u of users) await mcp__slack__slack_send_message({ to: u })"
+  - "users.map(u => mcp__github__create_issue({ title: u }))"
+---
+id: no-raw-content-return
+valid:
+  - "r.file.content.slice(0, 200)"
+invalid:
+  - "r.file.content"

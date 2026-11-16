@@ -1,0 +1,9 @@
+id: no-raw-content-return
+language: javascript
+severity: warning
+message: "Return a summary or slice, not whole file contents"
+rule:
+  kind: expression_statement
+  has:
+    kind: member_expression
+    regex: '\.content$'
