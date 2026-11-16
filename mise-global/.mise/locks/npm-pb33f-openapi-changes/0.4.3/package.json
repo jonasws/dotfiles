@@ -2,6 +2,6 @@
   "name": "mise-npm-install",
   "private": true,
   "dependencies": {
-    "@pb33f/openapi-changes": "0.4.1"
+    "@pb33f/openapi-changes": "0.4.3"
   }
 }

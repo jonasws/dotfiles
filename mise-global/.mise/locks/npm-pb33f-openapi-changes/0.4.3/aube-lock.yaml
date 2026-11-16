@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       '@pb33f/openapi-changes':
-        specifier: 0.4.1
-        version: 0.4.1
+        specifier: 0.4.3
+        version: 0.4.3
 
 packages:
 
@@ -18,8 +18,8 @@ packages:
     resolution: {integrity: sha512-wgm9Ehl2jpeqP3zw/7mo3kRHFp5MEDhqAdwy1fTGkHAwnkGOVsgpvQhL8B5n1qlb01jV3n/bI0ZfZp5lWA1k4w==}
     engines: {node: '>=18.0.0'}
 
-  '@pb33f/openapi-changes@0.4.1':
-    resolution: {integrity: sha512-9ukPb1JTch7VaA3TgOG+3xzakc7alD3CrEXpIXSyHcJbBIAfukPkwVb5TSGv0u2SWO4+yPeGYEOmziQqIR4kkA==}
+  '@pb33f/openapi-changes@0.4.3':
+    resolution: {integrity: sha512-/tIiEXSJ8Xbz0Ns8nIskRRF23rKvDUgnuWkNvJeUmC1OqabgTg/SRPfyfUGi2le+PgnkviE+CxR/iKsl+1qfmQ==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
@@ -85,8 +85,8 @@ packages:
       kerberos:
         optional: true
 
-  tar@7.5.22:
-    resolution: {integrity: sha512-MFO/QzvtAOmJbkhOaCTvbGcFN9L9b+JunIsDwaKljSOdcLMea3NJ1k9Usz/rjdfSXTq4dfzfeS7W4p4YOAAHeA==}
+  tar@7.5.23:
+    resolution: {integrity: sha512-lkukzdoGngZHJZXxW4S/E4Fp9ghTDlyZXrQGRNoJ/LXvDKcXUTq2sg5yQe74po7Voea6n/IN09+wE/QvJMiifA==}
     engines: {node: '>=18'}
 
   web-streams-polyfill@3.3.3:
@@ -103,11 +103,11 @@ snapshots:
     dependencies:
       minipass: 7.1.3
 
-  '@pb33f/openapi-changes@0.4.1':
+  '@pb33f/openapi-changes@0.4.3':
     dependencies:
       https-proxy-agent: 9.1.0
       node-fetch: 3.3.2
-      tar: 7.5.22
+      tar: 7.5.23
     transitivePeerDependencies:
       - kerberos
       - supports-color
@@ -158,7 +158,7 @@ snapshots:
 
   proxy-agent-negotiate@1.1.0: {}
 
-  tar@7.5.22:
+  tar@7.5.23:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0

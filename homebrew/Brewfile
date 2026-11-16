@@ -182,6 +182,8 @@ cask "rectangle"
 cask "slack"
 # Music streaming service
 cask "spotify"
+# Mesh VPN based on WireGuard
+cask "tailscale-app"
 # GPU-accelerated cross-platform terminal emulator and multiplexer
 cask "wezterm@nightly"
 # Multiplayer code editor
