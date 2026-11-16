@@ -34,10 +34,12 @@ out=$("$SG" scan -c "$RULES/sgconfig.yml" --json=compact "$dir/script.js" 2>/dev
 # rewrites it), warning asks (it may be intended, the user decides).
 "$JQ" -c '
   def fmt: "line \(.range.start.line + 1): \(.message)";
+  def cap: if length > 10 then .[:10] + ["and \(length - 10) more"] else . end;
   def decide($d; $r): {hookSpecificOutput: {hookEventName: "PreToolUse",
-    permissionDecision: $d, permissionDecisionReason: ("repl-lint: " + ($r | join("; ")))}};
-  ([.[] | select(.severity == "error") | fmt] | unique) as $e
-  | ([.[] | select(.severity == "warning") | fmt] | unique) as $w
+    permissionDecision: $d, permissionDecisionReason: ("repl-lint: " + ($r | cap | join("; ")))}};
+  def findings($s): [.[] | select(.severity == $s)] | unique_by([.range.start.line, .message]) | map(fmt);
+  findings("error") as $e
+  | findings("warning") as $w
   | if ($e | length) > 0 then decide("deny"; $e)
     elif ($w | length) > 0 then decide("ask"; $w)
     else empty end' <<<"$out" || fail "could not parse scanner output"

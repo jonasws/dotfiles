@@ -162,6 +162,7 @@ class Script:
         self.everywhere = {}  # name -> binding nodes in every scope
         self.declared = set()
         self.active = set()
+        self.resolved = {}  # (name, scope id) -> values, or the Unresolved it raised
         self._collect()
 
     def scope_of(self, node):
@@ -255,6 +256,14 @@ class Script:
     def name_values(self, name, scope):
         scope, found = self.lookup(name, scope)
         key = (name, id(scope))
+        # Every use of a name reads the same bindings, so resolve it once. A
+        # failure is cached too: a cycle found while resolving `name` passes
+        # through `name`, so it would be found again on every lookup.
+        if key in self.resolved:
+            cached = self.resolved[key]
+            if isinstance(cached, Unresolved):
+                raise cached
+            return cached
         if key in self.active:
             raise Unresolved(f"`{name}` depends on itself")
         self.active.add(key)
@@ -264,7 +273,11 @@ class Script:
                 out |= self.binding_values(binding, name)
             if len(out) > MAX_VALUES:
                 raise Unresolved(f"`{name}` takes too many values to check")
+            self.resolved[key] = out
             return out
+        except Unresolved as e:
+            self.resolved[key] = e
+            raise
         finally:
             self.active.discard(key)
 
