@@ -10,11 +10,17 @@
     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "2",
     "RIP_GRAVEYARD": "/Users/jonasws/.local/share/graveyard",
     "RIPGREP_CONFIG_PATH": "/Users/jonasws/dotfiles/ripgrep/dot-ripgreprc",
-    "GIT_CONFIG_COUNT": "2",
+    "GIT_CONFIG_COUNT": "5",
     "GIT_CONFIG_KEY_0": "commit.gpgsign",
-    "GIT_CONFIG_VALUE_0": "false",
+    "GIT_CONFIG_VALUE_0": "true",
     "GIT_CONFIG_KEY_1": "tag.gpgsign",
-    "GIT_CONFIG_VALUE_1": "false"
+    "GIT_CONFIG_VALUE_1": "false",
+    "GIT_CONFIG_KEY_2": "gpg.format",
+    "GIT_CONFIG_VALUE_2": "ssh",
+    "GIT_CONFIG_KEY_3": "gpg.ssh.program",
+    "GIT_CONFIG_VALUE_3": "ssh-keygen",
+    "GIT_CONFIG_KEY_4": "user.signingkey",
+    "GIT_CONFIG_VALUE_4": "/Users/jonasws/.config/agent-signing/id_ed25519"
   },
   "attribution": {
     "commit": ""
@@ -146,6 +152,9 @@
       "Bash(git push --force*)",
       "Bash(git push -f *)",
       "Bash(git rebase*)",
+      "Bash(resign-commits)",
+      "Bash(resign-commits *)",
+      "Bash(*/resign-commits*)",
       "Bash(git reset --hard*)",
       "Bash(herdr agent prompt *)",
       "Bash(herdr agent start *)",
@@ -601,6 +610,7 @@
         "~/.config/mise",
         "~/.config/twg/skills",
         "~/.config/git",
+      "~/.config/agent-signing",
         "~/catppuccin/delta/catppuccin.gitconfig",
         "~/.config/herdr",
         "~/.config/colima",

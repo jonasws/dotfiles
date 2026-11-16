@@ -1,23 +1,68 @@
 #!/usr/bin/env bash
-# Sign the unsigned commits between a base (default: upstream) and HEAD.
+# Sign the unsigned commits between a base and HEAD.
+#
+# With no base it fetches every remote and uses the default branch of
+# `upstream` (of `origin` when there is no `upstream`), so a fork's PR branch is
+# measured against the repository the PR goes to, not against its own stale
+# copy on the fork. A PR whose base is not the default branch passes it:
+# `resign-commits upstream/release-1.2`.
+#
+# It refuses a range that holds another author's commits or more than
+# 30 commits unless given --yes: either means the base is wrong, and
+# signing would rewrite commits that are already on the base branch.
+#
 # A script rather than a fish function so it also runs from Claude Code's `!`
 # prompt, which uses bash. Kept to bash 3.2 for machines without Homebrew bash.
 set -euo pipefail
 
+max_commits=30
+
 usage() {
-  echo "usage: resign-commits [base]   # base defaults to the branch's upstream" >&2
+  echo "usage: resign-commits [--yes] [base]   # base defaults to upstream's (else origin's) default branch" >&2
   exit 2
 }
 
-case "${1:-}" in -h | --help) usage ;; esac
-[ $# -le 1 ] || usage
+yes=0
+base=""
+for arg in "$@"; do
+  case "$arg" in
+    -h | --help) usage ;;
+    -y | --yes) yes=1 ;;
+    -*) usage ;;
+    *) [ -z "$base" ] || usage; base=$arg ;;
+  esac
+done
 
-base=${1:-}
+git fetch --all --quiet
+
 if [ -z "$base" ]; then
-  base=$(git rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' 2>/dev/null) || {
-    echo "resign-commits: no upstream; pass a base commit" >&2
+  if git remote get-url upstream >/dev/null 2>&1; then
+    remote=upstream
+  elif git remote get-url origin >/dev/null 2>&1; then
+    remote=origin
+  else
+    echo "resign-commits: no upstream or origin remote; pass a base commit" >&2
     exit 2
-  }
+  fi
+  if ! base=$(git symbolic-ref --quiet --short "refs/remotes/$remote/HEAD"); then
+    git remote set-head "$remote" --auto >/dev/null
+    base=$(git symbolic-ref --short "refs/remotes/$remote/HEAD")
+  fi
+fi
+git rev-parse --verify --quiet "$base^{commit}" >/dev/null || {
+  echo "resign-commits: $base is not a commit" >&2
+  exit 2
+}
+
+count=$(git rev-list --count "$base..HEAD")
+me=$(git config user.email || true)
+others=$(git log --format='%ae' "$base..HEAD" | grep -vxF -- "$me" | sort -u || true)
+echo "resign-commits: base $base, $count commits in $base..HEAD"
+if [ "$yes" -eq 0 ] && { [ "$count" -gt "$max_commits" ] || [ -n "$others" ]; }; then
+  [ "$count" -le "$max_commits" ] || echo "  more than $max_commits commits" >&2
+  [ -z "$others" ] || echo "  commits by others: $(echo $others)" >&2
+  echo "resign-commits: refusing; check the base, or pass --yes" >&2
+  exit 1
 fi
 
 # %G? needs gpg.ssh.allowedSignersFile to verify and reports N without it,

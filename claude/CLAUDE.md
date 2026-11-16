@@ -289,12 +289,20 @@ and rewrite any hit.
 
 Indent the body with 2 spaces (from line 2 and below).
 
-Commits you make come out unsigned: `GIT_CONFIG_*` in `settings.json` turns
-`commit.gpgsign` off for Claude's processes, since signing goes through 1Password's
-`op-ssh-sign`, which needs Touch ID and is unreachable from the sandbox. Do not pass
-`-S`. After committing, tell me how many unsigned commits there are and remind me to
-run `! resign-commits` (a script in `~/.local/bin`), naming a base only when the
-branch has no upstream. It signs from the oldest unsigned commit up, leaving earlier commits alone.
+Commits you make are signed with a key of your own: `GIT_CONFIG_*` in `settings.json`
+points git at `~/.config/agent-signing/id_ed25519` through plain `ssh-keygen`, so
+no 1Password or Touch ID is involved. The key is a signing key on my GitHub account
+and is listed in `~/dotfiles/git/allowed_signers`. Do not pass `-S` or change the
+signing settings.
+
+A commit that still comes out unsigned is signed with `resign-commits`, which goes
+through 1Password and is an `ask` rule. With no argument it fetches and signs from
+the default branch of `upstream` (of `origin` when there is none). For a PR whose
+base is not the default branch, pass it: `resign-commits upstream/<base>`, with the
+base from the PR (`pull_request_read` → `base.ref`). It refuses a range with other
+authors' commits or more than 30 commits; that means the base is wrong. Re-signing
+rewrites every hash from the oldest unsigned commit up, so anything that names one
+of those commits, such as a Go pseudo-version pin, must be moved to the new hash.
 
 ## Response style
 

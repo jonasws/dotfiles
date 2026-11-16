@@ -1,7 +1,8 @@
 #!/bin/sh
 # github-mcp-server as Claude Code starts it (see ~/.claude.json), deliberately weak:
 # it gets MISE_GITHUB_TOKEN, a fine-grained token with public-repo read and nothing
-# else, and runs with --read-only so no write tool is even registered. Full access
+# else, and runs with --read-only so no write tool is even registered. The actions
+# toolset adds job logs and run status for reading CI failures. Full access
 # stays with the gh wrapper, which agents cannot run. The token is exported to this
 # one process only; fnox-secret explains how all its callers share one Touch ID per
 # cold start.
@@ -17,4 +18,4 @@ fi
 GITHUB_PERSONAL_ACCESS_TOKEN="$("$(dirname "$0")/fnox-secret" MISE_GITHUB_TOKEN)"
 export GITHUB_PERSONAL_ACCESS_TOKEN
 
-exec "$real" "$@" --read-only
+exec "$real" "$@" --read-only --toolsets=default,actions
