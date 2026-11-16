@@ -30,8 +30,8 @@ motion = "full"
 border_style = "glyphs"
 # Fade the panes you are not in, so focus reads without the border.
 dim_unfocused = 12
-# The wheel only scrolls the focused pane, so hovering a pane focuses it.
-focus_follows_mouse = true
+# Off: click a pane to focus it. The wheel only scrolls the focused pane.
+focus_follows_mouse = false
 # The default cap of 12 cells cuts the agent topics and repo@branch titles
 # that scripts/workspace-names.py names workspaces with. The full name still
 # shows on hover.
