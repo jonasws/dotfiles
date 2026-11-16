@@ -186,8 +186,10 @@ RIP_GRAVEYARD = "{{env.HOME}}/.local/share/graveyard"
 
 # Commands that must run under `fnox exec` to receive their credentials. mise
 # orders these ahead of tool directories, so the wrapper here wins over the
-# maven that mise itself provisions.
-_.path = ["~/.local/bin/wrapped"]
+# maven that mise itself provisions. tuios/shims holds personal stand-ins on
+# the same terms: its tml opens documents as tuios panes inside tuios, even
+# from a project task that pins tml in its own `tools`.
+_.path = ["~/.local/bin/wrapped", "~/dotfiles/tuios/shims"]
 
 # Re-encrypt every secret into the local age provider, so resolution stops
 # reaching 1Password: MCP servers start without a 1Password prompt, and `mvn`

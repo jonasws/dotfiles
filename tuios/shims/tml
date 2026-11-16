@@ -1,0 +1,30 @@
+#!/usr/bin/env bash
+# tml shim. It sits on mise's _.path (mise-global/config.toml), which mise orders ahead of tool
+# directories, so it also wins over a tml that a project task installs through its own `tools`.
+#
+# Inside tuios, `tml FILE` opens FILE as a tuios pane beside this one instead of taking over the
+# terminal. When FILE.driver.py sits beside it, the driver opens and animates the pane. Anything
+# else (flags, stdin, outside tuios) goes to the real tml further down PATH.
+set -euo pipefail
+self_dir=$(cd "$(dirname "$0")" && pwd)
+
+if [[ ${TUIOS_ENV:-} == 1 && $# -eq 1 && -f $1 ]] && command -v tuios >/dev/null; then
+  file=$1
+  driver=${file%.tml}.driver.py
+  if [[ -f $driver ]]; then
+    nohup python3 -I "$driver" "$file" >/dev/null 2>&1 &
+    echo "Opened $file in a tuios pane, animated by $(basename "$driver")"
+  else
+    tuios tml show "$file" --pane >/dev/null
+    echo "Opened $file in a tuios pane"
+  fi
+  exit 0
+fi
+
+IFS=: read -ra dirs <<<"$PATH"
+for d in "${dirs[@]}"; do
+  [[ -d $d && $d -ef $self_dir ]] && continue
+  [[ -x $d/tml ]] && exec "$d/tml" "$@"
+done
+echo "tml: no tml on PATH besides this shim" >&2
+exit 127
