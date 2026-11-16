@@ -1,7 +1,7 @@
 id: no-empty-catch
 language: javascript
 severity: error
-message: "Do not swallow tool errors; handle or rethrow them"
+message: "Do not swallow tool errors: handle or rethrow them, or say why in a comment"
 rule:
   kind: catch_clause
   has:

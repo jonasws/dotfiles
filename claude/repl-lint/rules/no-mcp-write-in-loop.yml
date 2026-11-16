@@ -1,7 +1,8 @@
+# severity warning makes the hook ask the user rather than deny.
 id: no-mcp-write-in-loop
 language: javascript
-severity: error
-message: "State-changing MCP tools may not be called inside loops"
+severity: warning
+message: "State-changing MCP tool called in a loop: confirm the batch"
 rule:
   kind: call_expression
   has:

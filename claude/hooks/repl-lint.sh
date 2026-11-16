@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # PreToolUse hook for Code Mode's REPL tool: lint tool_input.code with ast-grep.
-# Hygiene only. Security comes from the session-taint hook and the OS sandbox.
+# A linter for mistakes an honest model makes, not a security boundary: a script
+# written to get past it will. Security comes from the per-call permission rules
+# and hooks every tool call from a script still meets, and from the OS sandbox.
 # Any failure exits 2, which refuses the script: a broken linter must not wave code through.
 set -o pipefail
 RULES="${REPL_LINT_RULES:-$HOME/.claude/repl-lint}"
@@ -28,19 +30,14 @@ trap 'rm -f "$dir/script.js"; rmdir "$dir"' EXIT
 out=$("$SG" scan -c "$RULES/sgconfig.yml" --json=compact "$dir/script.js" 2>/dev/null)
 [ -z "$out" ] && fail "scanner produced no output"
 
-result=$("$JQ" -r '
+# Rule severity picks the outcome: error denies (the script is wrong, the model
+# rewrites it), warning asks (it may be intended, the user decides).
+"$JQ" -c '
   def fmt: "line \(.range.start.line + 1): \(.message)";
+  def decide($d; $r): {hookSpecificOutput: {hookEventName: "PreToolUse",
+    permissionDecision: $d, permissionDecisionReason: ("repl-lint: " + ($r | join("; ")))}};
   ([.[] | select(.severity == "error") | fmt] | unique) as $e
   | ([.[] | select(.severity == "warning") | fmt] | unique) as $w
-  | if ($e | length) > 0 then
-      {hookSpecificOutput: {hookEventName: "PreToolUse", permissionDecision: "deny",
-        permissionDecisionReason: ("REPL policy: " + ($e | join("; ")))}} | tojson
-    elif ($w | length) > 0 then "warn\t" + ($w | join("; "))
-    else empty end' <<<"$out") || fail "could not parse scanner output"
-
-case "$result" in
-  "") ;;
-  warn$'\t'*) echo "repl-lint warnings: ${result#warn$'\t'}" >&2 ;;
-  *) printf '%s\n' "$result" ;;
-esac
-exit 0
+  | if ($e | length) > 0 then decide("deny"; $e)
+    elif ($w | length) > 0 then decide("ask"; $w)
+    else empty end' <<<"$out" || fail "could not parse scanner output"

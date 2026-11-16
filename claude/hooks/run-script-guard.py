@@ -101,6 +101,13 @@ REFLECTION = {
     "eval", "exec", "compile", "__import__", "getattr", "setattr", "delattr",
     "globals", "locals", "vars", "breakpoint", "__builtins__", "__loader__", "__spec__",
 }
+# Functions in allowed modules that evaluate a string as code or walk attributes
+# named in a string: typing evaluates forward references with eval, and
+# string.Formatter.get_field reaches dunders no ast.Attribute shows.
+EVAL_NAMES = {
+    "get_type_hints", "ForwardRef", "evaluate_forward_ref", "get_annotations",
+    "singledispatch", "singledispatchmethod", "Formatter", "get_field", "get_value",
+}
 FRAME_ATTRS = {
     "f_globals", "f_locals", "f_builtins", "f_back", "f_code",
     "gi_frame", "cr_frame", "ag_frame", "tb_frame", "tb_next",
@@ -369,7 +376,7 @@ class Script:
         for node in ast.walk(self.tree):
             p = self.parent.get(node)
             if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load):
-                if node.id in REFLECTION:
+                if node.id in REFLECTION or node.id in EVAL_NAMES:
                     out.append(f"uses {node.id}")
                 elif node.id == "call_boto3" and not (isinstance(p, ast.Call) and p.func is node):
                     out.append("uses call_boto3 other than by calling it")
@@ -383,7 +390,7 @@ class Script:
                         out.append("uses aws_mcp as a value")
             elif isinstance(node, ast.Attribute):
                 a = node.attr
-                if a in FRAME_ATTRS or (a.startswith("__") and a.endswith("__") and a not in DUNDERS_OK):
+                if a in FRAME_ATTRS or a in EVAL_NAMES or (a.startswith("_") and a not in DUNDERS_OK):
                     out.append(f"uses .{a}")
             elif isinstance(node, ast.Constant) and isinstance(node.value, str):
                 if "call_boto3" in node.value or "aws_mcp" in node.value:
@@ -400,6 +407,9 @@ class Script:
                     out.append(f"imports from {'.' * node.level}{module}")
                 elif module.split(".")[0] == "aws_mcp":
                     out.append("imports from aws_mcp")
+                for al in node.names:
+                    if al.name in EVAL_NAMES:
+                        out.append(f"imports {al.name}")
         if self.everywhere.get("call_boto3"):
             out.append("redefines call_boto3")
         if any(not (isinstance(b, ast.alias) and b.name == "aws_mcp" and not b.asname)
@@ -580,6 +590,12 @@ ASK = [
     ('if (op := "DeleteVpc"):\n    await call_boto3(service_name="ec2", operation_name=op)', "cannot follow"),
     ('async def cb(s, o):\n    return await call_boto3(service_name=s, operation_name=o)\nawait cb(*args)', "unpacks its arguments"),
     ('await call_boto3(service_name="ec2", operation_name=', "does not parse"),
+    ('import typing\nS = "asyncio.ensure_future(call_" + "boto3(service_name=\'ec2\', operation_name=\'DeleteVpc\'))"\n'
+     'def f(x: S): pass\ntyping.get_type_hints(f)', "uses .get_type_hints"),
+    ('from typing import get_type_hints as g', "imports get_type_hints"),
+    ('import typing\ntyping.ForwardRef("x")._evaluate(None, None)', "uses ._evaluate"),
+    ('import string\ndef h(): pass\ng = string.Formatter().get_field("0.__glob" + "als__", [h], {})[0]\n'
+     'await g["call_" + "boto3"](service_name="ec2", operation_name="DeleteVpc")', "uses .Formatter"),
 ]
 
 

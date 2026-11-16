@@ -1,12 +1,20 @@
 id: no-unbounded-loop
 language: javascript
 severity: error
-message: "Loops need an explicit bound"
+message: "Endless loop: add a bound, or a break, return or throw that ends it"
 rule:
   any:
     - pattern: while (true) $BODY
+    - pattern: while (1) $BODY
     - pattern: for (;;) $BODY
     - kind: do_statement
       has:
         field: condition
-        regex: '^\(\s*true\s*\)$'
+        regex: '^\(\s*(true|1)\s*\)$'
+  not:
+    has:
+      any:
+        - kind: break_statement
+        - kind: return_statement
+        - kind: throw_statement
+      stopBy: end
