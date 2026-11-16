@@ -2,23 +2,6 @@
   "$schema": "https://www.schemastore.org/claude-code-keybindings.json",
   "bindings": [
     {
-      "context": "Chat",
-      "bindings": {
-        "meta+enter": "chat:newline",
-        "ctrl+x ctrl+s": "chat:submit",
-        "ctrl+x t": "command:tasks",
-        "ctrl+x r": "command:resume",
-        "ctrl+x f": "command:fork",
-        "ctrl+x g": "command:bg",
-        "ctrl+x c": "command:compact",
-        "ctrl+x d": "command:diff"
-      }
-    },
-    {
-      "context": "Autocomplete",
-      "bindings": { "enter": "autocomplete:accept" }
-    },
-    {
       "context": "ModelPicker",
       "bindings": { "enter": "modelPicker:thisSessionOnly" }
     },
