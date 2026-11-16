@@ -142,7 +142,9 @@ after-command-finished = "/usr/bin/python3 -I ~/.config/tuios/scripts/workspace-
 path = "../.worktrees/{{ repo }}/{{ branch | slug }}"
 
 # Which motions run. Workspace switches, pane layout and zoom are cuts; the
-# working-agent shimmer, overlay fades, scrolling slide and copy sweep stay.
+# working-agent shimmer, overlay fades, scrolling slide and copy sweep stay. The
+# workspace keys open a pane before they switch (scripts/new-workspace.sh), so a
+# cut never shows an empty workspace's splash.
 [motion]
 workspace = "none"
 layout = "off"
@@ -211,24 +213,26 @@ choose_tree = ["super+k", "ctrl+alt+k"]
 goto_picker = ["super+,"]
 # Ghostty hands these Cmd chords to tuios (ghostty/config.ghostty unbinds
 # them): Cmd+T and Cmd+N go to a new workspace and Cmd+1..9 picks one, like a
-# tab bar's; Cmd+Shift+N stays Ghostty's new window.
+# tab bar's; Cmd+Shift+N stays Ghostty's new window. Those keys and prefix+c are
+# command keys below that run scripts/new-workspace.sh: the pane opens before
+# the switch, so an empty workspace's splash never draws.
 # Cmd+W closes the pane, a command key below. Cmd+R and Cmd+D split right and
 # down, as Ghostty's own splits did.
-new_workspace = ["super+t", "super+n"]
+new_workspace = []
 # Ctrl+Tab and Ctrl+Shift+Tab step through the session's workspaces, like tabs.
 next_workspace = ["ctrl+tab"]
 prev_workspace = ["ctrl+shift+tab"]
 split_vertical = ["super+r"]
 split_horizontal = ["super+d"]
-switch_workspace_1 = ["super+1"]
-switch_workspace_2 = ["super+2"]
-switch_workspace_3 = ["super+3"]
-switch_workspace_4 = ["super+4"]
-switch_workspace_5 = ["super+5"]
-switch_workspace_6 = ["super+6"]
-switch_workspace_7 = ["super+7"]
-switch_workspace_8 = ["super+8"]
-switch_workspace_9 = ["super+9"]
+switch_workspace_1 = []
+switch_workspace_2 = []
+switch_workspace_3 = []
+switch_workspace_4 = []
+switch_workspace_5 = []
+switch_workspace_6 = []
+switch_workspace_7 = []
+switch_workspace_8 = []
+switch_workspace_9 = []
 # Cmd+. labels the panes and focuses the one whose label you type.
 display_panes = ["super+."]
 # Ctrl+Shift+Space labels the text on every pane of the workspace.
@@ -237,16 +241,17 @@ hints_all_panes = ["ctrl+shift+space"]
 [keybindings.prefix_mode]
 # herdr: prefix+v splits right and prefix+c opens a tab (a tuios workspace).
 prefix_split_vertical = ["v", "|", "\\"]
-# herdr: prefix+1..9 picks a tab.
-switch_workspace_1 = ["1"]
-switch_workspace_2 = ["2"]
-switch_workspace_3 = ["3"]
-switch_workspace_4 = ["4"]
-switch_workspace_5 = ["5"]
-switch_workspace_6 = ["6"]
-switch_workspace_7 = ["7"]
-switch_workspace_8 = ["8"]
-switch_workspace_9 = ["9"]
+# herdr: prefix+1..9 picks a tab, through scripts/new-workspace.sh (command
+# keys below) so an empty tab gets its pane before it shows.
+switch_workspace_1 = []
+switch_workspace_2 = []
+switch_workspace_3 = []
+switch_workspace_4 = []
+switch_workspace_5 = []
+switch_workspace_6 = []
+switch_workspace_7 = []
+switch_workspace_8 = []
+switch_workspace_9 = []
 prefix_select_0 = []
 prefix_select_1 = []
 prefix_select_2 = []
@@ -259,7 +264,7 @@ prefix_select_8 = []
 prefix_select_9 = []
 prefix_review = ["ctrl+v"]
 prefix_new_window = []
-new_workspace = ["c"]
+new_workspace = []
 next_workspace = ["n"]
 prev_workspace = ["p"]
 prefix_next_window = ["tab"]
@@ -375,6 +380,13 @@ send_to_workspace_7 = []
 send_to_workspace_8 = []
 send_to_workspace_9 = []
 
+# f and o in the rail flip the agents section's filter (this session only,
+# which also narrows prefix+a and prefix+A) and its sort, and each choice
+# sticks in sidebar.json. The header controls still flip them.
+[keybindings.sidebar]
+agents_filter = []
+agents_sort = []
+
 [keybindings.window_management]
 next_session = []
 prev_session = []
@@ -421,6 +433,154 @@ command = "herdr-splits.resize-up"
 key = "ctrl+shift+l"
 type = "plugin_action"
 command = "herdr-splits.resize-right"
+
+# A new workspace, or a switch to one, with its first pane already open.
+[[keybindings.command]]
+key = "super+t"
+name = "ws-new-super-t"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh"
+description = "New workspace, pane first"
+
+[[keybindings.command]]
+key = "super+n"
+name = "ws-new-super-n"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh"
+description = "New workspace, pane first"
+
+[[keybindings.command]]
+key = "prefix+c"
+name = "ws-new-prefix-c"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh"
+description = "New workspace, pane first"
+
+[[keybindings.command]]
+key = "super+1"
+name = "ws-1-super"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 1"
+description = "Workspace 1"
+
+[[keybindings.command]]
+key = "super+2"
+name = "ws-2-super"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 2"
+description = "Workspace 2"
+
+[[keybindings.command]]
+key = "super+3"
+name = "ws-3-super"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 3"
+description = "Workspace 3"
+
+[[keybindings.command]]
+key = "super+4"
+name = "ws-4-super"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 4"
+description = "Workspace 4"
+
+[[keybindings.command]]
+key = "super+5"
+name = "ws-5-super"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 5"
+description = "Workspace 5"
+
+[[keybindings.command]]
+key = "super+6"
+name = "ws-6-super"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 6"
+description = "Workspace 6"
+
+[[keybindings.command]]
+key = "super+7"
+name = "ws-7-super"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 7"
+description = "Workspace 7"
+
+[[keybindings.command]]
+key = "super+8"
+name = "ws-8-super"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 8"
+description = "Workspace 8"
+
+[[keybindings.command]]
+key = "super+9"
+name = "ws-9-super"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 9"
+description = "Workspace 9"
+
+[[keybindings.command]]
+key = "prefix+1"
+name = "ws-1-prefix"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 1"
+description = "Workspace 1"
+
+[[keybindings.command]]
+key = "prefix+2"
+name = "ws-2-prefix"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 2"
+description = "Workspace 2"
+
+[[keybindings.command]]
+key = "prefix+3"
+name = "ws-3-prefix"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 3"
+description = "Workspace 3"
+
+[[keybindings.command]]
+key = "prefix+4"
+name = "ws-4-prefix"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 4"
+description = "Workspace 4"
+
+[[keybindings.command]]
+key = "prefix+5"
+name = "ws-5-prefix"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 5"
+description = "Workspace 5"
+
+[[keybindings.command]]
+key = "prefix+6"
+name = "ws-6-prefix"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 6"
+description = "Workspace 6"
+
+[[keybindings.command]]
+key = "prefix+7"
+name = "ws-7-prefix"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 7"
+description = "Workspace 7"
+
+[[keybindings.command]]
+key = "prefix+8"
+name = "ws-8-prefix"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 8"
+description = "Workspace 8"
+
+[[keybindings.command]]
+key = "prefix+9"
+name = "ws-9-prefix"
+type = "shell"
+command = "~/.config/tuios/scripts/new-workspace.sh 9"
+description = "Workspace 9"
 
 # Popups and pickers, opened by scripts/toggle-popup.sh in the directory of the
 # pane the key was pressed in. The tv pane picker stays on prefix+f for its
