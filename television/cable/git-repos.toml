@@ -20,7 +20,7 @@ frecency = false
 
 [preview]
 shell = "bash"
-command = "git -C {} log -n 200 --pretty=medium --all --graph --color"
+command = "git -C {} log -n 200 --pretty=medium --branches --remotes --tags --graph --color"
 
 [keybindings]
 enter = "actions:open"
