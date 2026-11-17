@@ -801,21 +801,6 @@ backend = "pipx:awslogs"
 specifiers = ["latest"]
 uv = { path = ".mise/locks/pipx-awslogs/0.15.0", digest = "sha256:fd458ae071680a2fec337f5301db18594a8c39843a12089a2045f3a3ea4946a1" }
 
-[[tools."pipx:mcp2cli"]]
-version = "3.9.0"
-backend = "pipx:mcp2cli"
-specifiers = ["latest"]
-
-[[tools."pipx:posting"]]
-version = "2.11.1"
-backend = "pipx:posting"
-specifiers = ["latest"]
-
-[[tools."pipx:sqlit-tui"]]
-version = "1.6.5"
-backend = "pipx:sqlit-tui"
-specifiers = ["latest"]
-
 [[tools."pipx:xmlformatter"]]
 version = "0.2.9"
 backend = "pipx:xmlformatter"

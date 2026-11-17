@@ -40,8 +40,6 @@ node = "24"
 "npm:defuddle" = "latest"
 "npm:typescript-language-server" = "latest"
 "pipx:awslogs" = "latest"
-"pipx:posting" = "latest"
-"pipx:sqlit-tui" = "latest"
 "pipx:xmlformatter" = "latest"
 python = "latest"
 rust = "latest"
@@ -58,7 +56,6 @@ neovim = "latest"
 "github:docker/buildx" = "latest"
 superfile = "latest"
 uv = "latest"
-"pipx:mcp2cli" = "latest"
 "npm:@earendil-works/pi-coding-agent" = "latest"
 mitmproxy = "latest"
 "github:mfontanini/presenterm" = "latest"
@@ -157,7 +154,6 @@ minimum_release_age_excludes = [
   "github:always-further/nono",
   "aqua:github/github-mcp-server",
   "aqua:anthropics/claude-code",
-  "pipx:mcp2cli",
   "go:github.com/isaacphi/mcp-language-server",
   "npm:@earendil-works/pi-coding-agent",
   "npm:exa-mcp-server",

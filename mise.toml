@@ -474,10 +474,6 @@ exclude = ["functions"]
 root = "otree"
 target = "~/.config"
 
-[dotfile_groups.posting]
-root = "posting"
-target = "~/.config/posting"
-
 [dotfile_groups.presenterm]
 root = "presenterm"
 target = "~/.config/presenterm"
