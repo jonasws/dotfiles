@@ -6,6 +6,7 @@
 #   jira.sh list '<jql>' [limit]  one aligned row per issue, served from cache
 #   jira.sh preview KEY           the issue as Markdown, rendered by leaf
 #   jira.sh open KEY              the issue in the browser
+#   jira.sh url KEY               the issue's URL
 #
 # A list prints its last result at once and, when that is over a minute old,
 # refetches in the background; the channel's `watch` picks up the new rows. The
@@ -30,6 +31,15 @@ creds() {
   )"
   { read -r host; read -r email; read -r token; read -r cloud; } <<<"$out"
   case "$host" in http://* | https://*) ;; *) host="https://$host" ;; esac
+  mkdir -p "$cache"
+  printf '%s' "$host" >"$cache/host"
+}
+
+# The site URL, from the cache once a fetch has stored it, so formatting a list
+# costs no credential lookup.
+site() {
+  [ -s "$cache/host" ] || creds
+  cat "$cache/host"
 }
 
 # The search response for one JQL on stdout. The credentials reach curl on
@@ -65,8 +75,7 @@ fetch() {
 }
 
 # The search JSON on stdin, one aligned row per issue:
-#   key  lane  priority type  age  assignee  summary  ‹epic›
-# Column widths are the widest value in the list, so the rows line up; summary
+#   key  lane  priority type  age  assignee  summary  ‹epic›# Column widths are the widest value in the list, so the rows line up; summary
 # and epic are last because they vary most. Lanes run right to left across the
 # board (in progress before to do), rank order within each. The lane is
 # coloured by status category, as Jira colours its lozenges.
@@ -143,11 +152,13 @@ case "$cmd" in
     } | leaf --inline ansi:100
     ;;
   open)
-    creds
-    open "$host/browse/$1"
+    open "$(site)/browse/$1"
+    ;;
+  url)
+    printf '%s/browse/%s\n' "$(site)" "$1"
     ;;
   *)
-    echo "usage: jira.sh list JQL [LIMIT] | preview KEY | open KEY" >&2
+    echo "usage: jira.sh list JQL [LIMIT] | preview KEY | open KEY | url KEY" >&2
     exit 2
     ;;
 esac

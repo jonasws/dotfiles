@@ -590,13 +590,14 @@ command = "~/.config/television/scripts/agent-sessions/popup.sh"
 description = "Agent session picker"
 
 # CN Kunde's Jira board, backlog and open epics (tv jira): Tab cycles them,
-# Enter opens the issue in the browser, ctrl-y copies its key. J for Jira.
+# Enter types the issue's URL into the pane the key was pressed in, without
+# submitting it; alt-enter opens it in the browser, ctrl-y copies it.
 [[keybindings.command]]
 key = "super+j"
 name = "jira"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh jira 90% 80% -- ~/.config/tuios/scripts/close-on-leave.sh tv jira"
-description = "Jira board and epics"
+command = "~/.config/tuios/scripts/jira-popup.sh"
+description = "Jira: pick an issue URL into pane"
 
 [[keybindings.command]]
 key = "prefix+l"
