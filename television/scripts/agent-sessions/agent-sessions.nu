@@ -395,7 +395,7 @@ def cwd-plan [s: record]: nothing -> record {
         do -i { ^git -C $from_ancestor rev-parse --show-toplevel } | complete | get stdout | str trim
     } else {
         let name = (repo-name $s.cwd)
-        [~/CX ~/CNOPS ~/CN-TERMINAL ~ ~/src ~/code] | each {|r| $r | path expand | path join $name }
+        [~/CX ~/CNOPS ~/CN-TERMINAL ~/LIFLIG ~ ~/src ~/code] | each {|r| $r | path expand | path join $name }
         | where {|d| ($d | path join .git | path exists) } | first | default null
     }
     if $repo == null { error make {msg: $"($s.cwd | tilde) is gone and no repository was found to restore it from"} }

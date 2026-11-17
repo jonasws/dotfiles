@@ -518,7 +518,8 @@
     "aws-core@agent-toolkit-for-aws": false,
     "kotlin-lsp@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true,
-    "cc-plugin-easel@builtin": false
+    "cc-plugin-easel@builtin": false,
+    "cargonet@cn-agent-tools": true
   },
   "extraKnownMarketplaces": {
     "playwright-skill": {
@@ -545,6 +546,12 @@
         "source": "github",
         "repo": "aws/agent-toolkit-for-aws"
       }
+    },
+    "cn-agent-tools": {
+      "source": {
+        "source": "directory",
+        "path": "/Users/jonasws/LIFLIG/cn-agent-tools"
+      }
     }
   },
   "outputStyle": "Concise",
@@ -567,6 +574,7 @@
         "~/CX",
         "~/CNOPS",
         "~/CN-TERMINAL",
+        "~/LIFLIG",
         "~/NSBNO",
         "~/dotfiles",
         "~/.herdr/worktrees",
@@ -599,6 +607,7 @@
         "~/CX",
         "~/CNOPS",
         "~/CN-TERMINAL",
+        "~/LIFLIG",
         "~/NSBNO",
         "~/dotfiles",
         "~/.herdr/worktrees",
@@ -610,7 +619,7 @@
         "~/.config/mise",
         "~/.config/twg/skills",
         "~/.config/git",
-      "~/.config/agent-signing",
+        "~/.config/agent-signing",
         "~/catppuccin/delta/catppuccin.gitconfig",
         "~/.config/herdr",
         "~/.config/colima",

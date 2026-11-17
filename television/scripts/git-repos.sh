@@ -2,55 +2,22 @@
 # Emit one absolute path per git repository on this machine.
 #
 # Two sources, in this order: zoxide's frecency list (most visited repos first),
-# then a full `fd` scan of ~ for anything zoxide has never scored -- freshly
-# cloned repos, mostly. Duplicates are dropped, keeping the zoxide position.
+# then an `fd` scan of ~ for anything zoxide has never scored -- freshly cloned
+# repos, mostly. Duplicates are dropped, keeping the zoxide position.
 #
-# The fd scan takes seconds on a large home directory, which would make every
-# picker launch feel sluggish. So the scan result is cached and refreshed in
-# the background: every call returns immediately from zoxide plus whatever the
-# cache holds, and a stale cache only means a newly cloned repo shows up a few
-# seconds late.
+# --format '{//}' prints each .git's parent directory without a process per
+# match; `--exec dirname` made the scan about 6x slower, which is what once
+# justified caching it.
 set -euo pipefail
-
-cache_dir="${XDG_CACHE_HOME:-$HOME/.cache}/television"
-cache="$cache_dir/git-repos"
-lock="$cache.lock"
-max_age_minutes=10
-lock_age_minutes=5
-
-mkdir -p "$cache_dir"
-
-scan() {
-  fd -g .git -HL -t d -d 3 --prune ~ -E 'Library' -E 'Application Support' --exec dirname '{}'
-}
-
-stale() {
-  [[ ! -s $cache ]] && return 0
-  [[ -n $(find "$cache" -mmin "+$max_age_minutes" -print -quit) ]]
-}
-
-# A crashed refresh would otherwise leave the lock behind and freeze the cache.
-[[ -d $lock && -n $(find "$lock" -mmin "+$lock_age_minutes" -print -quit) ]] && rmdir "$lock" 2>/dev/null
-
-# `mkdir` is the atomic test-and-set: the 2s refresh tick would otherwise start a
-# new scan on top of the one still running. Output goes to /dev/null so the
-# background job never holds this script's stdout open -- tv waits for EOF on the
-# source pipe, and an inherited fd would stall the picker for the whole scan.
-if stale && mkdir "$lock" 2>/dev/null; then
-  (
-    trap 'rmdir "$lock" 2>/dev/null' EXIT
-    scan >"$cache.tmp" && mv "$cache.tmp" "$cache"
-  ) >/dev/null 2>&1 &
-fi
 
 {
   # `if`, not `&&`: the loop's status is its last test, and a trailing non-repo
-  # would otherwise abort the group under `set -e` before the cache is read.
+  # would otherwise abort the group under `set -e`.
   # realpath restores the on-disk casing: zoxide keeps whatever case a path was
   # typed in (~/cnops), and on a case-insensitive volume that would slip past
   # the dedupe next to fd's ~/CNOPS.
   zoxide query -l | while IFS= read -r dir; do
     if [[ -d $dir/.git ]]; then printf '%s\0' "$dir"; fi
   done | xargs -0 realpath
-  [[ -s $cache ]] && cat "$cache"
+  fd -g .git -HL -t d -d 3 --prune ~ -E 'Library' -E 'Application Support' --format '{//}'
 } | awk '!seen[$0]++'
