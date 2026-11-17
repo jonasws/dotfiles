@@ -190,6 +190,28 @@ echo "$tag" > "$root/version"
 "$root/bin/herdr" --version
 """
 
+[tasks."update:tv-nightly"]
+description = "Build television from main and link it as tv in ~/.local/bin"
+# Not in `update`: nightly is opt-in. television is not a mise tool, as with
+# tuios: a mise-managed release on PATH would shadow the link. main carries the
+# kitty keyboard protocol, so alt+enter and ctrl+enter reach tv inside tuios.
+# The first run on 0.16 migrates ~/.config/television/config.toml and leaves a
+# config.toml.0.15.bak beside it.
+tools = { rust = "latest" }
+run = """
+set -euo pipefail
+root="$HOME/.local/share/tv-nightly"
+sha=$(git ls-remote https://github.com/alexpasmantier/television refs/heads/main | cut -f1)
+if [ -x "$root/bin/tv" ] && [ "$(cat "$root/built-commit" 2>/dev/null)" = "$sha" ]; then
+  echo "tv is already at ${sha:0:7}"
+else
+  cargo install --git https://github.com/alexpasmantier/television --rev "$sha" --locked --force --root "$root" television
+  echo "$sha" > "$root/built-commit"
+fi
+ln -sfn "$root/bin/tv" "$HOME/.local/bin/tv"
+"$root/bin/tv" --version
+"""
+
 [tasks."update:manifests"]
 description = "Rewrite the homebrew manifests this repo tracks"
 # Weekly, not daily: these two files are rewritten on every run, and most of

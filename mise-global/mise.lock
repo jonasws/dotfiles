@@ -893,24 +893,14 @@ checksum = "sha256:131f654e7f8366fd37dbe9363739f8d82e57ff3f632f45963cd233c049cfa
 url = "https://github.com/yorukot/superfile/releases/download/v1.6.0/superfile-darwin-v1.6.0-arm64.tar.gz"
 url_api = "https://api.github.com/repos/yorukot/superfile/releases/assets/441063713"
 
-[[tools.television]]
-version = "0.15.9"
-backend = "aqua:alexpasmantier/television"
-specifiers = ["latest"]
-
-[tools.television."platforms.macos-arm64"]
-checksum = "sha256:94ae7177d499f74e7544243ffe9c82371183ca11a6363f198a4b3d0e29f82732"
-url = "https://github.com/alexpasmantier/television/releases/download/0.15.9/tv-0.15.9-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/alexpasmantier/television/releases/assets/447568866"
-
 [[tools.twg]]
-version = "1.4.4"
+version = "1.4.5"
 backend = "http:twg"
 specifiers = ["latest"]
 
 [tools.twg."platforms.macos-arm64"]
-checksum = "blake3:1dbcb33ee0b9ee5c4b0fe1dc1f6652546af5c2484556dd522fab46bb248e85c4"
-url = "https://teamwork-graph.atlassian.com/cli/twg-darwin-arm64-v1.4.4"
+checksum = "blake3:13eda4f9f5093ecf89b10d32147ea0b473a140768c7d260bb9f5f71f0cc54284"
+url = "https://teamwork-graph.atlassian.com/cli/twg-darwin-arm64-v1.4.5"
 
 [[tools.usage]]
 version = "6.9.0"
