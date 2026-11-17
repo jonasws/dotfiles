@@ -295,7 +295,7 @@ prefix_explore = ["E"]
 # that had F move to ctrl+u.
 hints = ["ctrl+u"]
 # Labels on every pane of the workspace, not just the focused one: alt and
-# the single-pane key. Y is the yazi file picker's, ctrl+y the last message.
+# the single-pane key. Y is the tv file picker's, ctrl+y the last message.
 hints_all_panes = ["alt+u"]
 
 # herdr's capital letters: prefix+shift+x closes a tab and shift+t renames it,
@@ -597,7 +597,7 @@ description = "Agent session picker"
 key = "super+j"
 name = "jira"
 type = "shell"
-command = "~/.config/tuios/scripts/jira-popup.sh"
+command = "~/.config/tuios/scripts/tv-popup.sh jira jira text 90% 80%"
 description = "Jira: pick an issue URL into pane"
 
 [[keybindings.command]]
@@ -615,14 +615,14 @@ description = "lazygit: log"
 [[keybindings.command]]
 key = "prefix+y"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh yazi 80% 60% -- ~/.config/tuios/scripts/yazi-popup.sh"
+command = "~/.config/tuios/scripts/toggle-popup.sh yazi 90% 90% -- yazi"
 description = "yazi: browse"
 
 [[keybindings.command]]
 key = "prefix+Y"
 type = "shell"
-command = "~/.config/tuios/scripts/yazi-popup.sh pick"
-description = "yazi: pick files into pane"
+command = "~/.config/tuios/scripts/tv-popup.sh files files paths 80% 70%"
+description = "tv: pick files into pane"
 
 # Close the pane. On a session's last pane, close the session too and show the
 # next one, rather than leave the session empty on its splash screen.

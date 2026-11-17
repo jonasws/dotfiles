@@ -1,0 +1,21 @@
+#!/bin/sh
+# Claude Code, run under `mise exec` so mise [env] (for example DOCKER_HOST from
+# ~/CX/mise.local.toml) applies to the agent's cwd.
+#
+# tuios execs delegates directly: no shell, no `mise activate` hook, so [env] is
+# never evaluated for the worktree. Interactive fish already has the hook; the
+# extra `mise exec` there recomputes the same values and is harmless.
+#
+# On PATH via `_.path` in the global mise config, ahead of the mise shim.
+# `mise which` resolves tools, not PATH, so it returns the real binary and not
+# this script.
+
+set -e
+
+real="$(mise which claude 2>/dev/null || true)"
+if [ -z "$real" ]; then
+  echo "claude: mise provisions no claude for $PWD" >&2
+  exit 127
+fi
+
+exec mise exec -- "$real" "$@"
