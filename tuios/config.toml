@@ -59,6 +59,7 @@ right = ["transfers", "copy-help", "cpu", "ram", "clock", "session-controls"]
 # its Resume row waits for y in the agents view.
 [daemon]
 resume_agents = "auto"
+keep_awake = "agents"
 
 # Fold the Working group in the agents view (prefix+i) until it is opened, so
 # the view leads with what needs me. F folds or opens any group.

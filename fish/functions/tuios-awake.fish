@@ -10,7 +10,7 @@ function tuios-awake --description "Keep the Mac running with the lid closed whi
     set -q _flag_min_battery; and set floor $_flag_min_battery
 
     # proc list, not proc by: name lookups skip ancestors, and in a tuios pane the daemon is one.
-    set -l daemon (proc list --json | jq -r '[.processes[] | select(.name == "tuios" and .command == "tuios daemon")] | max_by(.start_time) | .pid // empty')
+    set -l daemon (proc list --json | jq -r '[.processes[] | select(.name == "tuios" and (.command | test("(^|/)tuios daemon( |$)")))] | max_by(.start_time) | .pid // empty')
     if test -z "$daemon"
         echo "tuios-awake: no tuios daemon running" >&2
         return 1
