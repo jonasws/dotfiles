@@ -8,6 +8,7 @@
     "CLAUDE_CODE_SHELL": "/opt/homebrew/bin/bash",
     "CLAUDE_CODE_MAX_CONCURRENT_SUBAGENTS": "3",
     "CLAUDE_CODE_MAX_SUBAGENT_SPAWN_DEPTH": "2",
+    "CLAUDE_CODE_PLUGIN_DIRS": "/Users/jonasws/dotfiles/claude/mods/agent-rows",
     "RIP_GRAVEYARD": "/Users/jonasws/.local/share/graveyard",
     "RIPGREP_CONFIG_PATH": "/Users/jonasws/dotfiles/ripgrep/dot-ripgreprc",
     "GIT_CONFIG_COUNT": "5",
@@ -511,10 +512,6 @@
     "type": "command",
     "command": "bash /Users/jonasws/.claude/statusline-command.sh",
     "refreshInterval": 60
-  },
-  "subagentStatusLine": {
-    "type": "command",
-    "command": "sh /Users/jonasws/.claude/subagent-statusline.sh"
   },
   "enabledPlugins": {
     "playwright-skill@playwright-skill": true,

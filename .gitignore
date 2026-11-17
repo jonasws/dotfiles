@@ -22,6 +22,9 @@ television/cable/*
 !television/cable/git-worktrees.toml
 !television/cable/zoxide.toml
 /.tmp
+# Written by the mod loader beside each mod in claude/mods/.
+claude/mods/*/.claude-plugin/types/
+claude/mods/*/.claude-plugin/tsconfig.json
 /superfile/theme
 /fnox/age-se.txt
 

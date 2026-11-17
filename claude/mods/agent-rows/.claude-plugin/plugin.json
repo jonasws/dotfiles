@@ -1,0 +1,5 @@
+{
+  "name": "agent-rows",
+  "version": "0.1.0",
+  "description": "One-line subagent rows: status mark, name, description, token sparkline, context share, model, effort, elapsed time and worktree"
+}
