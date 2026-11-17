@@ -409,6 +409,11 @@
             "type": "command",
             "command": "tuios agent-hook claude-code --integration 3",
             "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 -I \"$HOME/.claude/hooks/tuios-workspace-topic.py\"",
+            "timeout": 5
           }
         ]
       }
@@ -463,6 +468,11 @@
           {
             "type": "command",
             "command": "tuios agent-hook claude-code --integration 3",
+            "timeout": 5
+          },
+          {
+            "type": "command",
+            "command": "python3 -I \"$HOME/.claude/hooks/tuios-workspace-topic.py\"",
             "timeout": 5
           }
         ]
