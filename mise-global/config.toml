@@ -45,6 +45,9 @@ node = "24"
 "pipx:xmlformatter" = "latest"
 python = "latest"
 rust = "latest"
+# television from the tip of main (mise run update:tv-nightly refreshes it): main
+# carries the kitty keyboard protocol, so alt+enter reaches tv inside tuios.
+"cargo:alexpasmantier/television" = "branch:main"
 sops = "latest"
 viddy = "latest"
 docker-cli = "latest"
@@ -218,5 +221,5 @@ fnox sync -g -p sync-age -f
 
 [shell_alias]
 nvn = "~/.local/share/mise/installs/neovim/nightly/bin/nvim"
-herdrn = "~/.local/share/herdr-nightly/bin/herdr"
+herdrn = "~/.local/share/mise/installs/github-herdrdev-herdr/nightly/herdr"
 n = "nvim"

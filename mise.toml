@@ -165,51 +165,43 @@ ln -sfn "$root/bin/tuios" "$HOME/.local/bin/tuios"
 sync_hosts
 """
 
+[tasks."update:tv-nightly"]
+description = "Reinstall television from the tip of main"
+# Not in `update`: nightly is opt-in. television is a mise tool on the cargo
+# backend's `branch:main` version, which mise treats as installed once it is
+# there, so --force rebuilds it. Skipped when the installed build already is
+# main's tip. main carries the kitty keyboard protocol, so alt+enter and
+# ctrl+enter reach tv inside tuios. The first run on 0.16 migrates
+# ~/.config/television/config.toml and leaves a config.toml.0.15.bak beside it.
+run = """
+set -euo pipefail
+tool="cargo:alexpasmantier/television@branch:main"
+sha=$(git ls-remote https://github.com/alexpasmantier/television refs/heads/main | cut -f1)
+dir=$(mise where "$tool" 2>/dev/null || true)
+if [ -n "$dir" ] && grep -q "$sha" "$dir/.crates.toml" 2>/dev/null; then
+  echo "tv is already at ${sha:0:7}"
+  exit 0
+fi
+mise install --force "$tool"
+mise exec "$tool" -- tv --version
+"""
+
 [tasks."update:herdr-nightly"]
 description = "Install the newest herdr preview build behind the herdrn alias"
 # Not in `update`: nightly is opt-in. herdr publishes prebuilt preview builds
-# as prereleases, so this downloads one instead of compiling. It sits under its
-# own prefix because the mise-managed release shadows anything in ~/.local/bin.
-# Preview builds can lag the latest stable tag; the tag is printed. The
-# running server stays on its old build until `herdrn server stop`.
+# as prereleases, which mise's github backend installs by tag without
+# activating them, next to the aqua release that `herdr` runs. The nightly
+# symlink gives the herdrn alias one path. Preview builds can lag the latest
+# stable tag; the tag is printed. The running server stays on its old build
+# until `herdrn server stop`.
 run = """
 set -euo pipefail
-root="$HOME/.local/share/herdr-nightly"
-asset="herdr-macos-$(uname -m | sed 's/arm64/aarch64/')"
-tag=$(curl -fsSL "https://api.github.com/repos/herdrdev/herdr/releases?per_page=30" |
-  python3 -c 'import json,sys; print(next(r["tag_name"] for r in json.load(sys.stdin) if r["prerelease"]))')
-if [ -x "$root/bin/herdr" ] && [ "$(cat "$root/version" 2>/dev/null)" = "$tag" ]; then
-  echo "herdr is already at $tag"
-  exit 0
-fi
-mkdir -p "$root/bin"
-curl -fsSL -o "$root/bin/herdr.new" "https://github.com/herdrdev/herdr/releases/download/$tag/$asset"
-chmod +x "$root/bin/herdr.new"
-mv "$root/bin/herdr.new" "$root/bin/herdr"
-echo "$tag" > "$root/version"
-"$root/bin/herdr" --version
-"""
-
-[tasks."update:tv-nightly"]
-description = "Build television from main and link it as tv in ~/.local/bin"
-# Not in `update`: nightly is opt-in. television is not a mise tool, as with
-# tuios: a mise-managed release on PATH would shadow the link. main carries the
-# kitty keyboard protocol, so alt+enter and ctrl+enter reach tv inside tuios.
-# The first run on 0.16 migrates ~/.config/television/config.toml and leaves a
-# config.toml.0.15.bak beside it.
-tools = { rust = "latest" }
-run = """
-set -euo pipefail
-root="$HOME/.local/share/tv-nightly"
-sha=$(git ls-remote https://github.com/alexpasmantier/television refs/heads/main | cut -f1)
-if [ -x "$root/bin/tv" ] && [ "$(cat "$root/built-commit" 2>/dev/null)" = "$sha" ]; then
-  echo "tv is already at ${sha:0:7}"
-else
-  cargo install --git https://github.com/alexpasmantier/television --rev "$sha" --locked --force --root "$root" television
-  echo "$sha" > "$root/built-commit"
-fi
-ln -sfn "$root/bin/tv" "$HOME/.local/bin/tv"
-"$root/bin/tv" --version
+root="$HOME/.local/share/mise/installs/github-herdrdev-herdr"
+tag=$(mise ls-remote --prerelease github:herdrdev/herdr | grep '^preview-' | tail -1)
+[ -n "$tag" ] || { echo "no herdr preview build found" >&2; exit 1; }
+mise install "github:herdrdev/herdr@$tag"
+ln -sfn "./$tag" "$root/nightly"
+"$root/nightly/herdr" --version
 """
 
 [tasks."update:manifests"]

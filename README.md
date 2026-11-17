@@ -58,7 +58,7 @@ belong directly in `$HOME` are named `dot-<name>` in the repo.
 | `mise run update:weekly` | Adds cask upgrades with `--greedy`, `brew cleanup` and `mise prune`. |
 | `mise run update:tuios-nightly` | Builds tuios from main ([tuios/README.md](tuios/README.md#installing)). |
 | `mise run update:nvim-nightly` | Reinstalls Neovim nightly for `nvn`. |
-| `mise run update:tv-nightly` | Builds television from main and links it as `tv`. |
+| `mise run update:tv-nightly` | Reinstalls television (a mise tool on `branch:main`) when main has moved. |
 
 New releases wait 24 hours before mise installs them (mise's
 `minimum_release_age`). That delay is the guard against a yanked or broken

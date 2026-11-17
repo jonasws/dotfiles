@@ -193,6 +193,11 @@ version = "0.5.5"
 backend = "cargo:abtop"
 specifiers = ["latest"]
 
+[[tools."cargo:alexpasmantier/television"]]
+version = "branch:main"
+backend = "cargo:alexpasmantier/television"
+specifiers = ["branch:main"]
+
 [[tools."cargo:anglosaxon"]]
 version = "0.1.1"
 backend = "cargo:anglosaxon"
