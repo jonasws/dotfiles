@@ -335,14 +335,23 @@ class Script:
         return True
 
     def param_values(self, func, pname):
-        """Every string passed for parameter `pname` at the calls of `func`."""
+        """Every string passed for parameter `pname` at the calls of `func`.
+
+        A lambda counts as a wrapper only when it is assigned straight to one
+        name (`c = lambda op: ...`); its calls are then found by that name.
+        """
         if isinstance(func, ast.Lambda):
-            raise Unresolved(f"`{pname}` is a lambda parameter")
-        fname = func.name
-        if func.decorator_list:
-            raise Unresolved(f"`{fname}` is decorated")
-        if isinstance(self.parent.get(func), ast.ClassDef):
-            raise Unresolved(f"`{fname}` is a method")
+            p = self.parent.get(func)
+            if not (isinstance(p, ast.Assign) and p.value is func and len(p.targets) == 1
+                    and isinstance(p.targets[0], ast.Name)):
+                raise Unresolved(f"`{pname}` is a parameter of a lambda not assigned to one name")
+            fname = p.targets[0].id
+        else:
+            fname = func.name
+            if func.decorator_list:
+                raise Unresolved(f"`{fname}` is decorated")
+            if isinstance(self.parent.get(func), ast.ClassDef):
+                raise Unresolved(f"`{fname}` is a method")
         if len(self.everywhere.get(fname, [])) != 1:
             raise Unresolved(f"the name `{fname}` is bound more than once")
         a = func.args
@@ -429,6 +438,52 @@ class Script:
                for b in self.everywhere.get("aws_mcp", [])):
             out.append("rebinds aws_mcp")
         return out
+
+
+# call_boto3's parameters in order. The sandbox takes them by keyword only, so a
+# positional call fails there; normalize() gives each positional argument its
+# keyword, which is the only meaning such a call can have.
+CALL_BOTO3_PARAMS = ("service_name", "operation_name", "region_name", "params")
+
+
+def normalize(code):
+    """(code, notes): call_boto3 calls rewritten from positional to keyword arguments.
+
+    Only `name=` is inserted before each positional argument, so the rest of
+    the script, comments and layout included, stays as written. A rewrite that
+    does not parse, or that a call cannot take, leaves the code unchanged.
+    """
+    try:
+        tree = ast.parse(code)
+    except SyntaxError:
+        return code, []
+    src = code.encode()
+    starts = [0]
+    for line in src.splitlines(keepends=True):
+        starts.append(starts[-1] + len(line))
+    inserts = []
+    for node in ast.walk(tree):
+        if not (isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+                and node.func.id == "call_boto3" and node.args):
+            continue
+        if len(node.args) > len(CALL_BOTO3_PARAMS) or any(isinstance(a, ast.Starred) for a in node.args):
+            continue
+        names = CALL_BOTO3_PARAMS[:len(node.args)]
+        if any(k.arg in names or k.arg is None for k in node.keywords):
+            continue
+        for name, arg in zip(names, node.args):
+            inserts.append((starts[arg.lineno - 1] + arg.col_offset, f"{name}=".encode()))
+    if not inserts:
+        return code, []
+    out = src
+    for pos, text in sorted(inserts, reverse=True):
+        out = out[:pos] + text + out[pos:]
+    new = out.decode()
+    try:
+        ast.parse(new)
+    except SyntaxError:
+        return code, []
+    return new, [f"gave {len(inserts)} positional call_boto3 argument(s) their keyword"]
 
 
 def dedupe(items):
@@ -525,15 +580,26 @@ def main():
         data = json.load(sys.stdin)
     except ValueError:
         return 0
+    tool_name = data.get("tool_name", "")
     tool_input = data.get("tool_input") or {}
-    decision, why = decide_tool(data.get("tool_name", ""), tool_input)
+    notes = []
+    if (tool_name[len(TOOL_PREFIX):] in SCRIPT_TOOLS and tool_name.startswith(TOOL_PREFIX)
+            and isinstance(tool_input.get("code"), str)):
+        code, notes = normalize(tool_input["code"])
+        if notes:
+            tool_input = {**tool_input, "code": code}
+    decision, why = decide_tool(tool_name, tool_input)
     if decision == "ask" and isinstance(tool_input.get("code"), str):
         save_for_preview(tool_input["code"])
-    print(json.dumps({"hookSpecificOutput": {
+    out = {
         "hookEventName": "PreToolUse",
         "permissionDecision": decision,
-        "permissionDecisionReason": why,
-    }}))
+        "permissionDecisionReason": why + (f" (normalized: {'; '.join(notes)})" if notes else ""),
+    }
+    if notes:
+        # The verdict is on the rewritten code, so that is the code that runs.
+        out["updatedInput"] = tool_input
+    print(json.dumps({"hookSpecificOutput": out}))
     return 0
 
 
@@ -564,6 +630,20 @@ ALLOW = [
     'p = "Describe"\nawait call_boto3(service_name="ec2", operation_name=f"{p}Vpcs")',
     'import json, time as _t, base64, urllib.parse\nfrom datetime import datetime as D\nfrom urllib.parse import quote\n'
     'await call_boto3(service_name="ecs", operation_name="DescribeServices", params={})',
+    'c = lambda op, **p: call_boto3(service_name="rds", operation_name=op, params=p or None)\n'
+    'r, e = await asyncio.gather(c("DescribeDBInstances"), c("DescribeEvents", Duration=60))',
+]
+
+# (script, decision after normalize(), text the normalized script must contain)
+NORMALIZE = [
+    ('r = await call_boto3("rds", "DescribeDBInstances")', "allow",
+     'call_boto3(service_name="rds", operation_name="DescribeDBInstances")'),
+    ('r = await call_boto3("rds", "describe_events", "eu-west-1", {"Duration": 60})  # keep me', "allow",
+     'region_name="eu-west-1", params={"Duration": 60})  # keep me'),
+    ('await call_boto3("ec2", operation_name="DescribeVpcs")', "allow", 'service_name="ec2", operation_name='),
+    ('await call_boto3("ec2", "TerminateInstances")', "ask", 'operation_name="TerminateInstances"'),
+    ('await call_boto3("ec2", service_name="s3")', "ask", 'call_boto3("ec2", service_name="s3")'),
+    ('await call_boto3(*args)', "ask", 'call_boto3(*args)'),
 ]
 
 ASK = [
@@ -624,6 +704,12 @@ def self_test():
         if decision != "ask" or want not in why:
             failures += 1
             print(f"FAIL should ask with {want!r}: {code!r}\n  got {decision}: {why}")
+    for code, want, text in NORMALIZE:
+        new, _ = normalize(code)
+        decision, why = decide(new)
+        if decision != want or text not in new:
+            failures += 1
+            print(f"FAIL normalize {code!r}\n  got {decision}: {new!r} ({why})")
     tools = [
         ("mcp__aws__aws___search_documentation", {}, "allow"),
         ("mcp__aws__aws___get_tasks", {}, "allow"),
@@ -638,7 +724,7 @@ def self_test():
         if got != want:
             failures += 1
             print(f"FAIL {tool} {tool_input}: got {got} ({why}), want {want}")
-    print(f"{len(ALLOW)} allow, {len(ASK)} ask, {len(tools)} tool cases: {failures} failed")
+    print(f"{len(ALLOW)} allow, {len(ASK)} ask, {len(NORMALIZE)} normalize, {len(tools)} tool cases: {failures} failed")
     return 1 if failures else 0
 
 
