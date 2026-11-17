@@ -603,13 +603,13 @@ description = "Jira: pick an issue URL into pane"
 [[keybindings.command]]
 key = "prefix+l"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh lazygit 80% 60% -- ~/.config/tuios/scripts/lazygit-popup.sh status"
+command = "~/.config/tuios/scripts/toggle-popup.sh lazygit 90% 90% -- ~/.config/tuios/scripts/lazygit-popup.sh status"
 description = "lazygit: status"
 
 [[keybindings.command]]
 key = "prefix+L"
 type = "shell"
-command = "~/.config/tuios/scripts/toggle-popup.sh lazygit 80% 60% -- ~/.config/tuios/scripts/lazygit-popup.sh log"
+command = "~/.config/tuios/scripts/toggle-popup.sh lazygit 90% 90% -- ~/.config/tuios/scripts/lazygit-popup.sh log"
 description = "lazygit: log"
 
 [[keybindings.command]]
