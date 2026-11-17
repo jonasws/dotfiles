@@ -227,13 +227,13 @@ backend = "cargo:vitaly"
 specifiers = ["latest"]
 
 [[tools.docker-cli]]
-version = "29.9.3"
+version = "29.10.0"
 backend = "aqua:docker/cli"
 specifiers = ["latest"]
 
 [tools.docker-cli."platforms.macos-arm64"]
-checksum = "sha256:79145e169bca0b9571d02de8e1cd311a36e0e8fdb4599b6661a87b1bb3afbe13"
-url = "https://download.docker.com/mac/static/stable/aarch64/docker-29.9.3.tgz"
+checksum = "blake3:4cc4a450a55dc3e51424817d0203bfe602dd14e53c4f6449a808751b3879c257"
+url = "https://download.docker.com/mac/static/stable/aarch64/docker-29.10.0.tgz"
 
 [[tools.fnox]]
 version = "1.48.0"
