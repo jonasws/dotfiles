@@ -57,8 +57,9 @@ belong directly in `$HOME` are named `dot-<name>` in the repo.
 | `mise run update` | Daily: brew, mise tools (with `mise lock --global`), agent skills, nvim plugins, yazi, herdr plugins, then `git status` so changed lockfiles show. |
 | `mise run update:weekly` | Adds cask upgrades with `--greedy`, `brew cleanup` and `mise prune`. |
 | `mise run update:tuios-nightly` | Builds tuios from main ([tuios/README.md](tuios/README.md#installing)). |
-| `mise run update:nvim-nightly` | Reinstalls Neovim nightly for `nvn`. |
+| `mise run update:nvim-nightly` | Reinstalls Neovim nightly for `nvn` when the nightly tag has moved. |
 | `mise run update:tv-nightly` | Reinstalls television (a mise tool on `branch:main`) when main has moved. |
+| `mise run update:herdr-nightly` | Installs the newest herdr preview build for `herdrn`. |
 
 New releases wait 24 hours before mise installs them (mise's
 `minimum_release_age`). That delay is the guard against a yanked or broken
