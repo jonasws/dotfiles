@@ -50,14 +50,14 @@ url_api = "https://api.github.com/repos/FiloSottile/age/releases/assets/53554189
 provenance = "github-attestations"
 
 [[tools."aqua:anthropics/claude-code"]]
-version = "2.1.325"
+version = "2.1.326"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
 [tools."aqua:anthropics/claude-code"."platforms.macos-arm64"]
-checksum = "sha256:b0dc23f2d8c3ef55b2b22f03ef204e98b06b22b6c51a15b66d263b13442c4e03"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.325/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/745018486"
+checksum = "sha256:4e27662f58b98ca3c5cbe67081891d2cc86461fbb285c22ed8309078a070671b"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.326/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/756011686"
 
 [[tools."aqua:asciinema/asciinema"]]
 version = "3.2.1"
@@ -89,14 +89,14 @@ url = "https://github.com/bensadeh/tailspin/releases/download/7.0.0/tailspin-aar
 url_api = "https://api.github.com/repos/bensadeh/tailspin/releases/assets/476386804"
 
 [[tools."aqua:github/github-mcp-server"]]
-version = "2.1.0"
+version = "2.2.0"
 backend = "aqua:github/github-mcp-server"
 specifiers = ["latest"]
 
 [tools."aqua:github/github-mcp-server"."platforms.macos-arm64"]
-checksum = "sha256:3fb2936c33416693a8b268442ab9b1e838d4fbb8c2a6813d8a77f87c3009ced6"
-url = "https://github.com/github/github-mcp-server/releases/download/v2.1.0/github-mcp-server_Darwin_arm64.tar.gz"
-url_api = "https://api.github.com/repos/github/github-mcp-server/releases/assets/705307919"
+checksum = "sha256:5e46b05b87989d23267f0a69ee60a3acd1de51a72512ee5fcc2786ca60c54a6a"
+url = "https://github.com/github/github-mcp-server/releases/download/v2.2.0/github-mcp-server_Darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/github/github-mcp-server/releases/assets/756820559"
 provenance = "github-attestations"
 
 [[tools."aqua:showwin/speedtest-go"]]
@@ -120,14 +120,14 @@ url = "https://github.com/textfuel/lazyjira/releases/download/v2.19.2/lazyjira_d
 url_api = "https://api.github.com/repos/textfuel/lazyjira/releases/assets/469908542"
 
 [[tools.ast-grep]]
-version = "0.51.2"
+version = "0.51.3"
 backend = "aqua:ast-grep/ast-grep"
 specifiers = ["latest"]
 
 [tools.ast-grep."platforms.macos-arm64"]
-checksum = "sha256:ea4f4082d25e5f8e0450add6fd488dd008a373c90483cc2031759c8431f1dcfb"
-url = "https://github.com/ast-grep/ast-grep/releases/download/0.51.2/app-aarch64-apple-darwin.zip"
-url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/734229272"
+checksum = "sha256:7954eab1e2803d1485f263377be7f359db6d3915312b5d773cd575eb009330b1"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.51.3/app-aarch64-apple-darwin.zip"
+url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/753396910"
 
 [[tools.atuin]]
 version = "18.24.8"
@@ -670,13 +670,13 @@ url = "https://github.com/LuaLS/lua-language-server/releases/download/3.19.2/lua
 url_api = "https://api.github.com/repos/LuaLS/lua-language-server/releases/assets/635852571"
 
 [[tools.maven]]
-version = "3.10.0"
+version = "3.10.1"
 backend = "aqua:apache/maven"
 specifiers = ["3"]
 
 [tools.maven."platforms.macos-arm64"]
-checksum = "sha512:908b1501bfb420bf7c8affb855534a9c407fd6099367bfb9f2f2dcb8e9799102bffb84518cde74c679bd76870247c6528683abdd620581bffa90f95d92d175aa"
-url = "https://archive.apache.org/dist/maven/maven-3/3.10.0/binaries/apache-maven-3.10.0-bin.tar.gz"
+checksum = "sha512:8af2fcc48ee6b8f8fc0b21054226e14404b88500df6483cdeb3ae603408f6de27b1397ac591a9fb0d98fee64f4f624fee1383efd25b8998786cda1598fb9ea39"
+url = "https://archive.apache.org/dist/maven/maven-3/3.10.1/binaries/apache-maven-3.10.1-bin.tar.gz"
 
 [[tools.mitmproxy]]
 version = "12.3.1"
