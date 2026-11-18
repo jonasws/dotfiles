@@ -41,6 +41,9 @@ faint-opacity = 0.75
 
 background-opacity = 0.9
 background-blur-radius = 10
+# Apply the opacity to cells that carry an explicit background too (message
+# blocks, diff fills, code chips), so they stay in step with the base.
+background-opacity-cells = true
 # The padding takes the colour of the cells at the edge, so tuios's rail and
 # dock run to the window's border with no seam.
 window-padding-color = extend
