@@ -71,6 +71,13 @@ $notes}"
 
   card=$(add_card "$task: $title" "$prompt")
 
+  # The proof goes on the card, beside the run on the agents view's board.
+  if [[ -n $card ]]; then
+    prompt+="
+
+When you open the pull request, attach it and the test output to tuios task card $card: \`tuios task attach $card ${session:+-s $session }--link <PR url>\` and \`tuios task attach $card ${session:+-s $session }<file with the test output>\`. If tuios refuses, say so in your last message and go on."
+  fi
+
   # The popup stays out of the way of the new agent.
   tuios close-window tsk-board >/dev/null 2>&1 || true
 
@@ -80,7 +87,10 @@ $notes}"
       fail "start-agent for $task did not get ready; look at its pane or the Inbox"
   else
     slug=$(tr '[:upper:]' '[:lower:]' <<<"$title" | tr -cs 'a-z0-9' '-' | cut -c1-32 | sed 's/^-*//; s/-*$//')
-    (cd "$repo" && tsk status "$task" start >/dev/null 2>&1) || true
+    # Inside tuios, tsk takes the herdr emulation for Herdr, so a plain start
+    # of an assigned task would launch its agent there as well.
+    (cd "$repo" && tsk status "$task" started --no-dispatch >/dev/null 2>&1) ||
+      fail "tsk status $task started refused; run it in $repo to see why"
     tuios fan 1 --agent claude --repo "$repo" \
       --name "tsk/$(tr '[:upper:]' '[:lower:]' <<<"$task")${slug:+-$slug}" \
       ${card:+--task "$card"} "$prompt" >/dev/null 2>&1 ||
