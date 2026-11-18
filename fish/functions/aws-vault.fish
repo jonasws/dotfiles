@@ -1,4 +1,4 @@
-function aws-vault --wraps aws-vault --description 'aws-vault with AWS_MFA_SERIAL defaulted for interactive use'
+function aws-vault --description 'aws-vault with AWS_MFA_SERIAL defaulted for interactive use'
     # aws-vault >= v5 doesn't inherit mfa_serial from source_profile, and the
     # role profiles in aws/config deliberately omit it so `aws --profile X`
     # never prompts for MFA itself. Direct `aws-vault exec|login <role profile>`
