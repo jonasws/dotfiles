@@ -25,6 +25,12 @@ removed (`\tuios`, `tuio''s`). Script files named on the command line (.sh,
 .py, ...) are searched too, one level deep. Commands that are only help or
 version queries (help_only.py) are never asked about.
 
+A `tuios split-window` or `new-window` whose pane only shows files passes:
+tuios flags from LAUNCH_FLAGS, then `--` and a bare viewer from VIEWERS with
+only that viewer's listed flags. Flags that change what the pane may do
+(--host, --grants, --kind, --wait) and viewer flags that run commands (less
+`+!cmd`, bat --pager) still ask.
+
 It errs towards asking. Not covered: a program that talks to the herdr or
 tuios socket directly, and commands assembled at run time (`$cmd` is asked
 about, a string built in a script's own variables is not).
@@ -128,6 +134,22 @@ TUIOS = {
     "ship": {"commit": ADMIN, "merge": ADMIN, "push": ADMIN, "pr": ADMIN},
 }
 
+VIEW_LAUNCH = {"split-window", "new-window"}
+LAUNCH_FLAGS = {
+    "-s", "--session", "-w", "--window", "--cwd", "--name", "--ratio", "--workspace",
+    "--no-focus", "--keep-open", "--json", "--print-id",
+}
+VIEWERS = {
+    "leaf": {"-w", "--watch"},
+    "less": {"-R", "-r", "-S", "-N", "-F", "-X", "-K", "+F", "+G"},
+    "more": set(),
+    "bat": {"-p", "-pp", "--plain", "-n", "--number", "-A", "--show-all", "-l", "--language", "--paging"},
+    "cat": {"-n", "-v", "-A", "-e", "-t"},
+    "glow": {"-p", "--pager", "-w", "--width", "-s", "--style"},
+    "tail": {"-f", "-F", "-n"},
+    "head": {"-n"},
+}
+
 # Options that come before the subcommand and take a value. An unknown option
 # might take one too, so the word after it is checked as a subcommand as well.
 VALUE_OPTS = {
@@ -227,6 +249,19 @@ def lookup(prog, rest, args):
     return entry
 
 
+def viewer_launch(rest):
+    if rest[0] not in VIEW_LAUNCH or "--" not in rest:
+        return False
+    cut = rest.index("--")
+    own, cmd = rest[1:cut], rest[cut + 1:]
+    if any(w.startswith("-") and w.split("=", 1)[0] not in LAUNCH_FLAGS for w in own):
+        return False
+    if not cmd or cmd[0] not in VIEWERS:
+        return False
+    allowed = VIEWERS[cmd[0]]
+    return all(a.split("=", 1)[0] in allowed for a in cmd[1:] if a.startswith(("-", "+")))
+
+
 def classify(prog, args):
     """Return (name, kind) for a sensitive invocation, else None."""
     if "--" in args:
@@ -260,6 +295,8 @@ def classify(prog, args):
         rest, words = rest[1:], rest[1:1 + n]
         kind = lookup(prog, rest, args)
     if not kind:
+        return None
+    if kind == LAUNCH and prog == "tuios" and viewer_launch(rest):
         return None
     if isinstance(TUIOS.get(rest[0]), dict) and prog == "tuios" and len(rest) > 1:
         words = rest[:2]
@@ -385,7 +422,15 @@ ASK = [
     ("tuios send-text -s dotfiles -w build 'ls'", TYPE),
     ("tuios -s x capture-pane -w y", READ),
     ('tuios new-window -s "$TUIOS_SESSION" slides --no-focus -- ls', LAUNCH),
-    ("tuios split-window -s s right --no-focus -- tail -f x", LAUNCH),
+    ("tuios split-window -s s right --no-focus -- make test", LAUNCH),
+    ("tuios split-window right -- leaf --update", LAUNCH),
+    ("tuios split-window right -- less +!rm x", LAUNCH),
+    ("tuios split-window right -- bat --pager sh f", LAUNCH),
+    ("tuios split-window right -- ./leaf f.md", LAUNCH),
+    ("tuios split-window right leaf f.md", LAUNCH),
+    ("tuios new-window x --host build -- leaf f.md", LAUNCH),
+    ("tuios new-window x --grants admin -- less f", LAUNCH),
+    ("tuios new-window x -- vim f.md", LAUNCH),
     ("tuios run -s s -w build --timeout 600000 -- make test", TYPE),
     ("tuios run -w b -- mytool --help", TYPE),
     ("tuios -w build send-keys ctrl+c", TYPE),
@@ -438,6 +483,11 @@ PASS = [
     "rg -n herdr settings.json", "ls ~/.config/herdr/plugins.json",
     "bash ~/.claude/hooks/herdr-agent-state.sh session", "git status",
     "mise exec aqua:mfontanini/presenterm@latest -- presenterm deck.md",
+    "tuios split-window right --no-focus --name 'draft x.md' --cwd /tmp/a -- leaf -w '/tmp/a/x y.md'",
+    "tuios split-window -s s down --ratio 30 --no-focus -- tail -f app.log",
+    "tuios new-window log --no-focus --keep-open -- less -R /tmp/x.log",
+    "tuios new-window v -- bat --paging=always -l md f.md",
+    "tuios split-window right -- cat -n f",
 ]
 MCP_CASES = [
     ("list_agents", {}, False),

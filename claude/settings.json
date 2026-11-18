@@ -162,7 +162,6 @@
       "Bash(resign-commits *)",
       "Bash(*/resign-commits*)",
       "Bash(git reset --hard*)",
-      "Bash(twg:*)",
       "Edit(~/.claude/**)",
       "Edit(~/dotfiles/claude/settings.json)",
       "Edit(~/dotfiles/claude/hooks/**)",

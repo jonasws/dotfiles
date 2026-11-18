@@ -12,9 +12,9 @@
         {
           "hook": "help-allow",
           "on": "Bash",
-          "gives": "allow",
+          "gives": "allow / ask",
           "fail": "open",
-          "why": "--help / --version only"
+          "why": "--help / --version only; ask for other twg"
         },
         {
           "hook": "inline-script-guard",
@@ -77,6 +77,11 @@
           "cmd": "tuios send-agent-message ...",
           "by": "allow rule",
           "why": "mail is data, not a prompt"
+        },
+        {
+          "cmd": "tuios split-window right -- leaf -w f.md",
+          "by": "guard passes",
+          "why": "viewer pane: leaf, less, bat, cat, tail"
         },
         {
           "cmd": "tuios list-agents, wait-for",
@@ -164,8 +169,8 @@
         },
         {
           "kind": "rule",
-          "ex": "git push --force, git rebase, twg",
-          "why": "settings ask rules (51)"
+          "ex": "git push --force, git rebase",
+          "why": "settings ask rules (50)"
         },
         {
           "kind": "rule",
