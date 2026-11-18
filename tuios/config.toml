@@ -119,9 +119,16 @@ new_window_when_empty = true
 # changed hook (tuios main since 2026-11-08); an older daemon reads [hooks] only
 # at start, and needs `tuios restart-server`.
 [hooks]
+# Catches sessions made outside the picker and the worktree hook (prefix+N,
+# `tuios new`): a window in a session with no space files it by its folder.
+after-new-window = "~/.config/tuios/scripts/session-space.sh --window \"$TUIOS_SESSION_ID\" \"$TUIOS_WINDOW_ID\""
+
 # A worktree from prefix+U, `tuios worktree new`, `fan` or the New agent sheet
 # gets mise trusted and its tools installed before the first pane starts.
-after-new-worktree = "~/.config/tuios/scripts/new-worktree.sh"
+after-new-worktree = [
+  "~/.config/tuios/scripts/session-space.sh \"$TUIOS_SESSION_ID\" \"$TUIOS_WORKTREE_PATH\"",
+  "~/.config/tuios/scripts/new-worktree.sh",
+]
 
 # Worktrees sit beside their repo, in a hidden .worktrees folder of the repo's
 # parent, so a session in one still loads the CLAUDE.md of ~/CX, ~/CNOPS or

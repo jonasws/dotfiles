@@ -48,6 +48,11 @@ LaunchAgent.
   `tv git-worktrees` for the focused pane's repo. A linked worktree gets its
   own session, `<repo>-<branch>`, and `group_main` puts those sessions under
   the main checkout on the rail.
+- **Spaces.** A session is filed under a space named after the folder its
+  checkout sits in: `CX`, `CNOPS`, `CN-TERMINAL` or `LIFLIG`. `tuios-session.sh`
+  and the `after-new-worktree` and `after-new-window` hooks call `scripts/session-space.sh`, which
+  maps the path; `session-space.sh --all` files every open session. `dotfiles`
+  and `~/dev/tuios` go to `personal`; repos elsewhere stay in no space.
 - **herdr vocabulary.** The setup came over from herdr. A herdr workspace is a
   tuios session, a herdr tab is a tuios workspace, and a herdr pane is a tuios
   window. tuios also answers herdr's socket API (on its socket plus `.herdr`)

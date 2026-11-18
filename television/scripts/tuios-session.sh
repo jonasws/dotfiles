@@ -48,3 +48,6 @@ if [[ $session == session-* ]] && ! jq -e --arg name "$name" 'any(.[]; .name == 
 fi
 
 tuios switch-session --create --cwd "$repo_path" "${session:-$name}" >/dev/null
+
+# File it under its work area's space (CX, CNOPS, CN-TERMINAL, LIFLIG).
+"$HOME/.config/tuios/scripts/session-space.sh" "${session:-$name}" "$repo_path"
