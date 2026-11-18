@@ -35,8 +35,8 @@ output = "https://vygruppen.atlassian.net/browse/{strip_ansi|split: :0}"
 # Keep Jira's order (the board's rank) rather than tv's.
 no_sort = true
 frecency = false
-# Rereads the cache, which a background refetch replaces at most once a
-# minute, so this costs no API calls of its own.
+# Rereads the cache, which a background refetch replaces at most every
+# 20 seconds, so this costs no API calls of its own.
 watch = 5.0
 
 [preview]

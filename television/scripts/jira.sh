@@ -8,7 +8,7 @@
 #   jira.sh open KEY              the issue in the browser
 #   jira.sh url KEY               the issue's URL
 #
-# A list prints its last result at once and, when that is over a minute old,
+# A list prints its last result at once and, when that is over 20 seconds old,
 # refetches in the background; the channel's `watch` picks up the new rows. The
 # same search carries every issue's rendered description, so a preview never
 # calls Jira. Credentials and site come from the "Atlassian API Token" item in
@@ -17,7 +17,7 @@
 set -euo pipefail
 
 cache="${XDG_CACHE_HOME:-$HOME/.cache}/tv-jira"
-stale_after=60
+stale_after=20
 fields=summary,status,assignee,reporter,parent,issuetype,priority,labels,created,updated,description
 
 # One fnox request for every value, as fnox-secret makes it, so the daemon
