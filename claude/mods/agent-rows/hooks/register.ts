@@ -78,7 +78,7 @@ export const register: Register = on => {
   })
 
   // Who is speaking, at a glance: a Mauve box for what you typed, a peach
-  // bar for the agent and a rule between turns. A
+  // bar for the agent and a one-line turn summary. A
   // UserMessage that carries
   // `task` or `from` is not typed by you, so it keeps Claude Code's drawing.
   const MAX_LINES = 14
@@ -108,12 +108,20 @@ export const register: Register = on => {
     return Box({ borderStyle: 'quote', borderColor: '#fab387', children: [await next(e)] })
   })
 
+  // One dim line, no rule and no margin: the turn line costs a row, not four.
+  // The clock is stamped the first time a turn line is drawn, so a redraw keeps it.
+  const doneAt = new Map<string, string>()
   on('ui.render', { component: 'TurnDuration' }, async ($, e, next) => {
-    const { Box, Text } = $.ui.resolve(e)
-    const width = Math.min(e.viewport?.columns ?? 80, 120)
-    return Box({
-      flexDirection: 'column',
-      children: [Text({ dimColor: true, children: ['─'.repeat(width)] }), await next(e)],
+    const { Text } = $.ui.resolve(e)
+    const key = String(e.requestId ?? e.props?.durationMs)
+    if (!doneAt.has(key)) {
+      const d = new Date()
+      doneAt.set(key, `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`)
+    }
+    const ms = Number(e.props?.durationMs ?? 0)
+    return Text({
+      dimColor: true,
+      children: [`✻ ${e.props?.word ?? 'Worked'} for ${took(ms)} · ${doneAt.get(key)}`],
     })
   })
 }
