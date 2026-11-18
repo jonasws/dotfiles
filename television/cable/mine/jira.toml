@@ -9,8 +9,7 @@ backlog, then CN Kunde's open epics. The CN Ops (board 131) sources are
 commented out in [source]. Rows: key, lane, priority, type, age, assignee,
 summary, epic. Lists show their last result at once and
 refresh in the background. Enter prints the issue's URL, alt-enter opens it
-in the browser, ctrl-y copies the URL (replacing tv's copy of the whole row).
-ctrl-x lists the other actions: copy the key, print the URL or the key. Script: television/scripts/jira.sh.
+in the browser and closes the picker. Script: television/scripts/jira.sh.
 """
 requirements = ["fnox", "curl", "jq", "pandoc", "leaf"]
 
@@ -57,30 +56,9 @@ header = "{strip_ansi|split: :0}"
 [keybindings]
 tab = "cycle_sources"
 enter = "confirm_selection"
-alt-enter = "actions:open"
-ctrl-y = "actions:copy-url"
+alt-enter = ["actions:open", "quit"]
 
 [actions.open]
 description = "Open the issue in the browser"
 command = "~/.config/television/scripts/jira.sh open '{strip_ansi|split: :0}'"
 mode = "fork"
-
-[actions.copy-url]
-description = "Copy the issue URL"
-command = "printf %s 'https://vygruppen.atlassian.net/browse/{strip_ansi|split: :0}' | pbcopy"
-mode = "fork"
-
-[actions.copy-key]
-description = "Copy the issue key"
-command = "printf %s '{strip_ansi|split: :0}' | pbcopy"
-mode = "fork"
-
-[actions.print-url]
-description = "Print the issue URL"
-command = "printf '%s\n' 'https://vygruppen.atlassian.net/browse/{strip_ansi|split: :0}'"
-mode = "execute"
-
-[actions.print-key]
-description = "Print the issue key"
-command = "printf '%s\n' '{strip_ansi|split: :0}'"
-mode = "execute"

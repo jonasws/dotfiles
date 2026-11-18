@@ -604,7 +604,7 @@ description = "Agent session picker"
 
 # CN Kunde's Jira board, backlog and open epics (tv jira): Tab cycles them,
 # Enter types the issue's URL into the pane the key was pressed in, without
-# submitting it; alt-enter opens it in the browser, ctrl-y copies it.
+# submitting it; alt-enter opens it in the browser and closes the picker.
 [[keybindings.command]]
 key = "super+j"
 name = "jira"
