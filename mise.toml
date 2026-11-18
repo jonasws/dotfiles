@@ -254,6 +254,18 @@ launchctl bootout "gui/$(id -u)" "$plist" 2>/dev/null || true
 launchctl bootstrap "gui/$(id -u)" "$plist"
 """
 
+[tasks."sync:tsk-card-sync"]
+description = "(Re)load the LaunchAgent that moves tsk tasks to review from their tuios cards"
+# bootout fails when the agent is not loaded yet, which is fine.
+run = """
+set -euo pipefail
+plist="$HOME/Library/LaunchAgents/com.jonasws.tsk-card-sync.plist"
+[[ -e $plist ]] || { echo "$plist is missing: run 'mise dotfiles apply' first" >&2; exit 1; }
+mkdir -p "$HOME/.local/state/tsk-card-sync"
+launchctl bootout "gui/$(id -u)" "$plist" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$plist"
+"""
+
 [tasks."keychron:apply"]
 description = "Load keychron/q1-max.vil into the Keychron Q1 Max (Vial firmware) with vitaly"
 # The keyboard must be unlocked first: `vitaly -i 2064 lock -u` while holding
@@ -551,7 +563,12 @@ mode = "symlink"
 root = "tuios"
 target = "~/.config/tuios"
 mode = "symlink"
-exclude = ["README.md"]
+exclude = ["README.md", "launchd"]
+
+# The tsk card sync's LaunchAgent; see tuios/scripts/tsk-card-sync.sh.
+[dotfile_groups.tuios-launchd]
+root = "tuios/launchd"
+target = "~/Library/LaunchAgents"
 
 [dotfile_groups.wezterm]
 root = "wezterm"

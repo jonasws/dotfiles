@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Moves a tsk task to review when its tuios task card reaches review
+     (tuios/scripts/tsk-card-sync.sh). Linked into ~/Library/LaunchAgents by
+     the tuios-launchd dotfile group; load it with
+     `mise -C ~/dotfiles run sync:tsk-card-sync`. launchd expands no ~ or
+     $HOME, hence the absolute paths. -->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.jonasws.tsk-card-sync</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/Users/jonasws/.config/tuios/scripts/tsk-card-sync.sh</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>ThrottleInterval</key>
+	<integer>10</integer>
+	<key>StandardOutPath</key>
+	<string>/Users/jonasws/.local/state/tsk-card-sync/sync.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/jonasws/.local/state/tsk-card-sync/sync.log</string>
+</dict>
+</plist>
