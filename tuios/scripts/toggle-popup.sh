@@ -40,4 +40,10 @@ params=$(jq -n \
    + (if $session != "" then {session: $session} else {} end)
    + (if $pane != "" then {cwd_from: $pane} else {} end)' \
   --args -- "$@")
-tuios call popup "$params" >/dev/null
+opened=$(tuios call popup "$params")
+
+# The popup does not always take the keyboard on open. Keys then go to tuios,
+# where Tab moves the focus to another pane and close-on-leave.sh closes the
+# popup. Focusing it by id makes the picker's own keys reach it.
+id=$(jq -r '.window_id // empty' <<<"$opened")
+[[ -n $id ]] && tuios focus-window ${TUIOS_SESSION:+-s "$TUIOS_SESSION"} "$id" >/dev/null 2>&1 || true
