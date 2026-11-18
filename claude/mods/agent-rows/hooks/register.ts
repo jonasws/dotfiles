@@ -77,7 +77,7 @@ export const register: Register = on => {
     return next({ ...e, props: { ...a, body } })
   })
 
-  // Your prompts are yellow text behind a one-cell person mark, in the column
+  // Your prompts are plain text behind a yellow one-cell person mark, in the column
   // where a reply has its dot. A UserMessage that carries `task` or `from` is
   // not typed by you, so it keeps the stock drawing.
   const MAX_LINES = 14
@@ -99,7 +99,7 @@ export const register: Register = on => {
           flexDirection: 'column',
           flexGrow: 1,
           children: [
-            Text({ color: USER_COLOR, children: [shown] }),
+            Text({ children: [shown] }),
             ...(cut ? [Text({ dimColor: true, children: [`… +${lines.length - MAX_LINES} lines`] })] : []),
           ],
         }),
