@@ -493,7 +493,8 @@
     "kotlin-lsp@claude-plugins-official": true,
     "lua-lsp@claude-plugins-official": true,
     "cc-plugin-easel@builtin": false,
-    "cargonet@cn-agent-tools": true
+    "cargonet@cn-agent-tools": true,
+    "rust-analyzer-lsp@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "playwright-skill": {
