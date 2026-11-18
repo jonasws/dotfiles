@@ -100,14 +100,23 @@ account is in [fnox/README.md](fnox/README.md); in short:
   code comes from 1Password (`mfa_process = op item get … --otp`). Every other
   profile assumes a role on top of it, so `AWS_PROFILE=<profile> aws …` works
   with no `aws-vault exec`. fish and nushell export
-  `AWS_VAULT_KEYCHAIN_NAME=login` and `AWS_VAULT_PARALLEL_SAFE=true`.
+  `AWS_VAULT_KEYCHAIN_NAME=login` and `AWS_VAULT_PARALLEL_SAFE=true`. Role
+  profiles omit `mfa_serial` on purpose, and aws-vault doesn't inherit it from
+  `source_profile`, so the fish `aws-vault` function
+  ([`fish/functions/aws-vault.fish`](fish/functions/aws-vault.fish)) defaults
+  `AWS_MFA_SERIAL` for direct `aws-vault exec|login` calls. `credential_process`
+  and the AWS CLI don't go through it and don't need it.
 - [`fnox-trees/`](fnox-trees/) → `~/CX`, `~/CNOPS`, `~/CN-TERMINAL`
   `fnox.toml`. Each work tree has profiles per environment and role, `build`,
   `dev`, `staging` and `prod`, each with a `--admin` variant. Each is a 1-hour
   `aws-sts` lease on top of `capra-auth`:
   `fnox -P staging exec -- aws s3 ls`.
-- [`utils/aws-console`](utils/aws-console) opens the web console for a profile
-  through `aws-vault login`.
+- [`utils/aws-console`](utils/aws-console) (fish: `console <profile>`) opens the
+  web console for a profile in a Firefox container. The `aws` CLI resolves the
+  profile through `capra-auth`'s session, [Granted](https://docs.commonfate.io/granted/usage/console)
+  (`granted console`) builds the sign-in URL, and its Firefox add-on opens the
+  container. aws-vault is no longer involved, so there is no extra MFA prompt.
+  The `color` key in `aws/config` sets the container colour.
 - Claude Code asks before every `aws` and `fnox exec` call
   (`claude/settings.json`), and tuios marks the destructive ones
   ([tuios/README.md](tuios/README.md#agents)).
