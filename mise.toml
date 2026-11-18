@@ -190,9 +190,10 @@ mise exec "$tool" -- tv --version
 description = "Install the newest herdr preview build behind the herdrn alias"
 # Not in `update`: nightly is opt-in. herdr publishes prebuilt preview builds
 # as prereleases, which mise's github backend installs by tag without
-# activating them, next to the aqua release that `herdr` runs. The nightly
-# symlink gives the herdrn alias one path. Preview builds can lag the latest
-# stable tag; the tag is printed. The running server stays on its old build
+# activating them, next to the aqua release that `herdr` runs. The tag is
+# pinned in mise-global/config.toml so mise sees the install as configured;
+# stable stays first on PATH. The nightly symlink gives the herdrn alias one
+# path. Preview builds can lag the latest stable tag; the tag is printed. The running server stays on its old build
 # until `herdrn server stop`.
 run = """
 set -euo pipefail
@@ -200,6 +201,8 @@ root="$HOME/.local/share/mise/installs/github-herdrdev-herdr"
 tag=$(mise ls-remote --prerelease github:herdrdev/herdr | grep '^preview-' | tail -1)
 [ -n "$tag" ] || { echo "no herdr preview build found" >&2; exit 1; }
 mise install "github:herdrdev/herdr@$tag"
+sd '"github:herdrdev/herdr" = "[^"]*"' '"github:herdrdev/herdr" = "'"$tag"'"' "$HOME/dotfiles/mise-global/config.toml"
+mise lock --global
 ln -sfn "./$tag" "$root/nightly"
 "$root/nightly/herdr" --version
 """

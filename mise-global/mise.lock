@@ -413,6 +413,17 @@ url_api = "https://api.github.com/repos/hedhyw/json-log-viewer/releases/assets/5
 provenance = "github-attestations"
 provenance_verified = true
 
+[[tools."github:herdrdev/herdr"]]
+version = "preview-2026-10-14-fbd2ae23927f"
+backend = "github:herdrdev/herdr"
+specifiers = ["preview-2026-10-14-fbd2ae23927f"]
+
+[tools."github:herdrdev/herdr"."platforms.macos-arm64"]
+checksum = "sha256:e6543d05b318b9ecad8173a87bc2b50e20585ad99327f2ab3482879cdd3d9090"
+url = "https://github.com/herdrdev/herdr/releases/download/preview-2026-10-14-fbd2ae23927f/herdr-macos-aarch64"
+url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/640838817"
+provenance = "github-attestations"
+
 [[tools."github:huseyinbabal/taws"]]
 version = "1.3.0-rc.8"
 backend = "github:huseyinbabal/taws"

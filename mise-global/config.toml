@@ -97,6 +97,8 @@ pandoc = "latest"
 # Vial keyboard config over USB (keychron/q1-max.vil, mise run keychron:apply)
 "cargo:vitaly" = "latest"
 herdr = "latest"
+# Preview build behind the herdrn alias; pinned by `mise run update:herdr-nightly`.
+"github:herdrdev/herdr" = "preview-2026-10-14-fbd2ae23927f"
 "github:yazeed/proc-cli" = "latest"
 "github:agavra/tuicr" = "latest"
 hunk = "latest"
