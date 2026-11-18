@@ -77,26 +77,32 @@ export const register: Register = on => {
     return next({ ...e, props: { ...a, body } })
   })
 
-  // Your prompts get a Mauve box. A UserMessage that carries `task` or `from`
-  // is not typed by you, so it keeps the stock drawing.
+  // Your prompts are yellow text behind a one-cell person mark, in the column
+  // where a reply has its dot. A UserMessage that carries `task` or `from` is
+  // not typed by you, so it keeps the stock drawing.
   const MAX_LINES = 14
-  const BORDER_COLOR = '#cba6f7'
+  const USER_COLOR = '#f9e2af'
+  const USER_MARK = '\u{F007}'
 
   on('ui.render', { component: 'UserMessage' }, async ($, e, next) => {
     if (e.props?.task || e.props?.from) return next(e)
     if (typeof e.props?.text !== 'string') return next(e)
-    const { Box, Text, Markdown } = $.ui.resolve(e)
+    const { Box, Text } = $.ui.resolve(e)
     const lines = e.props.text.trim().split('\n')
     const cut = !e.props.isExpanded && lines.length > MAX_LINES
     const shown = (cut ? lines.slice(0, MAX_LINES) : lines).join('\n')
     return Box({
-      borderStyle: 'round',
-      borderColor: BORDER_COLOR,
-      paddingX: 1,
-      flexDirection: 'column',
+      flexDirection: 'row',
       children: [
-        Markdown({ text: shown }),
-        ...(cut ? [Text({ dimColor: true, children: [`… +${lines.length - MAX_LINES} lines`] })] : []),
+        Box({ width: 2, flexShrink: 0, children: [Text({ color: USER_COLOR, children: [USER_MARK] })] }),
+        Box({
+          flexDirection: 'column',
+          flexGrow: 1,
+          children: [
+            Text({ color: USER_COLOR, children: [shown] }),
+            ...(cut ? [Text({ dimColor: true, children: [`… +${lines.length - MAX_LINES} lines`] })] : []),
+          ],
+        }),
       ],
     })
   })
