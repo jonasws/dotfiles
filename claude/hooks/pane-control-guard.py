@@ -1,37 +1,53 @@
 #!/usr/bin/env python3
-"""PreToolUse hook for Bash: always ask before herdr or tuios commands that
-read from a pane, type into a pane, or launch a new one.
+"""PreToolUse hook for Bash and the tuios MCP tools: ask before commands that
+read from a pane, type into a shell, launch panes or agents, close or kill
+them, or change grants, config, plugins or code.
 
-Those commands let an agent drive other terminals (and other agents) on its
-own, so each one gets a prompt in every permission mode, auto mode included:
-a hook's "ask" is shown even where an allow rule or the classifier would
-have approved the call.
+Those commands let an agent drive other terminals and agents on its own, so
+each one gets a prompt in every permission mode, auto mode included: a hook's
+"ask" is shown even where an allow rule or the classifier would have approved
+the call. This hook is the only gate: settings.json holds no ask rules for
+tuios or herdr, because a rule matches the command text from its start
+(`tuios -s x send-text` slips past `Bash(tuios send-text *)`) and cannot carve
+out `--help`. It is registered with onFailure "block", so a crash or timeout
+blocks the call instead of letting it through.
+
+Asking an agent is allowed: `tuios ask-agent`, `tuios queue`, `tuios review
+send` and mail type a prompt into an agent whose own permissions still apply.
+`ask-agent` still asks with --allow-blocked (that answers a permission
+prompt), --force, or --select with --yes or --confirm (many agents at once,
+unlisted). `respond` always asks: it approves other agents' prompts.
 
 The command text is searched for herdr/tuios invocations wherever they sit:
 after `&&` or `;`, behind a path, `env`, `xargs` or `mise exec --`, inside
-`bash -c '...'`, `$(...)` or a heredoc. Script files named on the command
-line (.sh, .py, ...) are searched too, one level deep, because a skill
-script can run `herdr pane split` or `tuios split-window` itself.
+`bash -c '...'`, `$(...)` or a heredoc, and again with quotes and backslashes
+removed (`\tuios`, `tuio''s`). Script files named on the command line (.sh,
+.py, ...) are searched too, one level deep. Commands that are only help or
+version queries (help_only.py) are never asked about.
 
-It errs towards asking: a prompt costs one keypress, a miss costs a pane the
-user never approved. Not covered: a program that talks to the herdr or tuios
-socket directly, and commands assembled at run time (`$cmd` is asked about,
-a string built in a script's own variables is not).
+It errs towards asking. Not covered: a program that talks to the herdr or
+tuios socket directly, and commands assembled at run time (`$cmd` is asked
+about, a string built in a script's own variables is not).
 
-`python3 pane-control-guard.py --self-test` checks the tables below.
+`python3 -I pane-control-guard.py --self-test` checks the tables below.
 """
 
+import importlib.util
 import json
 import os
 import re
 import shlex
 import sys
 
-READ, TYPE, LAUNCH = "read", "type", "launch"
+READ, TYPE, LAUNCH, DESTROY, ADMIN = "read", "type", "launch", "destroy", "admin"
+AGENT = "agent"
 WHAT = {
     READ: "reads pane output",
-    TYPE: "types into a pane or agent",
-    LAUNCH: "launches a pane, tab, workspace or agent",
+    TYPE: "types into a pane or answers an agent's prompt",
+    LAUNCH: "launches a pane, tab, workspace, agent or plugin",
+    DESTROY: "closes, moves or kills panes, sessions or the server",
+    ADMIN: "changes grants, config, a work tree or ships code",
+    AGENT: "asks an agent with a flag that skips tuios's safeguards",
 }
 
 # (group, subcommand) as printed by `herdr <group> --help`.
@@ -52,11 +68,17 @@ HERDR = {
     ("worktree", "create"): LAUNCH,
     ("worktree", "open"): LAUNCH,
     ("agent", "start"): LAUNCH,
+    ("pane", "close"): DESTROY,
+    ("pane", "move"): DESTROY,
+    ("tab", "close"): DESTROY,
+    ("workspace", "close"): DESTROY,
+    ("server", "stop"): DESTROY,
+    ("server", "reload-config"): DESTROY,
 }
 
-# Top-level subcommands from `tuios --help`. `call`, `run-command`, `tape`,
-# `tmux`, `tmux-shim` and `mcp` can issue any of the others, so they count as
-# typing.
+# Top-level subcommands from `tuios --help`; a dict maps the second word, "*"
+# for any. `call`, `run-command`, `tape`, `tmux`, `tmux-shim` and `mcp` can
+# issue any of the others, so they count as typing.
 TUIOS = {
     "capture-pane": READ,
     "pane-view": READ,
@@ -66,13 +88,12 @@ TUIOS = {
     "explain-agent-detect": READ,
     "explain-agent-screen": READ,
     "subscribe": READ,
+    "record-pane": {"start": READ},
     "run": TYPE,
     "send-text": TYPE,
     "send-keys": TYPE,
     "paste-buffer": TYPE,
-    "queue": TYPE,
     "respond": TYPE,
-    "ask-agent": TYPE,
     "resume-agent": TYPE,
     "call": TYPE,
     "run-command": TYPE,
@@ -80,21 +101,55 @@ TUIOS = {
     "tmux": TYPE,
     "tmux-shim": TYPE,
     "mcp": TYPE,
+    "task": {"add": TYPE, "dispatch": LAUNCH},
+    "ask-agent": AGENT,
     "new-window": LAUNCH,
     "split-window": LAUNCH,
     "start-agent": LAUNCH,
+    "delegate": LAUNCH,
+    "agent-proto": LAUNCH,
     "fan": LAUNCH,
     "popup": LAUNCH,
     "xpanes": LAUNCH,
     "new": LAUNCH,
     "worktree": LAUNCH,
     "resurrect": LAUNCH,
+    "plugins": dict.fromkeys(
+        ["run", "open", "dev", "build", "install", "update", "enable", "approve", "link"], LAUNCH),
+    "close-window": DESTROY,
+    "close-workspace": DESTROY,
+    "kill-session": DESTROY,
+    "kill-server": DESTROY,
+    "restart-server": DESTROY,
+    "detach-client": DESTROY,
+    "set-pane-grants": ADMIN,
+    "set-config": ADMIN,
+    "checkpoint": {"restore": ADMIN},
+    "ship": {"commit": ADMIN, "merge": ADMIN, "push": ADMIN, "pr": ADMIN},
 }
 
-# Options that come before the subcommand and take a value.
+# Options that come before the subcommand and take a value. An unknown option
+# might take one too, so the word after it is checked as a subcommand as well.
 VALUE_OPTS = {
     "herdr": {"--session", "--machine", "--remote"},
-    "tuios": {"-s", "--session", "-w", "--window"},
+    "tuios": {
+        "-s", "--session", "-w", "--window", "--server", "--theme", "--cpuprofile",
+        "--pprof", "--border-style", "--dockbar-position", "--scrollback-lines",
+        "--window-button-position", "--window-button-style", "--window-title-position",
+        "--zoom-max-width",
+    },
+}
+# Options that print something and exit before any subcommand runs.
+EXIT_OPTS = {
+    "herdr": {"--help", "-h", "--version", "-V"},
+    "tuios": {"--help", "-h", "--version", "-v", "--skill", "--list-themes", "--preview-theme"},
+}
+KNOWN_FLAGS = {
+    "herdr": set(),
+    "tuios": {"--debug", "--ascii-only", "--no-animations", "--standalone", "--json",
+              "--confirm-quit", "--hide-clock", "--show-clock", "--hide-scrollbar",
+              "--hide-window-buttons", "--shared-borders", "--show-cpu", "--show-ram",
+              "--show-keys"},
 }
 
 # The program name at a command position or inside a quoted string, not a
@@ -102,10 +157,45 @@ VALUE_OPTS = {
 CALL = re.compile(r"""(?:^|[\s;&|(`'"=/])(herdr|tuios)(?=[\s'")`;&|]|$)""")
 # Where an invocation's own arguments end.
 BOUNDARY = re.compile(r"[;&|)\n`]|\$\(")
+UNQUOTE = re.compile(r"""[\\'"]""")
 SCRIPT_EXT = {".sh", ".bash", ".zsh", ".fish", ".py", ".js", ".mjs", ".ts", ".rb", ".pl", ".lua"}
 MAX_SCRIPT_BYTES = 256 * 1024
 MAX_SCRIPTS = 8
 UNKNOWN = "unknown"
+
+MCP_PREFIX = "mcp__tuios__tuios_"
+MCP_PASS = {
+    "list_agents", "list_windows", "get_agent_state", "wait_for", "read_agent_messages",
+    "send_agent_message", "set_agent_state", "set_agent_meta", "ask_agent",
+}
+MCP_ASK = {
+    "capture_pane": READ,
+    "peek_prompt": READ,
+    "events": READ,
+    "send_text": TYPE,
+    "send_keys": TYPE,
+    "respond": TYPE,
+    "fan": LAUNCH,
+    "delegate": LAUNCH,
+}
+
+
+def load_help_only():
+    path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "help_only.py")
+    spec = importlib.util.spec_from_file_location("help_only", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+try:
+    help_only = load_help_only()
+    is_help_only = help_only.is_help_only
+except Exception:  # without it, nothing counts as a help query: more asking, never less
+    help_only = None
+
+    def is_help_only(command):
+        return False
 
 
 def invocations(text):
@@ -118,12 +208,46 @@ def invocations(text):
         yield m.group(1), args
 
 
+def agent_flags_risky(args):
+    flags = set(a.split("=", 1)[0] for a in args)
+    if "--allow-blocked" in flags or "--force" in flags:
+        return True
+    return "--select" in flags and bool(flags & {"--yes", "--confirm"})
+
+
+def lookup(prog, rest, args):
+    if prog == "herdr":
+        return HERDR.get(tuple(rest[:2]))
+    entry = TUIOS.get(rest[0])
+    if isinstance(entry, dict):
+        sub = rest[1] if len(rest) > 1 else None
+        return entry.get(sub, entry.get("*")) if sub else None
+    if entry == AGENT:
+        return AGENT if agent_flags_risky(args) else None
+    return entry
+
+
 def classify(prog, args):
     """Return (name, kind) for a sensitive invocation, else None."""
-    opts = VALUE_OPTS[prog]
-    i = 0
-    while i < len(args) and args[i].startswith("-"):
-        i += 2 if args[i] in opts else 1
+    if "--" in args:
+        own = args[:args.index("--")]
+    else:
+        own = args
+    if prog == "tuios" and ("--help" in own or "-h" in own):
+        return None  # cobra prints help wherever the flag sits before --
+    opts, exits, known = VALUE_OPTS[prog], EXIT_OPTS[prog], KNOWN_FLAGS[prog]
+    i, unsure = 0, False
+    while i < len(args) and args[i].startswith("-") and args[i] != "--":
+        flag = args[i].split("=", 1)[0]
+        if flag in exits:
+            return None
+        if "=" in args[i] or flag in known:
+            i += 1
+        elif flag in opts:
+            i += 2
+        else:
+            unsure = True
+            i += 1
     rest = args[i:]
     if not rest:
         return None
@@ -131,19 +255,24 @@ def classify(prog, args):
     words = rest[:n]
     if any(w.startswith(("$", "<")) for w in words):
         return (f"{prog} {' '.join(words)}", UNKNOWN)
-    if prog == "tuios":
-        kind = TUIOS.get(words[0])
-    else:
-        kind = HERDR.get(tuple(words))
-    return (f"{prog} {' '.join(words)}", kind) if kind else None
+    kind = lookup(prog, rest, args)
+    if not kind and unsure and len(rest) > 1:
+        rest, words = rest[1:], rest[1:1 + n]
+        kind = lookup(prog, rest, args)
+    if not kind:
+        return None
+    if isinstance(TUIOS.get(rest[0]), dict) and prog == "tuios" and len(rest) > 1:
+        words = rest[:2]
+    return (f"{prog} {' '.join(words)}", kind)
 
 
 def hits_in(text):
     found = []
-    for prog, args in invocations(text):
-        hit = classify(prog, args)
-        if hit and hit not in found:
-            found.append(hit)
+    for variant in (text, UNQUOTE.sub("", text)):
+        for prog, args in invocations(variant):
+            hit = classify(prog, args)
+            if hit and hit not in found:
+                found.append(hit)
     return found
 
 
@@ -190,25 +319,40 @@ def reason(direct, scripts):
 
 
 def evaluate(command, cwd=None):
+    if is_help_only(command):
+        return None
     direct = hits_in(command)
     scripts = script_hits(command, cwd)
     return reason(direct, scripts) if direct or scripts else None
 
 
+def evaluate_mcp(tool, params):
+    name = tool[len(MCP_PREFIX):] if tool.startswith(MCP_PREFIX) else tool
+    if name == "ask_agent":
+        risky = params.get("allow_blocked") or params.get("force") or (
+            params.get("select") and params.get("confirm"))
+        return f"Pane control: `{tool}` {WHAT[AGENT]}." if risky else None
+    if name in MCP_PASS:
+        return None
+    if name in MCP_ASK:
+        return f"Pane control: `{tool}` {WHAT[MCP_ASK[name]]}."
+    return f"Pane control: `{tool}` is a tuios tool this guard does not know yet, so it asks."
+
+
 def main():
     if "--self-test" in sys.argv:
         return self_test()
+    data = json.load(sys.stdin)
+    tool = data.get("tool_name") or ""
+    params = data.get("tool_input") or {}
     try:
-        data = json.load(sys.stdin)
-    except ValueError:
-        return 0
-    if data.get("tool_name") != "Bash":
-        return 0
-    command = (data.get("tool_input") or {}).get("command")
-    if not isinstance(command, str) or not command:
-        return 0
-    try:
-        why = evaluate(command, data.get("cwd"))
+        if tool == "Bash":
+            command = params.get("command")
+            why = evaluate(command, data.get("cwd")) if isinstance(command, str) and command else None
+        elif tool.startswith("mcp__tuios__"):
+            why = evaluate_mcp(tool, params)
+        else:
+            why = None
     except Exception as e:  # a broken guard asks rather than waves through
         why = f"pane-control-guard failed ({type(e).__name__}: {e}); asking instead"
     if why:
@@ -235,29 +379,81 @@ ASK = [
     ("herdr agent send-keys reviewer esc", TYPE),
     ("herdr pane wait-output p --match done", READ),
     ("herdr agent start claude --pane p", LAUNCH),
+    ("herdr --machine m pane run p ls", TYPE),
+    ("herdr pane close p", DESTROY),
+    ("herdr server stop", DESTROY),
     ("tuios send-text -s dotfiles -w build 'ls'", TYPE),
     ("tuios -s x capture-pane -w y", READ),
     ('tuios new-window -s "$TUIOS_SESSION" slides --no-focus -- ls', LAUNCH),
     ("tuios split-window -s s right --no-focus -- tail -f x", LAUNCH),
     ("tuios run -s s -w build --timeout 600000 -- make test", TYPE),
+    ("tuios run -w b -- mytool --help", TYPE),
     ("tuios -w build send-keys ctrl+c", TYPE),
     ("tuios fan 3 'do the thing'", LAUNCH),
     ("tuios start-agent claude -- --model x", LAUNCH),
-    ("tuios queue -s s -w review 'then migrate'", TYPE),
     ("tuios call send-text", TYPE),
     ("tuios list-windows; tuios send-keys enter", TYPE),
     ("herdr pane $SUB p", UNKNOWN),
+    ("tuios respond -w review approve", TYPE),
+    ("tuios --server foo send-text x", TYPE),
+    ("tuios --server=foo run -- make", TYPE),
+    ("tuios --theme x start-agent claude", LAUNCH),
+    ("tuios --made-up val send-text x", TYPE),
+    ("\\tuios send-text x", TYPE),
+    ("tuio''s send-text x", TYPE),
+    ('"tuios" send-text x', TYPE),
+    ("tuios 'send-text' x", TYPE),
+    ("command tuios send-text x", TYPE),
+    ("tuios delegate --role review 'look'", LAUNCH),
+    ("tuios agent-proto --protocol acp -- claude", LAUNCH),
+    ("tuios ship commit -w b -m x", ADMIN),
+    ("tuios ship pr -s s --draft", ADMIN),
+    ("tuios set-pane-grants -w x --respond", ADMIN),
+    ("tuios set-config border_style rounded", ADMIN),
+    ("tuios checkpoint restore -w b 2", ADMIN),
+    ("tuios record-pane start -w b -o x.cast", READ),
+    ("tuios task add -p 'do x' title", TYPE),
+    ("tuios task dispatch mode auto", LAUNCH),
+    ("tuios plugins run foo act", LAUNCH),
+    ("tuios close-window x", DESTROY),
+    ("tuios kill-session s", DESTROY),
+    ("tuios ask-agent -w a --allow-blocked 'yes'", AGENT),
+    ("tuios ask-agent -w a --force 'q'", AGENT),
+    ("tuios ask-agent --select 'group:x' --yes 'q'", AGENT),
+    ("tuios ask-agent --select 'group:x' --confirm T 'q'", AGENT),
 ]
 PASS = [
     "herdr pane list", "herdr pane current", "herdr pane get p", "herdr pane focus p",
     "herdr workspace list", "herdr tab list", "herdr agent list", "herdr agent wait x --state idle",
-    "herdr status", "herdr --version", "herdr", "herdr pane close p",
-    "tuios list-windows", "tuios ls", "tuios list-agents -s s", "tuios --skill",
+    "herdr status", "herdr --version", "herdr",
+    "tuios list-windows", "tuios ls", "tuios list-agents -s s", "tuios --skill", "tuios --skill run",
+    "tuios --skill all", "tuios --help", "tuios -h send-text", "tuios send-text --help",
+    "tuios ask-agent --help", "tuios start-agent -h", "tuios help send-text",
     "tuios note set 'next: run migration'", "tuios ask-human 'run it?' -o yes -o no",
     "tuios send-agent-message -s s -w a 'hi'", "tuios mermaid f.mmd", "tuios task block 3 'stuck'",
+    "tuios ask-agent -s s -w a 'is the retry safe?'", "tuios ask-agent --select 'group:x' 'q'",
+    "tuios queue -w build 'then migrate'", "tuios queue ls", "tuios review send -w b",
+    "tuios ship status -s s", "tuios ship", "tuios checkpoint list -w b", "tuios record-pane stop -w b",
+    "tuios plugins list", "tuios task ls", "tuios pane-grants", "tuios wait-for window-idle -w b",
     "rg -n herdr settings.json", "ls ~/.config/herdr/plugins.json",
     "bash ~/.claude/hooks/herdr-agent-state.sh session", "git status",
     "mise exec aqua:mfontanini/presenterm@latest -- presenterm deck.md",
+]
+MCP_CASES = [
+    ("list_agents", {}, False),
+    ("send_agent_message", {"text": "hi"}, False),
+    ("ask_agent", {"window": "a", "text": "q"}, False),
+    ("ask_agent", {"window": "a", "text": "q", "allow_blocked": True}, True),
+    ("ask_agent", {"text": "q", "force": True}, True),
+    ("ask_agent", {"text": "q", "select": "group:x", "confirm": "T"}, True),
+    ("ask_agent", {"text": "q", "select": "group:x"}, False),
+    ("send_text", {"window": "a", "text": "ls"}, True),
+    ("send_keys", {"keys": "enter"}, True),
+    ("respond", {"action": "approve"}, True),
+    ("delegate", {"prompt": "x"}, True),
+    ("fan", {}, True),
+    ("capture_pane", {}, True),
+    ("brand_new_tool", {}, True),
 ]
 
 
@@ -275,7 +471,9 @@ def self_test():
     for command, want in ASK:
         check(command, [k for _, k in hits_in(command)][:1], [want])
     for command in PASS:
-        check(command, hits_in(command), [])
+        check(command, evaluate(command), None)
+    for name, params, want in MCP_CASES:
+        check(f"mcp {name} {params}", bool(evaluate_mcp(MCP_PREFIX + name, params)), want)
     with tempfile.TemporaryDirectory() as d:
         hit = os.path.join(d, "viewer.sh")
         quiet = os.path.join(d, "quiet.sh")
@@ -287,9 +485,11 @@ def self_test():
         check("script, relative path", bool(evaluate("bash viewer.sh", d)), True)
         check("script without hits", evaluate(f"bash {quiet}", d), None)
         check("missing script", evaluate("bash /nonexistent/x.sh", d), None)
+        check("script --help still scanned", bool(evaluate("viewer.sh --help", d)), True)
     out = evaluate("herdr pane run p ls")
     check("reason text", bool(out) and "types into a pane" in out, True)
-    print(f"{len(ASK)} ask, {len(PASS)} pass, 4 script cases: {failures} failed")
+    check("help_only loaded", help_only is not None, True)
+    print(f"{len(ASK)} ask, {len(PASS)} pass, {len(MCP_CASES)} mcp, 5 script cases: {failures} failed")
     return 1 if failures else 0
 
 
