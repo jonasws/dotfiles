@@ -52,8 +52,10 @@ profile_value() {
 color="$(profile_value color)"
 region="$(profile_value region)"
 
-# Where to land. Regional host plus ?region=, the same shape `aws-vault login`
-# produced, so the console opens in the profile's region.
+# Where to land. Regional host plus ?region=, so the console opens in the
+# profile's region. Built here rather than with `granted console --service`,
+# which always appends /home and breaks sub-paths such as codesuite/codeartifact
+# (the tv aws-services picker passes real console paths).
 if [[ "$destination" =~ ^https?:// ]]; then
   url="$destination"
 else
@@ -78,7 +80,10 @@ if [[ $no_signin -eq 1 ]]; then
   exec "${args[@]}" --name "$profile" "$url"
 fi
 
-creds="$(aws configure export-credentials --profile "$profile" --format env-no-export)"
+if ! creds="$(aws configure export-credentials --profile "$profile" --format env-no-export)"; then
+  echo "aws-console: no credentials for '$profile' (MFA or 1Password step failed?)" >&2
+  exit 1
+fi
 
 granted_args=(console --url --firefox --container-name "$profile" --destination "$url")
 [[ -n "$color" ]] && granted_args+=(--color "$color")
