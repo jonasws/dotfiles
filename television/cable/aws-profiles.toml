@@ -19,6 +19,8 @@ enter = "actions:open-browser"
 
 [actions.open-browser]
 description = "Open the AWS console in the browser for the selected profile (pick a service)"
-command = "service=$(tv aws-services); $HOME/dotfiles/utils/aws-console '{}' \"$service\""
+# Esc in the service picker prints nothing: go back to the profile picker instead
+# of opening the console home. Esc there exits without running this action.
+command = "service=$(tv aws-services); if [ -z \"$service\" ]; then exec tv aws-profiles; fi; $HOME/dotfiles/utils/aws-console '{}' \"$service\""
 shell = "bash"
 mode = "execute"
