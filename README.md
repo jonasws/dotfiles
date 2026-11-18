@@ -101,7 +101,13 @@ account is in [fnox/README.md](fnox/README.md); in short:
   code comes from 1Password (`mfa_process = op item get … --otp`). Every other
   profile assumes a role on top of it, so `AWS_PROFILE=<profile> aws …` works
   with no `aws-vault exec`. fish and nushell export
-  `AWS_VAULT_KEYCHAIN_NAME=login` and `AWS_VAULT_PARALLEL_SAFE=true`.- [`fnox-trees/`](fnox-trees/) → `~/CX`, `~/CNOPS`, `~/CN-TERMINAL`
+  `AWS_VAULT_KEYCHAIN_NAME=login` and `AWS_VAULT_PARALLEL_SAFE=true`. Role
+  profiles omit `mfa_serial` on purpose, and aws-vault doesn't inherit it from
+  `source_profile`, so the fish `aws-vault` function
+  ([`fish/functions/aws-vault.fish`](fish/functions/aws-vault.fish)) defaults
+  `AWS_MFA_SERIAL` for direct `aws-vault exec|login` calls. `credential_process`
+  and the AWS CLI don't go through it and don't need it.
+- [`fnox-trees/`](fnox-trees/) → `~/CX`, `~/CNOPS`, `~/CN-TERMINAL`
   `fnox.toml`. Each work tree has profiles per environment and role, `build`,
   `dev`, `staging` and `prod`, each with a `--admin` variant. Each is a 1-hour
   `aws-sts` lease on top of `capra-auth`:
