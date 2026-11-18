@@ -11,8 +11,9 @@ session key (harness:id).
 Enter jumps to the pane already running the session. A pane whose agent
 exited gets the conversation back in its shell (tuios resume-agent, with the
 flags it was started with). Otherwise Enter opens a fish pane that resumes it
-in the tuios session for its checkout, creating that session, and the
-worktree from the session's branch when it was removed. In herdr it focuses
+in a workspace of its own (the first empty one, named after the session) in
+the tuios session for its checkout, creating that session, and the worktree
+from the session's branch when it was removed. In herdr it focuses
 the agent's pane or opens a tab in the checkout's workspace. Outside both it
 resumes in place. alt-f resumes a fork instead.
 

@@ -423,6 +423,15 @@ def session-on [root: string]: nothing -> any {
     | get -o 0.name
 }
 
+# The lowest workspace of a tuios session with no panes, or null when all nine
+# are in use (the pane then joins the workspace the session shows).
+def empty-workspace [session: string]: nothing -> any {
+    let r = (do -i { ^tuios list-workspaces -s $session --json } | complete)
+    if $r.exit_code != 0 { return null }
+    $r.stdout | from json | get -o workspaces | default []
+    | where window_count == 0 | get -o 0.workspace
+}
+
 def focus [p: record] {
     if ($p.herdr? | default false) {
         ^($SCRIPTS | path join herdr-focus.sh) $p.window_id
@@ -439,7 +448,7 @@ def in-tuios []: nothing -> bool {
 }
 
 # Focus the pane running the session; otherwise resume it in a new pane of the
-# tuios session for its checkout (tuios-session.sh opens or creates that one,
+# tuios session for its checkout, in the first empty workspace (tuios-session.sh opens or creates that one,
 # and names a worktree's session as tuios does), or in place outside tuios.
 # Inside herdr and not tuios. tuios panes set HERDR_ENV too, since tuios
 # answers herdr's API, so tuios is checked first.
@@ -498,7 +507,7 @@ def open-session [s: record, fork: bool, dry: bool] {
         let root = if $plan.restore == null { git-root $plan.dir } else { $plan.dir }
         return ({
             action: (if $fork { "fork" } else { "resume" })
-            via: (if $tuios { "tuios new-window + fish -C" } else if $herdr { "herdr tab + pane run" } else { "exec" })
+            via: (if $tuios { "tuios new-window (own workspace) + fish -C" } else if $herdr { "herdr tab + pane run" } else { "exec" })
             herdr_workspace: (if $herdr { herdr-workspace-on $root | default $"new workspace for ($root | tilde)" } else { null })
             cwd: $plan.dir
             restore_worktree: $plan.restore
@@ -518,7 +527,14 @@ def open-session [s: record, fork: bool, dry: bool] {
         # pane. new-window returns once the window exists, so the picker's
         # popup closes before the agent has started.
         let cmd = ($argv | each {|a| $a | sh-quote } | str join " ")
-        ^tuios new-window $name -s $session --cwd $plan.dir -- fish -C $cmd | ignore
+        let ws = (empty-workspace $session)
+        if $ws == null {
+            ^tuios new-window $name -s $session --cwd $plan.dir -- fish -C $cmd | ignore
+        } else {
+            ^tuios new-window $name -s $session --workspace $ws --cwd $plan.dir -- fish -C $cmd | ignore
+            ^tuios set-workspace-name -s $session $ws $name | ignore
+            ^tuios select-workspace -s $session $ws | ignore
+        }
     } else if $herdr {
         herdr-open $plan.dir $s.title $argv
     } else {
