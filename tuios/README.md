@@ -68,10 +68,10 @@ LaunchAgent.
   (`fish/functions/fish_title.fish`), or an agent's topic. A workspace shows,
   in order: a name given by hand (`prefix+T`, `set-workspace-name`), the OSC 1
   name of its active pane, its number. fish sends OSC 1 from
-  `fish_tab_title`: the branch, or `folder@branch` below the repo root, since
-  the session already names the repo. Claude Code sends only OSC 0, so
-  `claude/hooks/tuios-workspace-topic.py` sends its topic as OSC 1 on
-  `UserPromptSubmit` and `Stop`. With several agents in one workspace the
+  `fish_tab_title`: `repo@branch`, or the folder outside a repo. Claude Code
+  sends only OSC 0, so `claude/hooks/tuios-workspace-topic.py` sends its topic
+  as OSC 1 on `UserPromptSubmit` and `Stop`, and on `SessionStart` for a
+  resumed or forked session. With several agents in one workspace the
   focused one names it; name a deliberate multi-agent workspace by hand.
 - **Worktrees.** These go to `../.worktrees/<repo>/<branch>` beside the repo,
   so a worktree under `~/CX` still loads `~/CX/CLAUDE.md`. The
