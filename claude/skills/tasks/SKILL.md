@@ -26,10 +26,12 @@ tuios.
 | Start a tsk task in its own worktree | `prefix+S` on the board (`tsk-dispatch.sh worktree`, a `tuios fan 1`); the script marks the task started itself | `tsk dispatch`, `EnterWorktree`, a `tsk status` first |
 | A worktree with no tsk task | `tuios worktree new <branch> [--agent claude]` | `git worktree add`, `EnterWorktree` |
 | Several attempts at the same problem | `tuios fan N`, then `fan compare` / `fan verify` / `fan keep` | several `worktree new` by hand |
-| Hand a subtask to another agent and get the answer back | `tuios delegate` (`--isolation worktree` when it edits in parallel with you) | an Agent with `isolation: worktree` |
+| Hand a subtask to another agent and get the answer back | `tuios delegate` (`--isolation worktree` when it edits in parallel with you; recipe in the cheat sheet) | an Agent with `isolation: worktree` |
+| Coordinate several builders through a plan, with a review gate before each merge | the `tsk-coordinator` skill, but start each builder with `tuios delegate --isolation worktree --role implementation` instead of its assign-and-start step. The delegate's mail is the completion signal, and you move the tsk task to review: a worktree agent cannot reach the main checkout's board | its tsk dispatch step, which inside tuios runs through the herdr emulation; builders that set `review` themselves |
+| See what a worktree, delegate or fan agent changed, and send it notes | `tuios review <session>`, then `review note FILE:LINE TEXT` and `review send` | `git diff` in its folder, or waiting for the pull request |
 | A short mechanical subtask in this conversation (`implementer`, `Explore`, `researcher`) | the Agent tool, no isolation | `tuios delegate` (overkill) |
 | Track the order of steps inside one task | `tsk steps` on that task | Claude Code's Task tools (absent on this model) |
-| Outside tuios entirely (plain terminal, Herdr) | Claude Code's `--worktree` / `EnterWorktree`, or `tsk dispatch` in Herdr | tuios commands |
+| Outside tuios entirely (plain terminal, Herdr, Rex) | Claude Code's `--worktree` / `EnterWorktree`, or `tsk dispatch` in Herdr or Rex | tuios commands |
 
 The board keys are `[[keybindings.command]]` entries in
 `~/dotfiles/tuios/config.toml`, which `tuios keybinds explain` and `keybinds
@@ -43,7 +45,7 @@ Each tool keeps its own; none of them sees the others'.
 | Made by | Path | Base |
 |---|---|---|
 | tuios (`worktree new`, `fan`, `delegate --isolation worktree`, `prefix+S`) | `../.worktrees/<repo>/<branch-slug>` beside the repo, e.g. `~/CX/.worktrees/cn-cx-booking-service/tsk-t161-split-pool` | the main checkout's HEAD |
-| `tsk dispatch` (Herdr only) | `~/.herdr/worktrees/<repo>/…` | the task's `--base`, else the default branch |
+| `tsk dispatch` (Herdr or Rex only) | `~/.tsk/worktrees/<repo>/…` (`[dispatch] worktrees` in `~/.tsk/config.toml` moves it; tasks dispatched before tsk 0.14 keep `~/.herdr/worktrees/…`) | the task's `--base`, else the default branch |
 | Claude Code (`--worktree`, `EnterWorktree`, Agent `isolation: worktree`) | `<repo>/.claude/worktrees/<name>`, branch `worktree-<name>` | HEAD (`worktree.baseRef: "head"` in settings) |
 
 tuios puts worktrees beside the repo, not under `~/.local/share/tuios`, so a
@@ -88,8 +90,11 @@ command you would run.
 ## Avoid
 
 - **`tsk dispatch`, or `tsk status … started` without `--no-dispatch`, from
-  tuios.** Both need Herdr: you get `not-in-herdr`, or the task marked started
-  with no agent behind it.
+  tuios.** Every tuios pane sets `HERDR_ENV=1` for its herdr emulation, and tsk
+  picks its host from that variable alone, so it takes tuios for Herdr and
+  drives the emulation, which nobody has tested it against. Today nothing
+  launches only because no task has an agent assignee; don't rely on that.
+  Outside tuios, Herdr and Rex the refusal is `no-host`.
 - **`EnterWorktree` / `claude --worktree` inside a tuios worktree session.** It
   nests a second worktree under `.claude/worktrees/` of the first, which no
   cleanup expects.
@@ -100,6 +105,11 @@ command you would run.
 - **Assuming a worktree agent reads that worktree's `CLAUDE.md`.** An Agent
   subagent gets the parent conversation's instructions. A tuios worktree agent
   is a fresh session and does read it.
+
+Exact flags for the commands above (tsk review and block, `jq` over `tsk list
+--json`, the delegate recipe, reviewing and removing worktrees) are in
+[references/cheatsheet.md](references/cheatsheet.md). Read it instead of
+running `--help` first.
 
 For the three "task" systems side by side (statuses, dependencies, who hands
 out work), read [references/compare.md](references/compare.md).
