@@ -50,12 +50,15 @@ to open.
    If it prints an id, the pane is already showing the file and reloads on
    save. Say so and stop.
 
-4. **Open it:**
+4. **Open it,** with the literal name, directory and path written in:
 
    ```bash
-   tuios split-window right --no-focus --name "draft $(basename "$file")" \
-     --cwd "$(dirname "$file")" -- leaf -w "$file"
+   tuios split-window right --no-focus --name 'draft notes.md' \
+     --cwd '/abs/dir' -- leaf -w '/abs/dir/notes.md'
    ```
+
+   The `pane-control-guard` hook lets a pane that only runs `leaf -w` open
+   without a prompt. A `$(...)` anywhere in the command makes it ask.
 
    - `--no-focus` leaves the user where they are. Drop it when they asked to
      edit now.

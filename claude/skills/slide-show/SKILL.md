@@ -132,7 +132,8 @@ Check which multiplexer you are in, in this order:
 
 Every one of these commands asks the user for approval: the
 `pane-control-guard` hook prompts for anything that launches, types into or
-reads from a pane. That is intended, so don't route around it with a script,
+reads from a pane. Its exemption for viewer panes leaves out presenterm,
+which can run a deck's code blocks. That is intended, so don't route around it with a script,
 a different CLI or the socket; say what the pane will run and wait.
 
 Rex and tuios panes also set `HERDR_ENV=1` without a herdr server, so check

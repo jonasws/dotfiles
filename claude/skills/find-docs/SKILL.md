@@ -227,7 +227,8 @@ Rules of thumb:
   `twg collaborators`, Rovo search) spend Rovo credits, up to 10 per call. Prefer the
   plain read when it answers the question, and check `twg help <command>` for the
   `[Enriched]` label.
-- **Permissions.** Every `twg` call prompts (`ask`), and its credential directories are
+- **Permissions.** Every `twg` call prompts (`ask`, from the `help-allow` hook) except
+  help queries such as `twg jira space --help`, which pass. Its credential directories are
   unreadable to the agent. Never try to read them; if auth fails, ask the user to run
   `twg setup`.
 
