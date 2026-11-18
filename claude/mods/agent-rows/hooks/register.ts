@@ -77,10 +77,8 @@ export const register: Register = on => {
     return next({ ...e, props: { ...a, body } })
   })
 
-  // Who is speaking, at a glance: a Mauve box for what you typed, a peach
-  // bar for the agent and a one-line turn summary. A
-  // UserMessage that carries
-  // `task` or `from` is not typed by you, so it keeps Claude Code's drawing.
+  // Your prompts get a Mauve box. A UserMessage that carries `task` or `from`
+  // is not typed by you, so it keeps the stock drawing.
   const MAX_LINES = 14
   const BORDER_COLOR = '#cba6f7'
 
@@ -101,11 +99,6 @@ export const register: Register = on => {
         ...(cut ? [Text({ dimColor: true, children: [`… +${lines.length - MAX_LINES} lines`] })] : []),
       ],
     })
-  })
-
-  on('ui.render', { component: 'AssistantMessage' }, async ($, e, next) => {
-    const { Box } = $.ui.resolve(e)
-    return Box({ borderStyle: 'quote', borderColor: '#fab387', children: [await next(e)] })
   })
 
   // One dim line, no rule and no margin: the turn line costs a row, not four.
