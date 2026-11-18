@@ -25,7 +25,8 @@ removed (`\tuios`, `tuio''s`). Script files named on the command line (.sh,
 .py, ...) are searched too, one level deep. Commands that are only help or
 version queries (help_only.py) are never asked about.
 
-A `tuios split-window` or `new-window` whose pane only shows files passes:
+A `tuios split-window` or `new-window` whose pane only shows files passes
+(pagers, log viewers, nvim -R):
 tuios flags from LAUNCH_FLAGS, then `--` and a bare viewer from VIEWERS with
 only that viewer's listed flags. Flags that change what the pane may do
 (--host, --grants, --kind, --wait) and viewer flags that run commands (less
@@ -148,7 +149,39 @@ VIEWERS = {
     "glow": {"-p", "--pager", "-w", "--width", "-s", "--style"},
     "tail": {"-f", "-F", "-n"},
     "head": {"-n"},
+    "mdcat": {"-p", "--paginate", "-l", "--local", "--columns"},
+    "moor": set(),
+    "csvlens": {"-d", "--delimiter", "-t", "-c", "--no-headers", "--columns", "--filter", "--find",
+                "-i", "--ignore-case", "-S", "-W", "--wrap", "--auto-reload", "--color-columns"},
+    # Not tspin -e/--exec or --pager, not lnav -c/-f/-e/-i/-m/-u/-I/-d: they run commands.
+    "tspin": {"-f", "--follow", "--highlight", "--enable", "--disable", "--extras"},
+    "lnav": {"-r", "-R", "-q", "-N", "-t"},
+    "hl": {"-s", "--sort", "-F", "--follow", "--tail", "-l", "--level", "--since", "--until",
+           "-f", "--filter", "-q", "--query", "-L", "--local", "-e", "-E", "-c", "-P", "--paging"},
+    # No -c, --cmd, +cmd, -S, -u, -l or --listen: each runs Vim script or Lua.
+    "nvim": {"-R", "-M", "-n"},
+    "view": {"-R", "-M", "-n"},
+    # Not --ai-*, --k8s-*, --otlp-*, --vmlogs-*, --web-port or --config: they send
+    # logs out, open listeners or read clusters.
+    "gonzo": {"-f", "--file", "--follow", "--format", "-s", "--skin", "--disable-version-check",
+              "-b", "--log-buffer", "-m", "--memory-size", "-u", "--update-interval",
+              "--use-log-time", "--reverse-scroll-wheel", "--stop-words", "--web-disabled"},
+    "fx": {"-r", "--raw", "-s", "--slurp", "--yaml", "--toml", "--edn", "--maml", "--xml",
+           "--html", "--strict", "--no-inline"},
+    # Not --debug (writes a file) or --config.
+    "otree": {"-t", "--content-type", "-o", "--to", "--disable-header", "--disable-footer",
+              "--disable-filter", "--tree-disable-selected-highlight", "--tree-selected-symbol",
+              "--tree-format", "--filter-ignore-case", "--filter-exclude-mode", "-f",
+              "--header-format", "-V", "--vertical", "-H", "--horizontal", "-s", "--size",
+              "--disable-highlight", "-w", "--wrap", "--ignore-config", "--max-data-size",
+              "-R", "--live-reload"},
 }
+# fx reads every argument after the file as JavaScript, whose save() writes the file.
+MAX_PATHS = {"fx": 1}
+# Viewers that are only viewers with one of these flags.
+VIEWER_NEEDS = {"nvim": {"-R", "-M"}}
+# lnav opens host:path over ssh and runs a helper there.
+NO_REMOTE = {"lnav"}
 
 # Options that come before the subcommand and take a value. An unknown option
 # might take one too, so the word after it is checked as a subcommand as well.
@@ -258,8 +291,14 @@ def viewer_launch(rest):
         return False
     if not cmd or cmd[0] not in VIEWERS:
         return False
-    allowed = VIEWERS[cmd[0]]
-    return all(a.split("=", 1)[0] in allowed for a in cmd[1:] if a.startswith(("-", "+")))
+    prog, argv = cmd[0], cmd[1:]
+    if prog in VIEWER_NEEDS and not VIEWER_NEEDS[prog] & set(argv):
+        return False
+    if prog in NO_REMOTE and any(":" in a for a in argv):
+        return False
+    if prog in MAX_PATHS and sum(not a.startswith("-") for a in argv) > MAX_PATHS[prog]:
+        return False
+    return all(a.split("=", 1)[0] in VIEWERS[prog] for a in argv if a.startswith(("-", "+")))
 
 
 def classify(prog, args):
@@ -431,6 +470,23 @@ ASK = [
     ("tuios new-window x --host build -- leaf f.md", LAUNCH),
     ("tuios new-window x --grants admin -- less f", LAUNCH),
     ("tuios new-window x -- vim f.md", LAUNCH),
+    ("tuios new-window x -- nvim f.md", LAUNCH),
+    ("tuios new-window x -- nvim -R -c q f.md", LAUNCH),
+    ("tuios new-window x -- nvim -R +!id f.md", LAUNCH),
+    ("tuios new-window x -- nvim -R --cmd q f.md", LAUNCH),
+    ("tuios new-window x -- tspin -e make", LAUNCH),
+    ("tuios new-window x -- tspin --pager sh f.log", LAUNCH),
+    ("tuios new-window x -- lnav -e make", LAUNCH),
+    ("tuios new-window x -- lnav host:/var/log", LAUNCH),
+    ("tuios new-window x -- hl --config c.toml f.log", LAUNCH),
+    ("tuios new-window x -- fx f.json save", LAUNCH),
+    ("tuios new-window x -- fx f.json '.a = 1' save", LAUNCH),
+    ("tuios new-window x -- otree --debug out.log f.yaml", LAUNCH),
+    ("tuios new-window x -- otree --config c.toml f.yaml", LAUNCH),
+    ("tuios new-window x -- gonzo --ai-provider claude-code -f app.log", LAUNCH),
+    ("tuios new-window x -- gonzo --k8s-enabled", LAUNCH),
+    ("tuios new-window x -- gonzo --otlp-enabled", LAUNCH),
+    ("tuios new-window x -- gonzo --vmlogs-url http://x", LAUNCH),
     ("tuios run -s s -w build --timeout 600000 -- make test", TYPE),
     ("tuios run -w b -- mytool --help", TYPE),
     ("tuios -w build send-keys ctrl+c", TYPE),
@@ -488,6 +544,13 @@ PASS = [
     "tuios new-window log --no-focus --keep-open -- less -R /tmp/x.log",
     "tuios new-window v -- bat --paging=always -l md f.md",
     "tuios split-window right -- cat -n f",
+    "tuios split-window right -- nvim -R f.md", "tuios new-window v -- view f.txt",
+    "tuios new-window log -- tspin -f app.log", "tuios new-window log -- lnav -q /tmp/a.log",
+    "tuios new-window log -- hl -F -l warn app.log", "tuios new-window c -- csvlens --auto-reload d.csv",
+    "tuios new-window m -- moor f.txt", "tuios new-window m -- mdcat -p README.md",
+    "tuios new-window j -- fx data.json", "tuios new-window j -- fx --yaml -s a.yaml",
+    "tuios new-window o -- otree -R -t yaml k8s.yaml",
+    "tuios new-window g -- gonzo -f app.log --follow --web-disabled",
 ]
 MCP_CASES = [
     ("list_agents", {}, False),

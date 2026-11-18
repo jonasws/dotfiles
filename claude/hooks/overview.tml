@@ -81,7 +81,7 @@
         {
           "cmd": "tuios split-window right -- leaf -w f.md",
           "by": "guard passes",
-          "why": "viewer pane: leaf, less, bat, cat, tail"
+          "why": "viewer pane: pagers, log/JSON viewers, nvim -R"
         },
         {
           "cmd": "tuios list-agents, wait-for",
