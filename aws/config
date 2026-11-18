@@ -1,4 +1,4 @@
-; aws-vault-based AWS config (Option C1).
+; AWS config, linked to ~/.aws/config by `mise dot apply`.
 ;
 ; Master IAM user creds live in macOS Keychain via aws-vault. Master
 ; profile (`capra-auth`) exposes an MFA'd STS session via credential_process
@@ -9,10 +9,6 @@
 ;
 ; Role chaining (master-session -> target AssumeRole) still caps browser
 ; console / assume-role sessions at 1h. That ceiling is AWS-enforced.
-;
-; Activate with:
-;   AWS_CONFIG_FILE=~/dotfiles/aws/config-vault
-; or symlink in place of ~/.aws/config.
 ;
 ; One-time seeding of master IAM user creds. Store them in the `login`
 ; keychain (not aws-vault's default `aws-vault` keychain) so the same
