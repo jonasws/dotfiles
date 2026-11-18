@@ -75,9 +75,12 @@ macos-option-as-alt = true
 keybind = super+shift+r=reload_config
 keybind = alt+enter=unbind
 
-# Shift+Enter is Alt+Enter (ESC CR), a newline in Claude Code. A bare LF is
-# ctrl+j, which tuios and herdr bind to pane movement.
-keybind = shift+enter=text:\x1b\r
+# Shift+Enter as the Kitty protocol's CSI 13;2u, so tuios sees a real
+# Shift+Enter and passes it on in each pane's own encoding: a newline in
+# Claude Code, save in tsk's forms and quick capture. ESC CR would arrive as
+# Alt+Enter, and a bare LF as ctrl+j, which tuios and herdr bind to pane
+# movement.
+keybind = shift+enter=csi:13;2u
 
 # Option+Left/Right: Ghostty's defaults rewrite them to ESC b / ESC f before
 # encoding, so neither tuios nor the shell would see the arrow.

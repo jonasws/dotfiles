@@ -39,7 +39,7 @@ Ghostty leaves most chords to tuios. tuios's own keys are in
 | Cmd+R, Cmd+D, Cmd+W | tuios: split right, split down, close pane. |
 | Cmd+[, Cmd+] | tuios jump list. |
 | Cmd+. | tuios pane labels. AppKit swallows this chord, so Ghostty sends tuios the kitty-protocol encoding directly. |
-| Shift+Enter | ESC CR, which Claude Code reads as a newline. |
+| Shift+Enter | CSI 13;2u (Kitty protocol), so tuios passes a real Shift+Enter on: a newline in Claude Code, save in tsk. |
 | Option+Left/Right | Passed through as arrows instead of being rewritten to word jumps. |
 | Cmd+Shift+P / N / T | Ghostty's palette, new window, new tab. |
 | Cmd+L then hjkl | Moves between Ghostty's own splits. |
