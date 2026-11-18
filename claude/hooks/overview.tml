@@ -1,0 +1,305 @@
+<tml version="1" title="Agent hooks: allow / ask / deny">
+  <state>
+    {
+      "hooks": [
+        {
+          "hook": "pane-control-guard",
+          "on": "Bash, mcp__tuios__*",
+          "gives": "ask",
+          "fail": "block",
+          "why": "agents driving other panes"
+        },
+        {
+          "hook": "help-allow",
+          "on": "Bash",
+          "gives": "allow",
+          "fail": "open",
+          "why": "--help / --version only"
+        },
+        {
+          "hook": "inline-script-guard",
+          "on": "Bash",
+          "gives": "deny",
+          "fail": "open",
+          "why": "no python3 -c, node -e, heredoc code"
+        },
+        {
+          "hook": "run-script-guard",
+          "on": "mcp__aws__*",
+          "gives": "allow / ask",
+          "fail": "ask",
+          "why": "boto3 reads ok, mutations ask"
+        },
+        {
+          "hook": "repl-lint",
+          "on": "REPL",
+          "gives": "deny",
+          "fail": "block (exit 2)",
+          "why": "lints scripts with ast-grep"
+        },
+        {
+          "hook": "researcher-bash-guard",
+          "on": "researcher agent",
+          "gives": "deny",
+          "fail": "block",
+          "why": "only find-docs commands"
+        },
+        {
+          "hook": "atuin, tuios agent-hook",
+          "on": "Bash / all",
+          "gives": "none",
+          "fail": "open",
+          "why": "logging, pane state"
+        }
+      ],
+      "allow": [
+        {
+          "cmd": "tuios --help; mise --version",
+          "by": "help-allow",
+          "why": "prints help, runs nothing"
+        },
+        {
+          "cmd": "git commit --help | head -20",
+          "by": "help-allow",
+          "why": "pipe to head/tail/wc is fine"
+        },
+        {
+          "cmd": "tuios ask-agent -w a 'q'",
+          "by": "allow rule",
+          "why": "target agent's own permissions apply"
+        },
+        {
+          "cmd": "tuios queue -w build 'next'",
+          "by": "allow rule",
+          "why": "same as ask-agent, typed at rest"
+        },
+        {
+          "cmd": "tuios send-agent-message ...",
+          "by": "allow rule",
+          "why": "mail is data, not a prompt"
+        },
+        {
+          "cmd": "tuios list-agents, wait-for",
+          "by": "guard passes",
+          "why": "reads state, not pane text"
+        },
+        {
+          "cmd": "herdr pane list / get / focus",
+          "by": "allow rules",
+          "why": "layout reads"
+        },
+        {
+          "cmd": "mcp tuios list/mail/ask_agent",
+          "by": "allow rules",
+          "why": "same split as Bash"
+        }
+      ],
+      "notAllowed": [
+        {
+          "cmd": "tuios --help &gt; f",
+          "why": "redirect"
+        },
+        {
+          "cmd": "tuios --help; rm x",
+          "why": "one segment isn't help"
+        },
+        {
+          "cmd": "run.sh --help",
+          "why": "script may ignore the flag"
+        },
+        {
+          "cmd": "env rm --help",
+          "why": "wrapper runs another program"
+        },
+        {
+          "cmd": "tuios 'a b' --help",
+          "why": "any quote or $ rejects"
+        }
+      ],
+      "ask": [
+        {
+          "kind": "type",
+          "ex": "tuios send-text / send-keys / run",
+          "why": "types into a shell outside the sandbox"
+        },
+        {
+          "kind": "type",
+          "ex": "tuios respond approve",
+          "why": "approves another agent's permission prompt"
+        },
+        {
+          "kind": "agent",
+          "ex": "ask-agent --allow-blocked / --force",
+          "why": "skips tuios's needs_input / busy checks"
+        },
+        {
+          "kind": "agent",
+          "ex": "ask-agent --select &#x2026; --yes",
+          "why": "many agents at once, unlisted"
+        },
+        {
+          "kind": "read",
+          "ex": "capture-pane, peek-prompt, record-pane",
+          "why": "other panes may show secrets"
+        },
+        {
+          "kind": "launch",
+          "ex": "start-agent, delegate, fan, split-window",
+          "why": "new agents or panes"
+        },
+        {
+          "kind": "destroy",
+          "ex": "close-window, kill-session, herdr pane close",
+          "why": "loses someone's work"
+        },
+        {
+          "kind": "admin",
+          "ex": "set-pane-grants, set-config, ship pr",
+          "why": "widens rights or ships code"
+        },
+        {
+          "kind": "unknown",
+          "ex": "new mcp__tuios__* tool",
+          "why": "fails closed until classified"
+        },
+        {
+          "kind": "rule",
+          "ex": "git push --force, git rebase, twg",
+          "why": "settings ask rules (51)"
+        },
+        {
+          "kind": "rule",
+          "ex": "docker --privileged, fnox exec",
+          "why": "host / secret access"
+        },
+        {
+          "kind": "rule",
+          "ex": "Edit ~/.claude, hooks, shell rc",
+          "why": "agent editing its own guardrails"
+        }
+      ],
+      "deny": [
+        {
+          "what": "Bash(rm *)",
+          "why": "use rip / gomi; deletion is yours"
+        },
+        {
+          "what": "Bash(gh *)",
+          "why": "no creds; use github MCP"
+        },
+        {
+          "what": "Bash(aws *), aws-vault, awslogs",
+          "why": "AWS only via MCP + run-script-guard"
+        },
+        {
+          "what": "fnox get / export, op read / inject",
+          "why": "secret material"
+        },
+        {
+          "what": "security find-generic-password",
+          "why": "keychain"
+        },
+        {
+          "what": "Read .env, ~/.ssh, ~/.aws/credentials",
+          "why": "secret files"
+        },
+        {
+          "what": "twg auth / cache files",
+          "why": "Atlassian tokens"
+        },
+        {
+          "what": "WebSearch",
+          "why": "use find-docs (exa)"
+        },
+        {
+          "what": "python3 -c, node -e, heredoc code",
+          "why": "inline-script-guard: no diff, truncated"
+        }
+      ]
+    }
+  </state>
+  <tabs>
+    <tab id="flow" title="How it decides">
+      <col pad="1" gap="1">
+        <row gap="2">
+          <stat label="Hooks on Bash" value="4"/>
+          <stat label="Allow rules" value="58" role="success"/>
+          <stat label="Ask rules" value="51" role="warning"/>
+          <stat label="Deny rules" value="40" role="error"/>
+        </row>
+        <mermaid>flowchart LR
+  C[Tool call] --&gt; H[Matching hooks run in parallel]
+  C --&gt; R[Permission rules]
+  H --&gt; P{Strictest wins}
+  R --&gt; P
+  P --&gt;|deny| D[Blocked, reason to agent]
+  P --&gt;|ask| A[Prompt to you]
+  P --&gt;|allow| OK[Runs]
+  P --&gt;|nothing| M[Mode decides: auto classifier or prompt]</mermaid>
+        <kv>
+          <item k="Precedence" v="deny &gt; ask &gt; allow, for hooks and rules alike"/>
+          <item k="Hook allow" v="cannot beat an ask or deny rule"/>
+          <item k="Hook ask" v="beats any allow rule and the auto classifier"/>
+          <item k="onFailure block" v="pane guard crash or timeout blocks the call"/>
+          <item k="Bypass" v="! commands you type skip all hooks"/>
+        </kv>
+      </col>
+    </tab>
+    <tab id="allow" title="Allow">
+      <col pad="1" gap="1">
+        <text role="success">
+          <b>Runs without a prompt</b>
+        </text>
+        <table rows="state.allow">
+          <column field="cmd" title="Command"/>
+          <column field="by" title="Who allows"/>
+          <column field="why" title="Why"/>
+        </table>
+        <text role="dim">Help-only means: bare name, sub-words, one --help/-h/--version/-V. Joined by ; &amp;&amp; || is fine.</text>
+        <text role="warning">
+          <b>Looks like help, isn't allowed</b>
+        </text>
+        <table rows="state.notAllowed">
+          <column field="cmd" title="Command"/>
+          <column field="why" title="Why not"/>
+        </table>
+      </col>
+    </tab>
+    <tab id="ask" title="Ask">
+      <col pad="1" gap="1">
+        <text role="warning">
+          <b>Prompts you, in every mode</b>
+        </text>
+        <table rows="state.ask">
+          <column field="kind" title="Kind"/>
+          <column field="ex" title="Example"/>
+          <column field="why" title="Why"/>
+        </table>
+        <text role="dim">Rows marked rule come from settings ask rules; the rest from pane-control-guard.</text>
+      </col>
+    </tab>
+    <tab id="deny" title="Deny">
+      <col pad="1" gap="1">
+        <text role="error">
+          <b>Never runs; the agent gets the reason</b>
+        </text>
+        <table rows="state.deny">
+          <column field="what" title="Pattern"/>
+          <column field="why" title="Why"/>
+        </table>
+      </col>
+    </tab>
+    <tab id="hooks" title="Hooks">
+      <col pad="1" gap="1">
+        <table rows="state.hooks">
+          <column field="hook" title="Hook"/>
+          <column field="on" title="Matches"/>
+          <column field="gives" title="Returns"/>
+          <column field="fail" title="On failure"/>
+          <column field="why" title="Purpose"/>
+        </table>
+        <text role="dim">Self-tests: python3 -I ~/.claude/hooks/NAME.py --self-test. New hook file: mise dot apply before registering.</text>
+      </col>
+    </tab>
+  </tabs>
+</tml>
