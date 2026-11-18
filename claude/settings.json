@@ -1,4 +1,5 @@
 {
+  "prefersReducedMotion": true,
   "env": {
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
     "CLAUDE_CODE_EXPERIMENTAL_CODE_MODE": "1",

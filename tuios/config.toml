@@ -27,6 +27,10 @@ kitty_placeholders = "on"
 border_focused_color = "accent"
 # Full keeps the working-agent shimmer; [motion] below switches off the rest.
 motion = "full"
+# Frames as diffed cells in every client, this terminal included: the default,
+# kept explicit. "served" limits it to SSH and web; "off" uses Bubble Tea's
+# renderer. TUIOS_CELL_FRAME=0 turns it off for one run.
+cell_frames = "all"
 border_style = "glyphs"
 # Fade the panes you are not in, so focus reads without the border.
 dim_unfocused = 12
@@ -138,7 +142,8 @@ after-new-worktree = [
 path = "../.worktrees/{{ repo }}/{{ branch | slug }}"
 
 # Which motions run. Workspace switches, pane layout and zoom are cuts; the
-# working-agent shimmer, overlay fades, scrolling slide and copy sweep stay. The
+# overlay fades, scrolling slide and copy sweep stay; the working-agent
+# shimmer is off, as it fought Claude Code's own redraws. The
 # workspace keys open a pane before they switch (scripts/new-workspace.sh), so a
 # cut never shows an empty workspace's splash.
 [motion]
@@ -147,7 +152,7 @@ layout = "off"
 zoom = "off"
 scroll = "on"
 overlays = "on"
-sidebar = "on"
+sidebar = "off"
 copy = "on"
 confetti = "off"
 

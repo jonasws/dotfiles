@@ -76,4 +76,44 @@ export const register: Register = on => {
 
     return next({ ...e, props: { ...a, body } })
   })
+
+  // Who is speaking, at a glance: a Mauve box for what you typed, a peach
+  // bar for the agent and a rule between turns. A
+  // UserMessage that carries
+  // `task` or `from` is not typed by you, so it keeps Claude Code's drawing.
+  const MAX_LINES = 14
+  const BORDER_COLOR = '#cba6f7'
+
+  on('ui.render', { component: 'UserMessage' }, async ($, e, next) => {
+    if (e.props?.task || e.props?.from) return next(e)
+    if (typeof e.props?.text !== 'string') return next(e)
+    const { Box, Text, Markdown } = $.ui.resolve(e)
+    const lines = e.props.text.trim().split('\n')
+    const cut = !e.props.isExpanded && lines.length > MAX_LINES
+    const shown = (cut ? lines.slice(0, MAX_LINES) : lines).join('\n')
+    return Box({
+      borderStyle: 'round',
+      borderColor: BORDER_COLOR,
+      paddingX: 1,
+      flexDirection: 'column',
+      children: [
+        Markdown({ text: shown }),
+        ...(cut ? [Text({ dimColor: true, children: [`… +${lines.length - MAX_LINES} lines`] })] : []),
+      ],
+    })
+  })
+
+  on('ui.render', { component: 'AssistantMessage' }, async ($, e, next) => {
+    const { Box } = $.ui.resolve(e)
+    return Box({ borderStyle: 'quote', borderColor: '#fab387', children: [await next(e)] })
+  })
+
+  on('ui.render', { component: 'TurnDuration' }, async ($, e, next) => {
+    const { Box, Text } = $.ui.resolve(e)
+    const width = Math.min(e.viewport?.columns ?? 80, 120)
+    return Box({
+      flexDirection: 'column',
+      children: [Text({ dimColor: true, children: ['─'.repeat(width)] }), await next(e)],
+    })
+  })
 }
