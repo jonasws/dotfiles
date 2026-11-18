@@ -111,8 +111,12 @@ account is in [fnox/README.md](fnox/README.md); in short:
   `dev`, `staging` and `prod`, each with a `--admin` variant. Each is a 1-hour
   `aws-sts` lease on top of `capra-auth`:
   `fnox -P staging exec -- aws s3 ls`.
-- [`utils/aws-console`](utils/aws-console) opens the web console for a profile
-  through `aws-vault login`.
+- [`utils/aws-console`](utils/aws-console) (fish: `console <profile>`) opens the
+  web console for a profile in a Firefox container. The `aws` CLI resolves the
+  profile through `capra-auth`'s session, [Granted](https://docs.commonfate.io/granted/usage/console)
+  (`granted console`) builds the sign-in URL, and its Firefox add-on opens the
+  container. aws-vault is no longer involved, so there is no extra MFA prompt.
+  The `color` key in `aws/config` sets the container colour.
 - Claude Code asks before every `aws` and `fnox exec` call
   (`claude/settings.json`), and tuios marks the destructive ones
   ([tuios/README.md](tuios/README.md#agents)).

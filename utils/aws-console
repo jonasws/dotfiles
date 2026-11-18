@@ -1,41 +1,32 @@
 #!/usr/bin/env bash
-# Open an AWS console URL in firefox-container under the given profile,
-# using `aws-vault login` to mint a federated sign-in URL.
+# Open an AWS console page for a profile in a Firefox container, through Granted.
 #
 # Usage:
 #   aws-console [--no-signin] <profile> [<service>|<url>]
 #
-# --no-signin: skip aws-vault login and open the URL directly in the
-#   container. Use when you know the container already has a valid AWS
-#   session, to avoid signing out other tabs in the same container.
+# <service> is a console path such as "cloudformation" or "ec2/v2" (/home is
+# appended when it has no sub-path); a http(s):// argument is used as the
+# destination unchanged. Omit it to open the console home.
 #
-# If the second positional argument starts with http(s):// it is treated
-# as a destination URL (spliced into aws-vault's sign-in URL via
-# --path/--region in the normal flow, passed through unchanged with
-# --no-signin). Otherwise it's passed to `aws-vault login --path`.
-# Omit to open the plain console home.
+# --no-signin: skip the federated sign-in and open the URL directly in the
+#   container. Use when you know the container already has a valid AWS session,
+#   to avoid signing out other tabs in the same container.
+#
+# How it fits together:
+#   1. `aws configure export-credentials` resolves the profile through the
+#      normal CLI chain (source_profile -> capra-auth's credential_process), so
+#      the MFA'd session is reused and no `aws-vault exec` is involved.
+#   2. `granted console --url --firefox` turns those credentials into a
+#      federated sign-in URL wrapped in an ext+granted-containers: URL.
+#   3. `open -a Firefox` hands it to the Granted Firefox add-on, which opens it
+#      in a container named after the profile.
+# Needs the Granted add-on in Firefox:
+#   https://addons.mozilla.org/firefox/addon/granted/
 set -euo pipefail
 
-# Outside the interactive shell AWS_VAULT_KEYCHAIN_NAME is unset.
-# Without it aws-vault uses the default `aws-vault` keychain and can't see
-# the MFA'd capra-auth session cached in the `login` keychain, so it would
-# prompt for MFA every time. Pin the keychain to match the interactive shell.
-export AWS_VAULT_KEYCHAIN_NAME="login"
-
-# Run "$@", showing a gum spinner for its duration, and print what it wrote
-# to stdout. `gum spin` swallows the wrapped command's stdout itself (that's
-# how it keeps the spinner clean), so the command is redirected to a temp
-# file instead and that file is what we emit — keeps `$(spin ... )` usable
-# as a normal command-substitution from the call site.
-spin() {
-  local title="$1"
-  shift
-  local out
-  out="$(mktemp)"
-  gum spin --spinner dot --title "$title" \
-    -- env AWS_CONSOLE_SPIN_OUT="$out" bash -c '"$@" > "$AWS_CONSOLE_SPIN_OUT"' _ "$@"
-  cat "$out"
-  rm -f "$out"
+usage() {
+  echo "Usage: $(basename "$0") [--no-signin] <profile> [<service>|<url>]" >&2
+  exit 1
 }
 
 no_signin=0
@@ -43,67 +34,66 @@ if [[ "${1:-}" == "--no-signin" ]]; then
   no_signin=1
   shift
 fi
-
-if [[ $# -lt 1 ]]; then
-  echo "Usage: $(basename "$0") [--no-signin] <profile> [<service>|<url>]" >&2
-  exit 1
-fi
+[[ $# -ge 1 ]] || usage
 
 profile="$1"
 destination="${2:-}"
 
-# Read directly off the config file instead of shelling out to `aws
-# configure get` — it's a single local INI key, no need to pay for a full
+# Read a key straight off the config file instead of shelling out to
+# `aws configure get`: it's a single local INI key, no need to pay for a full
 # AWS CLI process start just to read it.
-color="$(awk -v want="[profile $profile]" -F'=' '
-  /^\[/ { insec = ($0 == want); next }
-  insec && $1 ~ /^[ \t]*color[ \t]*$/ { v=$2; gsub(/^[ \t]+|[ \t]+$/, "", v); print v; exit }
-' "${AWS_CONFIG_FILE:-$HOME/.aws/config}")"
+profile_value() {
+  awk -v want="[profile $profile]" -v key="$1" -F'=' '
+    /^\[/ { insec = ($0 == want); next }
+    insec && $1 ~ "^[ \t]*" key "[ \t]*$" { v=$2; gsub(/^[ \t]+|[ \t]+$/, "", v); print v; exit }
+  ' "${AWS_CONFIG_FILE:-$HOME/.aws/config}"
+}
 
-# aws-vault login needs mfa_serial to do MFA-gated AssumeRole on the
-# target role. We keep mfa_serial out of the target profile so
-# `aws --profile X ...` doesn't trigger its own MFA prompt. MFA token is
-# cached by aws-vault session elsewhere, so no --mfa-token injection here.
-export AWS_MFA_SERIAL="arn:aws:iam::259731000386:mfa/jstr"
+color="$(profile_value color)"
+region="$(profile_value region)"
+
+# Where to land. Regional host plus ?region=, the same shape `aws-vault login`
+# produced, so the console opens in the profile's region.
+if [[ "$destination" =~ ^https?:// ]]; then
+  url="$destination"
+else
+  host="console.aws.amazon.com"
+  query=""
+  if [[ -n "$region" ]]; then
+    host="$region.$host"
+    query="?region=$region"
+  fi
+  if [[ -z "$destination" ]]; then
+    path="console/home"
+  else
+    path="${destination#/}"
+    [[ "$path" == */* ]] || path="$path/home"
+  fi
+  url="https://$host/$path$query"
+fi
 
 if [[ $no_signin -eq 1 ]]; then
-  if [[ -z "$destination" ]]; then
-    login_url="https://console.aws.amazon.com/"
-  elif [[ "$destination" =~ ^https?:// ]]; then
-    login_url="$destination"
-  else
-    login_url="https://console.aws.amazon.com/${destination}/home"
-  fi
-elif [[ "$destination" =~ ^https?:// ]]; then
-  # aws-vault login doesn't accept a full URL as Destination; mint a
-  # generic sign-in URL then splice the original URL in via Python.
-  signin="$(spin "Signing in to '$profile'…" aws-vault login --stdout "$profile")"
-  encoded="$(python3 -c 'import sys, urllib.parse; print(urllib.parse.quote(sys.argv[1], safe=""))' "$destination")"
-  login_url="$(printf '%s' "$signin" | python3 -c '
-import re, sys
-signin = sys.stdin.read()
-encoded = sys.argv[1]
-sys.stdout.write(re.sub(r"Destination=[^&]+", "Destination=" + encoded, signin, count=1))
-' "$encoded")"
-elif [[ -n "$destination" ]]; then
-  # Service name, e.g. "cloudformation" or "ec2/v2". aws-vault's --path
-  # becomes the Destination path directly, so append /home if the caller
-  # didn't already include a sub-path, to match the canonical AWS
-  # console URL shape (otherwise the console shows a 404).
-  path="${destination#/}"
-  if [[ "$path" != */* ]]; then
-    path="${path}/home"
-  fi
-  login_url="$(spin "Signing in to '$profile'…" aws-vault login --stdout --path "$path" "$profile")"
-else
-  login_url="$(spin "Signing in to '$profile'…" aws-vault login --stdout "$profile")"
+  args=(firefox-container)
+  [[ -n "$color" ]] && args+=("--$color")
+  exec "${args[@]}" --name "$profile" "$url"
 fi
 
-args=(firefox-container)
-if [[ -n "$color" ]]; then
-  args+=("--${color}")
-fi
-args+=(--name "$profile" "$login_url")
+creds="$(aws configure export-credentials --profile "$profile" --format env-no-export)"
 
-gum style --foreground 212 "Opening browser for '$profile'…" >&2
-exec "${args[@]}"
+granted_args=(console --url --firefox --container-name "$profile" --destination "$url")
+[[ -n "$color" ]] && granted_args+=(--color "$color")
+[[ -n "$region" ]] && granted_args+=(--region "$region")
+
+# Export inside a subshell so the credentials reach granted without ever being
+# on a command line (visible in `ps`) or in this shell's environment.
+login_url="$(
+  while IFS= read -r line; do
+    export "$line"
+  done <<<"$creds"
+  granted "${granted_args[@]}"
+)"
+
+echo "Opening console for '$profile'…" >&2
+# Go through LaunchServices: a Firefox exec'd directly from a Rex pane can't
+# reach the running instance and starts a broken second one.
+exec open -a "${FIREFOX_APP:-Firefox}" "$login_url"

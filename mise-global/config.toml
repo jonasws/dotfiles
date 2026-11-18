@@ -12,6 +12,9 @@ fnox = "latest"
 fzf = "latest"
 github-cli = "latest"
 aws-vault = "latest"
+# AWS console sign-in URLs and Firefox containers (utils/aws-console). Resolves
+# to aqua:fwdcloudsec/granted, which also ships `assume`; only `granted` is used.
+granted = "latest"
 "github:aws-cloudformation/rain" = "latest"
 gum = "latest"
 "github:control-theory/gonzo" = "latest"
