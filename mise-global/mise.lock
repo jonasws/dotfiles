@@ -508,14 +508,14 @@ url = "https://github.com/riii111/sabiql/releases/download/v3.0.3/sabiql-aarch64
 url_api = "https://api.github.com/repos/riii111/sabiql/releases/assets/737339580"
 
 [[tools."github:smarzban/tsk"]]
-version = "0.13.0"
+version = "0.14.1"
 backend = "github:smarzban/tsk"
 specifiers = ["latest"]
 
 [tools."github:smarzban/tsk"."platforms.macos-arm64"]
-checksum = "sha256:824fd0b5e3a12e2fc8dc7791794d9e809f027f9ea85c3666b040482a9b53af2f"
-url = "https://github.com/smarzban/tsk/releases/download/v0.13.0/tsk-v0.13.0-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/smarzban/tsk/releases/assets/664998681"
+checksum = "sha256:d4181cd56888e3547ff46b8201d019c00c5354ebdb968f006cc44444797735b8"
+url = "https://github.com/smarzban/tsk/releases/download/v0.14.1/tsk-v0.14.1-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/smarzban/tsk/releases/assets/760307805"
 
 [[tools."github:thiagokokada/gh-gfm-preview"]]
 version = "1.4.0"

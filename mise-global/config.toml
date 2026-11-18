@@ -155,6 +155,7 @@ minimum_release_age_excludes = [
   "herdr",
   "hunk",
   "github:agavra/tuicr",
+  "github:smarzban/tsk",
   "github:dmtrKovalenko/fff",
   "github:always-further/nono",
   "aqua:github/github-mcp-server",
