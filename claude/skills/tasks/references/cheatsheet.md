@@ -81,6 +81,24 @@ tuios worktree rm <session>                        # --stash keeps uncommitted w
 `worktree rm` refuses to drop uncommitted work without `--stash`. Removing a
 worktree the user did not ask you to remove is their call.
 
+## tuios ship: from a worktree to a merged change
+
+```sh
+tuios ship commit -s <session> -m 'message'   # commits every change in its worktree, with your signing
+tuios ship merge -s <session>                 # merges the branch into its base in the main checkout
+tuios ship status -s <session> --refresh      # the PR and its checks (uses gh)
+tuios ship push -s <session>                  # pushes the branch
+tuios ship pr -s <session> --draft            # pushes and opens a PR with gh
+```
+
+- `commit` and `merge` are local. A merge that conflicts is undone and the
+  files are listed. Nothing is forced.
+- `push`, `pr` and `status` ask first (`--yes` skips it) and inside a tuios pane
+  need an Inbox approval. `pr` and `status` call `gh`, which has no credentials
+  in the sandbox and is denied in `settings.json`: tell the user the exact
+  command to run, do not try it.
+- tuios adds nothing to the commit message. Keep the no-tool-attribution rule.
+
 ## tuios: leave state for the user
 
 ```sh
