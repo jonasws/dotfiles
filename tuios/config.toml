@@ -678,6 +678,14 @@ type = "shell"
 command = "~/.config/tuios/scripts/toggle-popup.sh run-script-preview 90% 85% -- ~/.config/tuios/scripts/run-script-preview.sh"
 description = "Preview the AWS run_script awaiting permission"
 
+# A sandboxed agent cannot split its own pane; its draft-pane skill asks for
+# this key instead, and the pane opens as yours.
+[[keybindings.command]]
+key = "prefix+alt+e"
+type = "shell"
+command = "~/.config/tuios/scripts/open-agent-draft.sh"
+description = "Open the focused agent's draft in leaf beside it"
+
 [[keybindings.command]]
 key = "prefix+H"
 type = "shell"
