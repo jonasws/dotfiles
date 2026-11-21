@@ -211,6 +211,138 @@ role_arn=arn:aws:iam::590183747434:role/LifligDeveloper
 role_session_name=jstr-cnops-prod-developer
 color=red
 
+; Scoped-down profiles for AI agents and the AWS MCP Server. Each one takes the
+; account's LifligDeveloper session and narrows it with STS
+; GetScopedCredentials (bin/aws-scoped-credentials), so the identity in
+; CloudTrail stays jstr-<account>-developer and only the permissions shrink.
+; The policies are in aws/policies (~/.aws/policies):
+;   -readonly  control-plane metadata only: no writes, no log events, objects,
+;              items, parameter or secret values, Lambda or ECS environments
+;   -agent     the developer role minus IAM writes, role assumption, secret
+;              values and the common deletes
+; The scoped credentials expire with the developer session (1h, role chaining).
+; Needs aws-cli >= 2.41.2 and sts:GetScopedCredentials on LifligDeveloper.
+
+[profile cn-cx-build-readonly]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-cx-build-developer --policy readonly --description aws-mcp-readonly
+color=blue
+
+[profile cn-cx-build-agent]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-cx-build-developer --policy agent --description aws-mcp-agent
+color=blue
+
+[profile cn-cx-dev-readonly]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-cx-dev-developer --policy readonly --description aws-mcp-readonly
+color=pink
+
+[profile cn-cx-dev-agent]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-cx-dev-developer --policy agent --description aws-mcp-agent
+color=pink
+
+[profile cn-cx-staging-readonly]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-cx-staging-developer --policy readonly --description aws-mcp-readonly
+color=green
+
+[profile cn-cx-staging-agent]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-cx-staging-developer --policy agent --description aws-mcp-agent
+color=green
+
+[profile cn-cx-prod-readonly]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-cx-prod-developer --policy readonly --description aws-mcp-readonly
+color=red
+
+[profile cn-cx-prod-agent]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-cx-prod-developer --policy agent --description aws-mcp-agent
+color=red
+
+[profile cn-terminal-build-readonly]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-terminal-build-developer --policy readonly --description aws-mcp-readonly
+color=blue
+
+[profile cn-terminal-build-agent]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-terminal-build-developer --policy agent --description aws-mcp-agent
+color=blue
+
+[profile cn-terminal-dev-readonly]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-terminal-dev-developer --policy readonly --description aws-mcp-readonly
+color=pink
+
+[profile cn-terminal-dev-agent]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-terminal-dev-developer --policy agent --description aws-mcp-agent
+color=pink
+
+[profile cn-terminal-staging-readonly]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-terminal-staging-developer --policy readonly --description aws-mcp-readonly
+color=green
+
+[profile cn-terminal-staging-agent]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-terminal-staging-developer --policy agent --description aws-mcp-agent
+color=green
+
+[profile cn-terminal-prod-readonly]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-terminal-prod-developer --policy readonly --description aws-mcp-readonly
+color=red
+
+[profile cn-terminal-prod-agent]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cn-terminal-prod-developer --policy agent --description aws-mcp-agent
+color=red
+
+[profile cnops-build-readonly]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cnops-build-developer --policy readonly --description aws-mcp-readonly
+color=blue
+
+[profile cnops-build-agent]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cnops-build-developer --policy agent --description aws-mcp-agent
+color=blue
+
+[profile cnops-dev-readonly]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cnops-dev-developer --policy readonly --description aws-mcp-readonly
+color=pink
+
+[profile cnops-dev-agent]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cnops-dev-developer --policy agent --description aws-mcp-agent
+color=pink
+
+[profile cnops-staging-readonly]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cnops-staging-developer --policy readonly --description aws-mcp-readonly
+color=green
+
+[profile cnops-staging-agent]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cnops-staging-developer --policy agent --description aws-mcp-agent
+color=green
+
+[profile cnops-prod-readonly]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cnops-prod-developer --policy readonly --description aws-mcp-readonly
+color=red
+
+[profile cnops-prod-agent]
+region=eu-west-1
+credential_process=aws-scoped-credentials --profile cnops-prod-developer --policy agent --description aws-mcp-agent
+color=red
+
 # [profile europris-dtp-build-admin]
 # region=eu-west-1
 # source_profile=capra-auth

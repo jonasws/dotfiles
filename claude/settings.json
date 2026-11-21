@@ -312,7 +312,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "python3 -I \"$HOME/.claude/hooks/run-script-guard.py\"",
+            "command": "python3 -I \"$HOME/.claude/hooks/aws-mcp-guard.py\"",
             "timeout": 5
           }
         ]

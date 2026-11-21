@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Show the AWS run_script that an agent's permission prompt is asking about,
-# read-only in nvim. run-script-guard.py saves each script it asks about as
+# read-only in nvim. aws-mcp-guard.py saves each script it asks about as
 # ~/.cache/claude/run-script/<pane id>.py; this opens the one for the pane the
 # key was pressed in, or the newest one when that pane has none.
 set -euo pipefail

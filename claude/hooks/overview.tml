@@ -24,11 +24,11 @@
           "why": "no python3 -c, node -e, heredoc code"
         },
         {
-          "hook": "run-script-guard",
+          "hook": "aws-mcp-guard",
           "on": "mcp__aws__*",
           "gives": "allow / ask",
           "fail": "ask",
-          "why": "boto3 reads ok, mutations ask"
+          "why": "readonly-scoped profile ok, others ask"
         },
         {
           "hook": "repl-lint",
@@ -194,7 +194,7 @@
         },
         {
           "what": "Bash(aws *), aws-vault, awslogs",
-          "why": "AWS only via MCP + run-script-guard"
+          "why": "AWS only via MCP + aws-mcp-guard"
         },
         {
           "what": "fnox get / export, op read / inject",

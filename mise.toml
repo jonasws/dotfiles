@@ -592,4 +592,5 @@ mode = "symlink"
 [dotfiles]
 "~/.local/bin/wrapped" = { source = "fnox/wrapped", mode = "symlink" }
 "~/.local/bin/resign-commits" = { source = "bin/resign-commits", mode = "symlink" }
+"~/.local/bin/aws-scoped-credentials" = { source = "bin/aws-scoped-credentials", mode = "symlink" }
 "~/.config/herdr-automatic-rename" = { source = "herdr/automatic-rename", mode = "symlink" }

@@ -118,6 +118,17 @@ account is in [fnox/README.md](fnox/README.md); in short:
   (`granted console`) builds the sign-in URL, and its Firefox add-on opens the
   container. aws-vault is no longer involved, so there is no extra MFA prompt.
   The `color` key in `aws/config` sets the container colour.
+- `<account>-<env>-readonly` and `-agent` profiles in [`aws/config`](aws/config)
+  narrow the developer role's session with STS GetScopedCredentials, through
+  [`bin/aws-scoped-credentials`](bin/aws-scoped-credentials) and the policies
+  in [`aws/policies/`](aws/policies). The identity in CloudTrail stays the
+  developer session. `-readonly` allows control-plane reads only; `-agent` is
+  the developer role minus IAM writes, role assumption, secret values and the
+  common deletes. The AWS MCP Server (`aws` in
+  [`claude/mcp-servers.json`](claude/mcp-servers.json)) signs with these
+  profiles only, a `-readonly` one by default, and `aws-mcp-guard.py` lets
+  `run_script` run without asking on those. Needs aws-cli 2.41.2 or later and
+  `sts:GetScopedCredentials` on the role.
 - Claude Code asks before every `aws` and `fnox exec` call
   (`claude/settings.json`), and tuios marks the destructive ones
   ([tuios/README.md](tuios/README.md#agents)).
@@ -136,7 +147,7 @@ allows, asks about or denies. Its counts are kept by hand.
 | `pane-control-guard.py` | ask | Pane control through tuios or herdr: reading, typing, launching, closing. It is the only gate for these: settings has no tuios or herdr ask rules. A `tuios split-window` or `new-window` that only opens a viewer after `--` passes. The viewers are pagers (`leaf`, `less`, `bat`, `cat`), log viewers (`lnav`, `gonzo`, `tspin`, `hl`), JSON viewers (`fx` with one file, `otree`) and `nvim -R`. Each passes only with its own allow-listed flags, so flags that run commands, send data out or write files still ask. |
 | `help-allow.py` | allow, ask | Allows commands that are only `--help`, `-h`, `--version` or `help` (rules in `help_only.py`). It asks for every other `twg` command, in place of a `Bash(twg:*)` rule that would also catch `twg … --help`. |
 | `inline-script-guard.py` | deny | No `python3 -c`, `node -e` or heredoc programs. |
-| `run-script-guard.py` | allow, ask | AWS MCP scripts: boto3 reads pass, mutations ask. |
+| `aws-mcp-guard.py` | allow, ask | AWS MCP scripts: run without asking on a profile scoped read-only by `aws-scoped-credentials`, ask on any other profile. IAM enforces the scope, so the hook does not read the script. |
 | `repl-lint.sh` | deny | Lints REPL scripts with ast-grep. |
 | `researcher-bash-guard.py` | deny | The `researcher` agent runs only find-docs commands. |
 

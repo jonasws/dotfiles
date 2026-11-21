@@ -5,6 +5,14 @@
     "args": ["mcp"],
     "env": {}
   },
+  "aws": {
+    "type": "stdio",
+    "command": "uvx",
+    "args": ["mcp-proxy-for-aws@1.8.0", "https://aws-mcp.eu-central-1.api.aws/mcp", "--metadata", "AWS_REGION=eu-west-1"],
+    "env": {
+      "AWS_MCP_PROXY_PROFILES": "cn-cx-dev-readonly cn-cx-build-readonly cn-cx-staging-readonly cn-cx-prod-readonly cn-terminal-dev-readonly cn-terminal-build-readonly cn-terminal-staging-readonly cn-terminal-prod-readonly cnops-dev-readonly cnops-build-readonly cnops-staging-readonly cnops-prod-readonly cn-cx-dev-agent cn-cx-build-agent cn-cx-staging-agent cn-cx-prod-agent cn-terminal-dev-agent cn-terminal-build-agent cn-terminal-staging-agent cn-terminal-prod-agent cnops-dev-agent cnops-build-agent cnops-staging-agent cnops-prod-agent"
+    }
+  },
   "aws-knowledge": {
     "type": "http",
     "url": "https://knowledge-mcp.global.api.aws"
