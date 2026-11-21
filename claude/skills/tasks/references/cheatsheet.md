@@ -94,9 +94,9 @@ tuios ship pr -s <session> --draft            # pushes and opens a PR with gh
 - `commit` and `merge` are local. A merge that conflicts is undone and the
   files are listed. Nothing is forced.
 - `push`, `pr` and `status` ask first (`--yes` skips it) and inside a tuios pane
-  need an Inbox approval. `pr` and `status` call `gh`, which has no credentials
-  in the sandbox and is denied in `settings.json`: tell the user the exact
-  command to run, do not try it.
+  need an Inbox approval. `push` and `pr` change the remote, which is the
+  user's to do, and `status` calls `gh`, which cannot read private repos:
+  tell the user the exact command to run, do not try it.
 - tuios adds nothing to the commit message. Keep the no-tool-attribution rule.
 
 ## tuios: leave state for the user

@@ -10,8 +10,7 @@
 #
 # `libs` prints the top five candidates as TSV: id, title, totalSnippets,
 # trustScore, benchmarkScore, and up to five indexed versions. The key comes
-# from CONTEXT7_API_KEY, which a SessionStart hook (claude/hooks/context7-env.sh)
-# puts into every Bash command of a session.
+# from CONTEXT7_API_KEY in the environment.
 #
 # -sS drops the progress meter but still prints a one-line reason when the
 # connection fails (plain -s exits 6 silently, which reads like an empty
@@ -30,7 +29,7 @@ kind=$1
 shift
 
 if [[ -z ${CONTEXT7_API_KEY:-} ]]; then
-  echo 'context7: CONTEXT7_API_KEY is empty; the SessionStart hook did not resolve it' >&2
+  echo 'context7: CONTEXT7_API_KEY is empty; the key is missing from the environment' >&2
   exit 1
 fi
 

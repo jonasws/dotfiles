@@ -69,7 +69,7 @@ How to delegate:
 
 ## Context7 — library and framework documentation
 
-Context7 is three GET endpoints on `context7.com`, called through the skill's `context7.sh` (`~/.claude/skills/find-docs/context7.sh`): `search`, `libs` or `context`, then one `<name>=<value>` argument per parameter, quoted when it has spaces. It wraps curl with flags that keep failures readable and silence the noise, and adds the key: every Bash command in a session carries `CONTEXT7_API_KEY`, which a SessionStart hook (`claude/hooks/context7-env.sh`) fetches from fnox, so requests authenticate inside the sandbox too. In a sandboxed session, name `context7.com` on the command. The `researcher` subagent can run Context7 only this way.
+Context7 is three GET endpoints on `context7.com`, called through the skill's `context7.sh` (`~/.claude/skills/find-docs/context7.sh`): `search`, `libs` or `context`, then one `<name>=<value>` argument per parameter, quoted when it has spaces. It wraps curl with flags that keep failures readable and silence the noise, and adds the key from `CONTEXT7_API_KEY`, which the environment already holds. The `researcher` subagent can run Context7 only this way.
 
 Two ways in, and the first match in this table decides. Count calls against the backend budget of about three: search is one call, resolving a library and then querying it is two, and each query on an ID you already hold is one.
 
@@ -108,7 +108,7 @@ Queries that do not depend on each other, such as the topics of a split question
 
 Answer from what came back: use the docs' own code snippets over code written from memory, and adapt them rather than rewriting them.
 
-**Errors** come back as JSON with `error` and `message`. `429` means the monthly quota is exhausted: say so, and if `CONTEXT7_API_KEY` is empty in the session, say the hook did not resolve it. Then answer from training knowledge *and mark which parts those are*. Silently degrading to memory is the failure mode that misleads. `401` means a bad key; `503` is a transient search failure worth one retry.
+**Errors** come back as JSON with `error` and `message`. `429` means the monthly quota is exhausted: say so, and if `CONTEXT7_API_KEY` is empty, say the key is missing from the environment. Then answer from training knowledge *and mark which parts those are*. Silently degrading to memory is the failure mode that misleads. `401` means a bad key; `503` is a transient search failure worth one retry.
 
 ## aws-knowledge MCP — anything AWS
 

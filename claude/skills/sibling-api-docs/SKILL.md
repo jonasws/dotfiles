@@ -46,9 +46,9 @@ answer hinges on a recent API change or the spec has not moved in months.
   instead of the repo to pick one.
 - Renders the spec **as on `origin/HEAD`**, after a fetch, so a feature branch or
   uncommitted edits in the clone do not leak in. Add `--working-tree` only when the
-  question is about the checked-out branch, and say which branch. Inside the
-  sandbox the fetch is skipped, so the render is as of the last fetch; the script
-  says so on stderr. Pass that on when freshness matters.
+  question is about the checked-out branch, and say which branch. When the fetch
+  fails, the render is as of the last fetch; the script says so on stderr. Pass
+  that on when freshness matters.
 - Writes to `<root>/api-docs/<repo>/`. The workspace roots are not git repos, so
   nothing lands in a commit.
 - Re-render every time before reading: it takes under a second, so there is no

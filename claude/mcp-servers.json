@@ -19,8 +19,8 @@
   },
   "exa": {
     "type": "stdio",
-    "command": "$HOME/.local/bin/wrapped/exa-mcp-server",
-    "args": [],
+    "command": "mise",
+    "args": ["exec", "npm:exa-mcp-server", "--", "exa-mcp-server"],
     "env": {
       "ENABLED_TOOLS": "web_search_exa,web_fetch_exa,web_search_advanced_exa,agent_run"
     }
@@ -33,8 +33,8 @@
   },
   "github": {
     "type": "stdio",
-    "command": "$HOME/.local/bin/wrapped/github-mcp-server",
-    "args": ["stdio"],
+    "command": "mise",
+    "args": ["exec", "aqua:github/github-mcp-server", "--", "github-mcp-server", "stdio", "--read-only", "--toolsets=default,actions"],
     "env": {}
   },
   "journey": {

@@ -39,3 +39,13 @@ EOF
   echo "DOCKER_CONFIG=$dir"
   echo "DOCKER_AUTH_CONFIG={\"auths\":$auths}"
 } >>"$NONO_ENV_FILE"
+
+# Which tuios pane and repo this nono session belongs to. nono's approval
+# requests carry the session id but no process, and the approval bridge
+# (nono/approvals/bridge.py) asks in the agent's own pane from this record.
+sessions="$HOME/.local/state/nono-agent/sessions"
+mkdir -p "$sessions"
+workdir="${NONO_WORKDIR:-$PWD}"
+repo="$(basename "$(git -C "$workdir" rev-parse --show-toplevel 2>/dev/null || echo "$workdir")")"
+printf '{"pane":"%s","tuios_session":"%s","repo":"%s"}\n' \
+  "${TUIOS_PANE_ID:-}" "${TUIOS_SESSION:-}" "$repo" >"$sessions/$NONO_SESSION_ID.json"

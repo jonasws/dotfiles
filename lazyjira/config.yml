@@ -1,7 +1,7 @@
 # lazyjira configuration, linked to ~/.config/lazyjira (LAZYJIRA_CONFIG_DIR).
 # Only non-default values live here; docs/Config.md in textfuel/lazyjira has
-# the rest. Host, email and token come from the wrapper in ~/.local/bin/wrapped,
-# so there is no auth.json.
+# the rest. Host, email and token come from the `lazyjira` fish function
+# (fnox), so there is no auth.json.
 jira:
   serverType: cloud
 

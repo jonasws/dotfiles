@@ -20,8 +20,7 @@ cache="${XDG_CACHE_HOME:-$HOME/.cache}/tv-jira"
 stale_after=20
 fields=summary,status,assignee,reporter,parent,issuetype,priority,labels,created,updated,description
 
-# One fnox request for every value, as fnox-secret makes it, so the daemon
-# answers from the same warm cache. The export runs in a subshell and only the
+# One fnox request for every value, so the daemon answers from one warm cache. The export runs in a subshell and only the
 # four values leave it.
 creds() {
   local out

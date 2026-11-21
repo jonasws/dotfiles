@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- nono's approval webhook, answered in tuios (nono/approvals/bridge.py).
+     Linked into ~/Library/LaunchAgents by the nono-launchd dotfile group; load
+     it with `mise -C ~/dotfiles run sync:nono-approvals`. It must run outside
+     every tuios pane: only such a caller may ask on behalf of an agent's pane.
+     launchd expands no ~ or $HOME, hence the absolute paths. -->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.jonasws.nono-approvals</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/python3</string>
+		<string>-I</string>
+		<string>/Users/jonasws/dotfiles/nono/approvals/bridge.py</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>ThrottleInterval</key>
+	<integer>10</integer>
+	<key>StandardOutPath</key>
+	<string>/Users/jonasws/.local/state/nono-approvals/bridge.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/jonasws/.local/state/nono-approvals/bridge.log</string>
+</dict>
+</plist>

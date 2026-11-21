@@ -1,8 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Passwords come from fnox: ~/.local/bin/wrapped/mvn runs Maven under `fnox exec`,
-  which injects LIFLIG_GITHUB_PAT and NEXUS_PASSWORD. Both usernames are the login
-  name, so nothing personal or secret is stored here.
+  Passwords come from the environment. In your shells the `mvn` alias (mise
+  shell_alias) runs Maven under `fnox exec`, which injects LIFLIG_GITHUB_PAT and
+  NEXUS_PASSWORD; for agents, nono sets both to placeholders its proxy swaps
+  for the real values. Both usernames are the login name, so nothing personal
+  or secret is stored here.
 
   repositoryOrigins (Maven 3.10+) binds each server's credentials to its host. The
   repositories are declared in project POMs, which Maven reads after it scopes

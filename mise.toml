@@ -255,19 +255,52 @@ description = "Copy the agents' brokered credentials from fnox into the keychain
 # read:packages only, which fnox does not hold; pass it as NONO_GITHUB_PACKAGES.
 run = """
 set -eu
-secret="$HOME/.local/bin/wrapped/fnox-secret"
 put() { security add-generic-password -U -s nono -a "$1" -w "$2"; echo "nono/$1 stored"; }
-pat="$("$secret" GITHUB_PERSONAL_ACCESS_TOKEN)"
+pat="$(fnox get GITHUB_PERSONAL_ACCESS_TOKEN)"
 put github_pat_basic "x-access-token:$pat"
-put github_public "$("$secret" MISE_GITHUB_TOKEN)"
-put nexus_basic "$(id -un):$("$secret" NEXUS_PASSWORD)"
-put context7 "$("$secret" CONTEXT7_API_KEY)"
-put exa "$("$secret" EXA_API_KEY)"
+put github_public "$(fnox get MISE_GITHUB_TOKEN)"
+put nexus_basic "$(id -un):$(fnox get NEXUS_PASSWORD)"
+put context7 "$(fnox get CONTEXT7_API_KEY)"
+put exa "$(fnox get EXA_API_KEY)"
 if [ -n "${NONO_GITHUB_PACKAGES:-}" ]; then
   put github_packages "$NONO_GITHUB_PACKAGES"
 else
   echo "nono/github_packages not changed: set NONO_GITHUB_PACKAGES to a read:packages PAT"
 fi
+"""
+
+[tasks."nono:java-truststore"]
+description = "Build the JDK truststore that lets Maven in nono trust nono's CA"
+# The liflig-agent profile keeps one CA (CN=nono-proxy-ca) in your macOS trust
+# store for a year (tls_intercept.ca_lifecycle = "trusted"). The JVM reads
+# neither that store nor SSL_CERT_FILE, so MAVEN_OPTS points it at a copy of the
+# JDK's roots with that CA added. A short nono run creates the CA the first
+# time (a Touch ID prompt). Run again when nono rotates it, once a year.
+run = """
+set -eu
+nono run --profile liflig-agent -- true
+work="$(mktemp -d)"
+security find-certificate -c nono-proxy-ca -p >"$work/ca.pem"
+java_home="$(mise where java)"
+keytool -importkeystore -noprompt \
+  -srckeystore "$java_home/lib/security/cacerts" -srcstorepass changeit \
+  -destkeystore "$work/truststore.p12" -deststoretype PKCS12 -deststorepass changeit >/dev/null
+keytool -importcert -noprompt -alias nono-proxy-ca -file "$work/ca.pem" \
+  -keystore "$work/truststore.p12" -storepass changeit
+mkdir -p "$HOME/.local/share/nono-agent"
+mv "$work/truststore.p12" "$HOME/.local/share/nono-agent/java-truststore.p12"
+echo "truststore: $HOME/.local/share/nono-agent/java-truststore.p12"
+"""
+
+[tasks."sync:nono-approvals"]
+description = "(Re)load the LaunchAgent that answers nono's approval requests in tuios"
+run = """
+set -euo pipefail
+plist="$HOME/Library/LaunchAgents/com.jonasws.nono-approvals.plist"
+[[ -e $plist ]] || { echo "$plist is missing: run 'mise dotfiles apply' first" >&2; exit 1; }
+mkdir -p "$HOME/.local/state/nono-approvals"
+launchctl bootout "gui/$(id -u)" "$plist" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$plist"
 """
 
 [tasks."lima:agents"]
@@ -447,7 +480,7 @@ mode = "symlink-each"
 [dotfile_groups.fnox]
 root = "fnox"
 target = "~/.config/fnox"
-exclude = ["README.md", "wrapped"]
+exclude = ["README.md"]
 
 [dotfile_groups.fnox-trees]
 root = "fnox-trees"
@@ -553,6 +586,13 @@ exclude = ["README.md", "herdr/test", "launchd"]
 root = "rex/launchd"
 target = "~/Library/LaunchAgents"
 
+# The bridge that answers nono's approval requests in tuios; see
+# nono/approvals/bridge.py.
+[dotfile_groups.nono-launchd]
+root = "nono/approvals"
+target = "~/Library/LaunchAgents"
+exclude = ["bridge.py"]
+
 [dotfile_groups.ripgrep]
 root = "ripgrep"
 dot_prefix = true
@@ -632,7 +672,6 @@ mode = "symlink"
 
 # Directories that sit beside a group's target rather than inside it.
 [dotfiles]
-"~/.local/bin/wrapped" = { source = "fnox/wrapped", mode = "symlink" }
 "~/.local/bin/resign-commits" = { source = "bin/resign-commits", mode = "symlink" }
 "~/.local/bin/aws-scoped-credentials" = { source = "bin/aws-scoped-credentials", mode = "symlink" }
 "~/.config/herdr-automatic-rename" = { source = "herdr/automatic-rename", mode = "symlink" }

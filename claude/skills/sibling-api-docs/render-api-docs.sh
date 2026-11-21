@@ -84,13 +84,7 @@ else
     ref=${ref/\(\)/(detached HEAD)}
     changed=$(spec_changed "$repo_dir" HEAD "$rel" "$spec")
   else
-    # The Claude Code sandbox points TMPDIR at /tmp/claude-<uid> and blocks
-    # writes to a sibling clone's .git, so a fetch there can only fail.
-    if [[ ${TMPDIR:-} == @(/private|)/tmp/claude-* ]]; then
-      echo "sandboxed: skipping fetch; using origin/HEAD as last fetched" >&2
-    else
-      GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND="ssh -o BatchMode=yes" git -C "$repo_dir" fetch --quiet origin 2>/dev/null || echo "fetch failed; using origin/HEAD as last fetched" >&2
-    fi
+    GIT_TERMINAL_PROMPT=0 GIT_SSH_COMMAND="ssh -o BatchMode=yes" git -C "$repo_dir" fetch --quiet origin 2>/dev/null || echo "fetch failed; using origin/HEAD as last fetched" >&2
     spec="$specs_dir/$name.${rel##*.}"
     if git -C "$repo_dir" show "origin/HEAD:$rel" >"$spec" 2>/dev/null; then
       ref="origin/HEAD $(git -C "$repo_dir" log -1 --format='%h %cr' origin/HEAD)"

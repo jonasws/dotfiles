@@ -1,9 +1,12 @@
 {
   "$schema": "https://raw.githubusercontent.com/nolabs-ai/nono/refs/heads/main/crates/nono-cli/data/nono-profile.schema.json",
-  "extends": ["nolabs-ai/claude", "liflig-aws"],
+  "extends": [
+    "nolabs-ai/claude",
+    "liflig-aws"
+  ],
   "meta": {
     "name": "liflig-agent",
-    "description": "Claude Code for the Liflig/Vy repos: workspaces, mise, Maven, Docker (Lima), tuios, and brokered GitHub, Nexus, Context7, Exa and read-only AWS. No credential of yours in the sandbox."
+    "description": "Claude Code for the Liflig/Vy repos: workspaces, mise, Maven, Docker (Lima), tuios, and brokered GitHub, Nexus, Context7, Exa and read-only AWS. No credential of yours in the sandbox; unknown hosts are asked in tuios."
   },
   "security": {
     "signal_mode": "allow_same_sandbox",
@@ -55,6 +58,7 @@
       "~/.agents/skills",
       "~/Library/Caches/ms-playwright",
       "~/.local/state/nono-agent",
+      "~/.local/share/nono-agent",
       "~/.docker/cli-plugins"
     ],
     "read_file": [
@@ -91,10 +95,46 @@
     ]
   },
   "network": {
-    "allow_domain": ["*"],
+    "allow_domain": [
+      "codeload.github.com",
+      "objects.githubusercontent.com",
+      "release-assets.githubusercontent.com",
+      "github-releases.githubusercontent.com",
+      "ghcr.io",
+      "pkg-containers.githubusercontent.com",
+      "repo.maven.apache.org",
+      "repo1.maven.org",
+      "registry.npmjs.org",
+      "pypi.org",
+      "files.pythonhosted.org",
+      "huggingface.co",
+      "cdn-lfs.huggingface.co",
+      "*.hf.co",
+      "mise-versions.jdx.dev",
+      "mise.jdx.dev",
+      "api.adoptium.net",
+      "knowledge-mcp.global.api.aws",
+      "www.superlogical.com",
+      "ruteplan-mcp.trafficinfo.vydev.io"
+    ],
+    "approval_backends": {
+      "tuios": {
+        "type": "webhook",
+        "url": "unix:///Users/jonasws/.local/state/nono-approvals/approval.sock",
+        "timeout_secs": 300
+      }
+    },
+    "approval_defaults": {
+      "backend": "tuios"
+    },
+    "tls_intercept": {
+      "ca_lifecycle": "trusted",
+      "ca_validity": "365d"
+    },
     "credentials": [
       "github_git",
       "github_api",
+      "github_raw",
       "maven_github",
       "nexus",
       "context7",
@@ -105,18 +145,33 @@
         "upstream": "https://github.com",
         "credential_key": "github_pat_basic",
         "inject_mode": "basic_auth",
-        "env_var": "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "env_var": "GH_TOKEN",
         "phantom_format": "ghp_{}",
         "endpoint_policy": {
           "default": "deny",
           "deny": [
-            { "method": "*", "path": "/*/*/git-receive-pack" }
+            {
+              "method": "*",
+              "path": "/*/*/git-receive-pack"
+            }
           ],
           "allow": [
-            { "method": "GET", "path": "/*/*/info/refs" },
-            { "method": "POST", "path": "/*/*/git-upload-pack" },
-            { "method": "GET", "path": "/*/*/archive/**" },
-            { "method": "GET", "path": "/*/*/releases/download/**" }
+            {
+              "method": "GET",
+              "path": "/*/*/info/refs"
+            },
+            {
+              "method": "POST",
+              "path": "/*/*/git-upload-pack"
+            },
+            {
+              "method": "GET",
+              "path": "/*/*/archive/**"
+            },
+            {
+              "method": "GET",
+              "path": "/*/*/releases/download/**"
+            }
           ]
         }
       },
@@ -125,14 +180,44 @@
         "credential_key": "github_public",
         "inject_header": "Authorization",
         "credential_format": "token {}",
-        "env_var": "MISE_GITHUB_TOKEN",
+        "env_var": "GITHUB_PERSONAL_ACCESS_TOKEN",
         "phantom_format": "ghp_{}",
         "endpoint_policy": {
           "default": "deny",
           "allow": [
-            { "method": "GET", "path": "/**" },
-            { "method": "HEAD", "path": "/**" },
-            { "method": "POST", "path": "/graphql" }
+            {
+              "method": "GET",
+              "path": "/**"
+            },
+            {
+              "method": "HEAD",
+              "path": "/**"
+            },
+            {
+              "method": "POST",
+              "path": "/graphql"
+            }
+          ]
+        }
+      },
+      "github_raw": {
+        "upstream": "https://raw.githubusercontent.com",
+        "credential_key": "github_public",
+        "inject_header": "Authorization",
+        "credential_format": "token {}",
+        "env_var": "GITHUB_API_TOKEN",
+        "phantom_format": "ghp_{}",
+        "endpoint_policy": {
+          "default": "deny",
+          "allow": [
+            {
+              "method": "GET",
+              "path": "/**"
+            },
+            {
+              "method": "HEAD",
+              "path": "/**"
+            }
           ]
         }
       },
@@ -144,8 +229,14 @@
         "endpoint_policy": {
           "default": "deny",
           "allow": [
-            { "method": "GET", "path": "/**" },
-            { "method": "HEAD", "path": "/**" }
+            {
+              "method": "GET",
+              "path": "/**"
+            },
+            {
+              "method": "HEAD",
+              "path": "/**"
+            }
           ]
         }
       },
@@ -157,8 +248,14 @@
         "endpoint_policy": {
           "default": "deny",
           "allow": [
-            { "method": "GET", "path": "/**" },
-            { "method": "HEAD", "path": "/**" }
+            {
+              "method": "GET",
+              "path": "/**"
+            },
+            {
+              "method": "HEAD",
+              "path": "/**"
+            }
           ]
         }
       },
@@ -171,8 +268,14 @@
         "endpoint_policy": {
           "default": "deny",
           "allow": [
-            { "method": "GET", "path": "/api/**" },
-            { "method": "GET", "path": "/docs/**" }
+            {
+              "method": "GET",
+              "path": "/api/**"
+            },
+            {
+              "method": "GET",
+              "path": "/docs/**"
+            }
           ]
         }
       },
@@ -184,16 +287,23 @@
         "env_var": "EXA_API_KEY"
       }
     },
-    "open_port": [0],
-    "listen_port_range": [[49152, 65535]]
+    "open_port": [
+      0
+    ],
+    "listen_port_range": [
+      [
+        49152,
+        65535
+      ]
+    ]
   },
   "environment": {
     "deny_vars": [
       "SSH_AUTH_SOCK",
       "OP_*",
       "FNOX_*",
-      "GH_TOKEN",
       "GITHUB_TOKEN",
+      "MISE_GITHUB_TOKEN",
       "DOCKER_CONTEXT"
     ],
     "set_vars": {
@@ -211,7 +321,8 @@
       "UV_PYTHON_INSTALL_DIR": "$HOME/.cache/agents/uv-python",
       "UV_TOOL_DIR": "$HOME/.cache/agents/uv-tools",
       "GRADLE_USER_HOME": "$HOME/.cache/agents/gradle",
-      "MAVEN_ARGS": "-Dmaven.repo.local=$HOME/.m2/repository-agents -Dmaven.repo.local.tail=$HOME/.m2/repository",
+      "MAVEN_ARGS": "-ntp -Dkotlin.compiler.daemon=false -Daether.remoteRepositoryFilter.prefixes.resolvePrefixFiles.github=false -Daether.remoteRepositoryFilter.prefixes.resolvePrefixFiles.flyway-community-db-support=false --global-settings $HOME/.config/nono/maven/proxy-settings.xml -Dmaven.repo.local=$HOME/.m2/repository-agents -Dmaven.repo.local.tail=$HOME/.m2/repository",
+      "MAVEN_OPTS": "-Xms512m -Xmx2g -XX:+ExitOnOutOfMemoryError --enable-native-access=ALL-UNNAMED -Djavax.net.ssl.trustStore=$HOME/.local/share/nono-agent/java-truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=PKCS12",
       "DOCKER_HOST": "unix://$HOME/.lima/agents/sock/docker.sock",
       "TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE": "/run/user/501/docker.sock",
       "TESTCONTAINERS_HOST_OVERRIDE": "127.0.0.1"

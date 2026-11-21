@@ -69,10 +69,9 @@ to open.
      `read,write` silently loses pane navigation.
    - leaf is the pane's only program, so quitting it (`q`) closes the pane.
 
-   **In a sandboxed agent's pane** (`ccn`, grants `read,write`), `split-window`
-   answers `forbidden`: a new pane would run outside the sandbox, so only
-   `admin` panes may start one. Show the draft as a TML surface instead, which
-   needs only `write` and starts no process:
+   **When `split-window` answers `forbidden`**, your pane lacks tuios's `admin`
+   grant, which starting a pane needs. Show the draft as a TML surface instead,
+   which needs only `write` and starts no process:
 
    ```bash
    esc() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' "$1"; }

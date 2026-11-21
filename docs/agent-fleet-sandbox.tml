@@ -16,9 +16,9 @@
         {"k": "Read-only", "v": "~/dotfiles, ~/.m2/repository, your mise installs, atuin history"},
         {"k": "Denied", "v": "fnox config and state, atuin key, twg auth, herdr and Rex sockets"},
         {"k": "Unix sockets", "v": "tuios socket dir, Lima docker socket, atuin daemon"},
-        {"k": "Network", "v": "proxy, any host (plain tunnel), routes intercepted, listen 49152-65535"},
+        {"k": "Network", "v": "allowlist (registries, GitHub, docs MCPs); other hosts asked in tuios"},
         {"k": "Caches", "v": "XDG_CACHE_HOME, npm, uv, pip, Go, cargo, Gradle under ~/.cache/agents"},
-        {"k": "Before hook", "v": "writes the agent's DOCKER_CONFIG with the GHCR pull token"}
+        {"k": "Before hook", "v": "agent DOCKER_CONFIG; records which pane the session belongs to"}
       ],
       "mcp": [
         {"opt": "Hosted MCP, proxy inside, nono signs", "creds": "none", "profiles": "yes", "extra": "none (IAM)", "verdict": "chosen for run_script"},
@@ -42,7 +42,7 @@
       ],
       "tools": [
         {"tool": "mise", "here": "Own data, state, cache; your installs read-only; repo configs trusted by path", "own": "deny_* wraps one command; installs and hooks run outside"},
-        {"tool": "fnox", "here": "fnox-secret returns preset vars, so wrappers work; fnox itself denied", "own": "proxy --sandbox has no Unix socket allow; tuios and Docker unreachable"},
+        {"tool": "fnox", "here": "not used inside: tools read placeholders under their usual variable names", "own": "proxy --sandbox has no Unix socket allow; tuios and Docker unreachable"},
         {"tool": "atuin", "here": "hook talks to the daemon socket; MCP reads history; key denied", "own": "none"},
         {"tool": "tsk", "here": "~/.tsk writable, same board as yours", "own": "none"},
         {"tool": "twg", "here": "auth files denied, so twg cannot authenticate inside", "own": "open item"}
@@ -51,8 +51,8 @@
         {"q": "Outer sandbox", "chosen": "nono", "why": "Unix sockets, SigV4 re-signing, operation policies"},
         {"q": "Secret store", "chosen": "keychain via nono", "why": "no 1Password socket, no Touch ID per agent"},
         {"q": "Maven credentials", "chosen": "placeholders in your settings.xml", "why": "real URLs, hidden tokens, deploy blocked; mvnenc gives the JVM plaintext"},
-        {"q": "Web egress", "chosen": "any host, plain tunnel", "why": "WebFetch, docs and package downloads work; credentialed hosts stay policed"},
-        {"q": "fnox in the sandbox", "chosen": "not needed", "why": "fnox-secret honours preset vars; nono sets them"},
+        {"q": "Web egress", "chosen": "allowlist + ask in tuios", "why": "docs come through Context7, aws-knowledge and Exa; other hosts wait for you"},
+        {"q": "Wrappers", "chosen": "none", "why": "each route sets the variable its tool already reads"},
         {"q": "AWS delivery", "chosen": "nono aws_auth + profiles", "why": "several profiles, nothing usable inside"},
         {"q": "AWS scoping", "chosen": "AssumeRole + session policy", "why": "no sts:GetScopedCredentials grant needed; own session name"},
         {"q": "Docker", "chosen": "one rootless Lima VM", "why": "VM is the boundary; firewall stays enforceable"},
@@ -66,7 +66,7 @@
         {"what": "Approved egress reachable from containers", "note": "the allowlist limits where, not what"},
         {"what": "Classic PATs rotated by hand", "note": "short expiry plus a keychain update"},
         {"what": "Long run_script tasks", "note": "behaviour at session expiry is undocumented"},
-        {"what": "Open web egress", "note": "a path for sending data out; credentialed hosts stay policed"},
+        {"what": "Unknown hosts wait for you", "note": "WebFetch and direct fetches ask in tuios; refusal is final"},
         {"what": "gh on private repos", "note": "gh uses the public-read token; git fetch reaches private repos"},
         {"what": "twg (Jira, Confluence)", "note": "not brokered yet; its auth files stay denied"},
         {"what": "~/dotfiles is read-only", "note": "dotfiles work happens unsandboxed or via you"}
@@ -78,9 +78,9 @@
       ],
       "verify": [
         {"check": "git through nono: 401 challenge, placeholder accepted"},
-        {"check": "mvn -U verify: proxy settings and truststore from the wrapper"},
+        {"check": "mvn -U verify with the static proxy settings and truststore"},
         {"check": "claude --setting-sources project,local loads the ccn settings"},
-        {"check": "mise, gh, github MCP trust nono's CA (--trust-proxy-ca)"},
+        {"check": "mise, gh, github MCP trust nono's trusted CA"},
         {"check": "fff, kotlin-lsp, semble write only where granted"},
         {"check": "aws CLI and boto3 trust AWS_CA_BUNDLE; one call per profile"},
         {"check": "MCP proxy signs via aws-mcp route; s3:GetObject denied"},
@@ -152,7 +152,7 @@
   participant C as claude (sandboxed)
   S-&gt;&gt;S: settings copy without gh/aws denies and Claude's sandbox
   S-&gt;&gt;T: set-pane-grants read,write
-  S-&gt;&gt;N: exec nono run --profile liflig-agent --trust-proxy-ca
+  S-&gt;&gt;N: exec nono run --profile liflig-agent --proxy-port PORT
   N-&gt;&gt;K: read credentials, service nono
   N-&gt;&gt;N: before-hook: agent DOCKER_CONFIG
   N-&gt;&gt;N: start proxy, CA, placeholders
@@ -178,7 +178,7 @@
           <column field="use" title="Used for"/>
           <column field="limit" title="Limited by"/>
         </table>
-        <text role="dim">nono sets SSL_CERT_FILE, GIT_SSL_CAINFO, CURL_CA_BUNDLE, REQUESTS_CA_BUNDLE, NODE_EXTRA_CA_CERTS, AWS_CA_BUNDLE. gh needs --trust-proxy-ca once.</text>
+        <text role="dim">No wrappers: each route sets the variable its tool already reads (GH_TOKEN, GITHUB_PERSONAL_ACCESS_TOKEN, GITHUB_API_TOKEN, LIFLIG_GITHUB_PAT, NEXUS_PASSWORD, CONTEXT7_API_KEY, EXA_API_KEY). nono's CA is trusted in your macOS trust store for a year; nono also sets SSL_CERT_FILE, GIT_SSL_CAINFO, CURL_CA_BUNDLE, NODE_EXTRA_CA_CERTS, AWS_CA_BUNDLE.</text>
       </col>
     </tab>
     <tab id="github" title="GitHub">
@@ -227,8 +227,8 @@
         <kv>
           <item k="settings.xml" v="unchanged: env-var passwords, real repository URLs"/>
           <item k="Placeholders" v="LIFLIG_GITHUB_PAT, NEXUS_PASSWORD set by nono"/>
-          <item k="Proxy" v="the mvn wrapper turns HTTPS_PROXY into --global-settings"/>
-          <item k="CA" v="the mvn wrapper adds nono's session CA to a JDK truststore"/>
+          <item k="Proxy" v="static global settings; ccn fixes the proxy port per session"/>
+          <item k="CA" v="truststore built once from nono's year-long trusted CA"/>
           <item k="Repo tail" v="your ~/.m2/repository read-only; agents write their own"/>
           <item k="Maven 4 mvnenc" v="not used: the JVM decrypts all settings at boot" role="warning"/>
         </kv>
@@ -307,6 +307,34 @@
           <column field="verdict" title="Verdict"/>
         </table>
         <text role="dim">Ryuk stays on: TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/run/user/UID/docker.sock. With Podman, turn it off and reap by label.</text>
+      </col>
+    </tab>
+    <tab id="approvals" title="Approvals">
+      <col pad="1" gap="1">
+        <mermaid>sequenceDiagram
+  participant A as agent (sandbox)
+  participant N as nono proxy
+  participant B as approval bridge (LaunchAgent)
+  participant T as tuios
+  actor You
+  A-&gt;&gt;N: CONNECT docs.spring.io:443
+  N-&gt;&gt;N: not on the allowlist
+  N-&gt;&gt;B: webhook over unix socket, session id
+  B-&gt;&gt;B: session id to pane, from the before-hook
+  B-&gt;&gt;T: ask-human -w pane, 3 options
+  T-&gt;&gt;You: question in the agent's pane and the Inbox
+  You--&gt;&gt;T: Allow this session
+  T--&gt;&gt;B: answer
+  B--&gt;&gt;N: allow_session
+  N--&gt;&gt;A: tunnel opened, cached for the session</mermaid>
+        <kv>
+          <item k="Allow once" v="granted: this connection only"/>
+          <item k="Allow this session" v="allow_session: host and port until the agent exits"/>
+          <item k="Deny" v="denied; timeout and errors deny too" role="error"/>
+          <item k="Socket" v="~/.local/state/nono-approvals, not writable by the sandbox"/>
+          <item k="Why a LaunchAgent" v="only a caller outside every pane may ask for another pane"/>
+          <item k="Docs" v="Context7, aws-knowledge and Exa need no approval"/>
+        </kv>
       </col>
     </tab>
     <tab id="tuios" title="tuios">

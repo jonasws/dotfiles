@@ -1,29 +1,32 @@
 ---
 name: maven-kotlin-builds
-description: Run or fix Maven builds in the Vy Kotlin repos under ~/CX, ~/CNOPS and ~/CN-TERMINAL. Use when a dependency or plugin fails with "Cannot access ... in offline mode", or when a build behaves differently inside and outside the sandbox.
+description: Run or fix Maven builds in the Vy Kotlin repos under ~/CX, ~/CNOPS and ~/CN-TERMINAL. Use when a dependency, plugin or repository fails to resolve, when authentication to GitHub Packages or Nexus fails, or when the Kotlin compiler misbehaves under Maven.
 ---
 
 # Maven with Kotlin
 
 `kotlin.compiler.daemon` is the Maven property. `kotlin.compiler.execution.strategy`
 is the Gradle equivalent and is silently ignored by `kotlin-maven-plugin`.
+`MAVEN_ARGS` already sets `-Dkotlin.compiler.daemon=false`: the detached daemon
+outlives the build and is the wrong process to hold the project's files.
 
-`mvn` on PATH is `~/.local/bin/wrapped/mvn`. Unsandboxed it runs the real binary
-under `fnox exec`, for the credentials `~/.m2/settings.xml` reads.
+Run `mvn` as it is. `~/.m2/settings.xml` reads the passwords for GitHub Packages
+(`github`, `LIFLIG_GITHUB_PAT`) and Nexus (`vy-nexus`, `NEXUS_PASSWORD`) from the
+environment, and the environment already has what it needs. `MAVEN_ARGS` and
+`MAVEN_OPTS` carry the rest (proxy, truststore, local repository); do not
+override them, and do not pass `-s` or `-gs`.
 
-Under nono (the `liflig-agent` profile, started with `ccn`) Maven is fully
-online. `LIFLIG_GITHUB_PAT` and `NEXUS_PASSWORD` hold placeholders that nono's
-proxy swaps for the real credentials on the way to maven.pkg.github.com and
-Nexus, which allow reads only, so `deploy` is refused there. The wrapper points
-Maven at the proxy and makes the JVM trust its CA. `MAVEN_ARGS` gives the agent
-its own `~/.m2/repository-agents`, with `~/.m2/repository` behind it read-only,
-so artifacts already downloaded are reused. Nothing to set up; just run `mvn`.
+Reading from GitHub Packages and Nexus works. Publishing to them (`deploy`) does
+not: tell the user the command and leave it to them.
 
-Under Claude Code's own sandbox (`$TMPDIR` is `/tmp/claude-*`) the wrapper runs
-`--offline` instead, since fnox cannot reach 1Password from there. Such a build
-resolves only what `~/.m2/repository` already holds: a new dependency or a
-first-time plugin fails with `Cannot access ... in offline mode`. Warm the cache
-from an unsandboxed shell with `mvn dependency:go-offline` rather than editing
-the wrapper. Never filter a build's output down to `ERROR`
-lines — that hides exactly this class of failure, and a build that never ran
-looks identical to one that passed.
+When resolution fails, read the whole error before changing anything:
+
+- `401`/`403` from maven.pkg.github.com or Nexus: report it with the URL. Do not
+  try other credentials or edit `settings.xml`.
+- `PKIX path building failed`: the JVM does not trust the proxy's certificate.
+  Tell the user to run `mise -C ~/dotfiles run nono:java-truststore`.
+- `Connection refused` to `127.0.0.1`: the proxy settings point at a port with no
+  proxy. Tell the user; do not remove the proxy.
+
+Never filter a build's output down to `ERROR` lines — that hides exactly these
+failures, and a build that never ran looks identical to one that passed.

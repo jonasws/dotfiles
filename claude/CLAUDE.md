@@ -80,38 +80,30 @@ Apple's `/bin/bash` is 3.2 and is the fallback on a machine without the Homebrew
 formula: no `${var^^}`, no associative arrays, no `mapfile`, no `globstar`. Prefer
 `python3` over bash 4+ syntax in anything that has to run there.
 
-## Sandbox and secrets
+## Credentials and network
 
-Inside Claude Code's sandbox the 1Password desktop app is unreachable, so `fnox`
-resolves nothing. `op` binds its daemon socket under `~/.config/op`, which is not
-writable there, and the app's per-client socket in the 1Password group container
-has a random per-client name with no stable path to allowlist. Anything needing a
-credential must therefore run outside the sandbox — as an MCP server Claude Code
-starts itself — or not need one at all.
+The tools that need credentials already have them in the environment. Use the
+tools; never look for credentials, read credential or keychain files, or ask the
+user to paste a token.
 
-`$TMPDIR` is the tell: the sandbox points it at `/tmp/claude-<uid>`, while an
-unsandboxed shell leaves it at `/var/folders/.../T/`.
-
-### Under nono
-
-A session started with `ccn` runs entirely inside nono's `liflig-agent` profile;
-`NONO_PROXY_TOKEN` in the environment is the tell. There, the tools work as they
-do outside, with credentials brokered by nono's proxy:
-
-- `git fetch` (GitHub ssh remotes go over HTTPS, private repos included), `gh`
-  and the github MCP (public reads), Maven against GitHub Packages and Nexus,
-  Context7 and Exa: the token variables hold placeholders the proxy swaps for
-  the real values. Pushes and Nexus deploys are refused by the proxy; the user
-  pushes and publishes from a window of their own.
-- `aws --profile <account>-<env>-readonly`, boto3 and the AWS MCP server: read
-  operations only, signed by nono as the read-only host profile. There are no
-  other AWS profiles in there, and `aws-vault` and `fnox` are not reachable.
-- Docker is the agents' own Lima VM (`docker info` to check). See the
-  `jvm-sandbox-tests` skill for Testcontainers.
-- tuios works with the pane's `read,write` grants. Opening a new pane answers
-  `forbidden`; show things as TML surfaces instead (the `draft-pane`,
-  `show-image` and `slide-show` skills say how).
-- `~/dotfiles` is read-only. Changes to it go through the user.
+- **GitHub:** `git fetch` works for every repo, private ones included (ssh remotes
+  go over HTTPS). `gh` and the github MCP read public repos. Pushing, opening PRs
+  and commenting are the user's: give them the command.
+- **Maven:** GitHub Packages and Nexus resolve as configured. Publishing is the
+  user's. See the `maven-kotlin-builds` skill.
+- **Docs:** Context7, the aws-knowledge MCP and Exa (`web_fetch_exa` for a page)
+  all work. Prefer them to fetching pages directly.
+- **AWS:** `aws --profile <account>-<env>-readonly` (for example
+  `cnops-dev-readonly`), boto3 and the AWS MCP server, for read operations. Other
+  profiles do not exist here, and writes are refused: give the user the command.
+- **Network:** package registries, GitHub and the services above are reachable
+  directly. Any other host asks the user first, so a direct fetch may wait for an
+  answer or be refused. A refusal is the user's decision; do not route around it.
+- **Docker:** `docker info` tells whether it is up. See the `jvm-sandbox-tests`
+  skill for Testcontainers.
+- **tuios:** opening a new pane can answer `forbidden`; show things as TML
+  surfaces instead (the `draft-pane`, `show-image` and `slide-show` skills say how).
+- **`~/dotfiles`** is read-only. Changes to it go through the user.
 
 ## Vy train data MCP servers
 
@@ -138,12 +130,8 @@ between them:
 
 ## GitHub
 
-Use the `github` MCP tools. Never the `gh` CLI — it is denied in
-`permissions.deny`, and it has no credentials in any case: `~/.config/gh/hosts.yml`
-is empty, and the `~/.local/bin/wrapped/gh` wrapper that supplies `GH_TOKEN` via
-`fnox-secret` cannot reach 1Password from inside the sandbox. Under nono (see
-"Under nono" above) `gh` is allowed and reads through the same public-read token
-as the github MCP; `git fetch` reaches private repos, `gh` does not.
+Prefer the `github` MCP tools. `gh` works too, for reads, with the same
+public-read access.
 
 The github MCP server is read-only and public-only: it runs with `--read-only` on
 a fine-grained token that can read public repositories and nothing else. It cannot

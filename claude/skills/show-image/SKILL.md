@@ -20,9 +20,9 @@ tuios new-window <name> --no-focus --keep-open -- \
   kitten icat <absolute-path>
 ```
 
-In a sandboxed agent's pane (`ccn`, grants `read,write`), `new-window` answers
-`forbidden`, since the new pane's process would run outside the sandbox. Show the
-picture as a TML surface instead; it needs only the `write` grant:
+When `new-window` answers `forbidden`, your pane lacks tuios's `admin` grant, which
+starting a pane needs. Show the picture as a TML surface instead; it needs only the
+`write` grant:
 
 ```bash
 printf '<tml version="1" title="%s"><image src="%s" alt="%s"/></tml>\n' \
