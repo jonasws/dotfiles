@@ -131,7 +131,7 @@ account is in [fnox/README.md](fnox/README.md); in short:
   stand-ins in [`tuios/shims/`](tuios/shims), first on `PATH`, run
   [`nono/launch-agent`](nono/launch-agent), which picks the `liflig-agent`
   or `liflig-pi` profile ([`nono/profiles/`](nono/profiles), both on
-  `liflig-base`), drops the tuios pane to `read,write` and sets
+  `liflig-base`), drops the tuios pane to `read,write,task` and sets
   `TUIOS_AGENT` and `HERDR_AGENT`, so tuios and herdr still recognise the
   harness behind nono. A shell,
   `tuios start-agent`, presets and `fan` all reach it by name; outside nono

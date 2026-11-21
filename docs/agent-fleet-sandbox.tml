@@ -74,7 +74,7 @@
       ],
       "gaps": [
         {"where": "tuios", "gap": "A caller outside any pane counts as you", "fix": "no grants for unplaced sandboxed callers (sandbox_check)"},
-        {"where": "tuios", "gap": "a sandboxed pane holds read,write only, so it cannot fan or start agents", "fix": "fan from your own pane: its agents land in nono through the claude and pi shims"},
+        {"where": "tuios", "gap": "a sandboxed pane holds read,write,task only, so it cannot fan or start agents", "fix": "fan from your own pane: its agents land in nono through the claude and pi shims"},
         {"where": "herdr, Rex", "gap": "no grants model", "fix": "their sockets stay out of the sandbox"}
       ],
       "verify": [
@@ -152,7 +152,7 @@
   participant K as Keychain
   participant C as claude (sandboxed)
   S-&gt;&gt;S: settings copy without gh/aws denies and Claude's sandbox
-  S-&gt;&gt;T: set-pane-grants read,write
+  S-&gt;&gt;T: set-pane-grants read,write,task
   S-&gt;&gt;N: exec nono run --profile liflig-agent --proxy-port PORT, TUIOS_AGENT=HERDR_AGENT=claude
   N-&gt;&gt;K: read credentials, service nono
   N-&gt;&gt;N: before-hook: agent DOCKER_CONFIG
@@ -350,7 +350,7 @@ tuios start-agent claude  # the same shim; tuios still sees Claude Code
   G -- no --&gt; F["forbidden"]</mermaid>
         <kv>
           <item k="Your panes" v="admin"/>
-          <item k="Agent panes" v="read,write, dropped before nono starts"/>
+          <item k="Agent panes" v="read,write,task, dropped before nono starts"/>
           <item k="write" v="only panes that hold nothing more than the agent's"/>
           <item k="No fan" v="start-agent and fan panes start outside nono" role="warning"/>
           <item k="herdr, Rex" v="no grants model; sockets stay out" role="warning"/>

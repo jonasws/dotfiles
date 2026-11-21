@@ -84,10 +84,11 @@ export NONO_AGENT_PROXY_PORT="$port"
 # uses to drop hook events from any other harness.
 export TUIOS_AGENT="$name" HERDR_AGENT="$name"
 
-# The pane keeps only read and write: the agent may not open panes or start
-# agents of its own outside the sandbox.
+# The pane keeps read, write and task (its session's task cards). Opening
+# panes, starting agents (fan) and the rest of admin are left out: the daemon
+# would start those programs outside the sandbox.
 if [ "${TUIOS_ENV:-}" = 1 ]; then
-  tuios set-pane-grants --grants read,write
+  tuios set-pane-grants --grants read,write,task
 fi
 
 exec mise exec -- nono run --silent --profile "$profile" --proxy-port "$port" -- "$real" "$@"
