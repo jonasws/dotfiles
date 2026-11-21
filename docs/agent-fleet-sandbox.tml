@@ -79,17 +79,30 @@
         {"where": "herdr, Rex", "gap": "no grants model", "fix": "their sockets stay out of the sandbox"}
       ],
       "verify": [
-        {"check": "git through nono: 401 challenge, placeholder accepted"},
-        {"check": "mvn -U verify with the static proxy settings and truststore"},
-        {"check": "claude --setting-sources project,local loads the launcher's settings copy"},
-        {"check": "mise, gh, github MCP trust nono's trusted CA"},
-        {"check": "fff, kotlin-lsp, semble write only where granted"},
-        {"check": "aws CLI and boto3 trust AWS_CA_BUNDLE; one call per profile"},
-        {"check": "MCP proxy signs via aws-mcp route; s3:GetObject denied"},
-        {"check": "Rootless Lima: heaviest Testcontainers suite, Ryuk on"},
-        {"check": "Container cannot reach the Mac's loopback"},
-        {"check": "MISE_SYSTEM_DATA_DIR reuse of your installs"},
-        {"check": "Scoped profiles rebuilt on AssumeRole + policy"}
+        {"area": "Launch", "check": "command -v claude and pi resolve to tuios/shims; tuios start-agent claude from your pane shows harness claude-code and grants read,write,task"},
+        {"area": "Launch", "check": "tuios explain-agent-detect names a sandboxed pane via TUIOS_AGENT; herdr recognises it via HERDR_AGENT"},
+        {"area": "Launch", "check": "claude --setting-sources project,local loads the launcher's settings copy"},
+        {"area": "Launch", "check": "Inside an agent, command -v tuios prints nono/shims/tuios (bash startup keeps PATH)"},
+        {"area": "Launch", "check": "Signed out of Claude, nono refuses to start rather than turn on LaunchServices"},
+        {"area": "Boundary", "check": "launchctl submit or bootstrap of a harmless job from inside nono is refused; if it runs, raise it with nono"},
+        {"area": "Boundary", "check": "open -a from inside nono is refused"},
+        {"area": "Boundary", "check": "With the tuios daemon stopped, a tuios call from inside fails instead of starting a daemon"},
+        {"area": "Boundary", "check": "fff, kotlin-lsp, semble write only where granted"},
+        {"area": "Network", "check": "git through nono: 401 challenge, placeholder accepted"},
+        {"area": "Network", "check": "mise, gh, github MCP trust nono's trusted CA"},
+        {"area": "Network", "check": "A host off the allowlist asks in the agent's pane through the approvals bridge"},
+        {"area": "Builds", "check": "mvn -U verify with the static proxy settings and truststore"},
+        {"area": "Builds", "check": "In a repo whose .mise.local.toml sets DOCKER_HOST, mise exec -- env inside nono shows the Lima socket"},
+        {"area": "Builds", "check": "Rootless Lima: heaviest Testcontainers suite, Ryuk on"},
+        {"area": "Builds", "check": "Container cannot reach the Mac's loopback"},
+        {"area": "Builds", "check": "MISE_SYSTEM_DATA_DIR reuse of your installs"},
+        {"area": "AWS", "check": "aws CLI and boto3 trust AWS_CA_BUNDLE; one call per profile"},
+        {"area": "AWS", "check": "MCP proxy signs via aws-mcp route; s3:GetObject denied"},
+        {"area": "AWS", "check": "Scoped profiles rebuilt on AssumeRole + policy"},
+        {"area": "Broker", "check": "mise run sync:nono-broker; mail from one repo's agent to another's arrives tagged [session] (peer PID and resolve-pane work)"},
+        {"area": "Broker", "check": "start-agent claude in another repo asks in the Inbox; the new pane is claude-code, read,write,task, and wakes on the prompt as mail"},
+        {"area": "Broker", "check": "Across sessions, --attach, --from and queue stay refused"},
+        {"area": "Keys", "check": "tuios keybinds doctor: prefix+alt+e is not shadowed; it opens the agent's draft in leaf; a symlinked draft is refused"}
       ]
     }
   </state>
@@ -397,6 +410,7 @@ tuios start-agent claude  # the same shim; tuios still sees Claude Code
       <col pad="1" gap="1">
         <text>Confirm on the Mac before building on it.</text>
         <table rows="state.verify">
+          <column field="area" title="Area"/>
           <column field="check" title="Check"/>
         </table>
         <text role="dim">Full write-up with sources: the Agent Fleet Sandbox page.</text>
