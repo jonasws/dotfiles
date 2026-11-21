@@ -243,6 +243,10 @@ description = "Show which commands the agent hooks and permission rules allow, a
 # XMLLINT_INDENT='  ' xmllint --format FILE, then drop the <?xml?> line it adds.
 run = "tuios tml show {{config_root}}/claude/hooks/overview.tml --pane"
 
+[tasks."claude:explain-sandbox"]
+description = "Show the agent fleet sandbox design (nono, tuios, Docker, Maven, AWS) in a tuios pane"
+run = "tuios tml show {{config_root}}/docs/agent-fleet-sandbox.tml --pane"
+
 [tasks."sync:rex-herdr"]
 description = "(Re)load the herdr socket server's LaunchAgent"
 # bootout fails when the agent is not loaded yet, which is fine.
