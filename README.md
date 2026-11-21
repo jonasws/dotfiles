@@ -127,9 +127,14 @@ account is in [fnox/README.md](fnox/README.md); in short:
   `-readonly` profiles, and `aws-mcp-guard.py` lets `run_script` run without
   asking on those. Needs aws-cli 2.41.2 or later and `sts:GetScopedCredentials`
   on the role.
-- **Agents in nono.** `ccn` (fish) starts Claude Code inside nono's
-  `liflig-agent` profile ([`nono/profiles/`](nono/profiles)), after dropping
-  the tuios pane to `read,write`. No credential of yours enters the sandbox:
+- **Agents in nono.** Plain `claude` and `pi` start inside nono: the
+  stand-ins in [`tuios/shims/`](tuios/shims), first on `PATH`, run
+  [`nono/launch-agent`](nono/launch-agent), which picks the `liflig-agent`
+  or `liflig-pi` profile ([`nono/profiles/`](nono/profiles), both on
+  `liflig-base`), drops the tuios pane to `read,write` and sets
+  `TUIOS_AGENT` so tuios still recognises the harness behind nono. A shell,
+  `tuios start-agent`, presets and `fan` all reach it by name; outside nono
+  only on purpose, with `command (mise which claude)`. No credential of yours enters the sandbox:
   each tool finds its usual variable (`GH_TOKEN`, `LIFLIG_GITHUB_PAT`,
   `NEXUS_PASSWORD`, `CONTEXT7_API_KEY`, `EXA_API_KEY`, ...) set to a
   placeholder, and nono's proxy, on the host, swaps in the real value. git

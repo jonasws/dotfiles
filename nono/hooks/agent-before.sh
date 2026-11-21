@@ -1,5 +1,5 @@
 #!/bin/sh
-# nono before-hook for the liflig-agent profile. Runs on the host, outside the
+# nono before-hook for the liflig-base profile. Runs on the host, outside the
 # sandbox, before the agent starts.
 #
 # Writes the Docker client config the agent uses. Docker sends registry

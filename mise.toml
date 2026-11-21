@@ -271,14 +271,14 @@ fi
 
 [tasks."nono:java-truststore"]
 description = "Build the JDK truststore that lets Maven in nono trust nono's CA"
-# The liflig-agent profile keeps one CA (CN=nono-proxy-ca) in your macOS trust
+# The liflig-base profile keeps one CA (CN=nono-proxy-ca) in your macOS trust
 # store for a year (tls_intercept.ca_lifecycle = "trusted"). The JVM reads
 # neither that store nor SSL_CERT_FILE, so MAVEN_OPTS points it at a copy of the
 # JDK's roots with that CA added. A short nono run creates the CA the first
 # time (a Touch ID prompt). Run again when nono rotates it, once a year.
 run = """
 set -eu
-nono run --profile liflig-agent -- true
+nono run --profile liflig-base -- true
 work="$(mktemp -d)"
 security find-certificate -c nono-proxy-ca -p >"$work/ca.pem"
 java_home="$(mise where java)"

@@ -1,0 +1,5 @@
+#!/bin/sh
+# pi, started in the liflig-pi nono profile by nono/launch-agent. First on PATH
+# via `_.path` in the global mise config, so tuios start-agent, presets and fan
+# reach it as plain `pi`.
+exec "$(dirname "$0")/../../nono/launch-agent" pi "$@"

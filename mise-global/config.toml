@@ -191,7 +191,9 @@ RIP_GRAVEYARD = "{{env.HOME}}/.local/share/graveyard"
 
 # tuios/shims holds personal stand-ins, ahead of tool directories: its tml
 # opens documents as tuios panes inside tuios, even from a project task that
-# pins tml in its own `tools`.
+# pins tml in its own `tools`. Its claude and pi start the agent inside nono
+# (nono/launch-agent), so every way of launching one by name is sandboxed: a
+# shell, tuios start-agent, presets and fan.
 _.path = ["~/dotfiles/tuios/shims"]
 
 # Maven everywhere. The Kotlin compile daemon is detached and outlives the
@@ -200,7 +202,7 @@ _.path = ["~/dotfiles/tuios/shims"]
 # GitHub Packages repository we have no credentials for (401): stop asking
 # both. A full `clean verify` with the Kotlin compiler in-process peaks under
 # 1G of heap. Agents in nono get their own MAVEN_ARGS and MAVEN_OPTS from the
-# liflig-agent profile, with these flags in them.
+# liflig-base profile, with these flags in them.
 MAVEN_ARGS = "-Dkotlin.compiler.daemon=false -Daether.remoteRepositoryFilter.prefixes.resolvePrefixFiles.github=false -Daether.remoteRepositoryFilter.prefixes.resolvePrefixFiles.flyway-community-db-support=false"
 MAVEN_OPTS = "-Xms512m -Xmx2g -XX:+ExitOnOutOfMemoryError --enable-native-access=ALL-UNNAMED"
 

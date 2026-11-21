@@ -11,7 +11,8 @@
         {"cred": "Agent signing key", "scope": "SSH signing key", "inside": "readable file", "use": "signed commits", "limit": "can sign, not push"}
       ],
       "profile": [
-        {"k": "Extends", "v": "nolabs-ai/claude, liflig-aws (generated)"},
+        {"k": "Profiles", "v": "liflig-agent (claude), liflig-pi (pi): the harness's nolabs-ai profile plus liflig-base"},
+        {"k": "liflig-base extends", "v": "liflig-aws (generated)"},
         {"k": "Writable", "v": "repo roots, ~/.tsk, ~/.m2/repository-agents, ~/.cache/agents, agents' mise dirs"},
         {"k": "Read-only", "v": "~/dotfiles, ~/.m2/repository, your mise installs, atuin history"},
         {"k": "Denied", "v": "fnox config and state, atuin key, twg auth, herdr and Rex sockets"},
@@ -73,13 +74,13 @@
       ],
       "gaps": [
         {"where": "tuios", "gap": "A caller outside any pane counts as you", "fix": "no grants for unplaced sandboxed callers (sandbox_check)"},
-        {"where": "tuios", "gap": "fan and start-agent start panes outside nono", "fix": "children inherit the wrapper; until then no fan"},
+        {"where": "tuios", "gap": "a sandboxed pane holds read,write only, so it cannot fan or start agents", "fix": "fan from your own pane: its agents land in nono through the claude and pi shims"},
         {"where": "herdr, Rex", "gap": "no grants model", "fix": "their sockets stay out of the sandbox"}
       ],
       "verify": [
         {"check": "git through nono: 401 challenge, placeholder accepted"},
         {"check": "mvn -U verify with the static proxy settings and truststore"},
-        {"check": "claude --setting-sources project,local loads the ccn settings"},
+        {"check": "claude --setting-sources project,local loads the launcher's settings copy"},
         {"check": "mise, gh, github MCP trust nono's trusted CA"},
         {"check": "fff, kotlin-lsp, semble write only where granted"},
         {"check": "aws CLI and boto3 trust AWS_CA_BUNDLE; one call per profile"},
@@ -145,26 +146,28 @@
     <tab id="launch" title="Launch">
       <col pad="1" gap="1">
         <mermaid>sequenceDiagram
-  participant S as ccn (fish)
+  participant S as claude (tuios/shims)
   participant T as tuios daemon
   participant N as nono supervisor
   participant K as Keychain
   participant C as claude (sandboxed)
   S-&gt;&gt;S: settings copy without gh/aws denies and Claude's sandbox
   S-&gt;&gt;T: set-pane-grants read,write
-  S-&gt;&gt;N: exec nono run --profile liflig-agent --proxy-port PORT
+  S-&gt;&gt;N: exec nono run --profile liflig-agent --proxy-port PORT, TUIOS_AGENT=claude-code
   N-&gt;&gt;K: read credentials, service nono
   N-&gt;&gt;N: before-hook: agent DOCKER_CONFIG
   N-&gt;&gt;N: start proxy, CA, placeholders
   N-&gt;&gt;C: apply Seatbelt, start claude --setting-sources project,local
   C-&gt;&gt;T: agent-hook and MCP over the socket, grants checked</mermaid>
-        <code lang="fish">ccn            # fish/functions/ccn.fish
+        <code lang="fish">claude                    # tuios/shims/claude, first on PATH: nono/launch-agent
+pi                        # tuios/shims/pi: the liflig-pi profile
+tuios start-agent claude  # the same shim; tuios still sees Claude Code
 # one-time: mise run nono:keychain, mise run lima:agents</code>
         <table rows="state.profile">
           <column field="k" title="Profile"/>
           <column field="v" title="What it adds"/>
         </table>
-        <text role="warning"><b>Always start Claude through ccn.</b> The agent can write ~/.claude; an unsandboxed claude would run what it planted.</text>
+        <text role="warning"><b>Plain claude and pi are sandboxed.</b> A shell, a preset, start-agent and fan all reach the shim by name. Outside nono only on purpose: command (mise which claude).</text>
         <text role="dim">! commands run inside the sandbox too. Push from another window.</text>
       </col>
     </tab>
@@ -205,7 +208,7 @@
           <item k="Denied" v="git-receive-pack (push), everything else" role="error"/>
           <item k="Route github_api" v="api.github.com, public-read token, GET and GraphQL"/>
           <item k="Credential helper" v="your gh auth git-credential, fed the placeholder"/>
-          <item k="ssh remotes" v="git@github.com: rewritten to https by ccn"/>
+          <item k="ssh remotes" v="git@github.com: rewritten to https by the launcher"/>
         </kv>
       </col>
     </tab>
@@ -227,7 +230,7 @@
         <kv>
           <item k="settings.xml" v="unchanged: env-var passwords, real repository URLs"/>
           <item k="Placeholders" v="LIFLIG_GITHUB_PAT, NEXUS_PASSWORD set by nono"/>
-          <item k="Proxy" v="static global settings; ccn fixes the proxy port per session"/>
+          <item k="Proxy" v="static global settings; the launcher fixes the proxy port per session"/>
           <item k="CA" v="truststore built once from nono's year-long trusted CA"/>
           <item k="Repo tail" v="your ~/.m2/repository read-only; agents write their own"/>
           <item k="Maven 4 mvnenc" v="not used: the JVM decrypts all settings at boot" role="warning"/>

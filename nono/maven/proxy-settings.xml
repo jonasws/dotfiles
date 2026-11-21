@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Global Maven settings for agents in nono (liflig-agent, MAVEN_ARGS
+  Global Maven settings for agents in nono (liflig-base, MAVEN_ARGS
   --global-settings). Your ~/.m2/settings.xml still applies on top, unchanged.
 
-  The JVM reads no HTTPS_PROXY, so Maven gets nono's proxy here: ccn fixes the
-  proxy's port per session (NONO_AGENT_PROXY_PORT) and nono hands the child its
+  The JVM reads no HTTPS_PROXY, so Maven gets nono's proxy here: nono/launch-agent fixes
+  the proxy's port per session (NONO_AGENT_PROXY_PORT) and nono hands the child its
   proxy token (NONO_PROXY_TOKEN). nono's CA is trusted through MAVEN_OPTS, a
   truststore built once by `mise run nono:java-truststore`.
 -->
