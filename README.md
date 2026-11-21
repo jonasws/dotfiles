@@ -147,7 +147,13 @@ account is in [fnox/README.md](fnox/README.md); in short:
   its CA through a truststore built once. Hosts not on the profile's list are
   asked in tuios: [`nono/approvals/bridge.py`](nono/approvals/bridge.py), a
   LaunchAgent, turns nono's approval request into `tuios ask-human` on the
-  agent's own pane (allow once, allow for the session, deny). Docker is a Lima
+  agent's own pane (allow once, allow for the session, deny). Agents in
+  other repos' sessions are reached by mail: tuios refuses an agent pane
+  anything outside its own session, and inside nono `tuios` passes exactly
+  those refusals to [`nono/broker/broker.py`](nono/broker/broker.py), a
+  LaunchAgent that delivers mail, lists agents and, after a yes in the
+  Inbox, starts claude or pi in another repo (`mise run sync:nono-broker`
+  loads it). Docker is a Lima
   VM of the agents' own ([`lima/agents.yaml`](lima/agents.yaml): rootless,
   read-only repo mounts, no route to the Mac). Agents get their own mise,
   Maven, npm, uv, Go and cargo caches, and read yours, so nothing they

@@ -303,6 +303,17 @@ launchctl bootout "gui/$(id -u)" "$plist" 2>/dev/null || true
 launchctl bootstrap "gui/$(id -u)" "$plist"
 """
 
+[tasks."sync:nono-broker"]
+description = "(Re)load the LaunchAgent that makes cross-session tuios calls for agents in nono"
+run = """
+set -euo pipefail
+plist="$HOME/Library/LaunchAgents/com.jonasws.nono-tuios-broker.plist"
+[[ -e $plist ]] || { echo "$plist is missing: run 'mise dotfiles apply' first" >&2; exit 1; }
+mkdir -p "$HOME/.local/state/nono-broker"
+launchctl bootout "gui/$(id -u)" "$plist" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$plist"
+"""
+
 [tasks."lima:agents"]
 description = "Create or start the agents' Docker VM (rootless, read-only repo mounts)"
 # limactl start takes a template path only when it creates the instance.
@@ -592,6 +603,11 @@ target = "~/Library/LaunchAgents"
 root = "nono/approvals"
 target = "~/Library/LaunchAgents"
 exclude = ["bridge.py"]
+
+[dotfile_groups.nono-broker-launchd]
+root = "nono/broker"
+target = "~/Library/LaunchAgents"
+exclude = ["broker.py", "client.py"]
 
 [dotfile_groups.ripgrep]
 root = "ripgrep"

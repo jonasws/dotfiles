@@ -91,4 +91,9 @@ if [ "${TUIOS_ENV:-}" = 1 ]; then
   tuios set-pane-grants --grants read,write,task
 fi
 
+# Inside the sandbox only, nono/shims comes first: its tuios passes calls the
+# daemon refuses across sessions to the tuios broker (nono/broker).
+PATH="$(cd "$(dirname "$0")" && pwd -P)/shims:$PATH"
+export PATH
+
 exec mise exec -- nono run --silent --profile "$profile" --proxy-port "$port" -- "$real" "$@"

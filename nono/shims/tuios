@@ -1,0 +1,21 @@
+#!/bin/sh
+# tuios for agents in nono; nono/launch-agent puts this directory first on PATH
+# inside the sandbox only. Every call goes to the real tuios. When the daemon
+# refuses mail, an agent listing or an agent start with `forbidden` (another
+# session, or starting an agent at all), the call is passed to the tuios
+# broker (nono/broker), which makes it outside the sandbox under its rules.
+
+real="$HOME/.local/bin/tuios"
+case ${1:-} in
+send-agent-message | list-agents | start-agent) ;;
+*) exec "$real" "$@" ;;
+esac
+
+# stdout goes straight through (fd 3); only stderr is kept, to look for the refusal.
+{ err="$("$real" "$@" 2>&1 1>&3)"; rc=$?; } 3>&1
+case $rc:$err in
+0:*) ;;
+*forbidden*) exec python3 -I "$(dirname "$0")/../broker/client.py" "$@" ;;
+esac
+[ -n "$err" ] && printf '%s\n' "$err" >&2
+exit "$rc"

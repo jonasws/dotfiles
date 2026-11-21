@@ -75,6 +75,7 @@
       "gaps": [
         {"where": "tuios", "gap": "A caller outside any pane counts as you", "fix": "no grants for unplaced sandboxed callers (sandbox_check)"},
         {"where": "tuios", "gap": "a sandboxed pane holds read,write,task only, so it cannot fan or start agents", "fix": "fan from your own pane: its agents land in nono through the claude and pi shims"},
+        {"where": "tuios", "gap": "no grant for mail to other sessions", "fix": "upstream: a mail grant; until then the tuios broker"},
         {"where": "herdr, Rex", "gap": "no grants model", "fix": "their sockets stay out of the sandbox"}
       ],
       "verify": [
@@ -353,6 +354,8 @@ tuios start-agent claude  # the same shim; tuios still sees Claude Code
           <item k="Agent panes" v="read,write,task, dropped before nono starts"/>
           <item k="write" v="only panes that hold nothing more than the agent's"/>
           <item k="No fan" v="start-agent and fan panes start outside nono" role="warning"/>
+          <item k="Other sessions" v="mail and listings via the tuios broker; starts after a yes in the Inbox"/>
+          <item k="Across sessions, never" v="queue, ask-agent, send-text: typing runs with the target's authority"/>
           <item k="herdr, Rex" v="no grants model; sockets stay out" role="warning"/>
         </kv>
       </col>

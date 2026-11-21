@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- The tuios broker for agents in nono (nono/broker/broker.py): cross-session
+     mail, agent listings and approved agent starts. Linked into
+     ~/Library/LaunchAgents by the nono-broker-launchd dotfile group; load it
+     with `mise -C ~/dotfiles run sync:nono-broker`. It must run outside every
+     tuios pane, since it calls tuios as you. launchd expands no ~ or $HOME,
+     hence the absolute paths. -->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.jonasws.nono-tuios-broker</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/python3</string>
+		<string>-I</string>
+		<string>/Users/jonasws/dotfiles/nono/broker/broker.py</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>ThrottleInterval</key>
+	<integer>10</integer>
+	<key>StandardOutPath</key>
+	<string>/Users/jonasws/.local/state/nono-broker/broker.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/jonasws/.local/state/nono-broker/broker.log</string>
+</dict>
+</plist>

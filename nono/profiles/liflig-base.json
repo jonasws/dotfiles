@@ -72,7 +72,8 @@
       "~/.lima/agents/sock"
     ],
     "unix_socket": [
-      "~/.local/share/atuin/atuin.sock"
+      "~/.local/share/atuin/atuin.sock",
+      "~/.local/state/nono-broker/broker.sock"
     ],
     "bypass_protection": [
       "~/.docker/cli-plugins"
