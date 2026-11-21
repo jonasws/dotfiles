@@ -132,7 +132,8 @@ account is in [fnox/README.md](fnox/README.md); in short:
   [`nono/launch-agent`](nono/launch-agent), which picks the `liflig-agent`
   or `liflig-pi` profile ([`nono/profiles/`](nono/profiles), both on
   `liflig-base`), drops the tuios pane to `read,write` and sets
-  `TUIOS_AGENT` so tuios still recognises the harness behind nono. A shell,
+  `TUIOS_AGENT` and `HERDR_AGENT`, so tuios and herdr still recognise the
+  harness behind nono. A shell,
   `tuios start-agent`, presets and `fan` all reach it by name; outside nono
   only on purpose, with `command (mise which claude)`. No credential of yours enters the sandbox:
   each tool finds its usual variable (`GH_TOKEN`, `LIFLIG_GITHUB_PAT`,

@@ -153,7 +153,7 @@
   participant C as claude (sandboxed)
   S-&gt;&gt;S: settings copy without gh/aws denies and Claude's sandbox
   S-&gt;&gt;T: set-pane-grants read,write
-  S-&gt;&gt;N: exec nono run --profile liflig-agent --proxy-port PORT, TUIOS_AGENT=claude-code
+  S-&gt;&gt;N: exec nono run --profile liflig-agent --proxy-port PORT, TUIOS_AGENT=HERDR_AGENT=claude
   N-&gt;&gt;K: read credentials, service nono
   N-&gt;&gt;N: before-hook: agent DOCKER_CONFIG
   N-&gt;&gt;N: start proxy, CA, placeholders

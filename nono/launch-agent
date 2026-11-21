@@ -15,8 +15,8 @@ set -eu
 name=$1
 shift
 case $name in
-claude) profile=liflig-agent hint=claude-code ;;
-pi) profile=liflig-pi hint=pi ;;
+claude) profile=liflig-agent ;;
+pi) profile=liflig-pi ;;
 *)
   echo "launch-agent: no nono profile for $name" >&2
   exit 2
@@ -77,11 +77,15 @@ if [ -z "$port" ]; then
 fi
 export NONO_AGENT_PROXY_PORT="$port"
 
-# tuios reads TUIOS_AGENT on a pane's foreground process when nothing in the
-# process tree names a harness it knows; nono sits between the pane and the
-# agent. The pane keeps only read and write: the agent may not open panes or
-# start agents of its own outside the sandbox.
-export TUIOS_AGENT="$hint"
+# nono sits between the pane and the agent, so the pane's foreground process
+# is no harness tuios or herdr knows. Both read a hint on that process instead:
+# TUIOS_AGENT and HERDR_AGENT name the harness (claude and pi are ids or
+# aliases in both). The agent's own processes inherit them, which tuios also
+# uses to drop hook events from any other harness.
+export TUIOS_AGENT="$name" HERDR_AGENT="$name"
+
+# The pane keeps only read and write: the agent may not open panes or start
+# agents of its own outside the sandbox.
 if [ "${TUIOS_ENV:-}" = 1 ]; then
   tuios set-pane-grants --grants read,write
 fi
