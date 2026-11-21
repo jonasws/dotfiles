@@ -324,7 +324,9 @@
       "MAVEN_OPTS": "-Xms512m -Xmx2g -XX:+ExitOnOutOfMemoryError --enable-native-access=ALL-UNNAMED -Djavax.net.ssl.trustStore=$HOME/.local/share/nono-agent/java-truststore.p12 -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=PKCS12",
       "DOCKER_HOST": "unix://$HOME/.lima/agents/sock/docker.sock",
       "TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE": "/run/user/501/docker.sock",
-      "TESTCONTAINERS_HOST_OVERRIDE": "127.0.0.1"
+      "TESTCONTAINERS_HOST_OVERRIDE": "127.0.0.1",
+      "TUIOS_NO_SERVICE": "1",
+      "TUIOS_NO_DAEMON_APP": "1"
     }
   },
   "session_hooks": {

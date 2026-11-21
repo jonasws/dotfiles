@@ -7,5 +7,6 @@
   "meta": {
     "name": "liflig-agent",
     "description": "Claude Code in the shared Liflig/Vy agent sandbox (liflig-base)."
-  }
+  },
+  "allow_launch_services": false
 }
