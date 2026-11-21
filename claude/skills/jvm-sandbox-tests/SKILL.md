@@ -43,7 +43,24 @@ Worth doing regardless of the sandbox; JDK 24+ disables dynamic agent loading in
 Verified 2026-09-14 in cn-cnops-journey on Zulu JDK 25.0.4.1 with MockK 1.14.11: 498 run
 / 329 errors before, 505 run / 0 errors after. Already applied there.
 
-## Testcontainers against colima
+## Testcontainers under nono
+
+Under nono (`ccn`, profile `liflig-agent`) the environment is already set: `DOCKER_HOST`
+points at the agents' own Lima VM (`~/.lima/agents/sock/docker.sock`, rootless Docker),
+`TESTCONTAINERS_HOST_OVERRIDE=127.0.0.1` reaches the ports Lima forwards, and Ryuk works
+through `TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE`. GHCR pulls authenticate from
+`DOCKER_CONFIG` and `DOCKER_AUTH_CONFIG`. Just run the tests. If Docker is down,
+`docker info` says `connection refused`: tell the user to run `mise run lima:agents`.
+
+The VM mounts `~/CX`, `~/CNOPS` and `~/CN-TERMINAL` read-only. A container cannot write
+back to the repo through a bind mount; copy files out with `docker cp`, or let the test
+write to its own build directory. The VM cannot open connections to the Mac, so a
+container cannot call a service that runs on the Mac outside Docker.
+
+The MockK/ByteBuddy attach problem above may not occur under nono, which lets processes
+in the same sandbox signal and inspect each other. The preloaded agent works either way.
+
+## Testcontainers against colima (Claude Code's own sandbox)
 
 `~/.config/colima/default/docker.sock` is in `sandbox.network.allowUnixSockets`, so the
 Docker API works from a sandboxed command. Two things still bite:

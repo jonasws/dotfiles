@@ -1,0 +1,111 @@
+# Docker for sandboxed agents: a Lima VM of its own, separate from colima.
+#
+#   mise run lima:agents          # create or start it
+#   DOCKER_HOST=unix://$HOME/.lima/agents/sock/docker.sock docker info
+#
+# Whoever may create containers controls this VM, so the VM is the boundary
+# (see docs/agent-fleet-sandbox.tml). It is built so that control is worth
+# little:
+#
+# - Rootless Docker, as in Lima's own docker template. The daemon runs as the
+#   VM user, and that user loses sudo once provisioning is done, so a
+#   privileged container cannot become root in the VM.
+# - Only the repo roots are mounted, read-only. No home directory, so nothing
+#   like ~/.aws, ~/.config/fnox or ~/.ssh exists in here.
+# - New connections from the VM to the Mac (host.lima.internal) are dropped, so
+#   containers cannot reach services on the Mac's loopback. Replies to the
+#   Mac's own connections into the VM (Lima's ssh and port forwarding) pass.
+# - No credentials live in the VM. Pull credentials come from the docker
+#   client in the sandbox, per request.
+#
+# Published container ports are forwarded to 127.0.0.1 on the Mac, which is how
+# Testcontainers in the sandbox reaches them (TESTCONTAINERS_HOST_OVERRIDE).
+
+minimumLimaVersion: 2.0.0
+base:
+- template:_images/ubuntu-lts
+
+cpus: 6
+memory: 10GiB
+disk: 100GiB
+
+mounts:
+- location: "~/CX"
+  writable: false
+- location: "~/CNOPS"
+  writable: false
+- location: "~/CN-TERMINAL"
+  writable: false
+
+containerd:
+  system: false
+  user: false
+
+provision:
+- mode: system
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    command -v docker >/dev/null 2>&1 && exit 0
+    export DEBIAN_FRONTEND=noninteractive
+    curl -fsSL https://get.docker.com | sh
+    systemctl disable --now docker.service docker.socket containerd.service containerd.socket || true
+    systemctl mask docker.service docker.socket containerd.service containerd.socket || true
+    apt-get install -y uidmap dbus-user-session nftables
+- mode: yq
+  path: "{{.Home}}/.config/docker/daemon.json"
+  expression: |
+    .features.cdi = true |
+    .features.containerd-snapshotter = true
+  owner: "{{.User}}"
+- mode: user
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    systemctl --user start dbus
+    if ! systemctl --user is-active --quiet docker; then
+      dockerd-rootless-setuptool.sh install
+    fi
+    docker context use rootless
+- mode: system
+  script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    # Keep the rootless daemon running without a login session.
+    loginctl enable-linger "{{.User}}"
+    # The daemon's user gives up sudo. Lima's own boot steps run as root and
+    # do not need it.
+    rm -f /etc/sudoers.d/90-lima-users
+    gpasswd -d "{{.User}}" sudo 2>/dev/null || true
+    # No new connections from the VM or its containers to the Mac.
+    host_ip="$(getent hosts host.lima.internal | awk '{print $1}' | head -1)"
+    [ -n "$host_ip" ] || exit 0
+    nft -f - <<EOF
+    table inet agents_egress
+    delete table inet agents_egress
+    table inet agents_egress {
+      chain output {
+        type filter hook output priority 0; policy accept;
+        ct state established,related accept
+        ip daddr $host_ip drop
+      }
+    }
+    EOF
+
+probes:
+- script: |
+    #!/bin/bash
+    set -eux -o pipefail
+    if ! timeout 30s bash -c "until command -v docker >/dev/null 2>&1; do sleep 3; done"; then
+      echo >&2 "docker is not installed yet"
+      exit 1
+    fi
+    if ! timeout 30s bash -c "until pgrep rootlesskit; do sleep 3; done"; then
+      echo >&2 "rootlesskit (used by rootless docker) is not running"
+      exit 1
+    fi
+  hint: See "/var/log/cloud-init-output.log" in the guest
+
+portForwards:
+- guestSocket: "/run/user/{{.UID}}/docker.sock"
+  hostSocket: "{{.Dir}}/sock/docker.sock"

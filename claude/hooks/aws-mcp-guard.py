@@ -61,6 +61,11 @@ def readonly_profile(profile, aws_config=None):
     parser = configparser.RawConfigParser(comment_prefixes=(";", "#"), strict=False)
     try:
         parser.read(path)
+        # Inside nono, AWS_CONFIG_FILE is the placeholder config that
+        # nono/tools/gen-aws.py writes. The sandbox can only read it, and nono
+        # re-signs each profile as the read-only host profile of that name.
+        if parser.get(f"profile {profile}", "nono_scope", fallback="") == READONLY_POLICY:
+            return f"profile {profile} is signed by nono as the read-only host profile"
         argv = shlex.split(parser.get(f"profile {profile}", "credential_process"))
     except (configparser.Error, ValueError):
         return None
@@ -199,6 +204,13 @@ credential_process=aws-vault export --format=json dev-developer
 credential_process=aws-scoped-credentials --profile dev-developer --policy /tmp/readonly.json
 [profile developer]
 source_profile=capra-auth
+[profile nono-readonly]
+aws_access_key_id = NONOPLACEHOLDER0000000000000000
+aws_secret_access_key = nono-placeholder
+nono_scope = readonly
+[profile nono-other]
+aws_access_key_id = NONOPLACEHOLDER0000000000000001
+nono_scope = agent
 """
 
 NORMALIZE = [
@@ -243,6 +255,9 @@ def self_test():
             (rs, {"code": "x", "aws_profile": "fake-readonly"}, [], "ask"),
             (rs, {"code": "x", "aws_profile": "path-readonly"}, [], "ask"),
             (rs, {"code": "x", "aws_profile": "developer"}, [], "ask"),
+            (rs, {"code": "x", "aws_profile": "nono-readonly"}, [], "allow"),
+            (rs, {"code": "x"}, ["nono-readonly"], "allow"),
+            (rs, {"code": "x", "aws_profile": "nono-other"}, [], "ask"),
             (rs, {"code": "x", "aws_profile": "nope"}, [], "ask"),
             (rs, {"code": "x", "aws_profile": ["dev-readonly"]}, [], "ask"),
             (rs, {"code": "x"}, [], "ask"),

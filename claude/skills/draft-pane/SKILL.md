@@ -69,6 +69,23 @@ to open.
      `read,write` silently loses pane navigation.
    - leaf is the pane's only program, so quitting it (`q`) closes the pane.
 
+   **In a sandboxed agent's pane** (`ccn`, grants `read,write`), `split-window`
+   answers `forbidden`: a new pane would run outside the sandbox, so only
+   `admin` panes may start one. Show the draft as a TML surface instead, which
+   needs only `write` and starts no process:
+
+   ```bash
+   esc() { sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' -e 's/>/\&gt;/g' "$1"; }
+   { printf '<tml version="1" title="draft %s"><markdown>' "$(basename "$file")"
+     esc "$file"; printf '</markdown></tml>\n'; } >"$file.tml"
+   tuios tml show "$file.tml" --pane
+   ```
+
+   After each revision, rebuild the `.tml` and run `tuios tml replace <surface>
+   "$file.tml"` with the surface id `tml show` printed. The user edits by
+   opening the file themselves (`leaf -w <file>` in a pane of their own); say
+   that, with the path.
+
 5. **Tell the user** the pane is open, that it reloads on save, and that
    `Ctrl+E` edits it in Neovim and `q` closes it.
 

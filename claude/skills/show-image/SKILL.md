@@ -20,6 +20,16 @@ tuios new-window <name> --no-focus --keep-open -- \
   kitten icat <absolute-path>
 ```
 
+In a sandboxed agent's pane (`ccn`, grants `read,write`), `new-window` answers
+`forbidden`, since the new pane's process would run outside the sandbox. Show the
+picture as a TML surface instead; it needs only the `write` grant:
+
+```bash
+printf '<tml version="1" title="%s"><image src="%s" alt="%s"/></tml>\n' \
+  "$name" "$abs_path" "$name" >"$TMPDIR/$name.tml"
+tuios tml show "$TMPDIR/$name.tml" --pane
+```
+
 - `--keep-open`: icat draws and exits at once; without it the window closes and the
   picture goes with it. The pane then shows "[The program exited with status 0.]"
   under the image, which is expected.

@@ -130,6 +130,14 @@ Check which multiplexer you are in, in this order:
 | `HERDR_ENV=1` | herdr | `herdr pane split --current --direction right --cwd "$DECK_DIR" --no-focus`, then `herdr pane run <pane> "presenterm deck.md"` with the pane id it returns. |
 | none of these | plain terminal | Give the user the command to run, with `!` in front if they want it in this session's terminal. |
 
+In a sandboxed agent's tuios pane (`ccn`, grants `read,write`), `new-window` answers
+`forbidden`: presenterm would run outside the sandbox. Give the deck as a TML surface
+instead, which needs only `write`: one `<tab>` per slide holding a `<markdown>` block
+(escape `&`, `<`, `>`) and, for a diagram, a `<mermaid>` block, then
+`tuios tml show deck.tml --pane`. Rebuild and `tuios tml replace <surface> deck.tml`
+after edits. Also tell the user `presenterm deck.md` to run in a pane of their own if
+they want the real deck.
+
 Every one of these commands asks the user for approval: the
 `pane-control-guard` hook prompts for anything that launches, types into or
 reads from a pane. Its exemption for viewer panes leaves out presenterm,

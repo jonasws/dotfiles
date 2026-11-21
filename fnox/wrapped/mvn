@@ -63,6 +63,77 @@ MAVEN_OPTS="${MAVEN_OPTS:-\
 -Daether.enhancedLocalRepository.trackingMode=local \
 -Dorg.slf4j.simpleLogger.showDateTime=true \
 -Dorg.slf4j.simpleLogger.dateTimeFormat=HH:mm:ss}"
+
+# Behind a TLS-intercepting HTTPS proxy, such as nono's credential proxy, the
+# JVM needs the proxy in Maven's settings and the proxy's CA in its truststore:
+# it reads neither HTTPS_PROXY nor SSL_CERT_FILE. nono writes its session CA last
+# into the bundle SSL_CERT_FILE names, after the system roots, so that one
+# certificate joins the JDK's own roots in a per-session PKCS12 truststore. The
+# proxy goes into a generated global settings file, so ~/.m2/settings.xml and
+# the repository URLs in the POMs stay exactly as they are outside the sandbox.
+if [ -n "${HTTPS_PROXY:-}" ] && [ -n "${SSL_CERT_FILE:-}" ] && [ -r "$SSL_CERT_FILE" ]; then
+  proxy_dir="${TMPDIR:-/tmp}/mvn-proxy-$(id -u)"
+  mkdir -p "$proxy_dir" && chmod 700 "$proxy_dir"
+
+  rest="${HTTPS_PROXY#*://}"
+  rest="${rest%%/*}"
+  proxy_user="" proxy_pass=""
+  case "$rest" in
+    *@*)
+      auth="${rest%%@*}"
+      rest="${rest#*@}"
+      proxy_user="${auth%%:*}"
+      proxy_pass="${auth#*:}"
+      ;;
+  esac
+  proxy_settings="$proxy_dir/proxy-settings.xml"
+  cat >"$proxy_settings" <<EOF
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">
+  <proxies>
+    <proxy>
+      <id>session-proxy</id>
+      <active>true</active>
+      <protocol>http</protocol>
+      <host>${rest%:*}</host>
+      <port>${rest##*:}</port>
+      <username>${proxy_user}</username>
+      <password>${proxy_pass}</password>
+      <nonProxyHosts>localhost|127.0.0.1</nonProxyHosts>
+    </proxy>
+  </proxies>
+</settings>
+EOF
+  chmod 600 "$proxy_settings"
+  set -- --global-settings "$proxy_settings" "$@"
+
+  java_home="$(mise where java 2>/dev/null || true)"
+  truststore="$proxy_dir/truststore-$(cksum <"$SSL_CERT_FILE" | cut -d' ' -f1).p12"
+  if [ ! -s "$truststore" ] && [ -n "$java_home" ] && [ -x "$java_home/bin/keytool" ]; then
+    keytool="$java_home/bin/keytool"
+    awk '/-----BEGIN CERTIFICATE-----/ { cert = "" }
+         { cert = cert $0 "\n" }
+         /-----END CERTIFICATE-----/ { last = cert }
+         END { printf "%s", last }' "$SSL_CERT_FILE" >"$proxy_dir/session-ca.pem"
+    if ! "$keytool" -printcert -file "$proxy_dir/session-ca.pem" 2>/dev/null | grep -q 'Owner:.*nono'; then
+      echo "mvn: the last certificate in $SSL_CERT_FILE is not a nono CA; trusting it anyway" >&2
+    fi
+    rm -f "$truststore.tmp"
+    if "$keytool" -importkeystore -noprompt \
+         -srckeystore "$java_home/lib/security/cacerts" -srcstorepass changeit \
+         -destkeystore "$truststore.tmp" -deststoretype PKCS12 -deststorepass changeit >/dev/null 2>&1 &&
+       "$keytool" -importcert -noprompt -alias proxy-session-ca -file "$proxy_dir/session-ca.pem" \
+         -keystore "$truststore.tmp" -storepass changeit >/dev/null 2>&1; then
+      mv "$truststore.tmp" "$truststore"
+    else
+      rm -f "$truststore.tmp"
+    fi
+  fi
+  if [ -s "$truststore" ]; then
+    MAVEN_OPTS="$MAVEN_OPTS -Djavax.net.ssl.trustStore=$truststore -Djavax.net.ssl.trustStorePassword=changeit -Djavax.net.ssl.trustStoreType=PKCS12"
+  else
+    echo "mvn: could not build a truststore with the proxy's CA (java: '${java_home:-not found}'); intercepted hosts will fail TLS" >&2
+  fi
+fi
 export MAVEN_OPTS
 
 case "$TMPDIR" in

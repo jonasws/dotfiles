@@ -1,0 +1,226 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nolabs-ai/nono/refs/heads/main/crates/nono-cli/data/nono-profile.schema.json",
+  "extends": ["nolabs-ai/claude", "liflig-aws"],
+  "meta": {
+    "name": "liflig-agent",
+    "description": "Claude Code for the Liflig/Vy repos: workspaces, mise, Maven, Docker (Lima), tuios, and brokered GitHub, Nexus, Context7, Exa and read-only AWS. No credential of yours in the sandbox."
+  },
+  "security": {
+    "signal_mode": "allow_same_sandbox",
+    "process_info_mode": "allow_same_sandbox",
+    "ipc_mode": "full"
+  },
+  "filesystem": {
+    "allow": [
+      "~/CX",
+      "~/CNOPS",
+      "~/CN-TERMINAL",
+      "~/LIFLIG",
+      "~/NSBNO",
+      "~/.herdr/worktrees",
+      "~/herdr-splits.nvim",
+      "~/.tsk",
+      "~/.local/share/graveyard",
+      "~/.local/share/Trash",
+      "~/.m2/repository-agents",
+      "~/.cache/agents",
+      "~/.local/share/mise-agents",
+      "~/.local/state/mise-agents",
+      "~/Library/Application Support/kotlin"
+    ],
+    "read": [
+      "~/dotfiles",
+      "~/.config/nono",
+      "~/.local/bin",
+      "~/.local/share/mise",
+      "~/.local/state/mise",
+      "~/.config/mise",
+      "~/.local/share/tuios-nightly",
+      "~/.config/git",
+      "~/.config/agent-signing",
+      "~/catppuccin",
+      "~/.config/herdr",
+      "~/.config/tuicr",
+      "~/.config/hunk",
+      "~/.config/bat",
+      "~/.config/gh",
+      "~/.config/presenterm",
+      "~/.config/twg/skills",
+      "~/.atuin",
+      "~/.local/share/atuin",
+      "~/.m2/repository",
+      "~/.rustup",
+      "~/.cargo",
+      "~/.cdk",
+      "~/.agents/skills",
+      "~/Library/Caches/ms-playwright",
+      "~/.local/state/nono-agent",
+      "~/.docker/cli-plugins"
+    ],
+    "read_file": [
+      "~/.m2/settings.xml",
+      "~/.gitignore",
+      "~/.rgignore",
+      "~/.ripgreprc",
+      "~/.config/starship.toml"
+    ],
+    "unix_socket_dir": [
+      "/private/tmp/tuios-$UID",
+      "~/.lima/agents/sock"
+    ],
+    "unix_socket": [
+      "~/.local/share/atuin/atuin.sock"
+    ],
+    "bypass_protection": [
+      "~/.docker/cli-plugins"
+    ],
+    "deny": [
+      "~/.config/fnox",
+      "~/.local/state/fnox",
+      "~/.local/share/atuin/key",
+      "~/.m2/settings-security*.xml",
+      "~/.testcontainers.properties",
+      "~/.config/twg/auth-profiles.json",
+      "~/.config/twg/consent.json",
+      "~/.config/twg/install.json",
+      "~/.config/twg/skills-lifecycle.json",
+      "~/.config/twg/tenant-contexts",
+      "~/Library/Caches/twg",
+      "~/.config/herdr/herdr.sock",
+      "~/.local/state/rex/herdr.sock"
+    ]
+  },
+  "network": {
+    "allow_domain": ["*"],
+    "credentials": [
+      "github_git",
+      "github_api",
+      "maven_github",
+      "nexus",
+      "context7",
+      "exa"
+    ],
+    "custom_credentials": {
+      "github_git": {
+        "upstream": "https://github.com",
+        "credential_key": "github_pat_basic",
+        "inject_mode": "basic_auth",
+        "env_var": "GITHUB_PERSONAL_ACCESS_TOKEN",
+        "phantom_format": "ghp_{}",
+        "endpoint_policy": {
+          "default": "deny",
+          "deny": [
+            { "method": "*", "path": "/*/*/git-receive-pack" }
+          ],
+          "allow": [
+            { "method": "GET", "path": "/*/*/info/refs" },
+            { "method": "POST", "path": "/*/*/git-upload-pack" },
+            { "method": "GET", "path": "/*/*/archive/**" },
+            { "method": "GET", "path": "/*/*/releases/download/**" }
+          ]
+        }
+      },
+      "github_api": {
+        "upstream": "https://api.github.com",
+        "credential_key": "github_public",
+        "inject_header": "Authorization",
+        "credential_format": "token {}",
+        "env_var": "MISE_GITHUB_TOKEN",
+        "phantom_format": "ghp_{}",
+        "endpoint_policy": {
+          "default": "deny",
+          "allow": [
+            { "method": "GET", "path": "/**" },
+            { "method": "HEAD", "path": "/**" },
+            { "method": "POST", "path": "/graphql" }
+          ]
+        }
+      },
+      "maven_github": {
+        "upstream": "https://maven.pkg.github.com",
+        "credential_key": "github_pat_basic",
+        "inject_mode": "basic_auth",
+        "env_var": "LIFLIG_GITHUB_PAT",
+        "endpoint_policy": {
+          "default": "deny",
+          "allow": [
+            { "method": "GET", "path": "/**" },
+            { "method": "HEAD", "path": "/**" }
+          ]
+        }
+      },
+      "nexus": {
+        "upstream": "https://nexus.common-services.vydev.io",
+        "credential_key": "nexus_basic",
+        "inject_mode": "basic_auth",
+        "env_var": "NEXUS_PASSWORD",
+        "endpoint_policy": {
+          "default": "deny",
+          "allow": [
+            { "method": "GET", "path": "/**" },
+            { "method": "HEAD", "path": "/**" }
+          ]
+        }
+      },
+      "context7": {
+        "upstream": "https://context7.com",
+        "credential_key": "context7",
+        "inject_header": "Authorization",
+        "credential_format": "Bearer {}",
+        "env_var": "CONTEXT7_API_KEY",
+        "endpoint_policy": {
+          "default": "deny",
+          "allow": [
+            { "method": "GET", "path": "/api/**" },
+            { "method": "GET", "path": "/docs/**" }
+          ]
+        }
+      },
+      "exa": {
+        "upstream": "https://api.exa.ai",
+        "credential_key": "exa",
+        "inject_header": "x-api-key",
+        "credential_format": "{}",
+        "env_var": "EXA_API_KEY"
+      }
+    },
+    "open_port": [0],
+    "listen_port_range": [[49152, 65535]]
+  },
+  "environment": {
+    "deny_vars": [
+      "SSH_AUTH_SOCK",
+      "OP_*",
+      "FNOX_*",
+      "GH_TOKEN",
+      "GITHUB_TOKEN",
+      "DOCKER_CONTEXT"
+    ],
+    "set_vars": {
+      "MISE_DATA_DIR": "$HOME/.local/share/mise-agents",
+      "MISE_STATE_DIR": "$HOME/.local/state/mise-agents",
+      "MISE_CACHE_DIR": "$HOME/.cache/agents/mise",
+      "MISE_SYSTEM_DATA_DIR": "$HOME/.local/share/mise",
+      "MISE_TRUSTED_CONFIG_PATHS": "$HOME/CX:$HOME/CNOPS:$HOME/CN-TERMINAL:$HOME/LIFLIG:$HOME/NSBNO:$HOME/dotfiles",
+      "XDG_CACHE_HOME": "$HOME/.cache/agents",
+      "npm_config_cache": "$HOME/.cache/agents/npm",
+      "CARGO_HOME": "$HOME/.cache/agents/cargo",
+      "GOPATH": "$HOME/.cache/agents/go",
+      "GOCACHE": "$HOME/.cache/agents/go-build",
+      "PIP_CACHE_DIR": "$HOME/.cache/agents/pip",
+      "UV_PYTHON_INSTALL_DIR": "$HOME/.cache/agents/uv-python",
+      "UV_TOOL_DIR": "$HOME/.cache/agents/uv-tools",
+      "GRADLE_USER_HOME": "$HOME/.cache/agents/gradle",
+      "MAVEN_ARGS": "-Dmaven.repo.local=$HOME/.m2/repository-agents -Dmaven.repo.local.tail=$HOME/.m2/repository",
+      "DOCKER_HOST": "unix://$HOME/.lima/agents/sock/docker.sock",
+      "TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE": "/run/user/501/docker.sock",
+      "TESTCONTAINERS_HOST_OVERRIDE": "127.0.0.1"
+    }
+  },
+  "session_hooks": {
+    "before": {
+      "script": "$HOME/dotfiles/nono/hooks/agent-before.sh",
+      "timeout_secs": 20
+    }
+  }
+}

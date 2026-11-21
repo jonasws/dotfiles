@@ -2,21 +2,23 @@
   <state>
     {
       "creds": [
-        {"cred": "PAT repo (keychain github_repo)", "scope": "classic: repo, read:org, SSO", "inside": "placeholder", "use": "git fetch, gh reads, Maven via Nexus", "limit": "nono: fetch only, GET, GET/HEAD"},
-        {"cred": "PAT packages (keychain github_packages)", "scope": "classic: read:packages, SSO", "inside": "real value", "use": "GHCR pulls, MISE_GITHUB_TOKEN", "limit": "scope: pull only"},
-        {"cred": "AWS profiles (aws-vault)", "scope": "-readonly / -agent, several", "inside": "placeholder keys", "use": "aws CLI, SDKs, AWS MCP", "limit": "IAM session policy + nono operations"},
-        {"cred": "Agent signing key", "scope": "SSH signing key", "inside": "readable file", "use": "signed commits", "limit": "can sign, not push"},
-        {"cred": "Claude login", "scope": "your Claude account", "inside": "package profile", "use": "the agent itself", "limit": "nolabs-ai/claude"}
+        {"cred": "nono/github_pat_basic", "scope": "classic PAT: repo, SSO", "inside": "placeholder", "use": "git fetch, GitHub Packages (Maven)", "limit": "nono: fetch and GET only"},
+        {"cred": "nono/github_public", "scope": "fine-grained, public read", "inside": "placeholder", "use": "gh, github MCP, mise", "limit": "scope: public read; GET + GraphQL"},
+        {"cred": "nono/nexus_basic", "scope": "your Nexus login", "inside": "placeholder", "use": "Maven via Nexus", "limit": "nono: GET/HEAD only"},
+        {"cred": "nono/context7, nono/exa", "scope": "API keys", "inside": "placeholder", "use": "find-docs, exa MCP", "limit": "nono route"},
+        {"cred": "nono/github_packages", "scope": "classic PAT: read:packages", "inside": "real value", "use": "GHCR pulls (docker, Testcontainers)", "limit": "scope: pull only"},
+        {"cred": "AWS -readonly profiles", "scope": "scoped host profiles, 12", "inside": "placeholder keys", "use": "aws CLI, SDKs, AWS MCP", "limit": "IAM session policy + read operations"},
+        {"cred": "Agent signing key", "scope": "SSH signing key", "inside": "readable file", "use": "signed commits", "limit": "can sign, not push"}
       ],
       "profile": [
-        {"k": "Extends", "v": "nolabs-ai/claude"},
-        {"k": "Writable", "v": "workspace, ~/.m2/repository-agents, agents' mise dirs"},
-        {"k": "Read-only", "v": "~/.m2/repository, your mise installs, ~/.config/agent-signing"},
-        {"k": "Denied", "v": "~/.config/fnox, fnox state, ~/.m2/settings*.xml, herdr and Rex sockets"},
-        {"k": "Unix sockets", "v": "tuios socket dir, ~/.lima/agents/sock/docker.sock"},
-        {"k": "Network", "v": "proxy mode, domain allowlist, open_port 0, no approvals"},
-        {"k": "Routes", "v": "github, github_api, nexus, aws_auth per service, aws-mcp"},
-        {"k": "Environment", "v": "MAVEN_ARGS, AWS_CONFIG_FILE, DOCKER_HOST, DOCKER_CONFIG, mise vars"}
+        {"k": "Extends", "v": "nolabs-ai/claude, liflig-aws (generated)"},
+        {"k": "Writable", "v": "repo roots, ~/.tsk, ~/.m2/repository-agents, ~/.cache/agents, agents' mise dirs"},
+        {"k": "Read-only", "v": "~/dotfiles, ~/.m2/repository, your mise installs, atuin history"},
+        {"k": "Denied", "v": "fnox config and state, atuin key, twg auth, herdr and Rex sockets"},
+        {"k": "Unix sockets", "v": "tuios socket dir, Lima docker socket, atuin daemon"},
+        {"k": "Network", "v": "proxy, any host (plain tunnel), routes intercepted, listen 49152-65535"},
+        {"k": "Caches", "v": "XDG_CACHE_HOME, npm, uv, pip, Go, cargo, Gradle under ~/.cache/agents"},
+        {"k": "Before hook", "v": "writes the agent's DOCKER_CONFIG with the GHCR pull token"}
       ],
       "mcp": [
         {"opt": "Hosted MCP, proxy inside, nono signs", "creds": "none", "profiles": "yes", "extra": "none (IAM)", "verdict": "chosen for run_script"},
@@ -39,13 +41,18 @@
         {"engine": "Apple container", "api": "none", "rootless": "VM per container", "verdict": "no; host service with your rights"}
       ],
       "tools": [
-        {"tool": "mise", "here": "Runs inside. Own MISE_DATA_DIR; your installs via MISE_SYSTEM_DATA_DIR read-only", "own": "deny_* wraps one command; installs and hooks run outside"},
-        {"tool": "fnox", "here": "Not on the agent path; config, keys, daemon denied", "own": "proxy --sandbox has no Unix socket allow; tuios and Docker unreachable"}
+        {"tool": "mise", "here": "Own data, state, cache; your installs read-only; repo configs trusted by path", "own": "deny_* wraps one command; installs and hooks run outside"},
+        {"tool": "fnox", "here": "fnox-secret returns preset vars, so wrappers work; fnox itself denied", "own": "proxy --sandbox has no Unix socket allow; tuios and Docker unreachable"},
+        {"tool": "atuin", "here": "hook talks to the daemon socket; MCP reads history; key denied", "own": "none"},
+        {"tool": "tsk", "here": "~/.tsk writable, same board as yours", "own": "none"},
+        {"tool": "twg", "here": "auth files denied, so twg cannot authenticate inside", "own": "open item"}
       ],
       "decisions": [
         {"q": "Outer sandbox", "chosen": "nono", "why": "Unix sockets, SigV4 re-signing, operation policies"},
         {"q": "Secret store", "chosen": "keychain via nono", "why": "no 1Password socket, no Touch ID per agent"},
-        {"q": "Maven credentials", "chosen": "nono reverse route", "why": "hides the token, blocks deploy; mvnenc gives the JVM plaintext"},
+        {"q": "Maven credentials", "chosen": "placeholders in your settings.xml", "why": "real URLs, hidden tokens, deploy blocked; mvnenc gives the JVM plaintext"},
+        {"q": "Web egress", "chosen": "any host, plain tunnel", "why": "WebFetch, docs and package downloads work; credentialed hosts stay policed"},
+        {"q": "fnox in the sandbox", "chosen": "not needed", "why": "fnox-secret honours preset vars; nono sets them"},
         {"q": "AWS delivery", "chosen": "nono aws_auth + profiles", "why": "several profiles, nothing usable inside"},
         {"q": "AWS scoping", "chosen": "AssumeRole + session policy", "why": "no sts:GetScopedCredentials grant needed; own session name"},
         {"q": "Docker", "chosen": "one rootless Lima VM", "why": "VM is the boundary; firewall stays enforceable"},
@@ -58,7 +65,11 @@
         {"what": "Repos in the VM mounts are readable", "note": "via a container, beyond the nono workspace"},
         {"what": "Approved egress reachable from containers", "note": "the allowlist limits where, not what"},
         {"what": "Classic PATs rotated by hand", "note": "short expiry plus a keychain update"},
-        {"what": "Long run_script tasks", "note": "behaviour at session expiry is undocumented"}
+        {"what": "Long run_script tasks", "note": "behaviour at session expiry is undocumented"},
+        {"what": "Open web egress", "note": "a path for sending data out; credentialed hosts stay policed"},
+        {"what": "gh on private repos", "note": "gh uses the public-read token; git fetch reaches private repos"},
+        {"what": "twg (Jira, Confluence)", "note": "not brokered yet; its auth files stay denied"},
+        {"what": "~/dotfiles is read-only", "note": "dotfiles work happens unsandboxed or via you"}
       ],
       "gaps": [
         {"where": "tuios", "gap": "A caller outside any pane counts as you", "fix": "no grants for unplaced sandboxed callers (sandbox_check)"},
@@ -67,7 +78,10 @@
       ],
       "verify": [
         {"check": "git through nono: 401 challenge, placeholder accepted"},
-        {"check": "Maven preemptive-auth name; mvn -U verify via the route"},
+        {"check": "mvn -U verify: proxy settings and truststore from the wrapper"},
+        {"check": "claude --setting-sources project,local loads the ccn settings"},
+        {"check": "mise, gh, github MCP trust nono's CA (--trust-proxy-ca)"},
+        {"check": "fff, kotlin-lsp, semble write only where granted"},
         {"check": "aws CLI and boto3 trust AWS_CA_BUNDLE; one call per profile"},
         {"check": "MCP proxy signs via aws-mcp route; s3:GetObject denied"},
         {"check": "Rootless Lima: heaviest Testcontainers suite, Ryuk on"},
@@ -131,25 +145,26 @@
     <tab id="launch" title="Launch">
       <col pad="1" gap="1">
         <mermaid>sequenceDiagram
-  participant S as cc (fish)
+  participant S as ccn (fish)
   participant T as tuios daemon
   participant N as nono supervisor
   participant K as Keychain
   participant C as claude (sandboxed)
+  S-&gt;&gt;S: settings copy without gh/aws denies and Claude's sandbox
   S-&gt;&gt;T: set-pane-grants read,write
-  S-&gt;&gt;N: exec nono run --profile liflig-agent
-  N-&gt;&gt;K: read PATs, service nono
+  S-&gt;&gt;N: exec nono run --profile liflig-agent --trust-proxy-ca
+  N-&gt;&gt;K: read credentials, service nono
+  N-&gt;&gt;N: before-hook: agent DOCKER_CONFIG
   N-&gt;&gt;N: start proxy, CA, placeholders
-  N-&gt;&gt;C: apply Seatbelt, start claude --settings sandboxed
+  N-&gt;&gt;C: apply Seatbelt, start claude --setting-sources project,local
   C-&gt;&gt;T: agent-hook and MCP over the socket, grants checked</mermaid>
-        <code lang="fish">tuios set-pane-grants --grants read,write
-exec nono run --profile liflig-agent -- \
-  claude --settings ~/.claude/settings.sandboxed.json</code>
+        <code lang="fish">ccn            # fish/functions/ccn.fish
+# one-time: mise run nono:keychain, mise run lima:agents</code>
         <table rows="state.profile">
           <column field="k" title="Profile"/>
           <column field="v" title="What it adds"/>
         </table>
-        <text role="warning"><b>Always start Claude through cc.</b> The agent can write ~/.claude; an unsandboxed claude would run what it planted.</text>
+        <text role="warning"><b>Always start Claude through ccn.</b> The agent can write ~/.claude; an unsandboxed claude would run what it planted.</text>
         <text role="dim">! commands run inside the sandbox too. Push from another window.</text>
       </col>
     </tab>
@@ -185,10 +200,12 @@ exec nono run --profile liflig-agent -- \
   G-&gt;&gt;N: POST git-receive-pack (push)
   N--&gt;&gt;G: 403, denied by endpoint policy</mermaid>
         <kv>
-          <item k="Route github" v="basic_auth, x-access-token:PAT, placeholder GITHUB_TOKEN"/>
-          <item k="Allowed" v="GET /*/*/info/refs, POST /*/*/git-upload-pack"/>
-          <item k="Denied" v="POST /*/*/git-receive-pack, everything else" role="error"/>
-          <item k="Route github_api" v="api.github.com, GET only, GH_TOKEN ghp_ placeholder"/>
+          <item k="Route github_git" v="github.com, basic_auth x-access-token:PAT, ghp_ placeholder"/>
+          <item k="Allowed" v="info/refs, git-upload-pack, archive, release downloads"/>
+          <item k="Denied" v="git-receive-pack (push), everything else" role="error"/>
+          <item k="Route github_api" v="api.github.com, public-read token, GET and GraphQL"/>
+          <item k="Credential helper" v="your gh auth git-credential, fed the placeholder"/>
+          <item k="ssh remotes" v="git@github.com: rewritten to https by ccn"/>
         </kv>
       </col>
     </tab>
@@ -196,26 +213,23 @@ exec nono run --profile liflig-agent -- \
       <col pad="1" gap="1">
         <mermaid>sequenceDiagram
   participant M as mvn (sandbox)
-  participant N as nono reverse route
+  participant N as nono proxy
   participant X as Nexus
-  M-&gt;&gt;N: GET 127.0.0.1/nexus/repository/group, Basic agent:placeholder
+  M-&gt;&gt;N: CONNECT nexus, GET artifact, no auth
+  N-&gt;&gt;X: forwarded unchanged
+  X--&gt;&gt;M: 401 Basic challenge
+  M-&gt;&gt;N: GET, Basic you:placeholder (NEXUS_PASSWORD)
   N-&gt;&gt;N: check placeholder, GET or HEAD allowed
-  N-&gt;&gt;X: GET over TLS, Basic you:PAT
+  N-&gt;&gt;X: GET, Basic you:real password
   X--&gt;&gt;M: artifact
   M-&gt;&gt;N: PUT (deploy)
   N--&gt;&gt;M: 403, endpoint policy</mermaid>
-        <code lang="sh">MAVEN_ARGS = -s ~/.config/nono/maven/settings.xml
-  -Dmaven.repo.local=$HOME/.m2/repository-agents
-  -Dmaven.repo.local.tail=$HOME/.m2/repository
-  -Daether.transport.http.preemptiveAuth=true
-  -Daether.connector.http.preemptiveAuth=true</code>
         <kv>
-          <item k="Mirror" v="mirrorOf *, url from env NEXUS_BASE_URL + /repository/group/"/>
-          <item k="Server" v="any username, password from env NEXUS_TOKEN (placeholder)"/>
-          <item k="Preemptive auth" v="needed: nono's 401 sends no challenge"/>
+          <item k="settings.xml" v="unchanged: env-var passwords, real repository URLs"/>
+          <item k="Placeholders" v="LIFLIG_GITHUB_PAT, NEXUS_PASSWORD set by nono"/>
+          <item k="Proxy" v="the mvn wrapper turns HTTPS_PROXY into --global-settings"/>
+          <item k="CA" v="the mvn wrapper adds nono's session CA to a JDK truststore"/>
           <item k="Repo tail" v="your ~/.m2/repository read-only; agents write their own"/>
-          <item k="Proxy settings" v="none; everything goes through the mirror"/>
-          <item k="Maven Wrapper" v="MVNW_REPOURL to the route, or Maven from mise"/>
           <item k="Maven 4 mvnenc" v="not used: the JVM decrypts all settings at boot" role="warning"/>
         </kv>
       </col>
