@@ -17,6 +17,9 @@
 # share one call. Context7 sends no ETag and `max-age=0`, so there is nothing
 # to revalidate against, and a conditional request would cost a call anyway.
 # CONTEXT7_CACHE_HOURS=0 skips the cache read and stores the fresh answer.
+# Each `context` answer is also written as markdown under docs/<libraryId>/,
+# with the library, query and fetch time in frontmatter, for the
+# `forge:docs-index` task to index with qmd.
 # When Context7 is unreachable, rate-limited or failing, an expired answer is
 # served instead, with a note on stderr.
 #
@@ -56,6 +59,39 @@ digest() {
 key=$({ echo "$endpoint"; printf '%s\n' "$@" | LC_ALL=C sort; } | digest)
 cached=$cache_dir/$key.json
 
+# param NAME ARGS... prints the value of the first NAME=value in ARGS.
+param() {
+  local name=$1 arg
+  shift
+  for arg in "$@"; do [[ $arg == "$name="* ]] && { printf '%s' "${arg#*=}"; return; }; done
+  return 0
+}
+
+write_markdown() {
+  local library query dir
+  library=$(param libraryId "$@")
+  query=$(param query "$@")
+  [[ -n $library ]] || return 0
+  dir=$cache_dir/docs/$(printf '%s' "${library#/}" | tr -c 'A-Za-z0-9._/-' '_')
+  mkdir -p "$dir"
+  {
+    echo '---'
+    echo 'source: context7'
+    printf 'library: %s\n' "$(jq -n --arg v "$library" '$v')"
+    printf 'query: %s\n' "$(jq -n --arg v "$query" '$v')"
+    printf 'fetched: %s\n' "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+    echo '---'
+    echo
+    printf '# %s\n\n' "${query:-$library}"
+    if [[ ${body:0:1} == '{' || ${body:0:1} == '[' ]]; then
+      printf '```json\n%s\n```\n' "$body"
+    else
+      printf '%s\n' "$body"
+    fi
+  } >"$dir/$key.md.part"
+  mv "$dir/$key.md.part" "$dir/$key.md"
+}
+
 emit() {
   if [[ $kind == libs ]]; then
     jq -r '.results[:5][] | [.id, .title, .totalSnippets, .trustScore, .benchmarkScore, ((.versions // [])[:5] | join(","))] | @tsv' "$1"
@@ -81,6 +117,9 @@ if (( rc == 0 )); then
   mkdir -p "$cache_dir"
   printf '%s\n' "$body" >"$cached.part"
   mv "$cached.part" "$cached"
+  if [[ $kind == context ]]; then
+    write_markdown "$@" || echo "context7: could not write the markdown copy for qmd" >&2
+  fi
   if [[ ${remaining:-} =~ ^[0-9]+$ ]] && (( remaining < 20 )); then
     echo "context7: $remaining requests left in this rate-limit window" >&2
   fi

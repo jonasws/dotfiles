@@ -254,6 +254,11 @@ description = "Prefetch a Maven project's dependencies and their sources, for ag
 dir = "{{ cwd }}"
 run = "bash {{config_root}}/forge/maven-sources.sh"
 
+[tasks."forge:docs-index"]
+description = "Index fetched docs (Context7 answers, plus any NAME=DIR) with qmd for local search: [NAME=DIR...]"
+dir = "{{ cwd }}"
+run = "bash {{config_root}}/forge/docs-index.sh"
+
 [tasks."nono:battle-aws"]
 description = "Battle test AWS inside the agent sandbox: [PROFILE] [BUCKET] [--interactive]"
 # Read-only: writes are aimed at resources that do not exist. Extra arguments

@@ -170,6 +170,10 @@ account is in [fnox/README.md](fnox/README.md); in short:
   plugins and dependency sources into `~/.m2/repository`
   ([`forge/maven-sources.sh`](forge/maven-sources.sh)), so find-docs reads a
   library's source at the version the build uses before going online.
+  `mise -C ~/dotfiles run forge:docs-index` indexes the Context7 answers
+  agents already fetched with qmd ([`forge/docs-index.sh`](forge/docs-index.sh)).
+  Checks not yet run on the Mac are in
+  [`docs/unverified-probes.md`](docs/unverified-probes.md).
   One-time setup: `mise run nono:keychain` (with `NONO_GITHUB_PACKAGES` set to
   a `read:packages` PAT), `mise run nono:java-truststore`,
   `mise run sync:nono-approvals` and `mise run lima:agents`. The design, with
