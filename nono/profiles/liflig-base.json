@@ -115,7 +115,8 @@
       "api.adoptium.net",
       "knowledge-mcp.global.api.aws",
       "www.superlogical.com",
-      "ruteplan-mcp.trafficinfo.vydev.io"
+      "ruteplan-mcp.trafficinfo.vydev.io",
+      "code.claude.com"
     ],
     "approval_backends": {
       "tuios": {

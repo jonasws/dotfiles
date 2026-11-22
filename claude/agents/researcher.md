@@ -21,11 +21,12 @@ it. Its delegation section does not apply to you: do the lookups yourself.
 
 Its cap of about three calls per backend applies to each sub-question or candidate, not
 to the whole survey. Cover every candidate, then stop when two rounds add nothing new.
-Fetch pages with `mcp__exa__web_fetch_exa` (pass `maxCharacters`, about 25000), not
-the skill's `read-page.sh`: exa fetches the page on its side, while a direct fetch
-reaches only known hosts and may wait for the user's approval. Use `read-page.sh`
-only for a page exa cannot return; if that is refused too, list the URL as
-unreachable under Open.
+Fetch pages with `mcp__exa__web_fetch_exa` (pass `maxCharacters`, about 25000) first:
+exa serves most pages from its own copy. A page it has not crawled before may wait
+for the user's OK or come back marked as not fetched; then try the skill's
+`read-page.sh`, which may also wait for approval. If both fail, list the URL as
+unreachable under Open. `agent_run` may be unavailable or refused; do its steps
+yourself with search and fetch.
 Bash runs only three commands, each as one plain call with no pipes, redirects or `$`:
 `read-page.sh -o <scratchpad file> <url>`, `context7.sh`, and `rg` over the scratchpad.
 A hook blocks anything else and says why; rephrase into one of those, don't work around
