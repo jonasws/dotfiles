@@ -96,6 +96,7 @@
         {"area": "Builds", "check": "Rootless Lima: heaviest Testcontainers suite, Ryuk on"},
         {"area": "Builds", "check": "Container cannot reach the Mac's loopback"},
         {"area": "Builds", "check": "MISE_SYSTEM_DATA_DIR reuse of your installs"},
+        {"area": "AWS", "check": "mise run nono:battle-aws -- PROFILE BUCKET --interactive: every check passes; nono audit show lists each decision"},
         {"area": "AWS", "check": "aws CLI and boto3 trust AWS_CA_BUNDLE; one call per profile"},
         {"area": "AWS", "check": "MCP proxy signs via aws-mcp route; s3:GetObject denied"},
         {"area": "AWS", "check": "Scoped profiles rebuilt on AssumeRole + policy"},

@@ -247,6 +247,12 @@ run = "tuios tml show {{config_root}}/claude/hooks/overview.tml --pane"
 description = "Regenerate the sandbox AWS config and nono's SigV4 routes from aws/config"
 run = "python3 -I {{config_root}}/nono/tools/gen-aws.py"
 
+[tasks."nono:battle-aws"]
+description = "Battle test AWS inside the agent sandbox: [PROFILE] [BUCKET] [--interactive]"
+# Read-only: writes are aimed at resources that do not exist. Extra arguments
+# go to the script. Then `nono audit show <id>` lists each proxy decision.
+run = "nono run --silent --profile liflig-base -- bash {{config_root}}/nono/battle/aws.sh"
+
 [tasks."nono:keychain"]
 description = "Copy the agents' brokered credentials from fnox into the keychain items nono reads"
 # nono resolves credential_key names from the login keychain, service "nono",

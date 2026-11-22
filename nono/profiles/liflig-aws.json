@@ -30,6 +30,7 @@
       "aws_rds",
       "aws_route53",
       "aws_s3",
+      "aws_s3_bucket",
       "aws_scheduler",
       "aws_secretsmanager",
       "aws_sns",
@@ -1345,6 +1346,38 @@
       },
       "aws_s3": {
         "upstream": "https://s3.*.amazonaws.com",
+        "aws_auth": {
+          "profiles": {
+            "NONOPLACEHOLDER092E0B52FF8D7147": "cn-cx-build-readonly",
+            "NONOPLACEHOLDERF59A54C6E7851105": "cn-cx-dev-readonly",
+            "NONOPLACEHOLDERCF63BAA352D40736": "cn-cx-prod-readonly",
+            "NONOPLACEHOLDEREEDF8E9F82E72902": "cn-cx-staging-readonly",
+            "NONOPLACEHOLDER4EC2B98058B1675F": "cn-terminal-build-readonly",
+            "NONOPLACEHOLDER853E2F5B86BCACB2": "cn-terminal-dev-readonly",
+            "NONOPLACEHOLDER164B1F906E46FCDE": "cn-terminal-prod-readonly",
+            "NONOPLACEHOLDER959E6736A4F44E29": "cn-terminal-staging-readonly",
+            "NONOPLACEHOLDER1ADAE3567BF7C674": "cnops-build-readonly",
+            "NONOPLACEHOLDER7FA4FFCDC84B4EDA": "cnops-dev-readonly",
+            "NONOPLACEHOLDER914A4EB8D17AFA76": "cnops-prod-readonly",
+            "NONOPLACEHOLDER9BEF0164D34C9DED": "cnops-staging-readonly"
+          }
+        },
+        "endpoint_policy": {
+          "default": "deny",
+          "allow": [
+            {
+              "method": "GET",
+              "path": "/**"
+            },
+            {
+              "method": "HEAD",
+              "path": "/**"
+            }
+          ]
+        }
+      },
+      "aws_s3_bucket": {
+        "upstream": "https://*.s3.*.amazonaws.com",
         "aws_auth": {
           "profiles": {
             "NONOPLACEHOLDER092E0B52FF8D7147": "cn-cx-build-readonly",

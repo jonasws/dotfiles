@@ -112,6 +112,13 @@ def main():
             "aws_auth": aws_auth,
             "endpoint_policy": rest_policy(),
         }
+    # The CLI and SDKs address a bucket virtual-hosted (bucket.s3.REGION...)
+    # by default; s3.*.amazonaws.com only covers path-style requests.
+    routes["aws_s3_bucket"] = {
+        "upstream": "https://*.s3.*.amazonaws.com",
+        "aws_auth": aws_auth,
+        "endpoint_policy": rest_policy(),
+    }
     for service, host in GLOBAL_QUERY_SERVICES.items():
         routes[f"aws_{service}"] = {
             "upstream": f"https://{host}",
