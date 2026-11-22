@@ -61,24 +61,9 @@ With JSON, save large output to a scratchpad file first, look at its shape
 (`jq 'keys'`, `jq '.[0] | keys'`, `nu -c 'open f.json | describe'`), then extract
 only the fields you need.
 
-## Shell for the Bash tool
+## Shell
 
-`CLAUDE_CODE_SHELL=/opt/homebrew/bin/bash` in `~/.claude/settings.json` pins Bash
-tool commands to Homebrew bash 5.3.
-
-Without it, Claude Code auto-detects: `$SHELL` when it names bash or zsh, otherwise
-the first working zsh, then bash, on PATH. Here `$SHELL=/bin/zsh`, so commands ran in
-zsh, where a bare `=word` is equals-expansion — `echo ===` fails with
-`(eval):1: == not found` and exits 1, easy to miss behind the real output of a
-compound command. Quote the separator (`echo '==='`) wherever zsh may still run it.
-
-Only bash and zsh are accepted; fish is not, and a path that is neither falls back to
-auto-detection without a warning. `defaultShell` in settings.json is a different
-setting — it chooses bash or PowerShell for `!`-prefix commands typed in the input box.
-
-Apple's `/bin/bash` is 3.2 and is the fallback on a machine without the Homebrew
-formula: no `${var^^}`, no associative arrays, no `mapfile`, no `globstar`. Prefer
-`python3` over bash 4+ syntax in anything that has to run there.
+Commands and scripts run in bash 4 or later. Use its features freely.
 
 ## Credentials and network
 
