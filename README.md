@@ -137,7 +137,7 @@ account is in [fnox/README.md](fnox/README.md); in short:
   `tuios start-agent`, presets and `fan` all reach it by name; outside nono
   only on purpose, with `command (mise which claude)`. No credential of yours enters the sandbox:
   each tool finds its usual variable (`GH_TOKEN`, `LIFLIG_GITHUB_PAT`,
-  `NEXUS_PASSWORD`, `CONTEXT7_API_KEY`, `EXA_API_KEY`, ...) set to a
+  `NEXUS_PASSWORD`, `CONTEXT7_API_KEY`, ...) set to a
   placeholder, and nono's proxy, on the host, swaps in the real value. git
   fetch (no push), `gh` and the github MCP (public reads), Maven against
   GitHub Packages and Nexus (reads only), Context7, Exa and read-only AWS
@@ -153,7 +153,15 @@ account is in [fnox/README.md](fnox/README.md); in short:
   those refusals to [`nono/broker/broker.py`](nono/broker/broker.py), a
   LaunchAgent that delivers mail, lists agents and, after a yes in the
   Inbox, starts claude or pi in another repo (`mise run sync:nono-broker`
-  loads it). Docker is a Lima
+  loads it). Exa goes through
+  [`nono/exa-gate/gate.py`](nono/exa-gate/gate.py), a LaunchAgent that holds
+  the key: search as asked, page contents from Exa's cache only, and a live
+  fetch of an uncached URL only after a yes in the agent's pane, which shows
+  the URL (`mise run sync:nono-exa-gate`). Agents never reach api.exa.ai
+  themselves. Files that run outside the sandbox without asking you first
+  (`.git/config`, `.git/hooks`, project `.claude` settings, `.mcp.json`,
+  `mise.local.toml`, `~/.claude/settings*.json`) are read-only to agents.
+  Docker is a Lima
   VM of the agents' own ([`lima/agents.yaml`](lima/agents.yaml): rootless,
   read-only repo mounts, no route to the Mac). Agents get their own mise,
   Maven, npm, uv, Go and cargo caches, and read yours, so nothing they

@@ -49,7 +49,9 @@ def session_info(session_id):
 def describe(request, where):
     kind = request.get("capability_type")
     if kind == "network":
-        what = f"reach {request.get('host')}:{request.get('port')}"
+        # A host approval opens a tunnel; nothing sent through it is shown or
+        # checked, so say so.
+        what = f"reach {request.get('host')}:{request.get('port')} (any path and data, unseen)"
     elif kind == "endpoint":
         op = request.get("operation")
         what = f"{request.get('method')} {request.get('upstream')}{request.get('path')}"

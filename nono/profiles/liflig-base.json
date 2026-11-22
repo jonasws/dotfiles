@@ -278,13 +278,6 @@
             }
           ]
         }
-      },
-      "exa": {
-        "upstream": "https://api.exa.ai",
-        "credential_key": "exa",
-        "inject_header": "x-api-key",
-        "credential_format": "{}",
-        "env_var": "EXA_API_KEY"
       }
     },
     "open_port": [
@@ -295,6 +288,10 @@
         49152,
         65535
       ]
+    ],
+    "deny_domain": [
+      "api.exa.ai",
+      "mcp.exa.ai"
     ]
   },
   "environment": {
@@ -346,7 +343,9 @@
       "GIT_CONFIG_KEY_7": "branch.autoSetupMerge",
       "GIT_CONFIG_VALUE_7": "false",
       "GIT_CONFIG_KEY_8": "checkout.guess",
-      "GIT_CONFIG_VALUE_8": "false"
+      "GIT_CONFIG_VALUE_8": "false",
+      "EXA_API_BASE_URL": "http://127.0.0.1:47811",
+      "EXA_API_KEY": "via-exa-gate"
     }
   },
   "session_hooks": {

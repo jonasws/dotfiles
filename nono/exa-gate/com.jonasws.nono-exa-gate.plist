@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Exa for agents in nono (nono/exa-gate/gate.py): search, and page contents
+     from Exa's cache, with a live fetch only after a yes in tuios. Linked into
+     ~/Library/LaunchAgents by the nono-exa-gate-launchd dotfile group; load it
+     with `mise -C ~/dotfiles run sync:nono-exa-gate`. launchd expands no ~ or
+     $HOME, hence the absolute paths. -->
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.jonasws.nono-exa-gate</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/bin/python3</string>
+		<string>-I</string>
+		<string>/Users/jonasws/dotfiles/nono/exa-gate/gate.py</string>
+	</array>
+	<key>RunAtLoad</key>
+	<true/>
+	<key>KeepAlive</key>
+	<true/>
+	<key>ThrottleInterval</key>
+	<integer>10</integer>
+	<key>StandardOutPath</key>
+	<string>/Users/jonasws/.local/state/nono-exa-gate/gate.log</string>
+	<key>StandardErrorPath</key>
+	<string>/Users/jonasws/.local/state/nono-exa-gate/gate.log</string>
+</dict>
+</plist>

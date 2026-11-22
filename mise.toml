@@ -309,6 +309,17 @@ launchctl bootout "gui/$(id -u)" "$plist" 2>/dev/null || true
 launchctl bootstrap "gui/$(id -u)" "$plist"
 """
 
+[tasks."sync:nono-exa-gate"]
+description = "(Re)load the LaunchAgent that serves Exa to agents in nono, cache-first"
+run = """
+set -euo pipefail
+plist="$HOME/Library/LaunchAgents/com.jonasws.nono-exa-gate.plist"
+[[ -e $plist ]] || { echo "$plist is missing: run 'mise dotfiles apply' first" >&2; exit 1; }
+mkdir -p "$HOME/.local/state/nono-exa-gate"
+launchctl bootout "gui/$(id -u)" "$plist" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$plist"
+"""
+
 [tasks."sync:nono-broker"]
 description = "(Re)load the LaunchAgent that makes cross-session tuios calls for agents in nono"
 run = """
@@ -614,6 +625,11 @@ exclude = ["bridge.py"]
 root = "nono/broker"
 target = "~/Library/LaunchAgents"
 exclude = ["broker.py", "client.py"]
+
+[dotfile_groups.nono-exa-gate-launchd]
+root = "nono/exa-gate"
+target = "~/Library/LaunchAgents"
+exclude = ["gate.py"]
 
 [dotfile_groups.ripgrep]
 root = "ripgrep"
