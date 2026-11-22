@@ -94,6 +94,8 @@ How to delegate:
 
 Context7 is three GET endpoints on `context7.com`, called through the skill's `context7.sh` (`~/.claude/skills/find-docs/context7.sh`): `search`, `libs` or `context`, then one `<name>=<value>` argument per parameter, quoted when it has spaces. It wraps curl with flags that keep failures readable and silence the noise, and adds the key from `CONTEXT7_API_KEY`, which the environment already holds. The `researcher` subagent can run Context7 only this way.
 
+Answers are cached on disk for three days, shared by every agent on the machine, so repeating an exact call costs nothing; the order of the arguments doesn't matter, but any change to the query text is a new call. `CONTEXT7_CACHE_HOURS=0` in front of the command forces a fresh answer, for a release from the last few days. A note on stderr that the answer is from an expired cache entry means Context7 was unreachable or rate-limited: use the answer, and say it may be stale.
+
 Two ways in, and the first match in this table decides. Count calls against the backend budget of about three: search is one call, resolving a library and then querying it is two, and each query on an ID you already hold is one.
 
 | The question | Call | Calls |

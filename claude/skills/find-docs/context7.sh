@@ -12,10 +12,17 @@
 # trustScore, benchmarkScore, and up to five indexed versions. The key comes
 # from CONTEXT7_API_KEY in the environment.
 #
+# Answers are cached on disk for CONTEXT7_CACHE_HOURS (default 72), keyed by
+# endpoint and parameters in any order, so agents asking the same question
+# share one call. Context7 sends no ETag and `max-age=0`, so there is nothing
+# to revalidate against, and a conditional request would cost a call anyway.
+# CONTEXT7_CACHE_HOURS=0 skips the cache read and stores the fresh answer.
+# When Context7 is unreachable, rate-limited or failing, an expired answer is
+# served instead, with a note on stderr.
+#
 # -sS drops the progress meter but still prints a one-line reason when the
-# connection fails (plain -s exits 6 silently, which reads like an empty
-# result). --fail-with-body exits non-zero on an HTTP error while keeping
-# Context7's one-line JSON reason.
+# connection fails. --fail-with-body exits non-zero on an HTTP error while
+# keeping Context7's one-line JSON reason.
 set -euo pipefail
 
 usage='usage: context7.sh search|libs|context <name>=<value>...'
@@ -39,13 +46,56 @@ for arg in "$@"; do
   params+=(--data-urlencode "$arg")
 done
 
-request() {
-  curl -sSG --fail-with-body --max-time 30 "https://context7.com/api/$endpoint" \
-    -H "Authorization: Bearer $CONTEXT7_API_KEY" "${params[@]}"
+ttl_hours=${CONTEXT7_CACHE_HOURS:-72}
+[[ $ttl_hours =~ ^[0-9]+$ ]] || { echo "context7: CONTEXT7_CACHE_HOURS must be whole hours" >&2; exit 2; }
+cache_dir=${XDG_CACHE_HOME:-$HOME/.cache}/context7
+
+digest() {
+  if command -v sha256sum >/dev/null; then sha256sum; else shasum -a 256; fi | cut -c1-32
+}
+key=$({ echo "$endpoint"; printf '%s\n' "$@" | LC_ALL=C sort; } | digest)
+cached=$cache_dir/$key.json
+
+emit() {
+  if [[ $kind == libs ]]; then
+    jq -r '.results[:5][] | [.id, .title, .totalSnippets, .trustScore, .benchmarkScore, ((.versions // [])[:5] | join(","))] | @tsv' "$1"
+  else
+    cat "$1"
+  fi
 }
 
-if [[ $kind == libs ]]; then
-  request | jq -r '.results[:5][] | [.id, .title, .totalSnippets, .trustScore, .benchmarkScore, ((.versions // [])[:5] | join(","))] | @tsv'
-else
-  request
+if (( ttl_hours > 0 )) && [[ -s $cached && -n $(find "$cached" -mmin "-$((ttl_hours * 60))") ]]; then
+  emit "$cached"
+  exit 0
 fi
+
+rc=0
+out=$(curl -sSG --fail-with-body --max-time 30 "https://context7.com/api/$endpoint" \
+  -H "Authorization: Bearer $CONTEXT7_API_KEY" "${params[@]}" \
+  -w '\n%{http_code}|%header{ratelimit-remaining}|%header{retry-after}') || rc=$?
+meta=${out##*$'\n'}
+body=${out%$'\n'*}
+IFS='|' read -r code remaining retry_after <<<"$meta" || true
+
+if (( rc == 0 )); then
+  mkdir -p "$cache_dir"
+  printf '%s\n' "$body" >"$cached.part"
+  mv "$cached.part" "$cached"
+  if [[ ${remaining:-} =~ ^[0-9]+$ ]] && (( remaining < 20 )); then
+    echo "context7: $remaining requests left in this rate-limit window" >&2
+  fi
+  emit "$cached"
+  exit 0
+fi
+
+if [[ -s $cached && $code =~ ^(000|429|5..)$ ]]; then
+  echo "context7: request failed (HTTP $code); this answer is from an expired cache entry" >&2
+  emit "$cached"
+  exit 0
+fi
+
+[[ -n $body ]] && printf '%s\n' "$body"
+if [[ $code == 429 && -n ${retry_after:-} ]]; then
+  echo "context7: rate-limited; retry after ${retry_after}s" >&2
+fi
+exit "$rc"
