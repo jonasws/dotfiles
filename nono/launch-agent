@@ -39,19 +39,18 @@ fi
 if [ "$name" = claude ]; then
   # The sandbox brokers GitHub, AWS and the rest, so the deny rules that keep
   # an unsandboxed Claude off gh and aws go, and so does Claude's own sandbox.
-  # git rewrites ssh remotes to https, which nono can broker.
+  # Agent git settings (signing key, https remotes) come from the profile for
+  # every harness, so Claude's own copies go. Messages from other sessions are
+  # accepted here: inside nono they come from peers, and sessions outside
+  # nono hold them (crossSessionInbound in settings.json).
   state="$HOME/.local/state/nono-agent"
   settings="$state/claude-settings.json"
   mkdir -p "$state"
   jq '
     .permissions.deny -= ["Bash(gh:*)", "Bash(aws *)", "Bash(awslogs *)"]
     | del(.sandbox)
-    | (.env.GIT_CONFIG_COUNT | tonumber) as $n
-    | .env["GIT_CONFIG_KEY_\($n)"] = "url.https://github.com/.insteadOf"
-    | .env["GIT_CONFIG_VALUE_\($n)"] = "git@github.com:"
-    | .env["GIT_CONFIG_KEY_\($n + 1)"] = "url.https://github.com/.insteadOf"
-    | .env["GIT_CONFIG_VALUE_\($n + 1)"] = "ssh://git@github.com/"
-    | .env.GIT_CONFIG_COUNT = "\($n + 2)"
+    | .env |= with_entries(select(.key | startswith("GIT_CONFIG_") | not))
+    | .crossSessionInbound = "accept"
   ' "$HOME/.claude/settings.json" >"$settings.$$"
   mv "$settings.$$" "$settings"
   set -- --setting-sources project,local --settings "$settings" "$@"

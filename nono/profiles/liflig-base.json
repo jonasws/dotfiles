@@ -327,7 +327,26 @@
       "TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE": "/run/user/501/docker.sock",
       "TESTCONTAINERS_HOST_OVERRIDE": "127.0.0.1",
       "TUIOS_NO_SERVICE": "1",
-      "TUIOS_NO_DAEMON_APP": "1"
+      "TUIOS_NO_DAEMON_APP": "1",
+      "GIT_CONFIG_COUNT": "9",
+      "GIT_CONFIG_KEY_0": "commit.gpgsign",
+      "GIT_CONFIG_VALUE_0": "true",
+      "GIT_CONFIG_KEY_1": "tag.gpgsign",
+      "GIT_CONFIG_VALUE_1": "false",
+      "GIT_CONFIG_KEY_2": "gpg.format",
+      "GIT_CONFIG_VALUE_2": "ssh",
+      "GIT_CONFIG_KEY_3": "gpg.ssh.program",
+      "GIT_CONFIG_VALUE_3": "ssh-keygen",
+      "GIT_CONFIG_KEY_4": "user.signingkey",
+      "GIT_CONFIG_VALUE_4": "$HOME/.config/agent-signing/id_ed25519",
+      "GIT_CONFIG_KEY_5": "url.https://github.com/.insteadOf",
+      "GIT_CONFIG_VALUE_5": "git@github.com:",
+      "GIT_CONFIG_KEY_6": "url.https://github.com/.insteadOf",
+      "GIT_CONFIG_VALUE_6": "ssh://git@github.com/",
+      "GIT_CONFIG_KEY_7": "branch.autoSetupMerge",
+      "GIT_CONFIG_VALUE_7": "false",
+      "GIT_CONFIG_KEY_8": "checkout.guess",
+      "GIT_CONFIG_VALUE_8": "false"
     }
   },
   "session_hooks": {
@@ -335,5 +354,11 @@
       "script": "$HOME/dotfiles/nono/hooks/agent-before.sh",
       "timeout_secs": 20
     }
-  }
+  },
+  "unsafe_macos_seatbelt_rules": [
+    "(deny file-write* (regex #\"^/Users/jonasws/(CX|CNOPS|CN-TERMINAL|LIFLIG|NSBNO|\\.herdr/worktrees|herdr-splits\\.nvim)/(.+/)?\\.git/(.+/)?(config|config\\.worktree)(\\.lock)?$\"))",
+    "(deny file-write* (regex #\"^/Users/jonasws/(CX|CNOPS|CN-TERMINAL|LIFLIG|NSBNO|\\.herdr/worktrees|herdr-splits\\.nvim)/(.+/)?\\.git/(.+/)?hooks(/|$)\"))",
+    "(deny file-write* (regex #\"^/Users/jonasws/(CX|CNOPS|CN-TERMINAL|LIFLIG|NSBNO|\\.herdr/worktrees|herdr-splits\\.nvim)/(.+/)?(\\.claude/settings(\\.local)?\\.json|\\.mcp\\.json|\\.?mise\\.local\\.toml)$\"))",
+    "(deny file-write* (regex #\"^/Users/jonasws/\\.claude/(settings(\\.local)?\\.json|hooks(/|$))\"))"
+  ]
 }
