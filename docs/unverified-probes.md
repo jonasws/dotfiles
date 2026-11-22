@@ -8,6 +8,10 @@ no tuios and no API keys; some were tested there against stubs, as noted.
 Run a probe, then tick it and note the date and result, or move it to **Failed**
 with what happened. Delete an entry once its fix has landed and passed.
 
+`mise -C ~/dotfiles run nono:probe` ([`nono/battle/probe.sh`](../nono/battle/probe.sh))
+runs the probes marked *(auto)* and prints PASS or FAIL for each ID; it works in a
+throwaway repo it creates under the first workspace root. The rest need you.
+
 Sandboxed commands below use the profile the agents run with:
 
 ```sh
@@ -18,27 +22,27 @@ nono run --silent --profile liflig-base -- <command>
 
 ## Sandbox: Seatbelt rules and git
 
-- [ ] **S1. Trust-handoff files are read-only to agents.**
+- [ ] **S1. Trust-handoff files are read-only to agents.** *(auto)*
   In the sandbox, from `<repo>`:
   `touch .git/hooks/probe`, `git config --local probe.x 1`,
   `printf x >> .mcp.json`, `printf x >> .claude/settings.json`,
   `printf x >> ~/.claude/settings.json`, `mkdir -p ~/.claude/hooks/probe`.
   Pass when each fails with "Operation not permitted" and nothing changed.
   Only the regexes were tested, in Python, against 17 deny and 15 allow paths.
-- [ ] **S2. Ordinary git work still writes.** In the sandbox, in `<repo>`:
+- [ ] **S2. Ordinary git work still writes.** *(auto)* In the sandbox, in `<repo>`:
   stage and commit a scratch change on a throwaway branch, then
   `git clone --depth 1 https://github.com/jonasws/dotfiles <scratch>/d` and
   `git -C <scratch>/d config --local probe.x 1`.
   Pass when all succeed: the denies cover the workspace roots only, not
   scratch clones, `.git/index` or objects.
-- [ ] **S3. Agent commits are signed.** After S2's commit:
+- [ ] **S3. Agent commits are signed.** *(auto)* After S2's commit:
   `git log -1 --show-signature`. Pass when it shows a good SSH signature by
   the agent key; `GIT_CONFIG_COUNT=9` in the profile's `set_vars` is what sets
   this, now that the Claude settings copy drops `GIT_CONFIG_*`.
-- [ ] **S4. SSH remotes go over HTTPS.** In the sandbox: `git fetch` in a
+- [ ] **S4. SSH remotes go over HTTPS.** *(auto)* In the sandbox: `git fetch` in a
   repo whose remote is `git@github.com:…`. Pass when it fetches without an
   SSH prompt or key.
-- [ ] **S5. `launchctl` cannot start work outside the sandbox.** In the sandbox:
+- [ ] **S5. `launchctl` cannot start work outside the sandbox.** *(auto)* In the sandbox:
   `launchctl submit -l nono.probe -- /usr/bin/touch /tmp/nono-escaped`, then
   outside: `test -e /tmp/nono-escaped && echo ESCAPED`.
   Pass when `launchctl` is refused and nothing is printed. If it escapes,
@@ -48,20 +52,37 @@ nono run --silent --profile liflig-base -- <command>
   agent, `SendMessage` to a session outside nono. Pass when it is held for
   you, not delivered into the turn. Then send from outside to the sandboxed
   agent; pass when it arrives.
-- [ ] **S7. `code.claude.com` is reachable.** In the sandbox:
+- [ ] **S7. `code.claude.com` is reachable.** *(auto)* In the sandbox:
   `curl -sS -o /dev/null -w '%{http_code}\n' https://code.claude.com/docs/en/settings`.
   Pass on 200 without an approval prompt.
+
+- [ ] **S8. Instructions every later session loads are read-only.** *(auto)*
+  In the sandbox: `touch ~/.claude/CLAUDE.md`,
+  `mkdir -p ~/.claude/skills/probe`, the same under `agents`, `commands` and
+  `output-styles`, and for pi `~/.pi/agent/extensions` and `AGENTS.md`.
+  Pass when each fails and Claude Code still writes the rest of `~/.claude`
+  (transcripts, todos). Not covered, deliberately: `~/.claude/plugins`
+  (Claude Code updates plugins itself) and pi's `settings.json` (pi saves model
+  changes there). A synced claude.ai skill or the `#` memory shortcut fails in a
+  sandboxed session; check both once.
+- [ ] **S9. Repo `.env` files are unreadable.** *(auto)* In the sandbox, in a
+  repo with `.env`, `sub/.env.local` and `.env.example`: `cat` each. Pass when
+  the first two fail, the example reads, and `ls` still lists `.env`. The rule
+  is `file-read-data` with an allow for `.env.example`, `.sample`, `.template`,
+  `.dist` and `.defaults` after it; P0 (`nono profile show`) is what checks that
+  nono accepts an `allow` rule there. A test or dev server that loads `.env`
+  fails inside the sandbox: that is the intent.
 
 ## Shell
 
 `claude/CLAUDE.md` now tells agents to assume bash 4 and no longer explains
 how the shell is chosen; the environment has to make that true.
 
-- [ ] **H1. The Bash tool runs Homebrew bash.** In a session outside nono and
+- [ ] **H1. The Bash tool runs Homebrew bash.** *(auto: the binary; the Bash tool itself is manual)* In a session outside nono and
   in a sandboxed one, have the agent run `echo "$BASH_VERSION"`. Pass on 5.x
   in both. `CLAUDE_CODE_SHELL` in `settings.json`'s `env` sets it; a path that
   is missing or unreadable falls back to `$SHELL` (zsh) silently.
-- [ ] **H2. Scripts find bash 5 on `PATH`.** `#!/usr/bin/env bash` and
+- [ ] **H2. Scripts find bash 5 on `PATH`.** *(auto)* `#!/usr/bin/env bash` and
   `bash <script>` take the first bash on `PATH`. From a mise task and a tuios
   pane, `command -v bash` is `/opt/homebrew/bin/bash`. Anything launchd starts
   gets `/usr/bin:/bin:/usr/sbin:/sbin` unless its plist sets `PATH`, so a bash
@@ -71,7 +92,7 @@ how the shell is chosen; the environment has to make that true.
 
 Tested in the container against a fake upstream only.
 
-- [ ] **E1. The LaunchAgent runs.** `mise run sync:nono-exa-gate`, then
+- [ ] **E1. The LaunchAgent runs.** *(auto)* `mise run sync:nono-exa-gate`, then
   `launchctl print gui/$(id -u)/com.jonasws.nono-exa-gate | rg state` and
   `curl -sS -X POST -o /dev/null -w '%{http_code}\n' http://127.0.0.1:47811/answer`.
   Pass on `state = running` and 403.
@@ -82,7 +103,7 @@ Tested in the container against a fake upstream only.
 - [ ] **E3. exa-mcp-server uses the gate.** From a sandboxed agent, run
   `web_search_exa`. Pass when the gate log shows the request and the agent
   gets results.
-- [ ] **E4. Direct Exa is refused.** In the sandbox:
+- [ ] **E4. Direct Exa is refused.** *(auto)* In the sandbox:
   `curl -sS https://api.exa.ai/search`. Pass when nono refuses the host.
 - [ ] **E5. Cache-only fetch, and the shape of a miss.** From a sandboxed
   agent, `web_fetch_exa` on a cached page (a popular docs page), then on a
@@ -112,17 +133,17 @@ Tested in the container against a fake upstream only.
 - [ ] **D3. MCP OAuth inside nono.** Start a sandboxed agent and use the
   superlogical MCP. Pass when its OAuth flow completes or its token is
   reused, without an approval for an unknown host.
-- [ ] **D4. Context7's real headers.** Outside the sandbox, with the key:
+- [ ] **D4. Context7's real headers.** *(auto: printed as INFO)* Outside the sandbox, with the key:
   `curl -sSG -D - -o /dev/null https://context7.com/api/v2/libs/search -H "Authorization: Bearer $CONTEXT7_API_KEY" --data-urlencode libraryName=http4k`.
   Record `Cache-Control`, any `ETag` or `Last-Modified`, and the
   `RateLimit-*` names. The cache assumes no validators and `max-age=0`, which
   was seen only on a 429. If a 200 carries an ETag or a useful `max-age`,
   revisit `context7.sh`.
-- [ ] **D5. `context7.sh` on macOS.** `curl --version` is 7.84 or later
+- [ ] **D5. `context7.sh` on macOS.** *(auto: the curl version)* `curl --version` is 7.84 or later
   (`%header{}`). Run the same `context` query twice. Pass when the second is
   instant and makes no call; `~/.cache/context7/<hash>.json` exists. This
   also exercises `shasum` and BSD `find -mmin`. Tested on Linux against a stub.
-- [ ] **D6. The cache inside the sandbox.** From a sandboxed agent, one
+- [ ] **D6. The cache inside the sandbox.** *(auto)* From a sandboxed agent, one
   `context7.sh context …` call. Pass when
   `~/.cache/agents/context7/<hash>.json` and
   `~/.cache/agents/context7/docs/<library>/<hash>.md` appear.
@@ -172,7 +193,10 @@ Nothing yet.
 Open sandbox gaps from the same review, tracked here so they are not lost:
 
 - The Lima VM's containers have open internet.
-- `~/.claude` skills, agents and `CLAUDE.md` are still writable by agents.
-- Repository `.env` files are readable.
+- `~/.claude/plugins` and pi's `settings.json` stay writable (see S8), as do a
+  repository's own `CLAUDE.md`, `AGENTS.md` and `.claude/skills`: changes there
+  go through git review.
+- Secrets in files other than `.env*` (`application-local.yml`, `.envrc`) stay
+  readable.
 - "Allow this session" on an unknown host opens a blind tunnel for the session.
 - S3 reads reach buckets in other people's accounts.

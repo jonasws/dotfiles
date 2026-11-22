@@ -265,6 +265,10 @@ description = "Battle test AWS inside the agent sandbox: [PROFILE] [BUCKET] [--i
 # go to the script. Then `nono audit show <id>` lists each proxy decision.
 run = "nono run --silent --profile liflig-base -- bash {{config_root}}/nono/battle/aws.sh"
 
+[tasks."nono:probe"]
+description = "Run the sandbox and docs probes that need no human; PASS/FAIL per probe ID"
+run = "bash {{config_root}}/nono/battle/probe.sh"
+
 [tasks."nono:keychain"]
 description = "Copy the agents' brokered credentials from fnox into the keychain items nono reads"
 # nono resolves credential_key names from the login keychain, service "nono",

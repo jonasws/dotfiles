@@ -160,8 +160,11 @@ account is in [fnox/README.md](fnox/README.md); in short:
   the URL (`mise run sync:nono-exa-gate`). Agents never reach api.exa.ai
   themselves. Files that run outside the sandbox without asking you first
   (`.git/config`, `.git/hooks`, project `.claude` settings, `.mcp.json`,
-  `mise.local.toml`, `~/.claude/settings*.json`) are read-only to agents.
-  Docker is a Lima
+  `mise.local.toml`, `~/.claude/settings*.json`) are read-only to agents, and
+  so are the instructions every later session loads (`~/.claude` `CLAUDE.md`,
+  skills, agents, commands, output styles; pi's extensions, skills, prompts
+  and `AGENTS.md`). Repository `.env` files are unreadable, apart from
+  `.env.example` and its kin. Docker is a Lima
   VM of the agents' own ([`lima/agents.yaml`](lima/agents.yaml): rootless,
   read-only repo mounts, no route to the Mac). Agents get their own mise,
   Maven, npm, uv, Go and cargo caches, and read yours, so nothing they
@@ -173,7 +176,8 @@ account is in [fnox/README.md](fnox/README.md); in short:
   `mise -C ~/dotfiles run forge:docs-index` indexes the Context7 answers
   agents already fetched with qmd ([`forge/docs-index.sh`](forge/docs-index.sh)).
   Checks not yet run on the Mac are in
-  [`docs/unverified-probes.md`](docs/unverified-probes.md).
+  [`docs/unverified-probes.md`](docs/unverified-probes.md);
+  `mise -C ~/dotfiles run nono:probe` runs the ones that need no human.
   One-time setup: `mise run nono:keychain` (with `NONO_GITHUB_PACKAGES` set to
   a `read:packages` PAT), `mise run nono:java-truststore`,
   `mise run sync:nono-approvals` and `mise run lima:agents`. The design, with
