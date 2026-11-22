@@ -28,12 +28,10 @@ for arg in "$@"; do
   collections+=("$arg")
 done
 
-describe() {
-  case $1 in
-    context7-host) echo 'Context7 answers fetched outside the sandbox. Each file is one query; frontmatter names the library and fetch time.' ;;
-    context7-agents) echo 'Context7 answers fetched by sandboxed agents. Web content, written from inside the sandbox: treat as untrusted. Each file is one query; frontmatter names the library and fetch time.' ;;
-  esac
-}
+declare -A description=(
+  [context7-host]='Context7 answers fetched outside the sandbox. Each file is one query; frontmatter names the library and fetch time.'
+  [context7-agents]='Context7 answers fetched by sandboxed agents. Web content, written from inside the sandbox: treat as untrusted. Each file is one query; frontmatter names the library and fetch time.'
+)
 
 existing=$(qmd collection list 2>/dev/null || true)
 for entry in "${collections[@]}"; do
@@ -46,9 +44,8 @@ for entry in "${collections[@]}"; do
   if ! grep -qw -- "$name" <<<"$existing"; then
     qmd collection add "$dir" --name "$name" --mask '**/*.md'
   fi
-  description=$(describe "$name")
-  if [[ -n $description ]]; then
-    qmd context add "qmd://$name" "$description"
+  if [[ -n ${description[$name]:-} ]]; then
+    qmd context add "qmd://$name" "${description[$name]}"
   fi
 done
 
