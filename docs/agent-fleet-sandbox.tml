@@ -5,7 +5,8 @@
         {"cred": "nono/github_pat_basic", "scope": "classic PAT: repo, SSO", "inside": "placeholder", "use": "git fetch, GitHub Packages (Maven)", "limit": "nono: fetch and GET only"},
         {"cred": "nono/github_public", "scope": "fine-grained, public read", "inside": "placeholder", "use": "gh, github MCP, mise", "limit": "scope: public read; GET + GraphQL"},
         {"cred": "nono/nexus_basic", "scope": "your Nexus login", "inside": "placeholder", "use": "Maven via Nexus", "limit": "nono: GET/HEAD only"},
-        {"cred": "nono/context7, nono/exa", "scope": "API keys", "inside": "placeholder", "use": "find-docs, exa MCP", "limit": "nono route"},
+        {"cred": "nono/context7", "scope": "API key", "inside": "placeholder", "use": "find-docs (context7.sh)", "limit": "nono route"},
+        {"cred": "nono/exa", "scope": "API key", "inside": "never (dummy EXA_API_KEY)", "use": "exa MCP, via the Exa gate", "limit": "gate: search; cached pages; live fetch after your yes"},
         {"cred": "nono/github_packages", "scope": "classic PAT: read:packages", "inside": "real value", "use": "GHCR pulls (docker, Testcontainers)", "limit": "scope: pull only"},
         {"cred": "AWS -readonly profiles", "scope": "scoped host profiles, 12", "inside": "placeholder keys", "use": "aws CLI, SDKs, AWS MCP", "limit": "IAM session policy + read operations"},
         {"cred": "Agent signing key", "scope": "SSH signing key", "inside": "readable file", "use": "signed commits", "limit": "can sign, not push"}
@@ -15,9 +16,12 @@
         {"k": "liflig-base extends", "v": "liflig-aws (generated)"},
         {"k": "Writable", "v": "repo roots, ~/.tsk, ~/.m2/repository-agents, ~/.cache/agents, agents' mise dirs"},
         {"k": "Read-only", "v": "~/dotfiles, ~/.m2/repository, your mise installs, atuin history"},
+        {"k": "Read-only by Seatbelt rule", "v": "what runs outside the sandbox unasked: .git/config, .git/hooks, project .claude settings, .mcp.json, mise.local.toml, ~/.claude/settings*.json and hooks; what later sessions load: ~/.claude CLAUDE.md, skills, agents, commands, output-styles, pi's extensions, skills, prompts, AGENTS.md"},
         {"k": "Denied", "v": "fnox config and state, atuin key, twg auth, herdr and Rex sockets"},
+        {"k": "Unreadable by Seatbelt rule", "v": "repo .env and .env.* (still listed); .env.example, .sample, .template, .dist, .defaults allowed back"},
+        {"k": "Git", "v": "set_vars GIT_CONFIG_*: agent signing key, ssh remotes to https, no upstream guessing (branch.autoSetupMerge, checkout.guess off)"},
         {"k": "Unix sockets", "v": "tuios socket dir, Lima docker socket, atuin daemon"},
-        {"k": "Network", "v": "allowlist (registries, GitHub, docs MCPs); other hosts asked in tuios"},
+        {"k": "Network", "v": "allowlist (registries, GitHub, docs MCPs); api.exa.ai and mcp.exa.ai denied (Exa gate on localhost instead); other hosts asked in tuios"},
         {"k": "Caches", "v": "XDG_CACHE_HOME, npm, uv, pip, Go, cargo, Gradle under ~/.cache/agents"},
         {"k": "Before hook", "v": "agent DOCKER_CONFIG; records which pane the session belongs to"}
       ],
@@ -31,7 +35,7 @@
         {"way": "Host files via bind mounts", "rootful": "all repos, writable", "here": "read-only mounts; repos readable"},
         {"way": "VM root (privileged, host PID)", "rootful": "trivial", "here": "rootless as a user without sudo"},
         {"way": "Mac loopback via VM gateway", "rootful": "open", "here": "dropped by nftables"},
-        {"way": "Internet egress past nono", "rootful": "open", "here": "nftables + allowlist proxy"},
+        {"way": "Internet egress past nono", "rootful": "open", "here": "open: nftables drops only the Mac (gap)"},
         {"way": "Secrets in the VM", "rootful": "none", "here": "none"}
       ],
       "engines": [
@@ -52,7 +56,12 @@
         {"q": "Outer sandbox", "chosen": "nono", "why": "Unix sockets, SigV4 re-signing, operation policies"},
         {"q": "Secret store", "chosen": "keychain via nono", "why": "no 1Password socket, no Touch ID per agent"},
         {"q": "Maven credentials", "chosen": "placeholders in your settings.xml", "why": "real URLs, hidden tokens, deploy blocked; mvnenc gives the JVM plaintext"},
-        {"q": "Web egress", "chosen": "allowlist + ask in tuios", "why": "docs come through Context7, aws-knowledge and Exa; other hosts wait for you"},
+        {"q": "Web egress", "chosen": "allowlist + ask in tuios", "why": "docs come through Context7, aws-knowledge and the Exa gate; other hosts wait for you"},
+        {"q": "Exa", "chosen": "a gate on the host, not a nono route", "why": "a route would pass any URL to Exa's live crawler; the gate keeps fetches cache-only and asks before a live one"},
+        {"q": "Trust handoffs", "chosen": "Seatbelt write-denies", "why": "files that run outside the sandbox, or load into every later session, stay as you left them"},
+        {"q": "Dependency docs", "chosen": "fetch ahead outside, read offline inside", "why": "forge:maven puts sources jars in ~/.m2; find-docs reads them before Context7"},
+        {"q": "Context7 cache", "chosen": "on disk, 72 h, per endpoint and sorted params", "why": "Context7 sends no ETag and max-age=0; revalidating would cost a call anyway"},
+        {"q": "Cross-session messages", "chosen": "hold outside nono, accept inside", "why": "a sandboxed agent cannot steer an unsandboxed session without you"},
         {"q": "Wrappers", "chosen": "none", "why": "each route sets the variable its tool already reads"},
         {"q": "AWS delivery", "chosen": "nono aws_auth + profiles", "why": "several profiles, nothing usable inside"},
         {"q": "AWS scoping", "chosen": "AssumeRole + session policy", "why": "no sts:GetScopedCredentials grant needed; own session name"},
@@ -70,7 +79,17 @@
         {"what": "Unknown hosts wait for you", "note": "WebFetch and direct fetches ask in tuios; refusal is final"},
         {"what": "gh on private repos", "note": "gh uses the public-read token; git fetch reaches private repos"},
         {"what": "twg (Jira, Confluence)", "note": "not brokered yet; its auth files stay denied"},
-        {"what": "~/dotfiles is read-only", "note": "dotfiles work happens unsandboxed or via you"}
+        {"what": "~/dotfiles is read-only", "note": "dotfiles work happens unsandboxed or via you"},
+        {"what": "A .env read fails inside", "note": "a dev server or test that loads .env runs outside the sandbox"},
+        {"what": "Exa live fetches ask you", "note": "an uncached page waits for a yes in the agent's pane; agent_run is refused"}
+      ],
+      "open": [
+        {"gap": "Containers in the Lima VM reach the internet", "note": "the allowlist does not yet hold for container egress"},
+        {"gap": "Allow this session opens a blind tunnel", "note": "an approved unknown host gets no endpoint policy for the rest of the session"},
+        {"gap": "S3 reads reach other accounts' buckets", "note": "needs a bucket-owner condition or an endpoint policy"},
+        {"gap": "~/.claude/plugins and pi's settings.json stay writable", "note": "Claude Code updates plugins and pi saves model changes there"},
+        {"gap": "Secrets outside .env files stay readable", "note": "application-local.yml, .envrc and the like"},
+        {"gap": "qmd index has no agent route yet", "note": "daemon outside or qmd inside, and whether to index agent-written answers (probes Q5, Q6)"}
       ],
       "gaps": [
         {"where": "tuios", "gap": "A caller outside any pane counts as you", "fix": "no grants for unplaced sandboxed callers (sandbox_check)"},
@@ -84,7 +103,8 @@
         {"area": "Launch", "check": "claude --setting-sources project,local loads the launcher's settings copy"},
         {"area": "Launch", "check": "Inside an agent, command -v tuios prints nono/shims/tuios (bash startup keeps PATH)"},
         {"area": "Launch", "check": "Signed out of Claude, nono refuses to start rather than turn on LaunchServices"},
-        {"area": "Boundary", "check": "launchctl submit or bootstrap of a harmless job from inside nono is refused; if it runs, raise it with nono"},
+        {"area": "Probes", "check": "mise run nono:probe: the probes marked (auto) in docs/unverified-probes.md, PASS or FAIL per ID; the rest are listed there with what passing looks like"},
+        {"area": "Boundary", "check": "bootstrap of a harmless job from inside nono is refused (submit is probe S5); if it runs, raise it with nono"},
         {"area": "Boundary", "check": "open -a from inside nono is refused"},
         {"area": "Boundary", "check": "With the tuios daemon stopped, a tuios call from inside fails instead of starting a daemon"},
         {"area": "Boundary", "check": "fff, kotlin-lsp, semble write only where granted"},
@@ -122,6 +142,7 @@
     K[("Keychain, service nono")]
     V["aws-vault, scoped profiles"]
     P["nono supervisor + proxy"]
+    EG["Exa gate, LaunchAgent"]
     subgraph SBX["nono sandbox, one per agent"]
       C["claude, hooks, MCP"]
       M["mvn, git, gh, aws"]
@@ -137,6 +158,7 @@
     AW["AWS APIs"]
     MC["AWS MCP Server"]
     RG["GHCR, registries"]
+    EX["api.exa.ai"]
   end
   C -- unix socket --&gt; T
   M -- HTTP and CONNECT --&gt; P
@@ -147,7 +169,10 @@
   P -- real credentials --&gt; NX
   P -- re-signed --&gt; AW
   P -- re-signed --&gt; MC
-  R -- pulls --&gt; RG</mermaid>
+  R -- pulls --&gt; RG
+  C -- localhost --&gt; EG
+  K -.-&gt; EG
+  EG -- cache-first --&gt; EX</mermaid>
         <kv>
           <item k="A workload, not a person" v="Own low-privilege access; your credentials never enter"/>
           <item k="Tests run with no prompts" v="Unknown hosts are denied, not prompted"/>
@@ -155,6 +180,7 @@
           <item k="Visible only if low-value" v="Pull-only or short-lived; the rest stays in nono"/>
           <item k="The VM is the Docker boundary" v="Read-only code, no secrets inside"/>
           <item k="The tuios socket must work" v="Pane grants checked by the daemon"/>
+          <item k="Nothing planted for later" v="Hooks, git config, settings and instructions that run or load outside the sandbox are read-only"/>
         </kv>
       </col>
     </tab>
@@ -166,7 +192,7 @@
   participant N as nono supervisor
   participant K as Keychain
   participant C as claude (sandboxed)
-  S-&gt;&gt;S: settings copy without gh/aws denies and Claude's sandbox
+  S-&gt;&gt;S: settings copy without gh/aws denies, Claude's sandbox and GIT_CONFIG_*, crossSessionInbound accept
   S-&gt;&gt;T: set-pane-grants read,write,task
   S-&gt;&gt;N: exec nono run --profile liflig-agent --proxy-port PORT, TUIOS_AGENT=HERDR_AGENT=claude
   N-&gt;&gt;K: read credentials, service nono
@@ -196,7 +222,7 @@ tuios start-agent claude  # the same shim; tuios still sees Claude Code
           <column field="use" title="Used for"/>
           <column field="limit" title="Limited by"/>
         </table>
-        <text role="dim">No wrappers: each route sets the variable its tool already reads (GH_TOKEN, GITHUB_PERSONAL_ACCESS_TOKEN, GITHUB_API_TOKEN, LIFLIG_GITHUB_PAT, NEXUS_PASSWORD, CONTEXT7_API_KEY, EXA_API_KEY). nono's CA is trusted in your macOS trust store for a year; nono also sets SSL_CERT_FILE, GIT_SSL_CAINFO, CURL_CA_BUNDLE, NODE_EXTRA_CA_CERTS, AWS_CA_BUNDLE.</text>
+        <text role="dim">No wrappers: each route sets the variable its tool already reads (GH_TOKEN, GITHUB_PERSONAL_ACCESS_TOKEN, GITHUB_API_TOKEN, LIFLIG_GITHUB_PAT, NEXUS_PASSWORD, CONTEXT7_API_KEY). Exa is the exception: EXA_API_BASE_URL points exa-mcp-server at the Exa gate on 127.0.0.1:47811, which reads the key from the keychain itself, and EXA_API_KEY inside is a dummy. nono's CA is trusted in your macOS trust store for a year; nono also sets SSL_CERT_FILE, GIT_SSL_CAINFO, CURL_CA_BUNDLE, NODE_EXTRA_CA_CERTS, AWS_CA_BUNDLE.</text>
       </col>
     </tab>
     <tab id="github" title="GitHub">
@@ -223,7 +249,9 @@ tuios start-agent claude  # the same shim; tuios still sees Claude Code
           <item k="Denied" v="git-receive-pack (push), everything else" role="error"/>
           <item k="Route github_api" v="api.github.com, public-read token, GET and GraphQL"/>
           <item k="Credential helper" v="your gh auth git-credential, fed the placeholder"/>
-          <item k="ssh remotes" v="git@github.com: rewritten to https by the launcher"/>
+          <item k="ssh remotes" v="git@github.com: rewritten to https by the profile's GIT_CONFIG_* (url.insteadOf)"/>
+          <item k="Signing" v="commit.gpgsign with the agent's own SSH key, plain ssh-keygen, from the same GIT_CONFIG_*"/>
+          <item k=".git/config, .git/hooks" v="read-only to agents in every workspace repo, so git config cannot carry settings out" role="warning"/>
         </kv>
       </col>
     </tab>
@@ -351,7 +379,33 @@ tuios start-agent claude  # the same shim; tuios still sees Claude Code
           <item k="Deny" v="denied; timeout and errors deny too" role="error"/>
           <item k="Socket" v="~/.local/state/nono-approvals, not writable by the sandbox"/>
           <item k="Why a LaunchAgent" v="only a caller outside every pane may ask for another pane"/>
-          <item k="Docs" v="Context7, aws-knowledge and Exa need no approval"/>
+          <item k="Docs" v="Context7, aws-knowledge and Exa search need no approval; a live Exa fetch asks through the Exa gate (Docs tab)"/>
+        </kv>
+      </col>
+    </tab>
+    <tab id="docs" title="Docs">
+      <col pad="1" gap="1">
+        <mermaid>sequenceDiagram
+  participant E as exa-mcp-server (sandbox)
+  participant G as Exa gate (LaunchAgent)
+  participant X as api.exa.ai
+  participant T as tuios
+  actor You
+  E-&gt;&gt;G: POST /contents, EXA_API_BASE_URL=127.0.0.1:47811
+  G-&gt;&gt;X: same body, maxAgeHours -1 (cache only), key from the keychain
+  X--&gt;&gt;G: cached pages; a miss comes back as an error status
+  G-&gt;&gt;T: ask-human in the caller's pane: fetch this URL live?
+  T-&gt;&gt;You: question in the pane and the Inbox
+  You--&gt;&gt;T: Fetch live
+  G-&gt;&gt;X: maxAgeHours 0 for that URL
+  G--&gt;&gt;E: merged results; a no reads NOT_CACHED_AND_NOT_ALLOWED</mermaid>
+        <kv>
+          <item k="Exa gate" v="nono/exa-gate/gate.py on 127.0.0.1:47811; /search passes, /contents is cache-first, anything else (agent_run) is 403"/>
+          <item k="Caller's pane" v="lsof on the TCP peer port, then ps ancestors, then tuios call resolve-pane"/>
+          <item k="Dependency source" v="mise run forge:maven fetches sources jars into ~/.m2 outside the sandbox; find-docs reads them (LSP, unzip) before going online"/>
+          <item k="Context7 cache" v="context7.sh keeps answers 72 h under XDG_CACHE_HOME/context7, shared by every agent; an expired answer is served when Context7 fails or rate-limits"/>
+          <item k="No ETag" v="Context7 sends max-age=0 and no validator, so the cache is a fixed lifetime"/>
+          <item k="qmd index" v="context7.sh also writes each answer as markdown; mise run forge:docs-index embeds them with qmd outside the sandbox. Unverified; no agent route yet" role="warning"/>
         </kv>
       </col>
     </tab>
@@ -399,6 +453,11 @@ tuios start-agent claude  # the same shim; tuios still sees Claude Code
           <column field="what" title="What"/>
           <column field="note" title="Note"/>
         </table>
+        <text role="error"><b>Open in this design</b></text>
+        <table rows="state.open">
+          <column field="gap" title="Gap"/>
+          <column field="note" title="Note"/>
+        </table>
         <text role="error"><b>Upstream gaps</b></text>
         <table rows="state.gaps">
           <column field="where" title="Where"/>
@@ -414,7 +473,7 @@ tuios start-agent claude  # the same shim; tuios still sees Claude Code
           <column field="area" title="Area"/>
           <column field="check" title="Check"/>
         </table>
-        <text role="dim">Full write-up with sources: the Agent Fleet Sandbox page.</text>
+        <text role="dim">Probes not yet run on the Mac, with commands: docs/unverified-probes.md. Full write-up with sources: the Agent Fleet Sandbox page.</text>
       </col>
     </tab>
   </tabs>
