@@ -203,6 +203,31 @@ names the fix for each problem). Plain `tml` cannot return an answer, because
 redirected output prints instead of opening the UI; ask in the conversation or use
 `tuios tml show --wait`.
 
+## Terminal panes or an artifact
+
+Panes are for me, now, beside the conversation. An artifact (the `Artifact` tool, a
+private page on claude.ai) is for anyone else, for later, or for what a terminal
+can't draw. Pick by audience and lifetime, not by how pretty it should be:
+
+| Need | Use |
+|---|---|
+| I review or edit text before it is sent | leaf (`draft-pane`) |
+| A deck I page through while we talk | presenterm (`slide-show`) |
+| A diagram I glance at once | `tuios mermaid` |
+| A live view of a running command, or a quick answer from me | TML (`tuios tml show`, `--wait`) |
+| A link for a teammate, a PR, Slack or Jira | artifact |
+| Something I'll reopen across sessions (a tracker, an investigation log, a board) | artifact; `/artifacts` and `Ctrl+]` find it again |
+| Interaction a pane can't do: sortable or filterable tables, hover, zoomable diagrams, many images, a chart with more than a sparkline's worth of data | artifact |
+| Comments from others that come back to the session | artifact, shared in the org |
+
+- Don't publish on your own for a question only I will read; offer it in one line.
+  Do publish when I name a reader or a place it will be posted.
+- A pane render doesn't become an artifact by exporting it (`presenterm -E`, an
+  `mmdc` SVG): build the page with the artifact skills instead.
+- Never publish anything with customer data, secrets, account ids or internal
+  hostnames without asking, even though a new artifact is private. Sharing is one
+  click away.
+
 ## tuios: one session per repository
 
 I run one tuios session per repository or project, as I ran one herdr workspace

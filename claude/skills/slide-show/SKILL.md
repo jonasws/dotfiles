@@ -9,6 +9,11 @@ argument-hint: "<topic or file to present>"
 Summarize a topic as a short presenterm deck, draw its structure as
 diagrams, and open it where the user can page through it.
 
+This skill is for a deck the user pages through in the terminal. When the
+deck is for other people (presented in a meeting, sent, attached or linked),
+make it as an artifact instead (`Artifact` quickstart with `intent: "slides"`):
+it gets a link, versions and comments, and downloads as .pptx or PDF.
+
 A deck beats a long chat answer when the user wants to see the shape of
 something (a flow, an architecture, a before/after, a set of options) or to
 show it to someone else. It costs little to make, so offer one when a
