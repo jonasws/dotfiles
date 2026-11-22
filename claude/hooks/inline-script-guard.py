@@ -184,7 +184,8 @@ def advice(command):
                      "find-and-replace, or `ast-grep -U` for structural rewrites.")
     rest = ("Otherwise use a dedicated CLI (jq, nu, sd, rg, ast-grep), or, for real logic, "
             "write a script file to the scratchpad with the Write tool and run it by path "
-            "(`python3 -I <path>`).")
+            "(`bash <path>` when it chains CLI tools, `python3 -I <path>` when it parses or "
+            "holds nested data).")
     return " ".join(first + [rest])
 
 

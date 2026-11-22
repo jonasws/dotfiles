@@ -52,6 +52,21 @@ nono run --silent --profile liflig-base -- <command>
   `curl -sS -o /dev/null -w '%{http_code}\n' https://code.claude.com/docs/en/settings`.
   Pass on 200 without an approval prompt.
 
+## Shell
+
+`claude/CLAUDE.md` now tells agents to assume bash 4 and no longer explains
+how the shell is chosen; the environment has to make that true.
+
+- [ ] **H1. The Bash tool runs Homebrew bash.** In a session outside nono and
+  in a sandboxed one, have the agent run `echo "$BASH_VERSION"`. Pass on 5.x
+  in both. `CLAUDE_CODE_SHELL` in `settings.json`'s `env` sets it; a path that
+  is missing or unreadable falls back to `$SHELL` (zsh) silently.
+- [ ] **H2. Scripts find bash 5 on `PATH`.** `#!/usr/bin/env bash` and
+  `bash <script>` take the first bash on `PATH`. From a mise task and a tuios
+  pane, `command -v bash` is `/opt/homebrew/bin/bash`. Anything launchd starts
+  gets `/usr/bin:/bin:/usr/sbin:/sbin` unless its plist sets `PATH`, so a bash
+  script run there gets 3.2.
+
 ## Exa gate
 
 Tested in the container against a fake upstream only.

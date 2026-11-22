@@ -55,7 +55,7 @@ session transcript, and a file edit made that way has no diff. The
 | Explore, filter, group or join structured data | `nu -c 'open f.json \| where ... \| select ...'`; `from json` for stdin |
 | YAML or TOML | `yq` |
 | Edit a file | the Edit tool; `sd` for find and replace; `ast-grep -U` for structural rewrites |
-| Logic none of these covers | write a script to the scratchpad with Write, then run `python3 -I <path>` |
+| Logic none of these covers | write a script to the scratchpad with Write and run it by path: `bash <path>` when it mostly chains CLI tools, `python3 -I <path>` when it parses, holds nested data or speaks HTTP |
 
 With JSON, save large output to a scratchpad file first, look at its shape
 (`jq 'keys'`, `jq '.[0] | keys'`, `nu -c 'open f.json | describe'`), then extract
