@@ -166,6 +166,10 @@ account is in [fnox/README.md](fnox/README.md); in short:
   read-only repo mounts, no route to the Mac). Agents get their own mise,
   Maven, npm, uv, Go and cargo caches, and read yours, so nothing they
   download runs in your shell later. `~/dotfiles` is read-only to them.
+  `mise -C ~/dotfiles run forge:maven` in a repo prefetches its dependencies,
+  plugins and dependency sources into `~/.m2/repository`
+  ([`forge/maven-sources.sh`](forge/maven-sources.sh)), so find-docs reads a
+  library's source at the version the build uses before going online.
   One-time setup: `mise run nono:keychain` (with `NONO_GITHUB_PACKAGES` set to
   a `read:packages` PAT), `mise run nono:java-truststore`,
   `mise run sync:nono-approvals` and `mise run lima:agents`. The design, with

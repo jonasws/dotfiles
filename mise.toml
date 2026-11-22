@@ -247,6 +247,13 @@ run = "tuios tml show {{config_root}}/claude/hooks/overview.tml --pane"
 description = "Regenerate the sandbox AWS config and nono's SigV4 routes from aws/config"
 run = "python3 -I {{config_root}}/nono/tools/gen-aws.py"
 
+[tasks."forge:maven"]
+description = "Prefetch a Maven project's dependencies and their sources, for agents to read offline: [DIR...]"
+# Runs where you call it, so `mise -C ~/dotfiles run forge:maven` from a repo
+# (or with repo paths as arguments) prefetches that repo.
+dir = "{{ cwd }}"
+run = "bash {{config_root}}/forge/maven-sources.sh"
+
 [tasks."nono:battle-aws"]
 description = "Battle test AWS inside the agent sandbox: [PROFILE] [BUCKET] [--interactive]"
 # Read-only: writes are aimed at resources that do not exist. Extra arguments

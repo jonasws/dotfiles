@@ -4,7 +4,8 @@ description: >-
   The single entrypoint for looking anything up outside this machine — library and
   framework docs, AWS service behavior, another project's source or changelog, and
   general web research. Routes the question to the right backend before spending a
-  remote call: the Context7 API for library/SDK/CLI docs, the aws-knowledge MCP for AWS,
+  remote call: a dependency's own source on this machine for libraries the repo uses,
+  the Context7 API for library/SDK/CLI docs, the aws-knowledge MCP for AWS,
   the github MCP for repo-specific source and history, Claude Code's own docs site for
   Claude Code itself, the superlogical MCP for Rex (the terminal), exa for everything
   else. Surveys across many sources (comparisons,
@@ -25,7 +26,7 @@ description: >-
 
 # External Lookup
 
-This skill starts where the local search ends. CLAUDE.md's tool table governs finding things in the repo — LSP for resolved symbols, semble for concepts, ast-grep for shape, fff and rg for text. Come here once the answer is demonstrably not on this machine: a version you do not have, a service whose source you cannot read, current state of the world, or the intent behind a design that source alone will not explain.
+This skill starts where the local search ends. CLAUDE.md's tool table governs finding things in the repo — LSP for resolved symbols, semble for concepts, ast-grep for shape, fff and rg for text. Come here once the answer is demonstrably not in the repo. It may still be on this machine: a dependency's source sits in the local package caches, and that is the first stop for a library the repo uses. Beyond that: a version you do not have, a service whose source you cannot read, current state of the world, or the intent behind a design that source alone will not explain.
 
 From there the only question is which door. Picking wrong costs twice: a wasted round trip, and an answer that reads as authoritative while coming from the wrong corpus — Context7 will happily return generic library prose for an AWS quota question.
 
@@ -33,7 +34,8 @@ From there the only question is which door. Picking wrong costs twice: a wasted 
 
 | The question is about | Backend | Entry point |
 |---|---|---|
-| A named library, framework, SDK, or CLI tool — API, config, migration | Context7 | `curl` the search endpoint; `libs/search` then `context` to go deep |
+| A library this repo depends on (in its `pom.xml` or `package.json`) — its API or behavior | Its source on this machine, at the version the build uses | the LSP, or the `-sources.jar` / `node_modules` copy — see [Libraries this repo depends on](#libraries-this-repo-depends-on--local-source-first) |
+| A named library, framework, SDK, or CLI tool that isn't a dependency here; guides, concepts and migrations for one that is | Context7 | `curl` the search endpoint; `libs/search` then `context` to go deep |
 | AWS — service behavior, API/CLI params, CloudFormation/CDK, regional availability | aws-knowledge MCP | `aws___search_documentation` |
 | Claude Code itself — settings, env vars, slash commands, hooks, compaction, caching, output styles, plugins | code.claude.com docs, locally | grep `llms.txt`, then `read-page.sh` the `.md` pages — see [Claude Code](#claude-code--its-own-documentation) |
 | Rex, the terminal — its CLI, docs, release notes, known bugs, feature requests | superlogical MCP | `search_docs`, `search_changelog`, `search_feedback`; see [Rex](#rex--the-superlogical-mcp) |
@@ -42,9 +44,30 @@ From there the only question is which door. Picking wrong costs twice: a wasted 
 | Everything else — news, comparisons, ecosystem questions, "does a tool exist for X" | exa MCP | `web_search_exa` |
 | Reading a URL you already have | `read-page.sh`, locally | `read-page.sh -o page.md <url>`: the server's markdown, else HTML via `defuddle`; then grep — see [Reading a page](#reading-a-page) |
 
-Two signals settle most cases: **is there a named artifact** (library, service, repo), and **is the answer stable documentation or a changing fact**. Documentation about a named artifact goes to Context7 or aws-knowledge; a changing fact about a named repo goes to github; anything with no named artifact goes to exa.
+Two signals settle most cases: **is there a named artifact** (library, service, repo), and **is the answer stable documentation or a changing fact**. Documentation about a named artifact goes to Context7 or aws-knowledge; a changing fact about a named repo goes to github; anything with no named artifact goes to exa. One check comes before both: **is the library a dependency of this repo?** Then its source is already here, at the version you build against, and that beats any index.
 
 When the user names a tool ("use exa", "check github"), read it as where to look, not how. Keep the rest of this skill: full-text exa search, pages read into files, the official docs before blog posts. Say so when the named source can't answer and you went elsewhere. For example, the github MCP can't search Discussions, so those go to exa.
+
+## Libraries this repo depends on — local source first
+
+Context7 and the web answer for whatever version the query names, usually the latest. The dependency's own source on this machine is the version the build actually uses, needs no network, and settles signatures, defaults and behavior. Read it first; go to Context7 for what code doesn't say (guides, concepts, migration notes), and pass the local version when you do.
+
+**JVM (Maven).** Libraries publish a `-sources.jar` next to the jar, and the local Maven repositories under `~/.m2` usually have it.
+
+1. From a call site, the `LSP` tool's `goToDefinition` opens the library source at the right version. Use it when the code already uses the API.
+2. Otherwise find the jar: `fd -g '<artifactId>-*-sources.jar' ~/.m2`. If several versions are there, the build's is in `mvn -q dependency:list -DincludeArtifactIds=<artifactId> -DoutputFile=/dev/stdout`, run in the module that declares the dependency, or in the `pom.xml` and its BOMs.
+3. Read it like a page: list, extract into the scratchpad, grep.
+
+   ```bash
+   unzip -l "$jar" | rg -i '<ClassName>'
+   unzip -p "$jar" org/http4k/core/Filter.kt > <scratchpad>/Filter.kt   # then grep the file
+   ```
+
+4. No sources jar on disk: `mvn -q dependency:sources -DincludeArtifactIds=<artifactId>` in that module fetches it. A library that publishes none: read its repository at the matching tag through the github MCP.
+
+**TypeScript (npm).** `npm ls <package>` gives the installed version; `node_modules/<package>/` holds its README, the `.d.ts` typings and the shipped code. Read those before any web lookup.
+
+Report the artifact as the source, with its version (`<groupId>:<artifactId>:<version>` and the path inside the jar), the same way you would a Context7 ID. When the local source and Context7 disagree, the local source is the version you run; say so.
 
 ## When to survey in a subagent
 
@@ -152,7 +175,7 @@ Use when the subject is a *project* rather than a topic: how an implementation a
 - `search_code` with bare identifiers plus `repo:`/`org:` — a code index, not a regex engine.
 - `search_issues` / `search_pull_requests` before concluding something is a bug in your own code; someone usually filed it.
 - `list_releases` / `get_latest_release` / `search_commits` for "when did this change" and version timing.
-- `get_file_contents` once you know the path. Reading the source settles what documentation leaves ambiguous, and it is also the right move for a **dependency's behavior** — read the library's own repo rather than unpacking jars locally. `LSP` `goToDefinition` and the `idea` MCP get you there too when sources are attached.
+- `get_file_contents` once you know the path. Reading the source settles what documentation leaves ambiguous. For a **dependency of this repo**, read its local source first (see [Libraries this repo depends on](#libraries-this-repo-depends-on--local-source-first)); come here for its repository when it publishes no sources jar, or for history: issues, releases, when something changed.
 
 When none of those resolve it, say so and hand the question back with what you would check next. An unanswered question the user can close in one sentence beats a plausible guess.
 
