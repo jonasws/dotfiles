@@ -374,6 +374,7 @@ exclude = ["mcp-servers.json"]
 # kept here is linked on its own rather than the whole directory.
 [dotfile_groups.claude.entries]
 "~/.claude/themes" = { mode = "symlink" }
+"~/.claude/hooks/decision-recorder" = { mode = "symlink" }
 "~/.claude/skills/brainstorming" = { mode = "symlink" }
 "~/.claude/skills/dispatching-parallel-agents" = { mode = "symlink" }
 "~/.claude/skills/draft-pane" = { mode = "symlink" }

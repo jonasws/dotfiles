@@ -130,7 +130,9 @@
       "Bash(aws *)",
       "Bash(awslogs *)",
       "Bash(fnox *secretsmanager get-secret-value*)",
-      "Bash(fnox *secretsmanager batch-get-secret-value*)"
+      "Bash(fnox *secretsmanager batch-get-secret-value*)",
+      "Edit(~/.local/share/agent-decisions/**)",
+      "Read(~/.local/share/agent-decisions/hmac.key)"
     ],
     "ask": [
       "Bash(fnox * exec *)",
@@ -241,6 +243,17 @@
             "type": "command",
             "command": "tuios agent-hook claude-code --integration 3",
             "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "^(startup|clear)$",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I \"$HOME/.claude/hooks/decision-recorder/decision-recorder.py\" sweep",
+            "timeout": 30,
+            "async": true
           }
         ]
       }
@@ -358,6 +371,17 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "matcher": "^(?!(Read|Glob|Grep|LSP|TodoWrite|TaskOutput|ToolSearch|Poll)$).*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I \"$HOME/.claude/hooks/decision-recorder/decision-recorder.py\" post",
+            "timeout": 5,
+            "async": true
+          }
+        ]
       }
     ],
     "PostToolUseFailure": [
@@ -377,6 +401,17 @@
             "type": "command",
             "command": "tuios agent-hook claude-code --integration 3",
             "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "^(?!(Read|Glob|Grep|LSP|TodoWrite|TaskOutput|ToolSearch|Poll)$).*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I \"$HOME/.claude/hooks/decision-recorder/decision-recorder.py\" post",
+            "timeout": 5,
+            "async": true
           }
         ]
       }
@@ -413,6 +448,15 @@
             "type": "command",
             "command": "tuios agent-hook claude-code --integration 3",
             "timeout": 310
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I \"$HOME/.claude/hooks/decision-recorder/decision-recorder.py\" capture",
+            "timeout": 5
           }
         ]
       }
@@ -464,6 +508,16 @@
             "timeout": 5
           }
         ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I \"$HOME/.claude/hooks/decision-recorder/decision-recorder.py\" reconcile",
+            "timeout": 30,
+            "async": true
+          }
+        ]
       }
     ],
     "StopFailure": [
@@ -484,6 +538,16 @@
             "type": "command",
             "command": "tuios agent-hook claude-code --integration 3",
             "timeout": 5
+          }
+        ]
+      },
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 -I \"$HOME/.claude/hooks/decision-recorder/decision-recorder.py\" reconcile",
+            "timeout": 30,
+            "async": true
           }
         ]
       }
