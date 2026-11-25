@@ -1,0 +1,99 @@
+{
+  "$schema": "https://lnav.org/schemas/format-v1.schema.json",
+  "logstash_dam": {
+    "title": "Logstash Java JSON",
+    "url": "https://github.com/logstash/logstash-logback-encoder",
+    "description": "Log format for DAM Logstash JSON",
+    "json": true,
+    "hide-extra": false,
+    "line-format": [
+      {
+        "field": "level",
+        "text-transform": "uppercase"
+      },
+      " ",
+      {
+        "field": "@timestamp"
+      },
+      " ",
+      {
+        "field": "messagePollerName",
+        "default-value": ""
+      },
+      " ",
+      {
+        "field": "message"
+      }
+    ],
+    "timestamp-field": "@timestamp",
+    "body-field": "message",
+    "level-field": "level",
+    "opid-field": "requestIdChain",
+    "level": {
+      "trace": "TRACE",
+      "debug": "DEBUG",
+      "info": "INFO",
+      "error": "ERROR",
+      "warning": "WARN"
+    },
+    "value": {
+      "level": {
+        "kind": "string",
+        "identifier": true
+      },
+      "message": {
+        "kind": "string"
+      },
+      "logger_name": {
+        "kind": "string",
+        "identifier": true
+      },
+      "service": {
+        "kind": "string",
+        "identifier": true,
+        "hidden": false
+      },
+      "version": {
+        "kind": "string",
+        "identifier": true,
+        "hidden": true
+      },
+      "@version": {
+        "kind": "string",
+        "identifier": true,
+        "hidden": true
+      },
+      "buildInfo": {
+        "kind": "json",
+        "hidden": true
+      },
+      "thread_name": {
+        "kind": "string",
+        "hidden": true
+      },
+      "messagePollerName": {
+        "kind": "string",
+        "identifier": true
+      },
+      "queueMessage": {
+        "kind": "quoted"
+      },
+      "level_value": {
+        "kind": "integer",
+        "identifier": true,
+        "hidden": true
+      },
+      "requestIdChain": {
+        "kind": "string",
+        "identifier": true
+      },
+      "requestPath": {
+        "kind": "string",
+        "identifier": true
+      },
+      "stack_trace": {
+        "kind": "quoted"
+      }
+    }
+  }
+}

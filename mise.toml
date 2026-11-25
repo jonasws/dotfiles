@@ -606,6 +606,9 @@ mode = "symlink"
 root = "leaf"
 target = "~/.config/leaf"
 
+# lnav reads ~/.lnav instead whenever that directory exists, so keep it absent.
+# The catppuccin-mocha theme is vendored from catppuccin/lnav, minus the
+# timeline-bar, alert-title and inactive-warn styles that lnav 0.14 rejects.
 [dotfile_groups.lnav]
 root = "lnav"
 target = "~/.config/lnav"

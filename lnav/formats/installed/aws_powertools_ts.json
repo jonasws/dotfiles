@@ -1,0 +1,125 @@
+{
+    "$schema": "https://lnav.org/schemas/format-v1.schema.json",
+    "aws_powertools_ts": {
+        "title": "AWS Powertools for TypeScript",
+        "description": "AWS Lambda Powertools for TypeScript logger format",
+        "file-type": "json",
+        "timestamp-field": "timestamp",
+        "level-field": "level",
+        "body-field": "message",
+        "hide-extra": false,
+        "level": {
+            "error": "ERROR",
+            "warning": "WARN",
+            "info": "INFO",
+            "debug": "DEBUG"
+        },
+        "line-format": [
+            {
+                "field": "__timestamp__",
+                "timestamp-format": "%Y-%m-%dT%H:%M:%S.%LZ"
+            },
+            " ",
+            {
+                "field": "level",
+                "min-width": 5,
+                "max-width": 5,
+                "overflow": "truncate",
+                "prefix": "[",
+                "suffix": "]"
+            },
+            " ",
+            {
+                "field": "service",
+                "auto-width": true,
+                "align": "left",
+                "prefix": "(",
+                "suffix": ")"
+            },
+            " ",
+            {
+                "field": "message"
+            }
+        ],
+        "value": {
+            "timestamp": {
+                "kind": "string"
+            },
+            "level": {
+                "kind": "string",
+                "identifier": true
+            },
+            "message": {
+                "kind": "string"
+            },
+            "service": {
+                "kind": "string",
+                "identifier": true
+            },
+            "cold_start": {
+                "kind": "boolean"
+            },
+            "function_name": {
+                "kind": "string",
+                "identifier": true
+            },
+            "function_arn": {
+                "kind": "string",
+                "hidden": true
+            },
+            "function_memory_size": {
+                "kind": "string",
+                "hidden": true
+            },
+            "function_request_id": {
+                "kind": "string",
+                "identifier": true
+            },
+            "xray_trace_id": {
+                "kind": "string",
+                "hidden": true
+            },
+            "sampling_rate": {
+                "kind": "float",
+                "hidden": true
+            },
+            "nominalDate": {
+                "kind": "string",
+                "identifier": true
+            },
+            "today": {
+                "kind": "string"
+            },
+            "trainCount": {
+                "kind": "integer"
+            },
+            "otn": {
+                "kind": "string",
+                "identifier": true
+            },
+            "status": {
+                "kind": "integer"
+            },
+            "body": {
+                "kind": "string"
+            },
+            "bucket": {
+                "kind": "string",
+                "identifier": true
+            },
+            "key": {
+                "kind": "string",
+                "identifier": true
+            },
+            "inOtrNotInEvent": {
+                "kind": "integer"
+            },
+            "inEventNotInOtr": {
+                "kind": "integer"
+            },
+            "count": {
+                "kind": "integer"
+            }
+        }
+    }
+}

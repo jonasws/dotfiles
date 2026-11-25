@@ -1,0 +1,98 @@
+{
+  "$schema": "https://lnav.org/schemas/format-v1.schema.json",
+  "ecs_logback": {
+    "title": "ecs-logback",
+    "description": "ECS Logback JSON format for AWS ECS containers using the Logback JSON encoder",
+    "file-type": "json",
+    "timestamp-field": "@timestamp",
+    "level-field": "level",
+    "convert-to-local-time": true,
+    "hide-extra": true,
+    "level": {
+      "trace": "TRACE",
+      "debug": "DEBUG",
+      "info": "INFO",
+      "warning": "WARN",
+      "error": "ERROR"
+    },
+    "line-format": [
+      {
+        "field": "__timestamp__",
+        "auto-width": true,
+        "align": "left",
+        "timestamp-format": "%H:%M:%S.%L"
+      },
+      " ",
+      {
+        "field": "level",
+        "align": "left",
+        "min-width": 5,
+        "max-width": 5,
+        "overflow": "truncate"
+      },
+      " ",
+      {
+        "field": "service"
+      },
+      " ",
+      {
+        "field": "logger_name",
+        "min-width": 50,
+        "max-width": 50,
+        "overflow": "abbrev"
+      },
+      " ",
+      {
+        "field": "message"
+      }
+    ],
+    "value": {
+      "@timestamp": {
+        "kind": "string"
+      },
+      "level": {
+        "kind": "string"
+      },
+      "message": {
+        "kind": "string"
+      },
+      "service": {
+        "kind": "string",
+        "identifier": true
+      },
+      "logger_name": {
+        "kind": "string",
+        "identifier": true
+      },
+      "messagePollerName": {
+        "kind": "string",
+        "hidden": true,
+        "identifier": true
+      },
+      "responseBody": {
+        "kind": "string",
+        "hidden": true
+      },
+      "thread_name": {
+        "kind": "string",
+        "hidden": true
+      },
+      "stack_trace": {
+        "kind": "string",
+        "hidden": true
+      },
+      "level_value": {
+        "kind": "integer",
+        "hidden": true
+      }
+    },
+    "sample": [
+      {
+        "line": "{\"@timestamp\":\"2026-05-13T10:23:45.123Z\",\"level\":\"INFO\",\"level_value\":20000,\"message\":\"Processing order event\",\"service\":\"order-service\",\"logger_name\":\"com.example.order.OrderEventHandler\",\"thread_name\":\"main\",\"messagePollerName\":\"poller-host-1\",\"responseBody\":null}"
+      },
+      {
+        "line": "{\"@timestamp\":\"2026-05-13T10:24:01.456Z\",\"level\":\"ERROR\",\"level_value\":40000,\"message\":\"Failed to connect to upstream service\",\"service\":\"order-service\",\"logger_name\":\"com.example.order.UpstreamClient\",\"thread_name\":\"http-worker-3\",\"messagePollerName\":\"poller-host-1\",\"responseBody\":\"{\\\"error\\\":\\\"connection refused\\\"}\",\"stack_trace\":\"java.net.ConnectException: Connection refused\\n\\tat com.example.order.UpstreamClient.connect(UpstreamClient.java:42)\"}"
+      }
+    ]
+  }
+}
