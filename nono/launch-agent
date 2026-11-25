@@ -56,7 +56,9 @@ if [ "$name" = claude ]; then
   # Agent git settings (signing key, https remotes) come from the profile for
   # every harness, so Claude's own copies go. Messages from other sessions are
   # accepted here: inside nono they come from peers, and sessions outside
-  # nono hold them (crossSessionInbound in settings.json).
+  # nono hold them (crossSessionInbound in settings.json). A SessionStart hook
+  # hands every session the AWS capabilities nono/tools/gen-aws.py wrote, so the
+  # agent knows what its read-only profiles cannot fetch before it tries.
   state="$HOME/.local/state/nono-agent"
   settings="$state/claude-settings.json"
   mkdir -p "$state"
@@ -65,6 +67,7 @@ if [ "$name" = claude ]; then
     | del(.sandbox)
     | .env |= with_entries(select(.key | startswith("GIT_CONFIG_") | not))
     | .crossSessionInbound = "accept"
+    | .hooks.SessionStart += [{hooks: [{type: "command", command: "sh \"$HOME/.config/nono/hooks/aws-context.sh\"", timeout: 5}]}]
   ' "$HOME/.claude/settings.json" >"$settings.$$"
   mv "$settings.$$" "$settings"
   set -- --setting-sources project,local --settings "$settings" "$@"
