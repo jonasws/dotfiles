@@ -1,0 +1,19 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nolabs-ai/nono/refs/heads/main/crates/nono-cli/data/nono-profile.schema.json",
+  "extends": [
+    "nolabs-ai/claude",
+    "liflig-base"
+  ],
+  "meta": {
+    "name": "liflig-agent",
+    "description": "Claude Code in the shared Liflig/Vy agent sandbox (liflig-base)."
+  },
+  "network": {
+    "allow_domain": ["api.anthropic.com"],
+    "deny_domain": ["*.datadoghq.com"]
+  },
+  "allow_launch_services": false,
+  "workdir": {
+    "access": "read"
+  }
+}

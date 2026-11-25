@@ -33,9 +33,16 @@ to open.
 
 ## Procedure
 
-1. **Write the draft to a file.** Use the scratchpad for drafts that are sent
-   somewhere else, with an absolute path and a `.md` extension. leaf renders a
-   commit message or plain text fine as markdown.
+1. **Write the draft to a file.** A draft that is sent somewhere else goes in
+   this pane's drafts directory, with a `.md` extension:
+
+   ```bash
+   dir="${XDG_CACHE_HOME:-$HOME/.cache}/drafts/${TUIOS_PANE_ID:-none}"
+   mkdir -p "$dir"   # then write "$dir/<name>.md"
+   ```
+
+   Use its absolute path from here on. leaf renders a commit message or plain
+   text fine as markdown.
 
 2. **Check you are in tuios:** `test "${TUIOS_ENV:-}" = 1`. If not, give the
    user `leaf -w <file>` to run and stop.
@@ -69,6 +76,14 @@ to open.
      `read,write` silently loses pane navigation.
    - leaf is the pane's only program, so quitting it (`q`) closes the pane.
 
+   **When `split-window` answers `forbidden`**, your pane lacks tuios's `admin`
+   grant, which starting a pane needs. The user opens the same pane with one
+   key instead: tell them to press `prefix+alt+e` in this pane. It opens the
+   newest `.md` in this pane's drafts directory, so the draft must be there
+   (step 1); a file elsewhere is not found. Everything else in this skill
+   (reuse, editing hand-off, closing) stays the same; `close-window` may also
+   answer `forbidden`, and then the user closes it with `q`.
+
 5. **Tell the user** the pane is open, that it reloads on save, and that
    `Ctrl+E` edits it in Neovim and `q` closes it.
 
@@ -88,7 +103,7 @@ The file has two writers, you and the user. Keep them apart:
 
 - `tuios close-window "draft <basename>"`, for a pane you opened, once the
   draft has been used or the user asks. Leave a pane the user is still reading.
-- Remove a scratchpad draft with `rip` once it has been used, unless the user
+- Remove a draft with `rip` once it has been used, unless the user
   wants to keep it.
 
 ## Rules

@@ -6,8 +6,7 @@ Machine-wide [fnox](https://fnox.jdx.dev) configuration, deployed by the `fnox` 
 
 ```
 fnox/                  # deployed to ~/.config/fnox/
-├── secrets.toml       # providers, secrets, profiles — references only
-└── wrapped/           # deployed to ~/.local/bin/wrapped/
+└── secrets.toml       # providers, secrets, profiles — references only
 ```
 
 `~/.config/fnox/config.toml` is the file fnox loads, and it is not in this
@@ -75,14 +74,11 @@ fnox get -P gcalcli --no-defaults GCALCLI_CLIENT_ID
 ## Touch ID: one per cold start
 
 Every profile has its own daemon and its own sync blob, so each profile read cold
-costs a Secure Enclave decrypt and a Touch ID. The secrets read at Claude Code
-startup — the github and Exa MCP tokens, gh's token (Claude Code runs gh on its
-own), and mise's GitHub token — are therefore
-top-level `env = false` secrets, fetched through `wrapped/fnox-secret`. Its header
-explains the three flags that make all of its callers share one decrypt: `-c`
-for a fingerprint that does not change per directory tree, `export --all` to
-resolve the whole blob at once, and `--non-interactive` to serialise parallel
-callers in the daemon.
+costs a Secure Enclave decrypt and a Touch ID. The secrets read most often —
+mise's GitHub token, Maven's, the Jira values — are therefore top-level, sharing
+the default daemon and one blob. Agents read none of them: they run in nono,
+which holds its own copies in the keychain (`mise run nono:keychain` copies them
+there once).
 
 After adding or rotating a top-level secret, `mise run sync-secrets` re-encrypts
 them all into one blob.

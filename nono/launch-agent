@@ -1,0 +1,116 @@
+#!/bin/sh
+# Starts an agent harness inside its nono profile. tuios/shims/claude and
+# tuios/shims/pi exec this, and that directory is first on PATH (`_.path` in the
+# global mise config), so a shell, `tuios start-agent`, a preset and `fan` all
+# reach it by the harness's own name: nothing that launches an agent needs to
+# know about nono.
+#
+#   launch-agent claude|pi [ARGS...]
+#
+# To run a harness outside the sandbox, call the real binary:
+# `command (mise which claude)` in fish.
+
+set -eu
+
+name=$1
+shift
+case $name in
+claude) profile=liflig-agent ;;
+pi) profile=liflig-pi ;;
+*)
+  echo "launch-agent: no nono profile for $name" >&2
+  exit 2
+  ;;
+esac
+
+real="$(mise which "$name" 2>/dev/null || true)"
+if [ -z "$real" ]; then
+  echo "$name: mise provisions no $name for $PWD" >&2
+  exit 127
+fi
+
+# tuios execs agents with no shell, so mise [env] is never evaluated for the
+# agent's cwd; `mise exec` applies it. Inside nono already (a nested harness),
+# there is nothing more to do.
+if [ -n "${NONO_CAP_FILE:-}" ]; then
+  exec mise exec -- "$real" "$@"
+fi
+
+# Only work on CargoNet and Liflig repos is sandboxed; anywhere else (this
+# repo included) the harness runs as it is. A worktree counts where its main
+# checkout lives, so a CN repo's worktree outside these roots stays sandboxed.
+sandboxed=false
+here="$(pwd -P)"
+main="$(git rev-parse --path-format=absolute --git-common-dir 2>/dev/null || true)"
+for root in "$HOME/CX" "$HOME/CNOPS" "$HOME/CN-TERMINAL" "$HOME/LIFLIG"; do
+  case "$here/" in "$root"/*) sandboxed=true ;; esac
+  case "$main/" in "$root"/*) sandboxed=true ;; esac
+done
+if [ "$sandboxed" = false ]; then
+  exec mise exec -- "$real" "$@"
+fi
+
+if [ "$name" = claude ]; then
+  # The sandbox brokers GitHub, AWS and the rest, so the deny rules that keep
+  # an unsandboxed Claude off gh and aws go, and so does Claude's own sandbox.
+  # Agent git settings (signing key, https remotes) come from the profile for
+  # every harness, so Claude's own copies go. Messages from other sessions are
+  # accepted here: inside nono they come from peers, and sessions outside
+  # nono hold them (crossSessionInbound in settings.json).
+  state="$HOME/.local/state/nono-agent"
+  settings="$state/claude-settings.json"
+  mkdir -p "$state"
+  jq '
+    .permissions.deny -= ["Bash(gh:*)", "Bash(aws *)", "Bash(awslogs *)"]
+    | del(.sandbox)
+    | .env |= with_entries(select(.key | startswith("GIT_CONFIG_") | not))
+    | .crossSessionInbound = "accept"
+  ' "$HOME/.claude/settings.json" >"$settings.$$"
+  mv "$settings.$$" "$settings"
+  set -- --setting-sources project,local --settings "$settings" "$@"
+fi
+
+if [ ! -s "$HOME/.local/share/nono-agent/java-truststore.p12" ]; then
+  echo "$name: Maven will not trust nono's CA: run 'mise -C ~/dotfiles run nono:java-truststore'" >&2
+fi
+
+# A fixed proxy port, so Maven's global settings can name it
+# (nono/hooks/agent-before.sh writes it into them).
+port=
+for _ in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20; do
+  candidate=$((40000 + $(od -An -N2 -tu2 /dev/urandom) % 9000))
+  if ! nc -z 127.0.0.1 "$candidate" 2>/dev/null; then
+    port=$candidate
+    break
+  fi
+done
+if [ -z "$port" ]; then
+  echo "$name: no free proxy port in 40000-48999" >&2
+  exit 1
+fi
+export NONO_AGENT_PROXY_PORT="$port"
+
+# nono grants only paths that exist, and the profile points mise's data and
+# state and Maven's agent repository here; created inside the sandbox they
+# would be refused.
+mkdir -p "$HOME/.local/share/mise-agents" "$HOME/.local/state/mise-agents" "$HOME/.m2/repository-agents"
+
+# nono sits between the pane and the agent, so the pane's foreground process
+# is no harness tuios or herdr knows. Both read a hint on that process instead:
+# TUIOS_AGENT and HERDR_AGENT name the harness (claude and pi are ids or
+# aliases in both). The agent's own processes inherit them, which tuios also
+# uses to drop hook events from any other harness.
+export TUIOS_AGENT="$name" HERDR_AGENT="$name"
+
+# The pane keeps read, write and task (its session's task cards). Opening
+# panes, starting agents (fan) and the rest of admin are left out: the daemon
+# would start those programs outside the sandbox.
+if [ "${TUIOS_ENV:-}" = 1 ]; then
+  tuios set-pane-grants --grants read,write,task
+fi
+
+# --allow-cwd: the folder the agent starts in is read-only unless a workspace
+# root already grants more (workdir.access in the liflig-agent and liflig-pi
+# profiles; the claude pack alone would make it read-write). Without it nono
+# would stop to ask, which it cannot do in a pane.
+exec mise exec -- nono run --silent --allow-cwd --profile "$profile" --proxy-port "$port" -- "$real" "$@"

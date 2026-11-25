@@ -33,6 +33,9 @@ workspaces = true
 [daemon]
 enabled = true
 autostart = true
+# Pinned: the default ($TMPDIR/atuin-$UID) differs inside nono, whose TMPDIR is
+# not the login one, and the nono profiles grant only this path.
+socket_path = "~/.local/share/atuin/atuin.sock"
 
 [threads]
 capture = true

@@ -1,0 +1,475 @@
+<tml version="1" title="Agent Fleet Sandbox">
+  <state>
+    {
+      "creds": [
+        {"cred": "nono/github_pat_basic", "scope": "classic PAT: repo, SSO", "inside": "placeholder", "use": "git fetch, GitHub Packages (Maven)", "limit": "nono: fetch and GET only"},
+        {"cred": "nono/github_public", "scope": "fine-grained, public read", "inside": "placeholder", "use": "find-docs github.sh, mise", "limit": "scope: public read; GET + GraphQL"},
+        {"cred": "nono/nexus_basic", "scope": "your Nexus login", "inside": "placeholder", "use": "Maven via Nexus", "limit": "nono: GET/HEAD only"},
+        {"cred": "nono/context7", "scope": "API key", "inside": "placeholder", "use": "find-docs (context7.sh)", "limit": "nono route"},
+        {"cred": "nono/exa", "scope": "API key", "inside": "never (dummy EXA_API_KEY)", "use": "exa MCP, via the Exa gate", "limit": "gate: search; cached pages; live fetch after your yes"},
+        {"cred": "nono/github_packages", "scope": "classic PAT: read:packages", "inside": "real value", "use": "GHCR pulls (docker, Testcontainers)", "limit": "scope: pull only"},
+        {"cred": "AWS -readonly profiles", "scope": "scoped host profiles, 12", "inside": "placeholder keys", "use": "aws CLI, SDKs, AWS MCP", "limit": "IAM session policy + read operations"},
+        {"cred": "Agent signing key", "scope": "SSH signing key", "inside": "readable file", "use": "signed commits", "limit": "can sign, not push"}
+      ],
+      "profile": [
+        {"k": "Profiles", "v": "liflig-agent (claude), liflig-pi (pi): the harness's nolabs-ai profile plus liflig-base"},
+        {"k": "liflig-base extends", "v": "liflig-aws (generated)"},
+        {"k": "Writable", "v": "repo roots, ~/.tsk, ~/.m2/repository-agents, ~/.cache/agents, agents' mise dirs"},
+        {"k": "Read-only", "v": "~/dotfiles, ~/.m2/repository, your mise installs, atuin history"},
+        {"k": "Read-only by Seatbelt rule", "v": "what runs outside the sandbox unasked: .git/config, .git/hooks, project .claude settings, .mcp.json, mise.local.toml, ~/.claude/settings*.json and hooks; what later sessions load: ~/.claude CLAUDE.md, skills, agents, commands, output-styles, pi's extensions, skills, prompts, AGENTS.md"},
+        {"k": "Denied", "v": "fnox config and state, atuin key, twg auth, herdr and Rex sockets"},
+        {"k": "Unreadable by Seatbelt rule", "v": "repo .env and .env.* (still listed); .env.example, .sample, .template, .dist, .defaults allowed back"},
+        {"k": "Git", "v": "set_vars GIT_CONFIG_*: agent signing key, ssh remotes to https, no upstream guessing (branch.autoSetupMerge, checkout.guess off)"},
+        {"k": "Unix sockets", "v": "tuios socket dir, Lima docker socket, atuin daemon"},
+        {"k": "Network", "v": "allowlist (registries, GitHub, docs MCPs); api.exa.ai and mcp.exa.ai denied (Exa gate on localhost instead); other hosts asked in tuios"},
+        {"k": "Caches", "v": "XDG_CACHE_HOME, npm, uv, pip, Go, cargo, Gradle under ~/.cache/agents"},
+        {"k": "Before hook", "v": "agent DOCKER_CONFIG; records which pane the session belongs to"}
+      ],
+      "mcp": [
+        {"opt": "Hosted MCP, proxy inside, nono signs", "creds": "none", "profiles": "yes", "extra": "none (IAM)", "verdict": "chosen for run_script"},
+        {"opt": "Hosted MCP, proxy on the host", "creds": "none", "profiles": "yes", "extra": "none", "verdict": "fallback; shared host bridge"},
+        {"opt": "Local aws-api-mcp-server on the host", "creds": "none", "profiles": "one per server", "extra": "READ_OPERATIONS_ONLY", "verdict": "no; superseded"},
+        {"opt": "No MCP: aws through nono", "creds": "none", "profiles": "yes", "extra": "operation allow-lists", "verdict": "base"}
+      ],
+      "dockerPaths": [
+        {"way": "Host files via bind mounts", "rootful": "all repos, writable", "here": "read-only mounts; repos readable"},
+        {"way": "VM root (privileged, host PID)", "rootful": "trivial", "here": "rootless as a user without sudo"},
+        {"way": "Mac loopback via VM gateway", "rootful": "open", "here": "dropped by nftables"},
+        {"way": "Internet egress past nono", "rootful": "open", "here": "open: nftables drops only the Mac (gap)"},
+        {"way": "Secrets in the VM", "rootful": "none", "here": "none"}
+      ],
+      "engines": [
+        {"engine": "Lima + rootless Docker", "api": "native dockerd", "rootless": "default", "verdict": "chosen for agents"},
+        {"engine": "Podman machine", "api": "compat layer", "rootless": "default", "verdict": "runner-up; Ryuk needs privileged"},
+        {"engine": "Colima (docker)", "api": "native", "rootless": "no", "verdict": "keep as your own"},
+        {"engine": "Docker Desktop, Sandboxes", "api": "native", "rootless": "ECI needs Business", "verdict": "no; tuios socket unreachable"},
+        {"engine": "Apple container", "api": "none", "rootless": "VM per container", "verdict": "no; host service with your rights"}
+      ],
+      "tools": [
+        {"tool": "mise", "here": "Own data, state, cache; your installs read-only; repo configs trusted by path", "own": "deny_* wraps one command; installs and hooks run outside"},
+        {"tool": "fnox", "here": "not used inside: tools read placeholders under their usual variable names", "own": "proxy --sandbox has no Unix socket allow; tuios and Docker unreachable"},
+        {"tool": "atuin", "here": "hook talks to the daemon socket; MCP reads history; key denied", "own": "none"},
+        {"tool": "tsk", "here": "~/.tsk writable, same board as yours", "own": "none"},
+        {"tool": "twg", "here": "auth files denied, so twg cannot authenticate inside", "own": "open item"}
+      ],
+      "decisions": [
+        {"q": "Outer sandbox", "chosen": "nono", "why": "Unix sockets, SigV4 re-signing, operation policies"},
+        {"q": "Secret store", "chosen": "keychain via nono", "why": "no 1Password socket, no Touch ID per agent"},
+        {"q": "Maven credentials", "chosen": "placeholders in your settings.xml", "why": "real URLs, hidden tokens, deploy blocked; mvnenc gives the JVM plaintext"},
+        {"q": "Web egress", "chosen": "allowlist + ask in tuios", "why": "docs come through Context7, aws-knowledge and the Exa gate; other hosts wait for you"},
+        {"q": "Exa", "chosen": "a gate on the host, not a nono route", "why": "a route would pass any URL to Exa's live crawler; the gate keeps fetches cache-only and asks before a live one"},
+        {"q": "Trust handoffs", "chosen": "Seatbelt write-denies", "why": "files that run outside the sandbox, or load into every later session, stay as you left them"},
+        {"q": "Dependency docs", "chosen": "fetch ahead outside, read offline inside", "why": "forge:maven puts sources jars in ~/.m2; find-docs reads them before Context7"},
+        {"q": "Context7 cache", "chosen": "on disk, 72 h, per endpoint and sorted params", "why": "Context7 sends no ETag and max-age=0; revalidating would cost a call anyway"},
+        {"q": "Cross-session messages", "chosen": "hold outside nono, accept inside", "why": "a sandboxed agent cannot steer an unsandboxed session without you"},
+        {"q": "Wrappers", "chosen": "none", "why": "each route sets the variable its tool already reads"},
+        {"q": "AWS delivery", "chosen": "nono aws_auth + profiles", "why": "several profiles, nothing usable inside"},
+        {"q": "AWS scoping", "chosen": "AssumeRole + session policy", "why": "the developer role's own trust; no grant needed; own session name"},
+        {"q": "Docker", "chosen": "one rootless Lima VM", "why": "VM is the boundary; firewall stays enforceable"},
+        {"q": "Ryuk", "chosen": "on", "why": "one variable; inside the VM boundary"},
+        {"q": "git push", "chosen": "left out", "why": "you push from your own window"}
+      ],
+      "limits": [
+        {"what": "Every audit log shows you", "note": "only the AWS session name tells agents apart"},
+        {"what": "Images from Nexus's Docker registry", "note": "would expose a Nexus-capable PAT; pull those yourself"},
+        {"what": "Repos in the VM mounts are readable", "note": "via a container, beyond the nono workspace"},
+        {"what": "Approved egress reachable from containers", "note": "the allowlist limits where, not what"},
+        {"what": "Classic PATs rotated by hand", "note": "short expiry plus a keychain update"},
+        {"what": "Long run_script tasks", "note": "behaviour at session expiry is undocumented"},
+        {"what": "Unknown hosts wait for you", "note": "WebFetch and direct fetches ask in tuios; refusal is final"},
+        {"what": "gh on private repos", "note": "gh uses the public-read token; git fetch reaches private repos"},
+        {"what": "twg (Jira, Confluence)", "note": "not brokered yet; its auth files stay denied"},
+        {"what": "~/dotfiles is read-only", "note": "dotfiles work happens unsandboxed or via you"},
+        {"what": "A .env read fails inside", "note": "a dev server or test that loads .env runs outside the sandbox"},
+        {"what": "Exa live fetches ask you", "note": "an uncached page waits for a yes in the agent's pane; agent_run is refused"}
+      ],
+      "open": [
+        {"gap": "Containers in the Lima VM reach the internet", "note": "the allowlist does not yet hold for container egress"},
+        {"gap": "Allow this session opens a blind tunnel", "note": "an approved unknown host gets no endpoint policy for the rest of the session"},
+        {"gap": "S3 reads reach other accounts' buckets", "note": "needs a bucket-owner condition or an endpoint policy"},
+        {"gap": "~/.claude/plugins and pi's settings.json stay writable", "note": "Claude Code updates plugins and pi saves model changes there"},
+        {"gap": "Secrets outside .env files stay readable", "note": "application-local.yml, .envrc and the like"},
+        {"gap": "qmd index has no agent route yet", "note": "daemon outside or qmd inside, and whether to index agent-written answers (probes Q5, Q6)"}
+      ],
+      "gaps": [
+        {"where": "tuios", "gap": "A caller outside any pane counts as you", "fix": "no grants for unplaced sandboxed callers (sandbox_check)"},
+        {"where": "tuios", "gap": "a sandboxed pane holds read,write,task only, so it cannot fan or start agents", "fix": "fan from your own pane: its agents land in nono through the claude and pi shims"},
+        {"where": "herdr, Rex", "gap": "no grants model", "fix": "their sockets stay out of the sandbox"}
+      ],
+      "verify": [
+        {"area": "Launch", "check": "command -v claude and pi resolve to tuios/shims; tuios start-agent claude from your pane shows harness claude-code and grants read,write,task"},
+        {"area": "Launch", "check": "tuios explain-agent-detect names a sandboxed pane via TUIOS_AGENT; herdr recognises it via HERDR_AGENT"},
+        {"area": "Launch", "check": "claude --setting-sources project,local loads the launcher's settings copy"},
+        {"area": "Launch", "check": "Signed out of Claude, nono refuses to start rather than turn on LaunchServices"},
+        {"area": "Probes", "check": "mise run nono:probe: the probes marked (auto) in docs/unverified-probes.md, PASS or FAIL per ID; the rest are listed there with what passing looks like"},
+        {"area": "Boundary", "check": "bootstrap of a harmless job from inside nono is refused (submit is probe S5); if it runs, raise it with nono"},
+        {"area": "Boundary", "check": "open -a from inside nono is refused"},
+        {"area": "Boundary", "check": "With the tuios daemon stopped, a tuios call from inside fails instead of starting a daemon"},
+        {"area": "Boundary", "check": "fff, kotlin-lsp, semble write only where granted"},
+        {"area": "Network", "check": "git through nono: 401 challenge, placeholder accepted"},
+        {"area": "Network", "check": "mise and gh trust nono's trusted CA"},
+        {"area": "Network", "check": "A host off the allowlist asks in the agent's pane through the approvals bridge"},
+        {"area": "Builds", "check": "mvn -U verify with the static proxy settings and truststore"},
+        {"area": "Builds", "check": "In a repo whose .mise.local.toml sets DOCKER_HOST, mise exec -- env inside nono shows the Lima socket"},
+        {"area": "Builds", "check": "Rootless Lima: heaviest Testcontainers suite, Ryuk on"},
+        {"area": "Builds", "check": "Container cannot reach the Mac's loopback"},
+        {"area": "Builds", "check": "MISE_SYSTEM_DATA_DIR reuse of your installs"},
+        {"area": "AWS", "check": "mise run nono:battle-aws -- PROFILE BUCKET --interactive: every check passes; nono audit show lists each decision"},
+        {"area": "AWS", "check": "aws CLI and boto3 trust AWS_CA_BUNDLE; one call per profile"},
+        {"area": "AWS", "check": "MCP proxy signs via aws-mcp route; s3:GetObject denied"},
+        {"area": "tuios", "check": "mail from one repo's agent to another's arrives; across sessions, --attach, --from and queue stay refused"},
+        {"area": "Keys", "check": "tuios keybinds doctor: prefix+alt+e is not shadowed; it opens the agent's draft in leaf; a symlinked draft is refused"}
+      ]
+    }
+  </state>
+  <tabs>
+    <tab id="overview" title="Overview">
+      <col pad="1" gap="1">
+        <row gap="2">
+          <stat label="Credentials inside" value="0 of yours" role="success"/>
+          <stat label="Prompts on test path" value="0" role="success"/>
+          <stat label="Writes from inside" value="none" role="warning"/>
+          <stat label="Docker boundary" value="VM" role="info"/>
+        </row>
+        <mermaid>flowchart TB
+  subgraph MAC["Your Mac, your user"]
+    T["tuios daemon: pane grants"]
+    K[("Keychain, service nono")]
+    V["aws-vault, scoped profiles"]
+    P["nono supervisor + proxy"]
+    EG["Exa gate, LaunchAgent"]
+    subgraph SBX["nono sandbox, one per agent"]
+      C["claude, hooks, MCP"]
+      M["mvn, git, gh, aws"]
+      D["docker CLI, Testcontainers"]
+    end
+  end
+  subgraph VM["Lima VM agents"]
+    R["rootless dockerd, ro mounts, nftables"]
+  end
+  subgraph UP["Upstreams"]
+    GH["github.com"]
+    NX["Nexus"]
+    AW["AWS APIs"]
+    MC["AWS MCP Server"]
+    RG["GHCR, registries"]
+    EX["api.exa.ai"]
+  end
+  C -- unix socket --&gt; T
+  M -- HTTP and CONNECT --&gt; P
+  D -- unix socket --&gt; R
+  K -.-&gt; P
+  V -.-&gt; P
+  P -- real credentials --&gt; GH
+  P -- real credentials --&gt; NX
+  P -- re-signed --&gt; AW
+  P -- re-signed --&gt; MC
+  R -- pulls --&gt; RG
+  C -- localhost --&gt; EG
+  K -.-&gt; EG
+  EG -- cache-first --&gt; EX</mermaid>
+        <kv>
+          <item k="A workload, not a person" v="Own low-privilege access; your credentials never enter"/>
+          <item k="Tests run with no prompts" v="Unknown hosts are denied, not prompted"/>
+          <item k="Leave writes out" v="Push, deploy, image push: from your own window"/>
+          <item k="Visible only if low-value" v="Pull-only or short-lived; the rest stays in nono"/>
+          <item k="The VM is the Docker boundary" v="Read-only code, no secrets inside"/>
+          <item k="The tuios socket must work" v="Pane grants checked by the daemon"/>
+          <item k="Nothing planted for later" v="Hooks, git config, settings and instructions that run or load outside the sandbox are read-only"/>
+        </kv>
+      </col>
+    </tab>
+    <tab id="launch" title="Launch">
+      <col pad="1" gap="1">
+        <mermaid>sequenceDiagram
+  participant S as claude (tuios/shims)
+  participant T as tuios daemon
+  participant N as nono supervisor
+  participant K as Keychain
+  participant C as claude (sandboxed)
+  S-&gt;&gt;S: settings copy without gh/aws denies, Claude's sandbox and GIT_CONFIG_*, crossSessionInbound accept
+  S-&gt;&gt;T: set-pane-grants read,write,task
+  S-&gt;&gt;N: exec nono run --profile liflig-agent --proxy-port PORT, TUIOS_AGENT=HERDR_AGENT=claude
+  N-&gt;&gt;K: read credentials, service nono
+  N-&gt;&gt;N: before-hook: agent DOCKER_CONFIG
+  N-&gt;&gt;N: start proxy, CA, placeholders
+  N-&gt;&gt;C: apply Seatbelt, start claude --setting-sources project,local
+  C-&gt;&gt;T: agent-hook and MCP over the socket, grants checked</mermaid>
+        <code lang="fish">claude                    # tuios/shims/claude, first on PATH: nono/launch-agent
+pi                        # tuios/shims/pi: the liflig-pi profile
+tuios start-agent claude  # the same shim; tuios still sees Claude Code
+# one-time: mise run nono:keychain, mise run lima:agents</code>
+        <table rows="state.profile">
+          <column field="k" title="Profile"/>
+          <column field="v" title="What it adds"/>
+        </table>
+        <text role="warning"><b>Plain claude and pi are sandboxed.</b> A shell, a preset, start-agent and fan all reach the shim by name. Outside nono only on purpose: command (mise which claude).</text>
+        <text role="dim">! commands run inside the sandbox too. Push from another window.</text>
+      </col>
+    </tab>
+    <tab id="creds" title="Credentials">
+      <col pad="1" gap="1">
+        <text>No 1Password, no fnox on the agent path. nono reads the macOS keychain on the host. nsbno requires SSO and allows no fine-grained PATs, so both tokens are classic.</text>
+        <table rows="state.creds">
+          <column field="cred" title="Credential"/>
+          <column field="scope" title="Scope"/>
+          <column field="inside" title="Inside"/>
+          <column field="use" title="Used for"/>
+          <column field="limit" title="Limited by"/>
+        </table>
+        <text role="dim">No wrappers: each route sets the variable its tool already reads (GH_TOKEN for gh only, GITHUB_GIT_TOKEN through git's credential helper, GITHUB_PERSONAL_ACCESS_TOKEN, GITHUB_API_TOKEN, LIFLIG_GITHUB_PAT, NEXUS_PASSWORD, CONTEXT7_API_KEY). Exa is the exception: EXA_API_BASE_URL points find-docs' exa.sh at the Exa gate on 127.0.0.1:47811, which reads the key from the keychain itself, and EXA_API_KEY inside is a dummy. nono's CA is trusted in your macOS trust store for a year; nono also sets SSL_CERT_FILE, GIT_SSL_CAINFO, CURL_CA_BUNDLE, NODE_EXTRA_CA_CERTS, AWS_CA_BUNDLE.</text>
+      </col>
+    </tab>
+    <tab id="github" title="GitHub">
+      <col pad="1" gap="1">
+        <mermaid>sequenceDiagram
+  participant G as git (sandbox)
+  participant N as nono proxy
+  participant H as github.com
+  G-&gt;&gt;N: GET info/refs, no auth
+  N-&gt;&gt;H: forwarded unchanged
+  H--&gt;&gt;G: 401 Basic challenge
+  G-&gt;&gt;G: credential helper gives the placeholder
+  G-&gt;&gt;N: GET info/refs, Basic x-access-token:placeholder
+  N-&gt;&gt;N: check placeholder and endpoint policy
+  N-&gt;&gt;H: same request with the real PAT
+  H--&gt;&gt;G: refs
+  G-&gt;&gt;N: POST git-upload-pack
+  N-&gt;&gt;H: forwarded with the real PAT
+  G-&gt;&gt;N: POST git-receive-pack (push)
+  N--&gt;&gt;G: 403, denied by endpoint policy</mermaid>
+        <kv>
+          <item k="Route github_git" v="github.com, basic_auth x-access-token:PAT, ghp_ placeholder"/>
+          <item k="Allowed" v="info/refs, git-upload-pack, archive, release downloads"/>
+          <item k="Denied" v="git-receive-pack (push), everything else" role="error"/>
+          <item k="Route github_api" v="api.github.com, public-read token, GET and GraphQL"/>
+          <item k="Credential helper" v="your gh auth git-credential, fed the placeholder"/>
+          <item k="ssh remotes" v="git@github.com: rewritten to https by the profile's GIT_CONFIG_* (url.insteadOf)"/>
+          <item k="Signing" v="commit.gpgsign with the agent's own SSH key, plain ssh-keygen, from the same GIT_CONFIG_*"/>
+          <item k=".git/config, .git/hooks" v="read-only to agents in every workspace repo, so git config cannot carry settings out" role="warning"/>
+        </kv>
+      </col>
+    </tab>
+    <tab id="maven" title="Maven">
+      <col pad="1" gap="1">
+        <mermaid>sequenceDiagram
+  participant M as mvn (sandbox)
+  participant N as nono proxy
+  participant X as Nexus
+  M-&gt;&gt;N: CONNECT nexus, GET artifact, no auth
+  N-&gt;&gt;X: forwarded unchanged
+  X--&gt;&gt;M: 401 Basic challenge
+  M-&gt;&gt;N: GET, Basic you:placeholder (NEXUS_PASSWORD)
+  N-&gt;&gt;N: check placeholder, GET or HEAD allowed
+  N-&gt;&gt;X: GET, Basic you:real password
+  X--&gt;&gt;M: artifact
+  M-&gt;&gt;N: PUT (deploy)
+  N--&gt;&gt;M: 403, endpoint policy</mermaid>
+        <kv>
+          <item k="settings.xml" v="unchanged: env-var passwords, real repository URLs"/>
+          <item k="Placeholders" v="LIFLIG_GITHUB_PAT, NEXUS_PASSWORD set by nono"/>
+          <item k="Proxy" v="static global settings; the launcher fixes the proxy port per session"/>
+          <item k="CA" v="truststore built once from nono's year-long trusted CA"/>
+          <item k="Repo tail" v="your ~/.m2/repository read-only; agents write their own"/>
+          <item k="Maven 4 mvnenc" v="not used: the JVM decrypts all settings at boot" role="warning"/>
+        </kv>
+      </col>
+    </tab>
+    <tab id="aws" title="AWS">
+      <col pad="1" gap="1">
+        <mermaid>sequenceDiagram
+  participant A as aws --profile cnops-dev-readonly
+  participant N as nono proxy
+  participant V as aws-vault (host)
+  participant S as logs.eu-west-1
+  A-&gt;&gt;N: DescribeLogGroups, signed with placeholder key
+  N-&gt;&gt;N: map key to host profile, operation Describe* allowed
+  N-&gt;&gt;V: credentials for cnops-dev-readonly
+  V--&gt;&gt;N: scoped session, cached
+  N-&gt;&gt;S: re-signed request
+  S--&gt;&gt;A: response
+  A-&gt;&gt;N: DeleteLogGroup
+  N--&gt;&gt;A: 403, operation not allowed</mermaid>
+        <kv>
+          <item k="Sandbox config" v="AWS_CONFIG_FILE with one placeholder profile per allowed profile"/>
+          <item k="Mapping" v="aws_auth.profiles: placeholder key ID to host profile"/>
+          <item k="Routes" v="one wildcard per service, concrete for iam, route53, cloudfront"/>
+          <item k="Operations" v="Describe*, List*, Get*; default deny; Unknown denied"/>
+          <item k="Never allow" v="sts:AssumeRole*, GetSessionToken, ecr:GetAuthorizationToken" role="error"/>
+          <item k="Two limits" v="IAM session policy and nono operation lists"/>
+        </kv>
+      </col>
+    </tab>
+    <tab id="mcp" title="AWS MCP">
+      <col pad="1" gap="1">
+        <mermaid>sequenceDiagram
+  participant P as mcp-proxy-for-aws (sandbox)
+  participant N as nono proxy
+  participant M as AWS MCP Server
+  participant X as Python sandbox (AWS)
+  participant S as Target service
+  P-&gt;&gt;N: run_script, signed with placeholder
+  N-&gt;&gt;M: re-signed as the scoped host profile
+  M-&gt;&gt;X: run the script, no credentials
+  X-&gt;&gt;M: call_boto3 logs DescribeLogGroups
+  M-&gt;&gt;S: API call as the signing identity, MCP context keys
+  S--&gt;&gt;M: IAM: identity, session policy, SCPs
+  M--&gt;&gt;P: script output</mermaid>
+        <text role="warning">nono never sees the script's own calls. IAM is the only control on run_script, so the profiles behind this route must be scoped.</text>
+        <table rows="state.mcp">
+          <column field="opt" title="Option"/>
+          <column field="creds" title="Creds inside"/>
+          <column field="profiles" title="Several profiles"/>
+          <column field="extra" title="Beyond IAM"/>
+          <column field="verdict" title="Verdict"/>
+        </table>
+      </col>
+    </tab>
+    <tab id="docker" title="Docker">
+      <col pad="1" gap="1">
+        <mermaid>flowchart LR
+  TC["Testcontainers in sandbox"] -- DOCKER_HOST --&gt; SO["Lima socket"]
+  SO --&gt; DD["rootless dockerd, no sudo"]
+  DD --&gt; CT["test containers"]
+  DD --&gt; RY["Ryuk"]
+  CT -- published ports --&gt; LH["localhost on the Mac"]
+  LH --&gt; TC
+  CT -. blocked by nftables .-&gt; LB["Mac loopback services"]
+  DD -- pulls via allowlist --&gt; RG["GHCR, Docker Hub, Nexus"]</mermaid>
+        <table rows="state.dockerPaths">
+          <column field="way" title="Way around nono"/>
+          <column field="rootful" title="Rootful VM"/>
+          <column field="here" title="This design"/>
+        </table>
+        <table rows="state.engines">
+          <column field="engine" title="Engine"/>
+          <column field="api" title="Docker API"/>
+          <column field="rootless" title="Rootless"/>
+          <column field="verdict" title="Verdict"/>
+        </table>
+        <text role="dim">Ryuk stays on: TESTCONTAINERS_DOCKER_SOCKET_OVERRIDE=/run/user/UID/docker.sock. With Podman, turn it off and reap by label.</text>
+      </col>
+    </tab>
+    <tab id="approvals" title="Approvals">
+      <col pad="1" gap="1">
+        <mermaid>sequenceDiagram
+  participant A as agent (sandbox)
+  participant N as nono proxy
+  participant B as approval bridge (LaunchAgent)
+  participant T as tuios
+  actor You
+  A-&gt;&gt;N: CONNECT docs.spring.io:443
+  N-&gt;&gt;N: not on the allowlist
+  N-&gt;&gt;B: webhook over unix socket, session id
+  B-&gt;&gt;B: session id to pane, from the before-hook
+  B-&gt;&gt;T: ask-human -w pane, 3 options
+  T-&gt;&gt;You: question in the agent's pane and the Inbox
+  You--&gt;&gt;T: Allow this session
+  T--&gt;&gt;B: answer
+  B--&gt;&gt;N: allow_session
+  N--&gt;&gt;A: tunnel opened, cached for the session</mermaid>
+        <kv>
+          <item k="Allow once" v="granted: this connection only"/>
+          <item k="Allow this session" v="allow_session: host and port until the agent exits"/>
+          <item k="Deny" v="denied; timeout and errors deny too" role="error"/>
+          <item k="Socket" v="~/.local/state/nono-approvals, not writable by the sandbox"/>
+          <item k="Why a LaunchAgent" v="only a caller outside every pane may ask for another pane"/>
+          <item k="Docs" v="Context7, aws-knowledge and Exa search need no approval; a live Exa fetch asks through the Exa gate (Docs tab)"/>
+        </kv>
+      </col>
+    </tab>
+    <tab id="docs" title="Docs">
+      <col pad="1" gap="1">
+        <mermaid>sequenceDiagram
+  participant E as exa.sh (sandbox)
+  participant G as Exa gate (LaunchAgent)
+  participant X as api.exa.ai
+  participant T as tuios
+  actor You
+  E-&gt;&gt;G: POST /contents, EXA_API_BASE_URL=127.0.0.1:47811
+  G-&gt;&gt;X: same body, maxAgeHours -1 (cache only), key from the keychain
+  X--&gt;&gt;G: cached pages; a miss comes back as an error status
+  G-&gt;&gt;T: ask-human in the caller's pane: fetch this URL live?
+  T-&gt;&gt;You: question in the pane and the Inbox
+  You--&gt;&gt;T: Fetch live
+  G-&gt;&gt;X: maxAgeHours 0 for that URL
+  G--&gt;&gt;E: merged results; a no reads NOT_CACHED_AND_NOT_ALLOWED</mermaid>
+        <kv>
+          <item k="Exa gate" v="nono/exa-gate/gate.py on 127.0.0.1:47811; /search passes, /contents is cache-first, anything else (agent runs, answers, research) is 403"/>
+          <item k="Caller's pane" v="lsof on the TCP peer port, then ps ancestors, then tuios call resolve-pane"/>
+          <item k="Dependency source" v="mise run forge:maven fetches sources jars into ~/.m2 outside the sandbox; find-docs reads them (LSP, unzip) before going online"/>
+          <item k="Context7 cache" v="context7.sh keeps answers 72 h under XDG_CACHE_HOME/context7, shared by every agent; an expired answer is served when Context7 fails or rate-limits"/>
+          <item k="No ETag" v="Context7 sends max-age=0 and no validator, so the cache is a fixed lifetime"/>
+          <item k="qmd index" v="context7.sh also writes each answer as markdown; mise run forge:docs-index embeds them with qmd outside the sandbox. Unverified; no agent route yet" role="warning"/>
+        </kv>
+      </col>
+    </tab>
+    <tab id="tuios" title="tuios">
+      <col pad="1" gap="1">
+        <mermaid>flowchart TB
+  A["Call on the tuios socket"] --&gt; P{"Kernel peer PID in a pane?"}
+  P -- yes --&gt; G{"Pane grants cover the verb?"}
+  P -- no --&gt; O["Treated as you, no limits: upstream gap"]
+  G -- yes --&gt; R["Runs"]
+  G -- no --&gt; F["forbidden"]</mermaid>
+        <kv>
+          <item k="Your panes" v="admin"/>
+          <item k="Agent panes" v="read,write,task, dropped before nono starts"/>
+          <item k="write" v="only panes that hold nothing more than the agent's"/>
+          <item k="No fan" v="start-agent and fan panes start outside nono" role="warning"/>
+          <item k="Other sessions" v="mail, allowed by tuios itself"/>
+          <item k="Across sessions, never" v="queue, ask-agent, send-text: typing runs with the target's authority"/>
+          <item k="herdr, Rex" v="no grants model; sockets stay out" role="warning"/>
+        </kv>
+      </col>
+    </tab>
+    <tab id="tools" title="mise, fnox">
+      <col pad="1" gap="1">
+        <table rows="state.tools">
+          <column field="tool" title="Tool"/>
+          <column field="here" title="In this design"/>
+          <column field="own" title="Its own sandbox"/>
+        </table>
+      </col>
+    </tab>
+    <tab id="decisions" title="Decisions">
+      <col pad="1" gap="1">
+        <table rows="state.decisions">
+          <column field="q" title="Question"/>
+          <column field="chosen" title="Chosen"/>
+          <column field="why" title="Why"/>
+        </table>
+      </col>
+    </tab>
+    <tab id="limits" title="Limits">
+      <col pad="1" gap="1">
+        <text role="warning"><b>Not possible, accepted</b></text>
+        <table rows="state.limits">
+          <column field="what" title="What"/>
+          <column field="note" title="Note"/>
+        </table>
+        <text role="error"><b>Open in this design</b></text>
+        <table rows="state.open">
+          <column field="gap" title="Gap"/>
+          <column field="note" title="Note"/>
+        </table>
+        <text role="error"><b>Upstream gaps</b></text>
+        <table rows="state.gaps">
+          <column field="where" title="Where"/>
+          <column field="gap" title="Gap"/>
+          <column field="fix" title="Suggested fix"/>
+        </table>
+      </col>
+    </tab>
+    <tab id="verify" title="Verify">
+      <col pad="1" gap="1">
+        <text>Confirm on the Mac before building on it.</text>
+        <table rows="state.verify">
+          <column field="area" title="Area"/>
+          <column field="check" title="Check"/>
+        </table>
+        <text role="dim">Probes not yet run on the Mac, with commands: docs/unverified-probes.md. Full write-up with sources: the Agent Fleet Sandbox page.</text>
+      </col>
+    </tab>
+  </tabs>
+</tml>

@@ -254,11 +254,17 @@ tuios send-agent-message --select 'session:dotfiles harness:claude-code' --confi
   by the git-repos picker that opens them, so `session:<repo>` works. Use
   `cwd:` for a session opened some other way, which tuios names
   `session-<hex>`.
-- `send-agent-message -s OTHER -w ID` fails across sessions: the sender
-  defaults to this pane and is looked up in the target session.
+- `send-agent-message -s OTHER -w ID` works too, with the full window id
+  from `list-agents`.
 - A `--select` write lists the panes first and sends only when given the
   token, which belongs to exactly that set of panes. Check that the set is
   the one agent you meant before you send.
+- Across repos, use mail. `queue` and `ask-agent` type into the other agent's
+  pane and reach only agents in this session.
+- No agent in that repo yet: `tuios start-agent claude -s <repo> --cwd <repo
+  root> --grants read,write,task --prompt 'TEXT'` may ask me first in the Inbox, then starts it
+  there; the prompt may reach it as mail from you. Wait for my answer; a
+  refusal means I will handle it.
 
 Inside tuios (`TUIOS_ENV=1`):
 

@@ -69,9 +69,7 @@ agent tooling and small CLIs, where a same-day fix is the reason to upgrade.
 
 **In the shell.** fish activates mise itself in `fish/conf.d/30-interactive.fish`
 (`MISE_FISH_AUTO_ACTIVATE=0` keeps Homebrew's snippet from doing it late).
-Non-interactive shells use the shims. mise's env also puts
-`~/.local/bin/wrapped` first on `PATH`; that folder holds the fnox wrappers
-below.
+Non-interactive shells use the shims.
 
 ## Credentials: fnox, 1Password and aws-vault
 
@@ -82,16 +80,16 @@ account is in [fnox/README.md](fnox/README.md); in short:
   only `op://` references. `mise run sync-secrets` caches them, encrypted, in
   the untracked `~/.config/fnox/config.toml`, so reads don't go to 1Password
   each time. A rotated value stays stale until the task runs again.
-- **Secrets reach one process at a time.** Secrets are `env = "exec"`, and the
-  scripts in [`fnox/wrapped/`](fnox/wrapped/) (`gh`, `mvn`, `hunk`,
-  `lazyjira`, the GitHub and Exa MCP servers) each export only what their one
-  program needs. mise gets its GitHub token the same way, through
-  `fnox-secret` as its `credential_command`.
+- **Secrets reach one process at a time.** In your own shells, the mise shell
+  aliases `mvn` and `lazyjira` run under `fnox exec`, which injects only the
+  `env = "exec"` secrets (or a profile's); mise's `credential_command` calls
+  `fnox get MISE_GITHUB_TOKEN`. `gh` holds your PAT itself: run
+  `gh auth login --with-token` once with `GITHUB_PERSONAL_ACCESS_TOKEN`, and
+  gh, its git credential helper and hunk use it from the keychain.
 - **One Touch ID per cold start.** The fnox daemon caches resolved secrets in
-  memory for 8 idle hours, and `fnox-secret` makes all callers share a single
-  decrypt.
-- **Not in the sandbox.** Claude Code's sandbox can't reach 1Password, so
-  anything that needs a secret runs outside it.
+  memory for 8 idle hours.
+- **Agents never see these.** Agents run in nono (below), which keeps its own
+  copies in the keychain and adds them to requests on the host.
 
 **AWS** has two routes, both built on one MFA session:
 

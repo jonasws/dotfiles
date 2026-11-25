@@ -176,8 +176,9 @@ minimum_release_age_excludes = [
 ]
 
 [settings.github]
-# mise runs this through sh with its shims stripped from PATH, hence the full path.
-credential_command = "~/.local/bin/wrapped/fnox-secret MISE_GITHUB_TOKEN"
+# mise runs this through sh with its shims stripped from PATH, hence the full
+# path. Agents in nono never reach it: their GITHUB_API_TOKEN comes first.
+credential_command = "~/.local/share/mise/shims/fnox get MISE_GITHUB_TOKEN"
 
 [env]
 # mise upgrades tsk; its board banner would otherwise advise `tsk update`.
@@ -188,12 +189,22 @@ LAZYJIRA_CONFIG_DIR = "{{env.HOME}}/.config/lazyjira"
 # and Claude Code's sandbox points TMPDIR elsewhere, so pin one shared place.
 RIP_GRAVEYARD = "{{env.HOME}}/.local/share/graveyard"
 
-# Commands that must run under `fnox exec` to receive their credentials. mise
-# orders these ahead of tool directories, so the wrapper here wins over the
-# maven that mise itself provisions. tuios/shims holds personal stand-ins on
-# the same terms: its tml opens documents as tuios panes inside tuios, even
-# from a project task that pins tml in its own `tools`.
-_.path = ["~/.local/bin/wrapped", "~/dotfiles/tuios/shims"]
+# tuios/shims holds personal stand-ins, ahead of tool directories: its tml
+# opens documents as tuios panes inside tuios, even from a project task that
+# pins tml in its own `tools`. Its claude and pi start the agent inside nono
+# (nono/launch-agent), so every way of launching one by name is sandboxed: a
+# shell, tuios start-agent, presets and fan.
+_.path = ["~/dotfiles/tuios/shims"]
+
+# Maven everywhere. The Kotlin compile daemon is detached and outlives the
+# build, the wrong process to hold a project's files, so compile in-process.
+# GitHub Packages serves no .meta/prefixes.txt (422) and Flyway's POM names a
+# GitHub Packages repository we have no credentials for (401): stop asking
+# both. A full `clean verify` with the Kotlin compiler in-process peaks under
+# 1G of heap. Agents in nono get their own MAVEN_ARGS and MAVEN_OPTS from the
+# liflig-base profile, with these flags in them.
+MAVEN_ARGS = "-Dkotlin.compiler.daemon=false -Daether.remoteRepositoryFilter.prefixes.resolvePrefixFiles.github=false -Daether.remoteRepositoryFilter.prefixes.resolvePrefixFiles.flyway-community-db-support=false"
+MAVEN_OPTS = "-Xms512m -Xmx2g -XX:+ExitOnOutOfMemoryError --enable-native-access=ALL-UNNAMED"
 
 # Re-encrypt every secret into the local age provider, so resolution stops
 # reaching 1Password: MCP servers start without a 1Password prompt, and `mvn`
@@ -214,7 +225,7 @@ cfg=~/.config/fnox/config.toml
 [[ -L $cfg ]] && rm "$cfg"
 printf 'import = ["./secrets.toml"]\n' > "$cfg"
 # One run re-encrypts every top-level secret under one shared key, which is
-# what lets fnox-secret's single batch decrypt them all behind one Touch ID.
+# what lets one Touch ID decrypt them all.
 # Profile secrets (`gcalcli`) stay pure 1Password references: it is
 # used interactively, where a prompt costs nothing, and revocation stays
 # immediate rather than waiting for the next sync.
@@ -222,6 +233,10 @@ fnox sync -g -p sync-age -f
 '''
 
 [shell_alias]
+# Your own shells only; agents get these credentials from nono instead. Maven
+# reads LIFLIG_GITHUB_PAT and NEXUS_PASSWORD (env = "exec" in fnox) through
+# ~/.m2/settings.xml.
+mvn = "fnox exec -- mvn"
 nvn = "~/.local/share/mise/installs/neovim/nightly/bin/nvim"
 herdrn = "~/.local/share/mise/installs/github-herdrdev-herdr/nightly/herdr"
 n = "nvim"

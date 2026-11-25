@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nolabs-ai/nono/refs/heads/main/crates/nono-cli/data/nono-profile.schema.json",
+  "extends": [
+    "nolabs-ai/pi",
+    "liflig-base"
+  ],
+  "meta": {
+    "name": "liflig-pi",
+    "description": "pi in the shared Liflig/Vy agent sandbox (liflig-base)."
+  },
+  "workdir": {
+    "access": "read"
+  }
+}

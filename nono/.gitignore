@@ -1,0 +1,5 @@
+# nono's own state; ~/.config/nono is this directory.
+# Recreate the pack with: nono pull nolabs-ai/claude
+packages/
+profile-drafts/
+pack-update-hints.json
