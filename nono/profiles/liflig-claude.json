@@ -1,0 +1,124 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nolabs-ai/nono/refs/heads/main/crates/nono-cli/data/nono-profile.schema.json",
+  "extends": "default",
+  "meta": {
+    "name": "liflig-claude",
+    "version": "0.1.5",
+    "description": "profiles/claude.json of the nolabs-ai/claude pack 0.1.5, copied so that liflig-agent does not extend the pack: nono asks registry.nono.sh for a pack's status on every run, 130-420 ms before the agent starts. Its before-hook is left out (liflig-base's replaces it); nono/launch-agent creates the directories it made. Diff against ~/.config/nono/packages/nolabs-ai/claude/profiles/claude.json after `nono pull`.",
+    "author": "nolabs-ai"
+  },
+  "groups": {
+    "include": [
+      {
+        "name": "claude_code_macos",
+        "when": "macos"
+      },
+      {
+        "name": "claude_code_linux",
+        "when": "linux"
+      },
+      {
+        "name": "user_caches_macos",
+        "when": "macos"
+      },
+      {
+        "name": "claude_cache_linux",
+        "when": "linux"
+      },
+      "node_runtime",
+      "rust_runtime",
+      "python_runtime",
+      {
+        "name": "vscode_macos",
+        "when": "macos"
+      },
+      {
+        "name": "vscode_linux",
+        "when": "linux"
+      },
+      {
+        "name": "linux_sysfs_read",
+        "when": "linux"
+      },
+      "nix_runtime",
+      "git_config",
+      "unlink_protection"
+    ]
+  },
+  "security": {
+    "signal_mode": "isolated",
+    "capability_elevation": false
+  },
+  "filesystem": {
+    "allow": [
+      "$HOME/.claude",
+      "$HOME/.local/state/claude/locks",
+      "$HOME/.cache/claude",
+      "$NONO_CONFIG/profile-drafts",
+      {
+        "path": "$HOME/Library/Keychains",
+        "when": "macos"
+      }
+    ],
+    "read": [
+      "$NONO_PACKAGES",
+      "$NONO_CONFIG/profiles"
+    ],
+    "allow_file": [
+      "$HOME/.claude.json",
+      "$HOME/.claude.json.lock",
+      "$HOME/.claude.lock"
+    ],
+    "bypass_protection": [
+      {
+        "path": "$HOME/Library/Keychains",
+        "when": "macos"
+      }
+    ],
+    "unix_socket_dir_bind": [
+      {
+        "path": "$XDG_RUNTIME_DIR/cc-socks",
+        "when": "linux"
+      }
+    ]
+  },
+  "network": {
+    "block": false
+  },
+  "workdir": {
+    "access": "readwrite"
+  },
+  "open_urls": {
+    "allow_origins": [
+      "https://claude.ai",
+      "https://claude.com",
+      "https://api.anthropic.com",
+      "https://platform.claude.com"
+    ],
+    "allow_localhost": true
+  },
+  "environment": {
+    "set_vars": {
+      "CLAUDE_CODE_TMPDIR": "$HOME/.claude/tmp",
+      "LC_MESSAGES": "C",
+      "TMPDIR": "$HOME/.claude/tmp/claude-$UID"
+    }
+  },
+  "diagnostics": {
+    "suppress_system_services": [
+      "forbidden-exec-sugid"
+    ]
+  },
+  "allow_launch_services": true,
+  "rollback": {
+    "exclude_patterns": [
+      "node_modules",
+      ".next",
+      "__pycache__",
+      "target"
+    ],
+    "exclude_globs": [
+      "*.tmp.[0-9]*.[0-9a-f]*"
+    ]
+  }
+}

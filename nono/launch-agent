@@ -97,6 +97,11 @@ export NONO_AGENT_PROXY_PORT="$port"
 # state and Maven's agent repository here; created inside the sandbox they
 # would be refused.
 mkdir -p "$HOME/.local/share/mise-agents" "$HOME/.local/state/mise-agents" "$HOME/.m2/repository-agents"
+if [ "$name" = claude ]; then
+  # TMPDIR in the liflig-claude profile; Claude Code refuses it unless private.
+  mkdir -p -m 700 "$HOME/.claude/tmp" "$HOME/.claude/tmp/claude-$(id -u)"
+  mkdir -p "$HOME/.cache/claude" "$HOME/.local/state/claude/locks"
+fi
 
 # nono sits between the pane and the agent, so the pane's foreground process
 # is no harness tuios or herdr knows. Both read a hint on that process instead:
