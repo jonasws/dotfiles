@@ -41,3 +41,5 @@ tuios/config.d/notify.toml
 tuios/.apply-config
 tuios/.reload-themes
 __pycache__/
+# mise's per-install lock directories, written beside the global config it reads
+mise-global/.mise/

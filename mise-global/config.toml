@@ -40,7 +40,9 @@ node = "24"
 "npm:@mermaid-js/mermaid-cli" = "11.15.0"
 "npm:@pb33f/openapi-changes" = "latest"
 "npm:defuddle" = "latest"
-"npm:typescript-language-server" = "latest"
+"npm:@tobilu/qmd" = "latest"
+"npm:typescript-language-server" = "6"
+"npm:typescript" = "6"
 "pipx:awslogs" = "latest"
 "pipx:xmlformatter" = "latest"
 python = "latest"
@@ -132,6 +134,7 @@ atuin = { version = "latest", postinstall = "for a in \"$MISE_TOOL_INSTALL_PATH\
 "aqua:bensadeh/tailspin" = "latest"
 "aqua:asciinema/asciinema" = "latest"
 twg = { version = "latest", bin = "twg", checksum_url = "https://teamwork-graph.atlassian.com/cli/SHA256SUMS-v{{ version }}", platforms = { windows-arm64 = { bin = "twg.exe", url = "https://teamwork-graph.atlassian.com/cli/twg-windows-arm64-v{{ version }}.exe" }, windows-x64 = { bin = "twg.exe", url = "https://teamwork-graph.atlassian.com/cli/twg-windows-x64-v{{ version }}.exe" } }, url = 'https://teamwork-graph.atlassian.com/cli/twg-{{ os(macos="darwin") }}-{{ arch() }}-v{{ version }}', version_date_expr = "[[fromJSON(body).version, fromJSON(body).publishedAt]]", version_json_path = ".version", version_list_url = "https://teamwork-graph.atlassian.com/cli/manifest.json" }
+"github:AltanS/collie" = "latest"
 
 [settings]
 # No `lockfile = true`: that creates a mise.lock in every project mise touches,
@@ -169,6 +172,7 @@ minimum_release_age_excludes = [
   "github:control-theory/gonzo",
   "github:walles/moor",
   "github:pamburus/hl",
+  "carapace",
 ]
 
 [settings.github]

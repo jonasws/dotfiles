@@ -1,7 +1,0 @@
-{
-  "name": "mise-npm-install",
-  "private": true,
-  "dependencies": {
-    "defuddle": "0.19.6"
-  }
-}
