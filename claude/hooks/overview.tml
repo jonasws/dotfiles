@@ -14,7 +14,7 @@
           "on": "Bash",
           "gives": "allow / ask",
           "fail": "open",
-          "why": "--help / --version only; ask for other twg"
+          "why": "--help / --version, atuin reads; ask for other twg and atuin"
         },
         {
           "hook": "inline-script-guard",
@@ -33,7 +33,7 @@
         {
           "hook": "repl-lint",
           "on": "REPL",
-          "gives": "deny",
+          "gives": "deny / ask",
           "fail": "block (exit 2)",
           "why": "lints scripts with ast-grep"
         },
@@ -62,6 +62,11 @@
           "cmd": "git commit --help | head -20",
           "by": "help-allow",
           "why": "pipe to head/tail/wc is fine"
+        },
+        {
+          "cmd": "atuin search --exit 0 --cwd . deploy",
+          "by": "help-allow",
+          "why": "atuin read; --delete and other writes ask"
         },
         {
           "cmd": "tuios ask-agent -w a 'q'",
@@ -97,6 +102,11 @@
           "cmd": "mcp tuios list/mail/ask_agent",
           "by": "allow rules",
           "why": "same split as Bash"
+        },
+        {
+          "cmd": "mcp atuin (all tools)",
+          "by": "allow rule",
+          "why": "every atuin MCP tool is read-only"
         }
       ],
       "notAllowed": [
@@ -228,7 +238,7 @@
       <col pad="1" gap="1">
         <row gap="2">
           <stat label="Hooks on Bash" value="4"/>
-          <stat label="Allow rules" value="58" role="success"/>
+          <stat label="Allow rules" value="59" role="success"/>
           <stat label="Ask rules" value="51" role="warning"/>
           <stat label="Deny rules" value="40" role="error"/>
         </row>

@@ -21,7 +21,12 @@ unlisted). `respond` always asks: it approves other agents' prompts.
 The command text is searched for herdr/tuios invocations wherever they sit:
 after `&&` or `;`, behind a path, `env`, `xargs` or `mise exec --`, inside
 `bash -c '...'`, `$(...)` or a heredoc, and again with quotes and backslashes
-removed (`\tuios`, `tuio''s`). Script files named on the command line (.sh,
+removed (`\tuios`, `tuio''s`). Text that only becomes data is skipped: a
+git `-m`/`--message` value in single quotes (or double quotes with no `$` or
+backtick), and the body of a heredoc read by a text consumer such as `git`,
+`cat` or `tee` when nothing on its line pipes it on or runs a shell. A heredoc
+fed to `bash`, piped onward, or on a line that runs an interpreter is still
+searched. Script files named on the command line (.sh,
 .py, ...) are searched too, one level deep. Commands that are only help or
 version queries (help_only.py) are never asked about.
 
@@ -31,6 +36,17 @@ tuios flags from LAUNCH_FLAGS, then `--` and a bare viewer from VIEWERS with
 only that viewer's listed flags. Flags that change what the pane may do
 (--host, --grants, --kind, --wait) and viewer flags that run commands (less
 `+!cmd`, bat --pager) still ask.
+
+An agent launch typed directly (`tuios start-agent`, `delegate`, `fan`, and
+the MCP `delegate` and `fan` tools) without `--grants` is denied, not asked:
+under `[agents.permissions] mode = "open"` the new agent would inherit this
+pane's `admin`. The reason tells the agent to pass `--grants read,write,task`
+(or `read`). `delegate --role review|research` passes, since tuios gives those
+`read` by default. Launches inside script files are only asked about, because
+a script's flags can sit on continued lines this scan does not join.
+
+`tuios ship push` and `ship pr` are denied too: pushing stays with the user,
+so the agent prints the command instead. `ship merge` still asks.
 
 It errs towards asking. Not covered: a program that talks to the herdr or
 tuios socket directly, and commands assembled at run time (`$cmd` is asked
@@ -235,6 +251,67 @@ MCP_ASK = {
 }
 
 
+USER_SHIPS = {"push", "pr"}
+USER_SHIP = (
+    "Pane control: `tuios ship {sub}` sends work off this machine, and pushing is the "
+    "user's. Print the command for the user to run instead; do not run it."
+)
+
+AGENT_LAUNCHES = {"start-agent", "delegate", "fan"}
+READ_ROLES = {"review", "research"}
+UNGRANTED = (
+    "Pane control: `{name}` starts an agent without `--grants`, so it would get this "
+    "pane's own grants (admin while tuios runs in open mode). Pass `--grants "
+    "read,write,task` for a worker, or `--grants read` for a read-only job; name wider "
+    "grants only when the user asked for them."
+)
+
+
+def own_args(args):
+    return args[:args.index("--")] if "--" in args else args
+
+
+def flag_value(args, flag):
+    for i, a in enumerate(args):
+        if a == flag and i + 1 < len(args):
+            return args[i + 1]
+        if a.startswith(flag + "="):
+            return a.split("=", 1)[1]
+    return None
+
+
+def ungranted(prog, args):
+    """The launch's name when it starts an agent without narrowed grants."""
+    if prog != "tuios":
+        return None
+    hit = classify(prog, args)
+    if not hit or hit[1] != LAUNCH:
+        return None
+    sub = hit[0].split()[1]
+    if sub not in AGENT_LAUNCHES:
+        return None
+    own = own_args(args)
+    if flag_value(own, "--grants") is not None:
+        return None
+    if sub == "delegate" and flag_value(own, "--role") in READ_ROLES:
+        return None
+    return hit[0]
+
+
+def deny_reason(command):
+    if is_help_only(command):
+        return None
+    for variant in variants(command):
+        for prog, args in invocations(variant):
+            hit = classify(prog, args)
+            if hit and hit[0] in {f"tuios ship {s}" for s in USER_SHIPS}:
+                return USER_SHIP.format(sub=hit[0].split()[2])
+            name = ungranted(prog, args)
+            if name:
+                return UNGRANTED.format(name=name)
+    return None
+
+
 def load_help_only():
     path = os.path.join(os.path.dirname(os.path.realpath(__file__)), "help_only.py")
     spec = importlib.util.spec_from_file_location("help_only", path)
@@ -251,6 +328,65 @@ except Exception:  # without it, nothing counts as a help query: more asking, ne
 
     def is_help_only(command):
         return False
+
+
+HEREDOC = re.compile(r"(?<!<)<<(-?)[ \t]*(['\"]?)([A-Za-z_][A-Za-z0-9_]*)\2")
+# A heredoc read by one of these is data, unless its line also runs something.
+TEXT_CONSUMERS = {
+    "git", "cat", "tee", "jq", "yq", "sd", "rg", "wc", "printf", "echo", "pbcopy",
+    "glow", "leaf", "less", "bat",
+}
+RUNS_CODE = re.compile(
+    r"\b(bash|sh|zsh|fish|dash|ksh|eval|source|python3?|node|perl|ruby|tuios|herdr|xargs)\b")
+SEGMENT_START = re.compile(r"[;&|\n(`]|\$\(")
+GIT_MESSAGE = re.compile(
+    r"""(\bgit\b[^;&|\n]*?\s(?:-[A-Za-z]*m|--message)(?:=|\s+))('[^']*'|"(?:[^"\\$`]|\\.)*")""")
+
+
+def inert_heredoc(line, pos):
+    before, after = line[:pos], line[pos:]
+    words = SEGMENT_START.split(before)[-1].split()
+    if not words or os.path.basename(words[0]) not in TEXT_CONSUMERS:
+        return False
+    return "|" not in after and not RUNS_CODE.search(before) and not RUNS_CODE.search(after)
+
+
+def strip_heredocs(text):
+    lines, out, i = text.split("\n"), [], 0
+    while i < len(lines):
+        line = lines[i]
+        out.append(line)
+        i += 1
+        for m in HEREDOC.finditer(line):
+            dash, delim = m.group(1), m.group(3)
+            body = []
+            while i < len(lines):
+                current = lines[i]
+                i += 1
+                if (current.lstrip("\t") if dash else current) == delim:
+                    break
+                body.append(current)
+            if not inert_heredoc(line, m.start()):
+                out.extend(body)
+            out.append(delim)
+    return "\n".join(out)
+
+
+def strip_messages(text):
+    while True:
+        stripped = GIT_MESSAGE.sub(lambda m: m.group(1) + "_", text)
+        if stripped == text:
+            return text
+        text = stripped
+
+
+def searchable(text):
+    return strip_messages(strip_heredocs(text))
+
+
+def variants(text):
+    clean = searchable(text)
+    return (clean, UNQUOTE.sub("", clean))
 
 
 def invocations(text):
@@ -344,7 +480,7 @@ def classify(prog, args):
 
 def hits_in(text):
     found = []
-    for variant in (text, UNQUOTE.sub("", text)):
+    for variant in variants(text):
         for prog, args in invocations(variant):
             hit = classify(prog, args)
             if hit and hit not in found:
@@ -402,6 +538,15 @@ def evaluate(command, cwd=None):
     return reason(direct, scripts) if direct or scripts else None
 
 
+def deny_mcp(tool, params):
+    name = tool[len(MCP_PREFIX):] if tool.startswith(MCP_PREFIX) else tool
+    if name not in {"delegate", "fan"} or params.get("grants"):
+        return None
+    if name == "delegate" and params.get("role") in READ_ROLES:
+        return None
+    return UNGRANTED.format(name=tool)
+
+
 def evaluate_mcp(tool, params):
     name = tool[len(MCP_PREFIX):] if tool.startswith(MCP_PREFIX) else tool
     if name == "ask_agent":
@@ -421,20 +566,28 @@ def main():
     data = json.load(sys.stdin)
     tool = data.get("tool_name") or ""
     params = data.get("tool_input") or {}
+    decision, why = "ask", None
     try:
         if tool == "Bash":
             command = params.get("command")
-            why = evaluate(command, data.get("cwd")) if isinstance(command, str) and command else None
+            if isinstance(command, str) and command:
+                denied = deny_reason(command)
+                if denied:
+                    decision, why = "deny", denied
+                else:
+                    why = evaluate(command, data.get("cwd"))
         elif tool.startswith("mcp__tuios__"):
-            why = evaluate_mcp(tool, params)
-        else:
-            why = None
+            denied = deny_mcp(tool, params)
+            if denied:
+                decision, why = "deny", denied
+            else:
+                why = evaluate_mcp(tool, params)
     except Exception as e:  # a broken guard asks rather than waves through
-        why = f"pane-control-guard failed ({type(e).__name__}: {e}); asking instead"
+        decision, why = "ask", f"pane-control-guard failed ({type(e).__name__}: {e}); asking instead"
     if why:
         print(json.dumps({"hookSpecificOutput": {
             "hookEventName": "PreToolUse",
-            "permissionDecision": "ask",
+            "permissionDecision": decision,
             "permissionDecisionReason": why,
         }}))
     return 0
@@ -568,6 +721,61 @@ MCP_CASES = [
     ("capture_pane", {}, True),
     ("brand_new_tool", {}, True),
 ]
+DENY = [
+    "tuios start-agent claude --name w --prompt 'do x'",
+    "tuios start-agent claude -- --grants admin",
+    "tuios delegate 'add tests'",
+    "tuios delegate --role implementation --isolation worktree 'x'",
+    "tuios -s repo fan 2 --agent claude 'try it'",
+    "cd ~/CX/r && tuios delegate --wait 10m 'x'",
+    "tuio''s delegate 'x'",
+    "tuios ship push -s s",
+    "tuios ship pr -s s --draft --title t",
+    "tuios -s s ship pr --yes",
+]
+NO_DENY = [
+    "tuios start-agent claude --grants read,write,task --prompt 'x'",
+    "tuios start-agent claude --grants=read -- --model x",
+    "tuios delegate --role review 'look'",
+    "tuios delegate --role=research 'find it'",
+    "tuios delegate --role implementation --grants read,write,task 'x'",
+    "tuios fan 2 --agent claude --grants read,write,task 'x'",
+    "tuios delegate --help",
+    "tuios new-window x -- make",
+    "tuios worktree new feat/x --agent claude",
+    "tuios send-text -w b ls",
+    "tuios ship merge -s s",
+    "tuios ship status -s s",
+    "tuios ship pr --help",
+]
+DATA_PASS = [
+    "git commit -m 'note: tuios ship push is the user' -m 'and tuios send-text too'",
+    'git commit -m "mentions tuios send-text x"',
+    "git commit -am 'tuios delegate example'",
+    "git commit -q -F - <<'EOF'\nfeat: x\n\n  tuios ship push and tuios delegate 'x'\nEOF",
+    "git commit -m \"$(cat <<'EOF'\nuse tuios send-text -w b ls\nEOF\n)\"",
+    "cat > notes.md <<'EOF'\ntuios fan 3 'x'\nEOF",
+    "git -C ~/r commit -F - <<EOF\ntuios ship pr\nEOF\ngit -C ~/r log -1",
+]
+DATA_ASK = [
+    "bash <<'EOF'\ntuios send-text -w b ls\nEOF",
+    "cat <<'EOF' | bash\ntuios send-text -w b ls\nEOF",
+    "cat <<'EOF' > x.sh && bash x.sh\ntuios send-text -w b ls\nEOF",
+    'git commit -m "$(tuios send-text -w b ls)"',
+    "git commit -m `tuios send-text -w b ls`",
+    "bash -c \"$(cat <<'EOF'\ntuios send-text -w b ls\nEOF\n)\"",
+    "git commit -m 'x'; tuios send-text -w b ls",
+    "git commit -F - <<'EOF'\nmsg\nEOF\ntuios send-text -w b ls",
+]
+MCP_DENY = [
+    ("delegate", {"prompt": "x"}, True),
+    ("delegate", {"prompt": "x", "role": "implementation"}, True),
+    ("delegate", {"prompt": "x", "role": "review"}, False),
+    ("delegate", {"prompt": "x", "grants": ["read", "write", "task"]}, False),
+    ("fan", {"prompt": "x", "count": 2}, True),
+    ("fan", {"prompt": "x", "grants": ["read"]}, False),
+    ("send_text", {"text": "x"}, False),
+]
 
 
 def self_test():
@@ -587,6 +795,16 @@ def self_test():
         check(command, evaluate(command), None)
     for name, params, want in MCP_CASES:
         check(f"mcp {name} {params}", bool(evaluate_mcp(MCP_PREFIX + name, params)), want)
+    for command in DENY:
+        check(f"deny {command}", bool(deny_reason(command)), True)
+    for command in NO_DENY:
+        check(f"no deny {command}", deny_reason(command), None)
+    for name, params, want in MCP_DENY:
+        check(f"mcp deny {name} {params}", bool(deny_mcp(MCP_PREFIX + name, params)), want)
+    for command in DATA_PASS:
+        check(f"data pass {command!r}", (evaluate(command), deny_reason(command)), (None, None))
+    for command in DATA_ASK:
+        check(f"data ask {command!r}", bool(evaluate(command) or deny_reason(command)), True)
     with tempfile.TemporaryDirectory() as d:
         hit = os.path.join(d, "viewer.sh")
         quiet = os.path.join(d, "quiet.sh")
@@ -602,7 +820,9 @@ def self_test():
     out = evaluate("herdr pane run p ls")
     check("reason text", bool(out) and "types into a pane" in out, True)
     check("help_only loaded", help_only is not None, True)
-    print(f"{len(ASK)} ask, {len(PASS)} pass, {len(MCP_CASES)} mcp, 5 script cases: {failures} failed")
+    print(f"{len(ASK)} ask, {len(PASS)} pass, {len(MCP_CASES)} mcp, "
+          f"{len(DENY) + len(NO_DENY) + len(MCP_DENY)} grant, "
+          f"{len(DATA_PASS) + len(DATA_ASK)} data, 5 script cases: {failures} failed")
     return 1 if failures else 0
 
 

@@ -134,14 +134,14 @@ allows, asks about or denies. Its counts are kept by hand.
 | Hook | Decides | What |
 | ---- | ------- | ---- |
 | `pane-control-guard.py` | ask | Pane control through tuios or herdr: reading, typing, launching, closing. It is the only gate for these: settings has no tuios or herdr ask rules. A `tuios split-window` or `new-window` that only opens a viewer after `--` passes. The viewers are pagers (`leaf`, `less`, `bat`, `cat`), log viewers (`lnav`, `gonzo`, `tspin`, `hl`), JSON viewers (`fx` with one file, `otree`) and `nvim -R`. Each passes only with its own allow-listed flags, so flags that run commands, send data out or write files still ask. |
-| `help-allow.py` | allow, ask | Allows commands that are only `--help`, `-h`, `--version` or `help` (rules in `help_only.py`). It asks for every other `twg` command, in place of a `Bash(twg:*)` rule that would also catch `twg … --help`. |
+| `help-allow.py` | allow, ask | Allows commands that are only `--help`, `-h`, `--version` or `help` (rules in `help_only.py`). It asks for every other `twg` command, in place of a `Bash(twg:*)` rule that would also catch `twg … --help`. It allows read-only `atuin` calls (`search`, `threads list`, `history list`, ...) and asks for any other, such as `atuin search --delete`, which a `Bash(atuin search *)` rule could not tell apart. |
 | `inline-script-guard.py` | deny | No `python3 -c`, `node -e` or heredoc programs. |
 | `run-script-guard.py` | allow, ask | AWS MCP scripts: boto3 reads pass, mutations ask. |
 | `repl-lint.sh` | deny | Lints REPL scripts with ast-grep. |
 | `researcher-bash-guard.py` | deny | The `researcher` agent runs only find-docs commands. |
 
 An ask from a settings rule outranks a hook's allow, so an ask rule cannot
-exempt `--help`. That is why the twg and pane-control checks live in hooks.
+exempt `--help`. That is why the twg, atuin and pane-control checks live in hooks.
 Each guard has a self-test: `python3 -I claude/hooks/<hook>.py --self-test`.
 
 ## Kept, but not in daily use
