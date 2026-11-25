@@ -17,7 +17,13 @@
 #
 # start-agent and fan wait until the agent is at its prompt, so the work runs
 # in the background; a failure opens a small popup that says why.
+#
+# Workers get WORKER_GRANTS rather than the board pane's own: they read and
+# type in their own session and work their card, but cannot start agents or
+# reach other sessions.
 set -euo pipefail
+
+WORKER_GRANTS=read,write,task
 
 mode=${1:-here}
 cwd=${TUIOS_ACTIVE_PANE_CWD:-$PWD}
@@ -61,7 +67,7 @@ dispatch() {
     worktree)
       prompt="Work on tsk task $task: $title.
 
-This is a git worktree, which is a tsk project of its own, so the task is not on this board. Do not add or move tsk tasks from here; the task is already started on the main checkout. When the work is ready, open a pull request and say what to look at.${notes:+
+This is a git worktree, which is a tsk project of its own, so the task is not on this board. Do not add or move tsk tasks from here; the task is already started on the main checkout. When the work is ready, commit it on this branch with git, do not push or open a pull request, and say what to look at: the user reviews the diff in tuios and merges it.${notes:+
 
 Notes from the task:
 $notes}"
@@ -75,14 +81,14 @@ $notes}"
   if [[ -n $card ]]; then
     prompt+="
 
-When you open the pull request, attach it and the test output to tuios task card $card: \`tuios task attach $card ${session:+-s $session }--link <PR url>\` and \`tuios task attach $card ${session:+-s $session }<file with the test output>\`. If tuios refuses, say so in your last message and go on."
+When the work is committed, attach the test output to tuios task card $card: \`tuios task attach $card ${session:+-s $session }<file with the test output>\`. If tuios refuses, say so in your last message and go on."
   fi
 
   # The popup stays out of the way of the new agent.
   tuios close-window tsk-board >/dev/null 2>&1 || true
 
   if [[ $mode == here ]]; then
-    tuios start-agent claude --name "$task" --cwd "$repo" --focus \
+    tuios start-agent claude --name "$task" --cwd "$repo" --focus --grants "$WORKER_GRANTS" \
       ${session:+-s "$session"} ${card:+--task "$card"} --prompt "$prompt" >/dev/null 2>&1 ||
       fail "start-agent for $task did not get ready; look at its pane or the Inbox"
   else
@@ -91,7 +97,7 @@ When you open the pull request, attach it and the test output to tuios task card
     # of an assigned task would launch its agent there as well.
     (cd "$repo" && tsk status "$task" started --no-dispatch >/dev/null 2>&1) ||
       fail "tsk status $task started refused; run it in $repo to see why"
-    tuios fan 1 --agent claude --repo "$repo" \
+    tuios fan 1 --agent claude --repo "$repo" --grants "$WORKER_GRANTS" \
       --name "tsk/$(tr '[:upper:]' '[:lower:]' <<<"$task")${slug:+-$slug}" \
       ${card:+--task "$card"} "$prompt" >/dev/null 2>&1 ||
       fail "tuios fan for $task failed"

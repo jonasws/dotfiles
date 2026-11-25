@@ -16,6 +16,11 @@ Inside tuios (`TUIOS_ENV=1`, the normal case) prefer tuios for every agent,
 worktree and hand-off. Claude Code's own worktrees are for sessions outside
 tuios.
 
+Agents run in nono, where their pane holds `read,write,task`. They work in
+their own session, mail any session and keep their session's task cards, but
+cannot start agents, make worktrees, merge or push. Those rows below are the
+user's: hand them the command, ready to paste (the cheat sheet has each one).
+
 ## Routing
 
 | The work | Use | Not |
@@ -26,10 +31,11 @@ tuios.
 | Start a tsk task in its own worktree | `prefix+S` on the board (`tsk-dispatch.sh worktree`, a `tuios fan 1`); the script marks the task started itself | `tsk dispatch`, `EnterWorktree`, a `tsk status` first |
 | A worktree with no tsk task | `tuios worktree new <branch> [--agent claude]` | `git worktree add`, `EnterWorktree` |
 | Several attempts at the same problem | `tuios fan N`, then `fan compare` / `fan verify` / `fan keep` | several `worktree new` by hand |
-| Hand a subtask to another agent and get the answer back | `tuios delegate` (`--isolation worktree` when it edits in parallel with you; recipe in the cheat sheet) | an Agent with `isolation: worktree` |
+| Hand a subtask to another agent and get the answer back | the Agent tool when it can run here; for a pane of its own, the user starts `tuios delegate --grants read,write,task` (`--isolation worktree` when it edits in parallel; command in the cheat sheet), and its answer reaches you as mail | an Agent with `isolation: worktree` |
 | Coordinate several builders through a plan, with a review gate before each merge | the `tsk-coordinator` skill, but start each builder with `tuios delegate --isolation worktree --role implementation` instead of its assign-and-start step. The delegate's mail is the completion signal, and you move the tsk task to review: a worktree agent cannot reach the main checkout's board | its tsk dispatch step, which inside tuios runs through the herdr emulation; builders that set `review` themselves |
-| See what a worktree, delegate or fan agent changed, and send it notes | `tuios review <session>`, then `review note FILE:LINE TEXT` and `review send` | `git diff` in its folder, or waiting for the pull request |
-| Take a worktree agent's reviewed work to a merged change | `tuios ship commit`, then `ship merge` (local, no `gh`). `ship push` and `ship pr` need `gh`, which has no credentials here: print the command for the user to run outside the sandbox | `git commit` / `git merge` by hand in the worktree, running `gh` yourself |
+| A worker finished and its work needs review | Tell the user which pane: they review it in the tuios review overlay (`v` on its rail row or in the agents view) and send notes back with `S`. For your own look, `tuios review <session> --stat`, then `review note` and `review send` | `git diff` in its folder, opening a pull request for review, Hunk or tuicr for a worker's diff |
+| Bring reviewed work into the base branch | The user's `tuios ship merge -s <session>` (`--squash` for one commit; `fan keep <s> --merge` for a fan), after their review. Give them the command | `git merge` by hand |
+| Push or open a pull request | The user's. Print the command for them to run (`git push`, or `tuios ship pr -s <session> --title … --body …`); nono refuses pushes and gh writes | running `ship push`, `ship pr`, `git push` or `gh` yourself |
 | A short mechanical subtask in this conversation (`implementer`, `Explore`, `researcher`) | the Agent tool, no isolation | `tuios delegate` (overkill) |
 | Track the order of steps inside one task | `tsk steps` on that task | Claude Code's Task tools (absent on this model) |
 | Outside tuios entirely (plain terminal, Herdr, Rex) | Claude Code's `--worktree` / `EnterWorktree`, or `tsk dispatch` in Herdr or Rex | tuios commands |
