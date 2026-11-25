@@ -1,6 +1,9 @@
 {
   "env": {
     "CLAUDE_CODE_ENABLE_TELEMETRY": "0",
+    "DISABLE_TELEMETRY": "1",
+    "DISABLE_ERROR_REPORTING": "1",
+    "CLAUDE_CODE_AUTO_MODE_REPO_VISIBILITY": "0",
     "CLAUDE_CODE_EXPERIMENTAL_CODE_MODE": "1",
     "DISABLE_AUTOUPDATER": "1",
     "DISABLE_UPDATES": "1",
@@ -631,6 +634,8 @@
         "~/LIFLIG",
         "~/NSBNO",
         "~/dotfiles",
+        "~/cockpit",
+        "~/obisidian-vaults/Liflig",
         "~/.herdr/worktrees",
         "~/herdr-splits.nvim",
         "~/Library/Caches/mise",
@@ -664,6 +669,8 @@
         "~/LIFLIG",
         "~/NSBNO",
         "~/dotfiles",
+        "~/cockpit",
+        "~/obisidian-vaults/Liflig",
         "~/.herdr/worktrees",
         "~/herdr-splits.nvim",
         "~/.local/bin",
@@ -775,9 +782,7 @@
   "lspServers": {
     "kotlin-lsp": {
       "command": "/Users/jonasws/.local/bin/intellij-server",
-      "args": [
-        "--stdio"
-      ],
+      "args": ["--stdio"],
       "extensionToLanguage": {
         ".kt": "kotlin",
         ".kts": "kotlin"
