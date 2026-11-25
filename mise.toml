@@ -243,6 +243,16 @@ description = "Show which commands the agent hooks and permission rules allow, a
 # XMLLINT_INDENT='  ' xmllint --format FILE, then drop the <?xml?> line it adds.
 run = "tuios tml show {{config_root}}/claude/hooks/overview.tml --pane"
 
+[tasks."nono:gen-aws"]
+description = "Regenerate the sandbox AWS config and nono's SigV4 routes from aws/config"
+run = "python3 -I {{config_root}}/nono/tools/gen-aws.py"
+
+[tasks."nono:battle-aws"]
+description = "Battle test AWS inside the agent sandbox: [PROFILE] [BUCKET] [--interactive]"
+# Read-only: writes are aimed at resources that do not exist. Extra arguments
+# go to the script. Then `nono audit show <id>` lists each proxy decision.
+run = "nono run --silent --profile liflig-base -- bash {{config_root}}/nono/battle/aws.sh"
+
 [tasks."nono:probe"]
 description = "Run the sandbox and docs probes that need no human; PASS/FAIL per probe ID"
 run = "bash {{config_root}}/nono/battle/probe.sh"
@@ -690,4 +700,5 @@ mode = "symlink"
 # Directories that sit beside a group's target rather than inside it.
 [dotfiles]
 "~/.local/bin/resign-commits" = { source = "bin/resign-commits", mode = "symlink" }
+"~/.local/bin/aws-scoped-credentials" = { source = "bin/aws-scoped-credentials", mode = "symlink" }
 "~/.config/herdr-automatic-rename" = { source = "herdr/automatic-rename", mode = "symlink" }

@@ -1,0 +1,60 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ControlPlaneReads",
+      "Effect": "Allow",
+      "Resource": "*",
+      "Action": [
+        "acm:Describe*", "acm:List*",
+        "apigateway:GET",
+        "application-autoscaling:Describe*",
+        "autoscaling:Describe*",
+        "cloudformation:Describe*", "cloudformation:Get*", "cloudformation:List*",
+        "cloudfront:Get*", "cloudfront:List*",
+        "cloudwatch:Describe*", "cloudwatch:Get*", "cloudwatch:List*",
+        "cognito-idp:Describe*", "cognito-idp:List*",
+        "dynamodb:Describe*", "dynamodb:List*",
+        "ec2:Describe*", "ec2:Get*",
+        "ecr:Describe*", "ecr:List*",
+        "ecs:Describe*", "ecs:List*",
+        "elasticloadbalancing:Describe*",
+        "events:Describe*", "events:List*", "events:TestEventPattern",
+        "iam:Get*", "iam:List*", "iam:Simulate*",
+        "kms:Describe*", "kms:List*",
+        "lambda:Get*", "lambda:List*",
+        "logs:Describe*", "logs:List*",
+        "rds:Describe*", "rds:List*",
+        "route53:Get*", "route53:List*",
+        "s3:GetBucket*", "s3:List*",
+        "scheduler:Get*", "scheduler:List*",
+        "secretsmanager:Describe*", "secretsmanager:List*",
+        "sns:Get*", "sns:List*",
+        "sqs:Get*", "sqs:List*",
+        "ssm:Describe*", "ssm:List*",
+        "states:Describe*", "states:List*",
+        "sts:GetCallerIdentity",
+        "tag:Get*",
+        "wafv2:Get*", "wafv2:List*"
+      ]
+    },
+    {
+      "Sid": "NoContentOrSecrets",
+      "Effect": "Deny",
+      "Resource": "*",
+      "Action": [
+        "dynamodb:*Item*", "dynamodb:Query", "dynamodb:Scan", "dynamodb:*Statement",
+        "ec2:DescribeInstanceAttribute", "ec2:DescribeLaunchTemplateVersions",
+        "ec2:GetPasswordData", "ec2:GetConsoleOutput", "ec2:GetConsoleScreenshot",
+        "ecr:GetAuthorizationToken", "ecr:GetDownloadUrlForLayer",
+        "ecs:DescribeTaskDefinition",
+        "lambda:GetFunction", "lambda:GetFunctionConfiguration",
+        "logs:Get*", "logs:FilterLogEvents", "logs:StartQuery", "logs:StartLiveTail",
+        "rds:DownloadDBLogFilePortion",
+        "s3:GetObject*",
+        "sqs:ReceiveMessage",
+        "ssm:GetParameter*", "ssm:GetCommandInvocation"
+      ]
+    }
+  ]
+}

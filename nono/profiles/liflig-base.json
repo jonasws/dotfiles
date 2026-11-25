@@ -91,7 +91,8 @@
       "~/.config/twg/tenant-contexts",
       "~/Library/Caches/twg",
       "~/.config/herdr/herdr.sock",
-      "~/.local/state/rex/herdr.sock"
+      "~/.local/state/rex/herdr.sock",
+      "~/dotfiles/aws"
     ]
   },
   "network": {
