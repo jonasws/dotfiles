@@ -278,8 +278,18 @@ prefix_workspace = ["ctrl+w"]
 # herdr: prefix+ctrl+n/p step through workspaces, here sessions.
 next_session = ["ctrl+n", ")"]
 prev_session = ["ctrl+p", "("]
+# prefix+> and prefix+< go to the next and previous machine in the rail (this
+# Mac, then [hosts]), landing on the session last shown there; prefix+; goes
+# back to the previous session, on whichever machine it was. The alt+. and
+# alt+, the docs suggest never reach tuios here: option_glyphs types them.
+next_host = [">"]
+prev_host = ["<"]
+last_session = [";"]
 # herdr: prefix+a and prefix+A step through the agents, across sessions, in the
-# order of the rail's agents section. J and K are tuios's own keys for it. The
+# order of the rail's agents section. J and K are tuios's own keys for it.
+# They stay on this machine: tuios leaves other machines' agents out of the
+# cycle, since reaching one opens a host connection. Those agents are in the
+# go-to picker (@), the agents view and the attention queue (prefix+o). The
 # attention queue keeps o for the oldest item that needs you, and the newest
 # finished turn moves from O, which opens the AWS profiles, to ctrl+k.
 next_agent = ["a", "J"]
@@ -736,10 +746,20 @@ type = "shell"
 command = "~/.config/tuios/scripts/tsk-dispatch.sh worktree"
 description = "tsk: start agent on task (worktree)"
 
+# The cockpit (~/cockpit, not in dotfiles): switch to its session, building it
+# with the orchestrator agent and the tsk board, grants pinned, when missing.
+[[keybindings.command]]
+key = "prefix+alt+c"
+type = "shell"
+command = "~/cockpit/bin/open"
+description = "Cockpit: open the orchestrator session"
+
 # Jump list over workspaces, across sessions, as Vim's ctrl+o / ctrl+i. The
 # jonasws.jumplist plugin (plugins/jumplist) records the visits; these keys
 # jump with your own rights, which a plugin would need the admin grant for.
-# Cmd+[ / Cmd+] are macOS back/forward and never reach Neovim.
+# Cmd+[ / Cmd+] are macOS back/forward and never reach Neovim. This machine
+# only: a plugin sees only this daemon's sessions, and a shell key run while
+# the client shows a session on another host cannot switch it back.
 # ghostty/config.ghostty unbinds them. The picker is `tv tuios-jumplist`, with
 # no key yet.
 [[keybindings.command]]
@@ -782,3 +802,6 @@ enabled = false
 
 [hosts.pi]
 addr = "pocket-pi.taile3b28a.ts.net"
+
+[hosts.pixel]
+addr = "droid@pixel-8-pro-terminal"

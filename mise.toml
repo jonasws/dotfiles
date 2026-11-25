@@ -125,7 +125,7 @@ description = "Build tuios from main and link it as tuios in ~/.local/bin"
 # links libghostty-vt, which needs the zig series ghostty pins (ZIG_SERIES in
 # scripts/ghostty-lib.sh); the library is built once and cached in the checkout.
 # Every host in tuios's [hosts] table gets the same commit, cross-built from
-# this clone; their daemons stay on the old build until
+# this clone for linux/arm64 with the ghostty backend; their daemons stay on the old build until
 # `tuios hosts sync NAME --restart`.
 tools = { go = "latest", zig = "0.17" }
 run = """
@@ -134,16 +134,36 @@ root="$HOME/.local/share/tuios-nightly"
 src="$root/src"
 # An unreachable host (tailnet down, Pi asleep) only warns: the local build
 # still counts as done.
+# Hosts get the ghostty backend too: sync refuses to cross-compile it, so the
+# linux/arm64 build is made here with the zig CC wrapper the release uses and
+# handed over with --binary. The library and the binary are cached per commit.
+host_bin="$root/linux-arm64/tuios"
+build_host_bin() {
+  local sha
+  sha=$(git -C "$src" rev-parse HEAD)
+  [ -x "$host_bin" ] && [ "$(cat "$root/linux-arm64/built-commit" 2>/dev/null)" = "$sha" ] && return
+  mkdir -p "$root/linux-arm64"
+  (cd "$src" && ./scripts/ghostty-lib.sh aarch64-linux-gnu >/dev/null)
+  (cd "$src" && CGO_ENABLED=1 GOOS=linux GOARCH=arm64 \
+    CC="$src/scripts/zigcc/aarch64-linux-gnu" \
+    PKG_CONFIG_PATH="$src/.ghostty-vt/aarch64-linux-gnu/pkgconfig" \
+    GOFLAGS="$(scripts/goflags.sh)" \
+    go build -trimpath -tags ghostty \
+      -ldflags "-s -w -X main.version=dev+${sha:0:12} -X main.commit=$sha -X main.builtBy=hosts-sync" \
+      -o "$host_bin" ./cmd/tuios)
+  echo "$sha" > "$root/linux-arm64/built-commit"
+}
 sync_hosts() {
   local out ok=0
-  out=$(tuios hosts sync --dev --src "$src" --json 2>/dev/null) && ok=1
+  build_host_bin || { echo "warning: the linux/arm64 ghostty build failed; hosts not synced" >&2; return; }
+  out=$(tuios hosts sync --binary "$host_bin" --json 2>/dev/null) && ok=1
   jq -r '.hosts[] | select(.action != "failed")
     | "\\(.host): \\(.action)", (.notes // [] | .[] | "  \\(.)")' <<<"$out" 2>/dev/null || true
   [ "$ok" = 1 ] && return
   jq -r '.hosts[] | select(.action == "failed")
     | "warning: tuios not synced to \\(.host): \\(.error)"' <<<"$out" >&2 2>/dev/null ||
     echo "warning: tuios host sync failed" >&2
-  echo "warning: rerun with: tuios hosts sync --dev --src $src" >&2
+  echo "warning: rerun with: tuios hosts sync --binary $host_bin" >&2
 }
 if [ -d "$src/.git" ]; then
   built=$(git -C "$src" rev-parse HEAD)

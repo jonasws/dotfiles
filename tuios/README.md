@@ -26,7 +26,8 @@ tuios runs from main, not from a release. `mise run update:tuios-nightly`:
 - builds it with the libghostty-vt emulator (the `ghostty` backend, with go and
   zig 0.17 from mise);
 - links the binary as `~/.local/bin/tuios`;
-- syncs the same commit to the hosts in `[hosts]` (`pi`).
+- cross-builds the same commit for linux/arm64 with the ghostty backend and
+  syncs it to the hosts in `[hosts]` (`pi`, `pixel`) with `hosts sync --binary`.
 
 `built-commit` in that folder records which commit is installed.
 
