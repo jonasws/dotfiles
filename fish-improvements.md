@@ -42,8 +42,9 @@ Universal variables: 186 → 12.
   Homebrew 8.23.0 (OpenSSL 4.1, HTTP/3, brotli, zstd), mise's
   `aqua:stunnel/static-curl` 8.20.0 (installed but in no config, so its shim
   falls through to Homebrew's), and macOS's 8.7.1 (LibreSSL). Homebrew's is
-  newest, patched first and most featureful. Pending: `mise uninstall
-  aqua:stunnel/static-curl` to drop the stale install and shim.
+  newest, patched first and most featureful. The stale mise install and
+  its shim were removed on 2026-11-25. Scripts that call curl pin
+  `$HOMEBREW_PREFIX/opt/curl/bin/curl`, so a bare PATH can't fall back to macOS's.
 - [x] **WezTerm and Ghostty CLIs on PATH.** Kept in fish for now. Moving them
   into each terminal's config wouldn't reach panes the tuios daemon starts
   (the reason Ghostty's went into fish in `2ed12f8`). `fish_add_path` skips

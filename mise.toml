@@ -247,6 +247,18 @@ run = "tuios tml show {{config_root}}/claude/hooks/overview.tml --pane"
 description = "Regenerate the sandbox AWS config and nono's SigV4 routes from aws/config"
 run = "python3 -I {{config_root}}/nono/tools/gen-aws.py"
 
+[tasks."forge:maven"]
+description = "Prefetch a Maven project's dependencies and their sources, for agents to read offline: [DIR...]"
+# Runs where you call it, so `mise -C ~/dotfiles run forge:maven` from a repo
+# (or with repo paths as arguments) prefetches that repo.
+dir = "{{ cwd }}"
+run = "bash {{config_root}}/forge/maven-sources.sh"
+
+[tasks."forge:docs-index"]
+description = "Index fetched docs (Context7 answers, plus any NAME=DIR) with qmd for local search: [NAME=DIR...]"
+dir = "{{ cwd }}"
+run = "bash {{config_root}}/forge/docs-index.sh"
+
 [tasks."nono:battle-aws"]
 description = "Battle test AWS inside the agent sandbox: [PROFILE] [BUCKET] [--interactive]"
 # Read-only: writes are aimed at resources that do not exist. Extra arguments
@@ -314,6 +326,17 @@ set -euo pipefail
 plist="$HOME/Library/LaunchAgents/com.jonasws.nono-approvals.plist"
 [[ -e $plist ]] || { echo "$plist is missing: run 'mise dotfiles apply' first" >&2; exit 1; }
 mkdir -p "$HOME/.local/state/nono-approvals"
+launchctl bootout "gui/$(id -u)" "$plist" 2>/dev/null || true
+launchctl bootstrap "gui/$(id -u)" "$plist"
+"""
+
+[tasks."sync:nono-exa-gate"]
+description = "(Re)load the LaunchAgent that serves Exa to agents in nono, cache-first"
+run = """
+set -euo pipefail
+plist="$HOME/Library/LaunchAgents/com.jonasws.nono-exa-gate.plist"
+[[ -e $plist ]] || { echo "$plist is missing: run 'mise dotfiles apply' first" >&2; exit 1; }
+mkdir -p "$HOME/.local/state/nono-exa-gate"
 launchctl bootout "gui/$(id -u)" "$plist" 2>/dev/null || true
 launchctl bootstrap "gui/$(id -u)" "$plist"
 """
@@ -618,6 +641,11 @@ target = "~/Library/LaunchAgents"
 root = "nono/approvals"
 target = "~/Library/LaunchAgents"
 exclude = ["bridge.py"]
+
+[dotfile_groups.nono-exa-gate-launchd]
+root = "nono/exa-gate"
+target = "~/Library/LaunchAgents"
+exclude = ["gate.py"]
 
 [dotfile_groups.ripgrep]
 root = "ripgrep"

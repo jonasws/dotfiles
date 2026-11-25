@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """PreToolUse hook for the researcher subagent: allow only find-docs' commands.
 
-The researcher needs Bash for three things, and this hook blocks everything
+The researcher needs Bash for five things, and this hook blocks everything
 else (exit 2, reason on stderr):
 
   read-page.sh -o <file> <https-url>       <file> inside a Claude temp dir
   context7.sh search|libs|context <k=v>... every further argument name=value
+  exa.sh search|contents ... -o <file>     <file> inside a Claude temp dir; contents URLs https
+  github.sh clone|api|search -o <out> ...  <out> inside a Claude temp dir
   rg <args>                                every path inside a Claude temp dir
 
 A command must be one plain call: no $, backtick or newline anywhere, and no
@@ -22,6 +24,8 @@ HOME = os.path.expanduser("~")
 SKILL = os.path.join(HOME, ".claude/skills/find-docs")
 READ_PAGE = os.path.realpath(os.path.join(SKILL, "read-page.sh"))
 CONTEXT7 = os.path.realpath(os.path.join(SKILL, "context7.sh"))
+EXA = os.path.realpath(os.path.join(SKILL, "exa.sh"))
+GITHUB = os.path.realpath(os.path.join(SKILL, "github.sh"))
 
 UID = os.getuid()
 TEMP_ROOTS = {
@@ -34,6 +38,8 @@ ALLOWED = (
     "researcher may run only these Bash commands, each as one plain call:\n"
     "  ~/.claude/skills/find-docs/read-page.sh -o <scratchpad file> <https-url>\n"
     "  ~/.claude/skills/find-docs/context7.sh search|libs|context <name>=<value>...\n"
+    "  ~/.claude/skills/find-docs/exa.sh search|contents ... -o <scratchpad file>\n"
+    "  ~/.claude/skills/find-docs/github.sh clone|api|search -o <scratchpad path> ...\n"
     "  rg <args> <scratchpad path>"
 )
 
@@ -72,6 +78,21 @@ def check(command):
                 and all("=" in a for a in args[1:]):
             return None
         return "context7.sh takes search|libs|context and <name>=<value> arguments"
+    if program(prog) == EXA:
+        out = [args[i + 1] for i, a in enumerate(args[:-1]) if a == "-o"]
+        if args and args[0] in ("search", "contents") and len(out) == 1 and in_temp(out[0]):
+            if args[0] == "search":
+                return None
+            urls = [a for a in args[1:] if not a.startswith("-") and a != out[0]
+                    and not a.isdigit()]
+            if urls and all(u.startswith("https://") for u in urls):
+                return None
+        return "exa.sh takes search|contents ... -o <scratchpad file>, contents URLs over https"
+    if program(prog) == GITHUB:
+        if len(args) >= 4 and args[0] in ("clone", "api", "search") \
+                and args[1] == "-o" and in_temp(args[2]):
+            return None
+        return "github.sh takes clone|api|search -o <scratchpad path> ..."
     if prog == "rg":
         if any(a == "--pre" or a.startswith(("--pre=", "--pre-glob")) for a in args):
             return "rg --pre runs commands"

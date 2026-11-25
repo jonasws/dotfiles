@@ -4,8 +4,9 @@ description: >-
   The single entrypoint for looking anything up outside this machine — library and
   framework docs, AWS service behavior, another project's source or changelog, and
   general web research. Routes the question to the right backend before spending a
-  remote call: the Context7 API for library/SDK/CLI docs, the aws-knowledge MCP for AWS,
-  the github MCP for repo-specific source and history, Claude Code's own docs site for
+  remote call: a dependency's own source on this machine for libraries the repo uses,
+  the Context7 API for library/SDK/CLI docs, the aws-knowledge MCP for AWS,
+  github.sh for an open-source repo's source and history, Claude Code's own docs site for
   Claude Code itself, the superlogical MCP for Rex (the terminal), exa for everything
   else. Surveys across many sources (comparisons,
   "what exists for X") go to the `researcher` subagent; see the skill. Not for the
@@ -25,7 +26,7 @@ description: >-
 
 # External Lookup
 
-This skill starts where the local search ends. CLAUDE.md's tool table governs finding things in the repo — LSP for resolved symbols, semble for concepts, ast-grep for shape, fff and rg for text. Come here once the answer is demonstrably not on this machine: a version you do not have, a service whose source you cannot read, current state of the world, or the intent behind a design that source alone will not explain.
+This skill starts where the local search ends. CLAUDE.md's tool table governs finding things in the repo — LSP for resolved symbols, semble for concepts, ast-grep for shape, fff and rg for text. Come here once the answer is demonstrably not in the repo. It may still be on this machine: a dependency's source sits in the local package caches, and that is the first stop for a library the repo uses. Beyond that: a version you do not have, a service whose source you cannot read, current state of the world, or the intent behind a design that source alone will not explain.
 
 From there the only question is which door. Picking wrong costs twice: a wasted round trip, and an answer that reads as authoritative while coming from the wrong corpus — Context7 will happily return generic library prose for an AWS quota question.
 
@@ -33,18 +34,40 @@ From there the only question is which door. Picking wrong costs twice: a wasted 
 
 | The question is about | Backend | Entry point |
 |---|---|---|
-| A named library, framework, SDK, or CLI tool — API, config, migration | Context7 | `curl` the search endpoint; `libs/search` then `context` to go deep |
+| A library this repo depends on (in its `pom.xml` or `package.json`) — its API or behavior | Its source on this machine, at the version the build uses | the LSP, or the `-sources.jar` / `node_modules` copy — see [Libraries this repo depends on](#libraries-this-repo-depends-on--local-source-first) |
+| A named library, framework, SDK, or CLI tool that isn't a dependency here; guides, concepts and migrations for one that is | Context7 | `curl` the search endpoint; `libs/search` then `context` to go deep |
 | AWS — service behavior, API/CLI params, CloudFormation/CDK, regional availability | aws-knowledge MCP | `aws___search_documentation` |
 | Claude Code itself — settings, env vars, slash commands, hooks, compaction, caching, output styles, plugins | code.claude.com docs, locally | grep `llms.txt`, then `read-page.sh` the `.md` pages — see [Claude Code](#claude-code--its-own-documentation) |
 | Rex, the terminal — its CLI, docs, release notes, known bugs, feature requests | superlogical MCP | `search_docs`, `search_changelog`, `search_feedback`; see [Rex](#rex--the-superlogical-mcp) |
-| A specific repo or org (never `nsbno` — see below) — source, issues, PRs, releases, changelogs, "when did this change" | github MCP | `search_code`, `search_issues`, `list_releases` |
+| A specific public repo or org (never `nsbno` — see below) — source, issues, PRs, releases, changelogs, "when did this change" | `github.sh`, locally | `clone` then `rg` and `git log`; `search issues`, `api repos/<o>/<r>/releases` — see [GitHub](#github--public-source-history-and-changelogs) |
 | The company's own Atlassian data — Jira issues, Confluence pages, Bitbucket PRs, owners, status, internal research | `twg` skill, not a backend here | load `twg`; see [twg](#twg--the-companys-own-atlassian-data) |
-| Everything else — news, comparisons, ecosystem questions, "does a tool exist for X" | exa MCP | `web_search_exa` |
+| Everything else — news, comparisons, ecosystem questions, "does a tool exist for X" | Exa | `exa.sh search`; see [Exa](#exa--the-open-web) |
 | Reading a URL you already have | `read-page.sh`, locally | `read-page.sh -o page.md <url>`: the server's markdown, else HTML via `defuddle`; then grep — see [Reading a page](#reading-a-page) |
 
-Two signals settle most cases: **is there a named artifact** (library, service, repo), and **is the answer stable documentation or a changing fact**. Documentation about a named artifact goes to Context7 or aws-knowledge; a changing fact about a named repo goes to github; anything with no named artifact goes to exa.
+Two signals settle most cases: **is there a named artifact** (library, service, repo), and **is the answer stable documentation or a changing fact**. Documentation about a named artifact goes to Context7 or aws-knowledge; a changing fact about a named repo goes to github; anything with no named artifact goes to exa. One check comes before both: **is the library a dependency of this repo?** Then its source is already here, at the version you build against, and that beats any index.
 
-When the user names a tool ("use exa", "check github"), read it as where to look, not how. Keep the rest of this skill: full-text exa search, pages read into files, the official docs before blog posts. Say so when the named source can't answer and you went elsewhere. For example, the github MCP can't search Discussions, so those go to exa.
+When the user names a tool ("use exa", "check github"), read it as where to look, not how. Keep the rest of this skill: full-text exa search, pages read into files, the official docs before blog posts. Say so when the named source can't answer and you went elsewhere. For example, GitHub's API can't search Discussions, so those go to exa.
+
+## Libraries this repo depends on — local source first
+
+Context7 and the web answer for whatever version the query names, usually the latest. The dependency's own source on this machine is the version the build actually uses, needs no network, and settles signatures, defaults and behavior. Read it first; go to Context7 for what code doesn't say (guides, concepts, migration notes), and pass the local version when you do.
+
+**JVM (Maven).** Libraries publish a `-sources.jar` next to the jar, and the local Maven repositories under `~/.m2` usually have it.
+
+1. From a call site, the `LSP` tool's `goToDefinition` opens the library source at the right version. Use it when the code already uses the API.
+2. Otherwise find the jar: `fd -g '<artifactId>-*-sources.jar' ~/.m2`. If several versions are there, the build's is in `mvn -q dependency:list -DincludeArtifactIds=<artifactId> -DoutputFile=/dev/stdout`, run in the module that declares the dependency, or in the `pom.xml` and its BOMs.
+3. Read it like a page: list, extract into the scratchpad, grep.
+
+   ```bash
+   unzip -l "$jar" | rg -i '<ClassName>'
+   unzip -p "$jar" org/http4k/core/Filter.kt > <scratchpad>/Filter.kt   # then grep the file
+   ```
+
+4. No sources jar on disk: `mvn -q dependency:sources -DincludeArtifactIds=<artifactId>` in that module fetches it. A library that publishes none: clone its repository at the matching tag with `github.sh clone`.
+
+**TypeScript (npm).** `npm ls <package>` gives the installed version; `node_modules/<package>/` holds its README, the `.d.ts` typings and the shipped code. Read those before any web lookup.
+
+Report the artifact as the source, with its version (`<groupId>:<artifactId>:<version>` and the path inside the jar), the same way you would a Context7 ID. When the local source and Context7 disagree, the local source is the version you run; say so.
 
 ## When to survey in a subagent
 
@@ -69,7 +92,9 @@ How to delegate:
 
 ## Context7 — library and framework documentation
 
-Context7 is three GET endpoints on `context7.com`, called through the skill's `context7.sh` (`~/.claude/skills/find-docs/context7.sh`): `search`, `libs` or `context`, then one `<name>=<value>` argument per parameter, quoted when it has spaces. It wraps curl with flags that keep failures readable and silence the noise, and adds the key: every Bash command in a session carries `CONTEXT7_API_KEY`, which a SessionStart hook (`claude/hooks/context7-env.sh`) fetches from fnox, so requests authenticate inside the sandbox too. In a sandboxed session, name `context7.com` on the command. The `researcher` subagent can run Context7 only this way.
+Context7 is three GET endpoints on `context7.com`, called through the skill's `context7.sh` (`~/.claude/skills/find-docs/context7.sh`): `search`, `libs` or `context`, then one `<name>=<value>` argument per parameter, quoted when it has spaces. It wraps curl with flags that keep failures readable and silence the noise, and adds the key from `CONTEXT7_API_KEY`. Inside the agent sandbox that variable holds a placeholder that nono swaps for the real key on the way out. Outside the sandbox it is empty and the script exits 1 saying so: then say Context7 is unavailable in this session and route to the next backend. The `researcher` subagent can run Context7 only this way.
+
+Answers are cached on disk for three days, shared by every agent on the machine, so repeating an exact call costs nothing; the order of the arguments doesn't matter, but any change to the query text is a new call. `CONTEXT7_CACHE_HOURS=0` in front of the command forces a fresh answer, for a release from the last few days. A note on stderr that the answer is from an expired cache entry means Context7 was unreachable or rate-limited: use the answer, and say it may be stale.
 
 Two ways in, and the first match in this table decides. Count calls against the backend budget of about three: search is one call, resolving a library and then querying it is two, and each query on an ID you already hold is one.
 
@@ -108,7 +133,7 @@ Queries that do not depend on each other, such as the topics of a split question
 
 Answer from what came back: use the docs' own code snippets over code written from memory, and adapt them rather than rewriting them.
 
-**Errors** come back as JSON with `error` and `message`. `429` means the monthly quota is exhausted: say so, and if `CONTEXT7_API_KEY` is empty in the session, say the hook did not resolve it. Then answer from training knowledge *and mark which parts those are*. Silently degrading to memory is the failure mode that misleads. `401` means a bad key; `503` is a transient search failure worth one retry.
+**Errors** come back as JSON with `error` and `message`. `429` means the monthly quota is exhausted: say so, and if `CONTEXT7_API_KEY` is empty, say the key is missing from the environment. Then answer from training knowledge *and mark which parts those are*. Silently degrading to memory is the failure mode that misleads. `401` means a bad key; `503` is a transient search failure worth one retry.
 
 ## aws-knowledge MCP — anything AWS
 
@@ -127,7 +152,7 @@ Claude Code changes weekly and the docs track each release, so answer from them,
 2. Read the two or three pages that match into files. Grep them together for the setting or variable name. Behavior is often split across pages: `settings-reference.md` has the key, `env-vars.md` the override, `prompt-caching.md` or `model-config.md` the reasoning. A grep across the files finds the cross-references.
 3. Check the local setup before you recommend a value: `~/dotfiles/claude/settings.json` (symlinked as `~/.claude/settings.json`) and `claude --version` against the docs' "Requires Claude Code vX" lines.
 
-For bugs, regressions or "does anyone else see this", search the `anthropics/claude-code` issues through the github MCP. For a broad how-to question whose page reads would flood this context, delegate to the `claude-code-guide` subagent instead. It returns a conclusion without the exact quotes, so cite the doc page yourself when the answer depends on a value.
+For bugs, regressions or "does anyone else see this", search the `anthropics/claude-code` issues with `github.sh search -o <file> issues 'repo:anthropics/claude-code is:issue <words>'`. For a broad how-to question whose page reads would flood this context, delegate to the `claude-code-guide` subagent instead. It returns a conclusion without the exact quotes, so cite the doc page yourself when the answer depends on a value.
 
 ## Rex — the superlogical MCP
 
@@ -145,28 +170,49 @@ Rex is the terminal this session may run in (`REX_SESSION` set, `rex` CLI). The 
 - **Links:** share only Discord links that appear in tool results, never one built from an ID. Decided posts are deleted from Discord.
 - Stay inline: one search and one read usually settle it. If `search_docs` finds nothing, try `list_docs` once for the page index before giving up.
 
-## github MCP — source, history, and changelogs
+## GitHub — public source, history, and changelogs
 
-Use when the subject is a *project* rather than a topic: how an implementation actually works, when behavior changed, whether a bug is known, what shipped in a release.
+Use when the subject is a *project* rather than a topic: how an implementation actually works, when behavior changed, whether a bug is known, what shipped in a release. The skill's `github.sh` writes everything to a file or directory; grep it after.
 
-- `search_code` with bare identifiers plus `repo:`/`org:` — a code index, not a regex engine.
-- `search_issues` / `search_pull_requests` before concluding something is a bug in your own code; someone usually filed it.
-- `list_releases` / `get_latest_release` / `search_commits` for "when did this change" and version timing.
-- `get_file_contents` once you know the path. Reading the source settles what documentation leaves ambiguous, and it is also the right move for a **dependency's behavior** — read the library's own repo rather than unpacking jars locally. `LSP` `goToDefinition` and the `idea` MCP get you there too when sources are attached.
+```bash
+gh=~/.claude/skills/find-docs/github.sh
+$gh clone -o <scratchpad>/fd sharkdp/fd [v10.2.0]       # shallow, blobless; then rg and git log in it
+$gh search -o <scratchpad>/issues.json issues 'repo:sharkdp/fd is:issue hidden files'
+$gh api -o <scratchpad>/rel.json 'repos/sharkdp/fd/releases?per_page=10'
+$gh api -o <scratchpad>/README.md --raw repos/sharkdp/fd/readme   # --raw: the file's own bytes, not JSON
+```
+
+- **Source:** clone at the tag you need, then `rg` and read the files. Reading the source settles what documentation leaves ambiguous. For a **dependency of this repo**, read its local source first (see [Libraries this repo depends on](#libraries-this-repo-depends-on--local-source-first)); come here when it publishes no sources jar.
+- **Known bugs:** `search issues` before concluding something is a bug in your own code; someone usually filed it. GitHub requires `is:issue` or `is:pr` in the query, so search each kind you need.
+- **When did this change:** `api repos/<o>/<r>/releases`, `search commits`, or `git log -S` in a clone (deepen it with `git fetch --deepen=200` first).
+- `search code` needs a token: it works inside the agent sandbox, not elsewhere.
+- **A github.com link** goes to `read-page.sh` like any page. github.com serves HTML whatever the Accept header asks for (an issue page answers 406 to `text/markdown` alone), and inside the agent sandbox its proxy lets only git traffic reach github.com, so the script reads these through the API with `github.sh` and writes markdown: a repository's README, an issue or PR with its comments (not PR review comments), a release, a release list. A `blob/` link becomes its `raw.githubusercontent.com` file. Any other github.com page (Actions, Discussions, wikis) answers 403 in the sandbox; use `github.sh api` or exa for those.
 
 When none of those resolve it, say so and hand the question back with what you would check next. An unanswered question the user can close in one sentence beats a plausible guess.
 
-Never use the `gh` CLI here; it is denied and unauthenticated in this environment.
+`gh` is not for this: inside the agent sandbox it reads only the private repos the user listed, and only from their checkout.
 
-Not for the `nsbno` org: the github MCP token lacks proper access there, so a search returns empty or partial results that look like a real "not found". Those repos are internal, not outside this machine. For another service's API (endpoints, DTOs), use the `sibling-api-docs` skill and read its rendered contract rather than its source. Otherwise search the local clones under `~/CX`, `~/CNOPS` and `~/CN-TERMINAL`, and if the repo is not cloned, say so. Search the default branch rather than whatever is checked out: `git fetch origin`, then `git grep <pattern> origin/HEAD` and `git show origin/HEAD:<path>`. CLAUDE.md's GitHub section has the full recipe and when the working-tree tools are safe to use instead.
+Not for the `nsbno` org: the public token cannot see it, so a search returns empty results that look like a real "not found". Those repos are internal, not outside this machine. For another service's API (endpoints, DTOs), use the `sibling-api-docs` skill and read its rendered contract rather than its source. Otherwise search the local clones under `~/CX`, `~/CNOPS` and `~/CN-TERMINAL`, and if the repo is not cloned, say so. Search the default branch rather than whatever is checked out: `git fetch origin`, then `git grep <pattern> origin/HEAD` and `git show origin/HEAD:<path>`. CLAUDE.md's GitHub section has the full recipe and when the working-tree tools are safe to use instead.
 
-## exa MCP — the open web
+## Exa — the open web
 
 The residual: no named library, no AWS service, no specific repo. Comparisons, ecosystem questions, incident writeups, vendor pages, standards, anything current.
 
-- `web_search_exa` — describe the ideal page, not keywords: `"blog post comparing Kotlin coroutines and virtual threads for JDBC workloads"` beats `"coroutines vs virtual threads"`. State the goal in `objective` so ranking knows what to surface.
-- `web_search_advanced_exa` — the same search with category filters, domain restrictions, date ranges, highlights, summaries and subpage crawling. It also returns the results' **full text untruncated** when `textMaxCharacters` is omitted, and `maxAgeHours: 0` forces a fresh crawl instead of the cached copy. So when you need the body of what you find, this one call beats searching and then fetching each hit.
-- `agent_run` — genuinely multi-step research only (build a list, cross-verify across sources, enrich a table). Long-running; a single question does not need it.
+Exa is two calls, search and page contents, made through the skill's `exa.sh` (`~/.claude/skills/find-docs/exa.sh`). It talks to the exa-gate on this Mac, which holds the key for every session, sandboxed or not: search goes through as asked, and page contents come from Exa's cache. Answers are cached on disk for a day, so repeating an exact call costs nothing; `EXA_CACHE_HOURS=0` in front forces a fresh one.
+
+```bash
+exa=~/.claude/skills/find-docs/exa.sh
+$exa search 'blog post comparing Kotlin coroutines and virtual threads for JDBC workloads' -o <scratchpad>/search.md
+$exa search 'http4k release notes for version 6' --domain github.com --since 2026-01-01 --text 20000 -o <scratchpad>/search.md
+$exa contents https://example.com/a https://example.com/b -o <scratchpad>/pages.md
+```
+
+- **Describe the ideal page, not keywords:** `"blog post comparing Kotlin coroutines and virtual threads for JDBC workloads"` beats `"coroutines vs virtual threads"`.
+- **Highlights or text.** By default each result carries about 1500 characters of highlights, enough to pick the hits. `--text N` or `--full` returns each result's page text in the search call itself, so when you need the body of what you find, one search beats searching and then fetching each hit.
+- **Filters:** `-n` (default 8), `--domain` and `--exclude` (repeat for more), `--since YYYY-MM-DD`, and `--category` (`company`, `research paper`, `news`, `pdf`, `github`, `personal site`, `people`, `financial report`).
+- **Write to a file with `-o` and grep it,** as with pages. `--json` gives Exa's own JSON when you need fields such as `publishedDate` across many results.
+- **Exit status:** 1 is a failed request, with Exa's or the gate's reason on stderr. If the gate is not answering, say so and give the user `mise -C ~/dotfiles run sync:nono-exa-gate`. 3 means a `contents` call came back without some pages (see [Reading a page](#reading-a-page)).
+- Exa's agent, answer and research endpoints are refused by the gate, because they let Exa fetch whatever it decides to. Do multi-step research yourself with search and contents, or hand it to the `researcher` subagent.
 
 ## Reading a page
 
@@ -188,9 +234,9 @@ defuddle's one blind spot is client-rendered pages: there is no JS engine, so an
 
 One escape from there:
 
-- **`web_fetch_exa`** for the client-rendered case `defuddle` cannot reach, or several URLs in one call. Always pass `maxCharacters`: omitting it truncates at about 3000 characters — silently, mid-sentence — and no env var or config changes that default. Exa bills `/contents` per page rather than per character, so raising it costs nothing in money; what it costs is context, because this result lands in the conversation and cannot be grepped first. Around 25000 is a working figure for reading a page properly. Wanting much more than that is the signal to go back to `defuddle` and a file: one large documentation page came back as 285,798 characters, roughly 71k tokens, which is most of a context window spent on a single fetch. And whatever the cap, this is the wrong tool for "list every X", where a truncated answer is indistinguishable from a complete one.
+- **`exa.sh contents`** for the client-rendered case `defuddle` cannot reach, or several URLs in one call: Exa returns its own rendered copy of each page, whole unless `--text N` caps it. Write it with `-o` and grep it like any page. A page Exa has not crawled before waits for the user's OK in the pane before a live fetch. Exit 3 means some pages did not come back (not cached and not allowed, or unreachable), and stderr names them; then try `read-page.sh`, and if that fails too, report the URL as unread.
 
-When the URL came from a search you just ran, reconsider the order: `web_search_advanced_exa` returns each result's full text in the search call itself, so searching and then fetching each hit pays twice for what one call already had.
+When the URL came from a search you just ran, reconsider the order: `exa.sh search --text N` (or `--full`) returns each result's page text in the search call itself, so searching and then fetching each hit pays twice for what one call already had.
 
 ## twg — the company's own Atlassian data
 
@@ -236,8 +282,8 @@ Rules of thumb:
 
 Crossing over is normal — a miss usually means the question was a different shape than it looked, not that the answer is unavailable.
 
-- Context7 has no entry for the library → its GitHub repo via the github MCP (README, source, releases), then exa.
-- Context7 has the library but not the detail → read the implementation with `get_file_contents`; source is ground truth.
+- Context7 has no entry for the library → its GitHub repo with `github.sh` (README, source, releases), then exa.
+- Context7 has the library but not the detail → clone it with `github.sh clone` and read the implementation; source is ground truth.
 - AWS docs describe the happy path only → exa for the real-world failure mode and writeups.
 - exa surfaces a promising URL → read it properly per [Reading a page](#reading-a-page) rather than reasoning from a search snippet.
 

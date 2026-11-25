@@ -124,13 +124,12 @@ Inside a checkout of a repo listed in `~/dotfiles/nono/github-repos.txt`,
 `-R`, `--repo`, `gh api` and every write are refused. For any other repo, ask
 the user to add it to the list.
 
-The github MCP server is read-only and public-only: it runs with `--read-only` on
-a fine-grained token that can read public repositories and nothing else. It cannot
-see any private repo, issue or PR, and it cannot create, comment, push or merge.
-Use it for public open-source code and history.
+For public open-source code and history (source, issues, PRs, releases), use the
+`find-docs` skill's `github.sh`: a shallow clone to grep, or a read-only API call
+with a public-read token. It cannot see any private repo.
 
-Do not use the github MCP for private repos — the `nsbno` and `capralifecycle`
-orgs included. A search there comes back empty and reads as "not found". Search
+Do not use it for private repos — the `nsbno` and `capralifecycle` orgs
+included. A search there comes back empty and reads as "not found". Search
 the local clones under `~/CX`, `~/CNOPS` and `~/CN-TERMINAL` instead. If the repo
 is not cloned, say so rather than concluding from an empty search. Anything that
 needs write access or a private repo is mine to do with `gh`; tell me the command.

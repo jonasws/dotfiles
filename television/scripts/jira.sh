@@ -16,12 +16,17 @@
 
 set -euo pipefail
 
+# Homebrew's curl: macOS's /usr/bin/curl (LibreSSL, older) comes first on a
+# PATH that fish or bash did not set up, as under launchd. CURL overrides.
+curl_bin=${CURL:-${HOMEBREW_PREFIX:-/opt/homebrew}/opt/curl/bin/curl}
+[[ -x $curl_bin ]] || { echo "$(basename "$0"): no Homebrew curl at $curl_bin; run 'brew install curl'" >&2; exit 1; }
+curl() { command "$curl_bin" "$@"; }
+
 cache="${XDG_CACHE_HOME:-$HOME/.cache}/tv-jira"
 stale_after=20
 fields=summary,status,assignee,reporter,parent,issuetype,priority,labels,created,updated,description
 
-# One fnox request for every value, as fnox-secret makes it, so the daemon
-# answers from the same warm cache. The export runs in a subshell and only the
+# One fnox request for every value, so the daemon answers from one warm cache. The export runs in a subshell and only the
 # four values leave it.
 creds() {
   local out

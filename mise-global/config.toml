@@ -39,7 +39,6 @@ node = "24"
 # renderer that doesn't need mmdc (mfontanini/presenterm#909).
 "npm:@mermaid-js/mermaid-cli" = "11.15.0"
 "npm:@pb33f/openapi-changes" = "latest"
-"npm:exa-mcp-server" = "latest"
 "npm:defuddle" = "latest"
 "npm:typescript-language-server" = "latest"
 "pipx:awslogs" = "latest"
@@ -108,7 +107,6 @@ bun = "latest"
 actionlint = "latest"
 "github:dmtrKovalenko/fff" = { version = "latest", matching = "fff-mcp", exe = "fff-mcp" }
 pre-commit = "latest"
-"aqua:github/github-mcp-server" = "latest"
 "aqua:anthropics/claude-code" = "latest"
 hwatch = "latest"
 "github:thiagokokada/gh-gfm-preview" = "latest"
@@ -158,11 +156,9 @@ minimum_release_age_excludes = [
   "github:smarzban/tsk",
   "github:dmtrKovalenko/fff",
   "github:always-further/nono",
-  "aqua:github/github-mcp-server",
   "aqua:anthropics/claude-code",
   "go:github.com/isaacphi/mcp-language-server",
   "npm:@earendil-works/pi-coding-agent",
-  "npm:exa-mcp-server",
   "github:BurntSushi/bttf",
   "github:huseyinbabal/taws",
   "github:riii111/sabiql",
