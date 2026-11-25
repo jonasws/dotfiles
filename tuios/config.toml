@@ -45,6 +45,10 @@ dock_workspace_label_max = 28
 frame_panels = true
 # New BSP workspaces cut each window along whichever split keeps panes most usable.
 tiling_scheme = "smart_split"
+# Every pane border carries its session's accent: peach where agents run in
+# nono, grey elsewhere (scripts/session-space.sh sets both). Unfocused borders
+# take it muted; the focused one keeps the mode colour in terminal mode.
+session_border = true
 
 # Dock messages show the icon and text, without the side bar and countdown line.
 [notifications]
@@ -181,6 +185,7 @@ tokens = [
   "need",
   "harness",
   "name",
+  "$sandbox",
   "progress",
   "elapsed",
   "$context",
@@ -190,6 +195,10 @@ tokens = [
   "now",
   "message",
 ]
+
+# The sandbox emoji on an agent inside nono, set by claude/statusline-command.sh.
+[appearance.sidebar.agent_row."$sandbox"]
+fg = "#fab387"
 
 [keybindings]
 # Option is the us-altgr-intl compose layer, so the characters it types go to

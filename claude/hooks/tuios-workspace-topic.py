@@ -28,6 +28,8 @@ import unicodedata
 
 MAX_LABEL = 60
 GENERIC_TITLES = {"claude", "claude code"}
+# Marks the workspace label of an agent running inside nono (nf-md-lock).
+SANDBOX_MARK = "\U000f033e"
 
 
 def normalize(title):
@@ -93,6 +95,8 @@ def main():
     topic = normalize(title)
     if not topic or topic.lower() in GENERIC_TITLES:
         return
+    if os.environ.get("NONO_CAP_FILE"):
+        topic = f"{SANDBOX_MARK} {topic}"
 
     if win.get("icon_name") == topic:
         return
