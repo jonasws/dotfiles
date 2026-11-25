@@ -20,6 +20,7 @@
       "~/CN-TERMINAL",
       "~/LIFLIG",
       "~/NSBNO",
+      "~/dev",
       "~/.herdr/worktrees",
       "~/herdr-splits.nvim",
       "~/.tsk",
@@ -117,7 +118,10 @@
       "knowledge-mcp.global.api.aws",
       "www.superlogical.com",
       "ruteplan-mcp.trafficinfo.vydev.io",
-      "code.claude.com"
+      "code.claude.com",
+      "proxy.golang.org",
+      "sum.golang.org",
+      "release.files.ghostty.org"
     ],
     "approval_backends": {
       "tuios": {
@@ -309,7 +313,7 @@
       "MISE_STATE_DIR": "$HOME/.local/state/mise-agents",
       "MISE_CACHE_DIR": "$HOME/.cache/agents/mise",
       "MISE_SYSTEM_DATA_DIR": "$HOME/.local/share/mise",
-      "MISE_TRUSTED_CONFIG_PATHS": "$HOME/CX:$HOME/CNOPS:$HOME/CN-TERMINAL:$HOME/LIFLIG:$HOME/NSBNO:$HOME/dotfiles",
+      "MISE_TRUSTED_CONFIG_PATHS": "$HOME/CX:$HOME/CNOPS:$HOME/CN-TERMINAL:$HOME/LIFLIG:$HOME/NSBNO:$HOME/dev:$HOME/dotfiles",
       "XDG_CACHE_HOME": "$HOME/.cache/agents",
       "npm_config_cache": "$HOME/.cache/agents/npm",
       "CARGO_HOME": "$HOME/.cache/agents/cargo",
@@ -359,13 +363,13 @@
     }
   },
   "unsafe_macos_seatbelt_rules": [
-    "(deny file-write* (regex #\"^/Users/jonasws/(CX|CNOPS|CN-TERMINAL|LIFLIG|NSBNO|\\.herdr/worktrees|herdr-splits\\.nvim)/(.+/)?\\.git/(.+/)?(config|config\\.worktree)(\\.lock)?$\"))",
-    "(deny file-write* (regex #\"^/Users/jonasws/(CX|CNOPS|CN-TERMINAL|LIFLIG|NSBNO|\\.herdr/worktrees|herdr-splits\\.nvim)/(.+/)?\\.git/(.+/)?hooks(/|$)\"))",
-    "(deny file-write* (regex #\"^/Users/jonasws/(CX|CNOPS|CN-TERMINAL|LIFLIG|NSBNO|\\.herdr/worktrees|herdr-splits\\.nvim)/(.+/)?(\\.claude/settings(\\.local)?\\.json|\\.mcp\\.json|\\.?mise\\.local\\.toml)$\"))",
+    "(deny file-write* (regex #\"^/Users/jonasws/(CX|CNOPS|CN-TERMINAL|LIFLIG|NSBNO|dev|\\.herdr/worktrees|herdr-splits\\.nvim)/(.+/)?\\.git/(.+/)?(config|config\\.worktree)(\\.lock)?$\"))",
+    "(deny file-write* (regex #\"^/Users/jonasws/(CX|CNOPS|CN-TERMINAL|LIFLIG|NSBNO|dev|\\.herdr/worktrees|herdr-splits\\.nvim)/(.+/)?\\.git/(.+/)?hooks(/|$)\"))",
+    "(deny file-write* (regex #\"^/Users/jonasws/(CX|CNOPS|CN-TERMINAL|LIFLIG|NSBNO|dev|\\.herdr/worktrees|herdr-splits\\.nvim)/(.+/)?(\\.claude/settings(\\.local)?\\.json|\\.mcp\\.json|\\.?mise\\.local\\.toml)$\"))",
     "(deny file-write* (regex #\"^/Users/jonasws/\\.claude/(settings(\\.local)?\\.json|hooks(/|$))\"))",
     "(deny file-write* (regex #\"^/Users/jonasws/\\.claude/(CLAUDE\\.md|agents|skills|commands|output-styles)(/|$)\"))",
     "(deny file-write* (regex #\"^/Users/jonasws/\\.pi/agent/(AGENTS\\.md|SYSTEM\\.md|APPEND_SYSTEM\\.md|extensions|skills|prompts)(/|$)\"))",
-    "(deny file-read-data (regex #\"^/Users/jonasws/(CX|CNOPS|CN-TERMINAL|LIFLIG|NSBNO|\\.herdr/worktrees|herdr-splits\\.nvim)/(.+/)?\\.env(\\.[^/]+)?$\"))",
-    "(allow file-read-data (regex #\"^/Users/jonasws/(CX|CNOPS|CN-TERMINAL|LIFLIG|NSBNO|\\.herdr/worktrees|herdr-splits\\.nvim)/(.+/)?\\.env\\.(example|sample|template|dist|defaults)$\"))"
+    "(deny file-read-data (regex #\"^/Users/jonasws/(CX|CNOPS|CN-TERMINAL|LIFLIG|NSBNO|dev|\\.herdr/worktrees|herdr-splits\\.nvim)/(.+/)?\\.env(\\.[^/]+)?$\"))",
+    "(allow file-read-data (regex #\"^/Users/jonasws/(CX|CNOPS|CN-TERMINAL|LIFLIG|NSBNO|dev|\\.herdr/worktrees|herdr-splits\\.nvim)/(.+/)?\\.env\\.(example|sample|template|dist|defaults)$\"))"
   ]
 }
