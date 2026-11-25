@@ -106,7 +106,6 @@
       "Read(~/.config/fnox/age*.txt)",
       "Read(~/dotfiles/fnox/age*.txt)",
       "Bash(aws-vault:*)",
-      "Bash(gh:*)",
       "Bash(rm:*)",
       "Bash(fnox get:*)",
       "Bash(op read:*)",
@@ -722,13 +721,13 @@
   "awaySummaryEnabled": false,
   "tui": "default",
   "prefersReducedMotion": false,
-  "crossSessionInbound": "hold",
   "timeFormat": "24-hour",
   "skipDangerousModePermissionPrompt": true,
   "theme": "custom:catppuccin-mocha",
   "editorMode": "vim",
   "idleCompaction": false,
   "remoteControlAtStartup": false,
+  "crossSessionInbound": "hold",
   "inputNeededNotifEnabled": true,
   "agentPushNotifEnabled": true,
   "skipAutoPermissionPrompt": true,
@@ -783,7 +782,9 @@
   "lspServers": {
     "kotlin-lsp": {
       "command": "/Users/jonasws/.local/bin/intellij-server",
-      "args": ["--stdio"],
+      "args": [
+        "--stdio"
+      ],
       "extensionToLanguage": {
         ".kt": "kotlin",
         ".kts": "kotlin"
