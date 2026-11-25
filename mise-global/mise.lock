@@ -50,15 +50,14 @@ url_api = "https://api.github.com/repos/FiloSottile/age/releases/assets/53554189
 provenance = "github-attestations"
 
 [[tools."aqua:anthropics/claude-code"]]
-version = "2.1.331"
+version = "2.1.332"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
 [tools."aqua:anthropics/claude-code"."platforms.macos-arm64"]
-checksum = "sha256:bed0f99361aaa41932d6d893eef35b02133b7a652e4c1dd845907bdb67908f82"
-checksum_source = "mise-versions"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.331/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/784084261"
+checksum = "sha256:96d9c674ec1da19b96d1f143129f1a032f65b5991421aeac8d2f1bd4c3881c69"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.332/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/789036291"
 
 [[tools."aqua:asciinema/asciinema"]]
 version = "3.2.1"
@@ -131,13 +130,13 @@ url_api = "https://api.github.com/repos/atuinsh/atuin/releases/assets/773455322"
 provenance = "github-attestations"
 
 [[tools.aws-cli]]
-version = "2.42.1"
+version = "2.42.2"
 backend = "aqua:aws/aws-cli"
 specifiers = ["latest"]
 
 [tools.aws-cli."platforms.macos-arm64"]
-checksum = "sha256:74e38ab8a592b635d7b0ae85e6f33cb1ceba79ce19c112d425cbbf535e607b23"
-url = "https://awscli.amazonaws.com/AWSCLIV2-2.42.1.pkg"
+checksum = "blake3:24777c448159aac1b8afb0602b54d102823d7c999aa08512744bf329014cce29"
+url = "https://awscli.amazonaws.com/AWSCLIV2-2.42.2.pkg"
 
 [[tools.aws-vault]]
 version = "7.18.1"
@@ -531,14 +530,14 @@ url_api = "https://api.github.com/repos/thiagokokada/gh-gfm-preview/releases/ass
 provenance = "github-attestations"
 
 [[tools."github:walles/moor"]]
-version = "2.19.7"
+version = "2.19.8"
 backend = "github:walles/moor"
 specifiers = ["latest"]
 
 [tools."github:walles/moor"."platforms.macos-arm64"]
-checksum = "sha256:b4774bda250b09746e75edfa4a24f6d496305b848a5208392395d756a748ae1e"
-url = "https://github.com/walles/moor/releases/download/v2.19.7/moor-v2.19.7-darwin-arm64"
-url_api = "https://api.github.com/repos/walles/moor/releases/assets/747698706"
+checksum = "sha256:ec648199b609c3f0cfe37746309905085cc4499a6075f52e3ddb25e22adb6c82"
+url = "https://github.com/walles/moor/releases/download/v2.19.8/moor-v2.19.8-darwin-arm64"
+url_api = "https://api.github.com/repos/walles/moor/releases/assets/790234750"
 
 [[tools."github:yazeed/proc-cli"]]
 version = "2.5.0"
@@ -918,13 +917,13 @@ url = "https://github.com/yorukot/superfile/releases/download/v1.6.1/superfile-d
 url_api = "https://api.github.com/repos/yorukot/superfile/releases/assets/772900819"
 
 [[tools.twg]]
-version = "1.4.6"
+version = "1.4.7"
 backend = "http:twg"
 specifiers = ["latest"]
 
 [tools.twg."platforms.macos-arm64"]
-checksum = "sha256:e95b9285a97f3d79a4ae1122264a43f72522740944de2dc8ff1b92376418926d"
-url = "https://teamwork-graph.atlassian.com/cli/twg-darwin-arm64-v1.4.6"
+checksum = "sha256:f1ddf61bb0393235d40a4057b2c4237b35b2a8888a9e5c4bb2b166b23ac031dd"
+url = "https://teamwork-graph.atlassian.com/cli/twg-darwin-arm64-v1.4.7"
 
 [[tools.usage]]
 version = "6.9.0"
@@ -969,11 +968,11 @@ url = "https://github.com/watchexec/watchexec/releases/download/v2.8.0/watchexec
 url_api = "https://api.github.com/repos/watchexec/watchexec/releases/assets/616138836"
 
 [[tools.zellij]]
-version = "0.46.0"
+version = "0.46.1"
 backend = "aqua:zellij-org/zellij"
 specifiers = ["latest"]
 
 [tools.zellij."platforms.macos-arm64"]
-checksum = "sha256:716a1c7887be83cc813900012a156a4d8e0ee1468ac56c58a299c9d8898cdc90"
-url = "https://github.com/zellij-org/zellij/releases/download/v0.46.0/zellij-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/zellij-org/zellij/releases/assets/734814747"
+checksum = "sha256:97ace8e179b98576debd963870424cf208e1ef4fc9bd6180e3c73ff1d798087d"
+url = "https://github.com/zellij-org/zellij/releases/download/v0.46.1/zellij-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/zellij-org/zellij/releases/assets/786127642"
