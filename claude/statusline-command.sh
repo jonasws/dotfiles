@@ -17,6 +17,7 @@ input=$(cat)
   IFS= read -r cache_warm
   IFS= read -r cache_expires
   IFS= read -r worktree
+  IFS= read -r transcript
 } < <(jq -r '
   (.workspace.project_dir // .workspace.current_dir // .cwd // ""),
   (.model.display_name // ""),
@@ -26,8 +27,29 @@ input=$(cat)
   (.rate_limits.five_hour.resets_at // ""),
   (.prompt_cache.warm // ""),
   (.prompt_cache.expires_at // ""),
-  (.workspace.git_worktree // .worktree.name // "")
+  (.workspace.git_worktree // .worktree.name // ""),
+  (.transcript_path // "")
 ' <<<"$input")
+
+# nono sets NONO_CAP_FILE in every sandboxed session. Claude Code's own Bash
+# sandbox leaves no trace in the environment, so read sandbox.enabled from the
+# settings files, the most specific one that sets it winning.
+settings=()
+for s in "$HOME/.claude/settings.json" "$cwd"/.claude/settings{,.local}.json; do
+  [ -r "$s" ] && settings+=("$s")
+done
+if [ -n "${NONO_CAP_FILE:-}" ]; then
+  sandbox=nono
+elif [ "$(jq -sr 'map(.sandbox.enabled | select(. != null)) | last // false' \
+  "${settings[@]}" 2>/dev/null)" = true ]; then
+  sandbox=claude
+else
+  sandbox=
+fi
+case $sandbox in
+  nono) sandbox_icon=🚧 ;;
+  claude) sandbox_icon=🦺 ;;
+esac
 
 # Feed tuios's rail and Inbox the model and the context left. tuios's own
 # context key counts what is used, so the window is dropped from what
@@ -41,6 +63,9 @@ if [ "${TUIOS_ENV:-}" = 1 ] && command -v tuios >/dev/null; then
     [ -n "$remaining" ] &&
       tuios set-agent-meta ${TUIOS_PANE_ID:+-w "$TUIOS_PANE_ID"} --source statusline \
         context="$(printf '%.0f' "$remaining")%"
+    [ -n "$sandbox" ] &&
+      tuios set-agent-meta ${TUIOS_PANE_ID:+-w "$TUIOS_PANE_ID"} --source statusline \
+        sandbox="$sandbox_icon"
   } </dev/null >/dev/null 2>&1 &
   disown
 fi
@@ -52,7 +77,7 @@ ESC=$'\033'
 RESET="${ESC}[0m"
 fg() { printf '%s[38;2;%d;%d;%dm' "$ESC" "0x${1:0:2}" "0x${1:2:2}" "0x${1:4:2}"; }
 GREEN=a6e3a1 RED=f38ba8 YELLOW=f9e2af
-SAPPHIRE=74c7ec BLUE=89b4fa SURFACE1=45475a
+SAPPHIRE=74c7ec BLUE=89b4fa SURFACE1=45475a LAVENDER=b4befe
 DIM=$(fg 7f849c)
 
 # Row one is starship's own render of starship/claude.toml, so the directory and
@@ -122,11 +147,26 @@ elif [ "$cache_warm" = "false" ] && [ "$cols" -ge 80 ]; then
   parts+=("${DIM}"$'\U000f0717'" cache cold${RESET}")
 fi
 
+# Artifacts published in this session, each title an OSC 8 link to its page.
+# The transcript is the only record of them; a republish keeps the newest title.
+if [ -r "$transcript" ]; then
+  while IFS=$'\t' read -r title url; do
+    parts+=("$(fg "$LAVENDER")"$'\U000f0339 \e]8;;'"$url"$'\e\\'"$title"$'\e]8;;\e\\'"$RESET")
+  done < <(rg -F '"artifact_id"' "$transcript" 2>/dev/null |
+    jq -rs '[.[] | .toolUseResult? | objects | select(.artifact_id and .url)]
+      | group_by(.artifact_id) | map(last) | .[] | [.title, .url] | @tsv')
+fi
+
 row2=""
 for p in "${parts[@]}"; do
   [ -n "$row2" ] && row2+="  ${DIM}│${RESET}  "
   row2+="$p"
 done
+
+# After the model: a construction sign inside nono, a safety vest in Claude
+# Code's Bash sandbox, nothing when neither is on. Emoji, because a Nerd Font
+# icon is squeezed into one cell and reads too small.
+[ -n "$sandbox" ] && row1+=" ${sandbox_icon}"
 
 printf '%s\n' "$row1"
 [ -n "$row2" ] && printf ' %s\n' "$row2"

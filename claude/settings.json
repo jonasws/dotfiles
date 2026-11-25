@@ -555,7 +555,7 @@
   "bashEditDiffEnabled": true,
   "statusLine": {
     "type": "command",
-    "command": "bash /Users/jonasws/.claude/statusline-command.sh",
+    "command": "bash \"$HOME/.claude/statusline-command.sh\"",
     "refreshInterval": 60
   },
   "enabledPlugins": {
