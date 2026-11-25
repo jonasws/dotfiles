@@ -253,6 +253,10 @@ description = "Battle test AWS inside the agent sandbox: [PROFILE] [BUCKET] [--i
 # go to the script. Then `nono audit show <id>` lists each proxy decision.
 run = "nono run --silent --profile liflig-base -- bash {{config_root}}/nono/battle/aws.sh"
 
+[tasks."nono:gen-github"]
+description = "Regenerate the agents' gh access from nono/github-repos.txt"
+run = "python3 -I {{config_root}}/nono/tools/gen-github.py"
+
 [tasks."nono:probe"]
 description = "Run the sandbox and docs probes that need no human; PASS/FAIL per probe ID"
 run = "bash {{config_root}}/nono/battle/probe.sh"

@@ -117,10 +117,12 @@ between them:
 
 ## GitHub
 
-Use the `github` MCP tools. Never the `gh` CLI — it is denied in
-`permissions.deny`, and it has no credentials in any case: `~/.config/gh/hosts.yml`
-is empty, and the `~/.local/bin/wrapped/gh` wrapper that supplies `GH_TOKEN` via
-`fnox-secret` cannot reach 1Password from inside the sandbox.
+Inside a checkout of a repo listed in `~/dotfiles/nono/github-repos.txt`,
+`gh` reads its PRs, issues, runs and releases: `pr list|view|diff|checks|status`,
+`issue list|view|status`, `run list|view`, `workflow list|view`,
+`release list|view`, `repo view`. It takes the repo from the working directory;
+`-R`, `--repo`, `gh api` and every write are refused. For any other repo, ask
+the user to add it to the list.
 
 The github MCP server is read-only and public-only: it runs with `--read-only` on
 a fine-grained token that can read public repositories and nothing else. It cannot

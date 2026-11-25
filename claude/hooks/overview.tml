@@ -200,7 +200,7 @@
         },
         {
           "what": "Bash(gh *)",
-          "why": "no creds; use github MCP"
+          "why": "outside nono; agents in nono get a scoped gh"
         },
         {
           "what": "Bash(aws *), aws-vault, awslogs",

@@ -1,0 +1,17 @@
+# Private repositories agents may read through gh, one
+# owner/name per line. Regenerate the profile after editing:
+#   mise -C ~/dotfiles run nono:gen-github
+nsbno/cn-cx-booking-facade
+nsbno/cn-cx-booking-service
+nsbno/cn-cx-cargodesk-webapp
+nsbno/cn-cx-consignment-events
+nsbno/cn-cx-consignment-service
+nsbno/cn-cx-customer-portal-webapp
+nsbno/cn-cx-customer-register
+nsbno/cn-cx-customs-ncts
+nsbno/cn-cx-customs-no
+nsbno/cn-cx-customs-se
+nsbno/cn-cx-infra
+nsbno/cn-cx-libs
+nsbno/cn-cx-lkw-walter-adapter
+nsbno/cn-cx-maritech-adapter
